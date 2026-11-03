@@ -1491,18 +1491,15 @@
   <!-- ==================== ARCHITECTURAL LEADERSHIP & GOVERNANCE ==================== -->
   <section class="about-section" id="about">
     <div class="about-container">
-      <div class="about-grid">
-        
-        <div class="about-visual-col">
-          <div class="about-card-frame">
-            <img src="./assets/awwwards_hero_hq.jpg" alt="Dimitar Prodromov - Sole Architect" class="about-architect-img">
-            <div class="about-badge-seal">
-              <span class="seal-mark">&#9670;</span>
-              <div class="seal-text">
-                <strong>DIMITAR PRODROMOV</strong>
-                <span>SOLE ARCHITECT &amp; MANAGING DIRECTOR</span>
-              </div>
-            </div>
+      <div class="about-grid executive-single-col">
+        <div class="about-content-col">
+          <span class="gold-eyebrow">ARCHITECTURAL LEADERSHIP // AETERNA TECHNOLOGIES</span>
+          <h2 class="about-title">Engineering Digital Sovereign Flagships</h2>
+          <div class="about-credentials-box">
+            <div class="cred-item"><strong>Sole Architect &amp; Managing Director:</strong> Dimitar Prodromov</div>
+            <div class="cred-item"><strong>Corporate Entity:</strong> AETERNA Technologies EOOD (UIC / VAT: BG101327948)</div>
+            <div class="cred-item"><strong>EU Horizon Europe Registration:</strong> PIC: 865986222 &bull; Project ID: 101403556</div>
+            <div class="cred-item"><strong>Studio Headquarters:</strong> Trapezitsa 6, Pomorie, European Union</div>
           </div>
           <div class="about-metrics-pill-row">
             <div class="about-metric-pill">
@@ -1517,16 +1514,6 @@
               <span class="m-val">100%</span>
               <span class="m-lbl">CLIENT CODE OWNERSHIP</span>
             </div>
-          </div>
-        </div>
-
-        <div class="about-content-col">
-          <span class="gold-eyebrow">ARCHITECTURAL LEADERSHIP // AETERNA TECHNOLOGIES</span>
-          <h2 class="about-title">Engineering Digital Sovereign Flagships</h2>
-          <div class="about-credentials-box">
-            <div class="cred-item"><strong>Corporate Entity:</strong> AETERNA Technologies EOOD (UIC / VAT: BG101327948)</div>
-            <div class="cred-item"><strong>EU Horizon Europe Registration:</strong> PIC: 865986222 &bull; Project ID: 101403556</div>
-            <div class="cred-item"><strong>Studio Headquarters:</strong> Trapezitsa 6, Pomorie, European Union</div>
           </div>
           <p class="about-body">
             Founded by Dimitar Prodromov, AETERNA operates at the bleeding edge of compiled web systems and spatial aesthetics. We reject the bloated, multi-layered template architectures (WordPress, Shopify liquid bloat, fragile page-builders) that plague standard commercial agencies.
@@ -2671,6 +2658,66 @@
     win.querySelectorAll(".ai-chip").forEach(chip => {
       chip.addEventListener("click", () => handleUserSubmit(chip.getAttribute("data-q")));
     });
+  })();
+
+  // ================== AETERNA 8K ULTRA-LUXURY MATERIAL & CAD OPTICS SCRIPT ==================
+  (function() {
+    function upgradeEmojisToPrecisionTypography() {
+      var emojiReplacements = [
+        { rx: /👁️?/g, rep: "◈" },
+        { rx: /🌐/g, rep: "↗" },
+        { rx: /⚡/g, rep: "◆" },
+        { rx: /💳/g, rep: "▪" },
+        { rx: /🅿/g, rep: "▪" },
+        { rx: /💡/g, rep: "◈" },
+        { rx: /⏱/g, rep: "◷" },
+        { rx: /💎/g, rep: "❖" },
+        { rx: /🛡/g, rep: "⛨" },
+        { rx: /💬/g, rep: "▸" },
+        { rx: /📄/g, rep: "▫" },
+        { rx: /🖨/g, rep: "▫" },
+        { rx: /📋/g, rep: "▫" },
+        { rx: /🔗/g, rep: "↗" }
+      ];
+
+      var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      var textNode;
+      while ((textNode = walker.nextNode())) {
+        var val = textNode.nodeValue;
+        var modified = false;
+        for (var i = 0; i < emojiReplacements.length; i++) {
+          if (emojiReplacements[i].rx.test(val)) {
+            val = val.replace(emojiReplacements[i].rx, emojiReplacements[i].rep);
+            modified = true;
+          }
+        }
+        if (modified) {
+          textNode.nodeValue = val;
+        }
+      }
+    }
+
+    function enforce8KCanvasSupersampling() {
+      var canvases = document.querySelectorAll("canvas");
+      var targetRatio = Math.min((window.devicePixelRatio || 1) * 1.5, 3.0);
+      for (var i = 0; i < canvases.length; i++) {
+        var c = canvases[i];
+        c.style.imageRendering = "high-quality";
+      }
+      if (window.renderer && typeof window.renderer.setPixelRatio === "function") {
+        window.renderer.setPixelRatio(targetRatio);
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", function() {
+        upgradeEmojisToPrecisionTypography();
+        enforce8KCanvasSupersampling();
+      });
+    } else {
+      upgradeEmojisToPrecisionTypography();
+      enforce8KCanvasSupersampling();
+    }
   })();
   </script>
 </body>
