@@ -78,11 +78,7 @@
         <span class="logo-text">AETERNA DIGITAL</span>
       </a>
 
-      <!-- Scarcity Allocation Pill in Header -->
-      <div class="header-scarcity-pill">
-        <span class="scarcity-pulse"></span>
-        <span class="scarcity-text">STUDIO ALLOCATION Q4 2026: <b>2 OF 4 SLOTS REMAIN</b></span>
-      </div>
+
 
       <!-- Center Navigation Links -->
       <nav class="nav-links" id="navLinks">
@@ -681,10 +677,7 @@
     <div class="editions-container">
       
       <div class="editions-header">
-        <div class="scarcity-capacity-banner">
-          <span class="scarcity-pulse"></span>
-          <span><b>STUDIO ALLOCATION Q4 2026:</b> 2 of 4 Bespoke Slots Available &bull; Direct Architect Execution</span>
-        </div>
+
         <span class="gold-eyebrow">OFFICIAL COMMERCIAL TIERS // TRANSPARENT PRICING &amp; TURNKEY DELIVERY</span>
         <h2 class="editions-title">Bespoke Web Architecture: What You Receive</h2>
         <p class="editions-lead">
@@ -2248,40 +2241,7 @@
     };
     fixCryptographicSeal();
 
-    // 2. ИНЖЕКТИРАНЕ НА PAAS.WEBSITE КАТО ВОДЕЩ РЕАЛЕН ПРОЕКТ В СЕКЦИЯТА CASE STUDIES
-    const injectPaasProjectCard = () => {
-      const headings = Array.from(document.querySelectorAll("h3"));
-      const anchialoHeading = headings.find(h => h.textContent.includes("Anchialo //"));
-      if (!anchialoHeading) return;
-      const cardContainer = anchialoHeading.closest("div[class*='card'], article, .project-card, .case-card") || anchialoHeading.parentElement.parentElement;
-      if (!cardContainer || document.getElementById("paas-flagship-card")) return;
-      const paasCard = cardContainer.cloneNode(true);
-      paasCard.id = "paas-flagship-card";
-      paasCard.setAttribute("data-category", "live");
-      paasCard.innerHTML = `
-        <div style="padding: 28px; background: linear-gradient(145deg, rgba(16,18,24,0.96), rgba(8,9,12,0.98)); border: 1px solid rgba(212,175,55,0.35); border-radius: 14px; position: relative; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.6);">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; font-size:11px; letter-spacing:1.5px; color:#d4af37; text-transform:uppercase; font-weight:700;">
-            <span>SOVEREIGN PaaS • ENDPOINT TELEMETRY &amp; DLP GOVERNANCE</span>
-            <span style="background:rgba(212,175,55,0.15); padding:4px 10px; border-radius:20px; border:1px solid rgba(212,175,55,0.4);">PACKAGE 04 • $8,900</span>
-          </div>
-          <h3 style="font-size:22px; color:#fff; margin:8px 0 12px; font-weight:600;">AETERNA SystemDef // Sovereign Fleet Telemetry (paas.website)</h3>
-          <p style="color:#a0a8b8; font-size:14px; line-height:1.65; margin-bottom:18px;">
-            Корпоративна B2B PaaS платформа за хардуерен одит, DLP превенция и телеметрия в реално време с двуезичен интерфейс (BG / EN). Включва интерактивен 60 FPS Android/Knox симулатор на живо, BASH терминал за компилиране на модули, глобална топология на 8 сървърни анклава и крипто/SEPA лицензиране.
-          </p>
-          <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px;">
-            <span style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#e2e8f0;">⚡ Live 60 FPS Device HUD</span>
-            <span style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#e2e8f0;">🛡 NIST-PQC ML-DSA-87</span>
-            <span style="font-size:11px; padding:5px 10px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); border-radius:6px; color:#e2e8f0;">🌐 BG / EN + Crypto Checkout</span>
-          </div>
-          <div style="display:flex; flex-wrap:wrap; gap:10px;">
-            <a href="https://paas.website" target="_blank" rel="noopener" style="padding:10px 16px; background:#d4af37; color:#050608; font-weight:700; font-size:12px; border-radius:6px; text-decoration:none; letter-spacing:0.5px;">🌐 Launch Live Site (paas.website) &rarr;</a>
-            <button type="button" onclick="window.openLivePreviewModal &amp;&amp; window.openLivePreviewModal('https://paas.website', 'AETERNA SystemDef // Sovereign Fleet Telemetry')" style="padding:10px 16px; background:rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.18); font-size:12px; border-radius:6px; cursor:pointer;">👁 Live Browser Preview</button>
-          </div>
-        </div>
-      `;
-      cardContainer.parentNode.insertBefore(paasCard, cardContainer);
-    };
-    injectPaasProjectCard();
+
 
     // 3. РЕАЛЕН THREE.JS 4D CUSTOM GLSL SHADER + МНОГОКОМПОНЕНТЕН РАЗГЛОБЯЕМ МЕХАНИЗЪМ
     const upgradeWebGLEngine = () => {
