@@ -2722,6 +2722,124 @@
       enforce8KCanvasSupersampling();
     }
   })();
+
+  // ================== 8K HAUTE-LUXURY CONFIGURATOR & INPUTS SCRIPT ==================
+  (function() {
+    function apply8KLuxuryConfigurator() {
+      // 1. Намираме секцията на калкулатора по заглавието или ID
+      var configContainer = document.getElementById("quoteConfigurator");
+      if (!configContainer) {
+        var headings = document.querySelectorAll("h2, h3");
+        for (var i = 0; i < headings.length; i++) {
+          if (headings[i].textContent.indexOf("Customize Your Features") !== -1) {
+            configContainer = headings[i].closest("section, div[class*='calc'], div[class*='invoice'], div[class*='config']") || headings[i].parentElement;
+            break;
+          }
+        }
+      }
+      if (configContainer) {
+        configContainer.classList.add("aeterna-8k-configurator");
+      }
+
+      // 2. Стилизираме STEP 1 картите (премахваме вътрешните грозни кутийки)
+      var pills = document.querySelectorAll(".cfg-tier-pill");
+      for (var p = 0; p < pills.length; p++) {
+        pills[p].classList.add("aeterna-8k-tier-card");
+      }
+
+      // 3. Стилизираме STEP 2, 3 и 4 чекбокс/радио картите и ценовите капсули (+$50, +$70...)
+      var inputs = document.querySelectorAll("input[type='checkbox'], input[type='radio']");
+      for (var k = 0; k < inputs.length; k++) {
+        var inp = inputs[k];
+        var card = inp.closest("label, div");
+        if (card) {
+          card.classList.add("aeterna-8k-addon-card");
+          if (inp.checked) card.classList.add("is-checked");
+
+          inp.addEventListener("change", function() {
+            var allCards = document.querySelectorAll(".aeterna-8k-addon-card");
+            for (var m = 0; m < allCards.length; m++) {
+              var cInp = allCards[m].querySelector("input[type='checkbox'], input[type='radio']");
+              if (cInp) {
+                if (cInp.checked) allCards[m].classList.add("is-checked");
+                else allCards[m].classList.remove("is-checked");
+              }
+            }
+          });
+
+          // Превръщаме цените (+$50, +$350 и т.н.) в 8K златни капсули
+          var spans = card.querySelectorAll("span, strong, div");
+          for (var s = 0; s < spans.length; s++) {
+            var sTxt = spans[s].textContent.trim();
+            if (/^\+\$\d+$/.test(sTxt) && spans[s].children.length === 0) {
+              spans[s].classList.add("aeterna-8k-price-pill");
+            }
+          }
+        }
+      }
+
+      // 4. Стилизираме STEP 5 текстовите полета
+      var textInputs = document.querySelectorAll("#quoteConfigurator input[type='text'], #quoteConfigurator input[type='email'], #quoteConfigurator input[type='tel']");
+      for (var n = 0; n < textInputs.length; n++) {
+        textInputs[n].classList.add("aeterna-8k-input");
+      }
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", apply8KLuxuryConfigurator);
+    } else {
+      apply8KLuxuryConfigurator();
+    }
+  })();
+
+  // ================== AETERNA 8K CHAMELEON ASCENT ENGINE ==================
+  (function() {
+    function initChameleonAscent() {
+      if (window.innerWidth <= 1024) return;
+      var container = document.getElementById("chameleon-container");
+      var video = document.getElementById("chameleon-video");
+      var logo = document.querySelector(".brand-logo");
+      if (!container || !video || !logo) return;
+
+      var hasTriggered = false;
+      function triggerAscent() {
+        if (hasTriggered) return;
+        hasTriggered = true;
+        video.currentTime = 0;
+        var playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.then(function() {
+            container.classList.add("active-ascent");
+            var logoRect = logo.getBoundingClientRect();
+            var targetTop = Math.max(logoRect.top + 6, 16);
+            var distanceY = window.innerHeight - targetTop;
+            container.style.transform = "translate3d(0, -" + distanceY + "px, 0)";
+          }).catch(function() {
+            // Browser autoplay restricted fallback
+          });
+        }
+      }
+
+      setTimeout(triggerAscent, 1200);
+
+      window.addEventListener("scroll", function() {
+        if (!hasTriggered) triggerAscent();
+      }, { once: true, passive: true });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initChameleonAscent);
+    } else {
+      initChameleonAscent();
+    }
+  })();
   </script>
+
+  <!-- ==================== AETERNA 8K CHAMELEON ASCENT STAGE ==================== -->
+  <div id="chameleon-container" aria-hidden="true">
+    <video id="chameleon-video" muted playsinline preload="auto">
+      <source src="./assets/chameleon_ascent.mp4" type="video/mp4">
+    </video>
+  </div>
 </body>
 </html>

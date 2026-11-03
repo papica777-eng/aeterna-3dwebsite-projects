@@ -5258,7 +5258,7 @@ body::after {
 }
 
 /* 8K MACHINED OBSIDIAN & SAPPHIRE GLASS WITH SPECULAR RIM LIGHTING */
-[class*="card"], [class*="tier"], [class*="package"], [class*="modal"] > div, [class*="proposal"], .aeterna-promo-banner, .about-content-col {
+[class*="card"], .cfg-tier-pill, [class*="package"], [class*="modal"] > div, [class*="proposal"], .aeterna-promo-banner, .about-content-col {
   background: 
     radial-gradient(120% 100% at 50% 0%, rgba(212, 175, 55, 0.08) 0%, rgba(255, 255, 255, 0.015) 45%, rgba(4, 5, 8, 0.96) 100%),
     linear-gradient(180deg, #0d1017 0%, #050609 100%) !important;
@@ -5275,7 +5275,7 @@ body::after {
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease, box-shadow 0.35s ease !important;
 }
 
-[class*="card"]:hover, [class*="tier"]:hover, [class*="package"]:hover {
+[class*="card"]:hover, .cfg-tier-pill:hover, [class*="package"]:hover {
   border-color: rgba(212, 175, 55, 0.38) !important;
   border-top-color: rgba(249, 226, 156, 0.85) !important;
   box-shadow: 
@@ -5393,4 +5393,205 @@ table th {
   letter-spacing: 0.1em !important;
   text-transform: uppercase !important;
   border-bottom: 1px solid rgba(212, 175, 55, 0.25) !important;
+}
+
+/* ==========================================================================
+   8K HAUTE-LUXURY CONFIGURATOR & INPUTS OVERHAUL
+   ========================================================================== */
+
+/* 1. ГЛАВНИЯТ КОНТЕЙНЕР НА КАЛКУЛАТОРА — 8K OBSIDIAN & GOLD AMBIENCE */
+.aeterna-8k-configurator, .configurator-section {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.14) 0%, transparent 60%),
+    radial-gradient(circle at 90% 90%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+    linear-gradient(180deg, #0b0d13 0%, #06070a 100%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.38) !important;
+  border-radius: 24px !important;
+  box-shadow: 
+    0 40px 100px rgba(0, 0, 0, 0.92),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 60px rgba(212, 175, 55, 0.04) !important;
+  position: relative !important;
+}
+
+/* 2. ПОПРАВКА НА STEP 1 (МАХАНЕ НА ГРОЗНИТЕ ВЪТРЕШНИ РАМКИ И 8K КАРТИ) */
+.aeterna-8k-tier-card, .config-tier-selector .cfg-tier-pill {
+  background: linear-gradient(145deg, rgba(20, 23, 32, 0.92) 0%, rgba(10, 12, 17, 0.98) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 16px !important;
+  padding: 24px 18px !important;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06) !important;
+  cursor: pointer !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Премахване на елементарните вътрешни рамки около текста в Step 1 */
+.aeterna-8k-tier-card *, .config-tier-selector .cfg-tier-pill * {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.aeterna-8k-tier-card:hover, .config-tier-selector .cfg-tier-pill:hover {
+  transform: translateY(-4px) !important;
+  border-color: rgba(212, 175, 55, 0.55) !important;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.8), 0 0 25px rgba(212, 175, 55, 0.18) !important;
+}
+
+.aeterna-8k-tier-card.active,
+.aeterna-8k-tier-card.selected,
+.config-tier-selector .cfg-tier-pill.active {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.25), transparent 70%),
+    linear-gradient(145deg, #171510 0%, #0b0a08 100%) !important;
+  border: 1px solid #d4af37 !important;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.85),
+    0 0 35px rgba(212, 175, 55, 0.28),
+    inset 0 0 20px rgba(212, 175, 55, 0.12) !important;
+}
+
+/* 3. STEP 2: 8K ADD-ON CARDS (ЗАМЯНА НА ОБИКНОВЕНИТЕ ЧЕКБОКСОВЕ С БУТИКОВИ МОДУЛИ) */
+.aeterna-8k-addon-card, .addons-grid .addon-card {
+  background: linear-gradient(135deg, rgba(18, 21, 30, 0.88) 0%, rgba(11, 13, 19, 0.96) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 16px !important;
+  padding: 20px 22px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  position: relative !important;
+  cursor: pointer !important;
+}
+
+.aeterna-8k-addon-card:hover, .addons-grid .addon-card:hover {
+  transform: translateY(-2px) !important;
+  border-color: rgba(212, 175, 55, 0.45) !important;
+  background: linear-gradient(135deg, rgba(24, 28, 40, 0.95) 0%, rgba(14, 16, 24, 0.98) 100%) !important;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7), 0 0 20px rgba(212, 175, 55, 0.12) !important;
+}
+
+.aeterna-8k-addon-card.is-checked, .addons-grid .addon-card.selected, .addons-grid .addon-card.is-checked {
+  background: 
+    radial-gradient(circle at 100% 0%, rgba(212, 175, 55, 0.18), transparent 65%),
+    linear-gradient(135deg, rgba(25, 23, 16, 0.96) 0%, rgba(12, 11, 9, 0.99) 100%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.85) !important;
+  box-shadow: 
+    0 18px 40px rgba(0, 0, 0, 0.8),
+    0 0 28px rgba(212, 175, 55, 0.2),
+    inset 0 1px 0 rgba(255, 230, 150, 0.25) !important;
+}
+
+/* Луксозен 3D Switch вместо обикновения квадратен чекбокс */
+.aeterna-8k-addon-card input[type="checkbox"],
+.aeterna-8k-addon-card input[type="radio"],
+.addons-grid .addon-card input[type="checkbox"],
+.addons-grid .addon-card input[type="radio"] {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  width: 24px !important;
+  height: 24px !important;
+  min-width: 24px !important;
+  border-radius: 7px !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.7) !important;
+  display: inline-grid !important;
+  place-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.25s ease !important;
+  margin-top: 2px !important;
+  margin-right: 12px !important;
+}
+
+.aeterna-8k-addon-card input[type="checkbox"]:checked,
+.aeterna-8k-addon-card input[type="radio"]:checked,
+.addons-grid .addon-card input[type="checkbox"]:checked,
+.addons-grid .addon-card input[type="radio"]:checked {
+  background: linear-gradient(135deg, #f5d77f 0%, #d4af37 50%, #9a7414 100%) !important;
+  border-color: #fff2b2 !important;
+  box-shadow: 0 0 16px rgba(212, 175, 55, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+.aeterna-8k-addon-card input[type="checkbox"]:checked::before,
+.aeterna-8k-addon-card input[type="radio"]:checked::before,
+.addons-grid .addon-card input[type="checkbox"]:checked::before,
+.addons-grid .addon-card input[type="radio"]:checked::before {
+  content: "✓" !important;
+  color: #050608 !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  line-height: 1 !important;
+}
+
+/* Метални 8K ценови капсули за +$50, +$70, +$350 */
+.aeterna-8k-price-pill, .addon-price-tag {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.16), rgba(212, 175, 55, 0.05)) !important;
+  border: 1px solid rgba(212, 175, 55, 0.45) !important;
+  color: #f5d77f !important;
+  padding: 4px 11px !important;
+  border-radius: 99px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.5px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+/* 4. STEP 5: БАНКОВИ ПОЛЕТА ЗА ВЪВЕЖДАНЕ НА ФИРМЕНИ ДАННИ (TEXT INPUTS) */
+.aeterna-8k-input, .billing-field input, .client-billing-form-grid input {
+  background: linear-gradient(180deg, rgba(7, 9, 14, 0.95) 0%, rgba(13, 16, 24, 0.95) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 12px !important;
+  padding: 15px 18px !important;
+  color: #ffffff !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.3px !important;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.75), 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.25s ease !important;
+}
+
+.aeterna-8k-input:focus, .billing-field input:focus, .client-billing-form-grid input:focus {
+  border-color: #d4af37 !important;
+  box-shadow: 
+    inset 0 3px 8px rgba(0, 0, 0, 0.8),
+    0 0 0 3px rgba(212, 175, 55, 0.18),
+    0 0 25px rgba(212, 175, 55, 0.25) !important;
+  outline: none !important;
+}
+
+/* ==========================================================================
+   AETERNA CHAMELEON ASCENT ENGINE (8K FAUX-CRYSTAL OPTIC OVERLAY)
+   ========================================================================== */
+#chameleon-container {
+  position: fixed;
+  left: 20px;
+  bottom: -320px;
+  width: 220px;
+  height: auto;
+  z-index: 99990;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: transform 7.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.8s ease;
+  opacity: 0;
+}
+
+#chameleon-container.active-ascent {
+  opacity: 0.95;
+}
+
+#chameleon-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 15px 35px rgba(212, 175, 55, 0.35)) contrast(1.15) brightness(1.08);
+}
+
+@media (max-width: 1024px) {
+  #chameleon-container {
+    display: none !important;
+  }
 }
