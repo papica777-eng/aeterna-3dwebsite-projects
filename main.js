@@ -709,13 +709,34 @@
   });
 
   // ==========================================================================
-  // 8c. INTERACTIVE SCOPE CONFIGURATOR & BRUTAL INVOICE GENERATOR
+  // 8c. INTERACTIVE SCOPE CONFIGURATOR & DUAL GATEWAY INVOICE GENERATOR
   // ==========================================================================
+  const STRIPE_LINKS = {
+    tier1: {
+      full: 'https://buy.stripe.com/9B6cMZga86Qa9IE8gDfAc00',
+      deposit: 'https://buy.stripe.com/dRm5kx7DCcau5soeF1fAc06'
+    },
+    tier2: {
+      full: 'https://buy.stripe.com/9B614hcXW4I25sodAXfAc01',
+      deposit: 'https://buy.stripe.com/8x27sF1fegqKg72eF1fAc07'
+    },
+    tier3: {
+      full: 'https://buy.stripe.com/9B6cMZ5vub6q0840ObfAc02',
+      deposit: 'https://buy.stripe.com/fZu3cp7DC0rMdYU0ObfAc08'
+    },
+    tier4: {
+      full: 'https://buy.stripe.com/aFa5kx8HG1vQ7AwbsPfAc03',
+      deposit: 'https://buy.stripe.com/4gMaERga80rMcUQ0ObfAc09'
+    }
+  };
+
   const tierPills = document.querySelectorAll('.cfg-tier-pill');
   const addonChecks = document.querySelectorAll('.cfg-addon-check');
   const maintRadios = document.querySelectorAll('input[name="maintPlan"]');
+  const settleRadios = document.querySelectorAll('input[name="paymentSchedule"]');
   const cfgBreakdownText = document.getElementById('cfgBreakdownText');
   const cfgTotalDisplay = document.getElementById('cfgTotalDisplay');
+  const cfgPeriodDisplay = document.getElementById('cfgPeriodDisplay');
   const btnTriggerCustomInvoice = document.getElementById('btnTriggerCustomInvoice');
 
   let currentTier = {
@@ -725,7 +746,7 @@
   };
 
   function recalculateConfigurator() {
-    let total = currentTier.price;
+    let totalScope = currentTier.price;
     let checkedAddons = [];
 
     addonChecks.forEach((chk) => {
@@ -734,24 +755,44 @@
         if (card) card.classList.add('selected');
         const price = parseInt(chk.getAttribute('data-price'), 10) || 0;
         const name = chk.getAttribute('data-name') || '';
-        total += price;
+        totalScope += price;
         checkedAddons.push({ name, price });
       } else {
         if (card) card.classList.remove('selected');
       }
     });
 
+    const isDeposit = document.querySelector('input[name="paymentSchedule"]:checked')?.value === 'deposit';
+    let payableNow = totalScope;
+    let balanceDue = 0;
+
+    if (isDeposit) {
+      payableNow = Math.round(totalScope * 0.5);
+      balanceDue = totalScope - payableNow;
+    } else {
+      // 5% Cash Prepayment Discount on full settlement
+      const discount = Math.round(totalScope * 0.05);
+      payableNow = totalScope - discount;
+      balanceDue = 0;
+    }
+
     if (cfgTotalDisplay) {
-      cfgTotalDisplay.textContent = total.toLocaleString('en-US');
+      cfgTotalDisplay.textContent = payableNow.toLocaleString('en-US');
+    }
+
+    if (cfgPeriodDisplay) {
+      cfgPeriodDisplay.textContent = isDeposit
+        ? 'USD • 50% Production Deposit Due Now (50% on Handover)'
+        : 'USD • 100% Full Turnkey Settlement (-5% Prepayment Discount)';
     }
 
     if (cfgBreakdownText) {
       const addonCount = checkedAddons.length;
       const addonSum = checkedAddons.reduce((acc, a) => acc + a.price, 0);
-      cfgBreakdownText.textContent = `${currentTier.title} ($${currentTier.price.toLocaleString('en-US')}) + ${addonCount} Selected Extras (+$${addonSum.toLocaleString('en-US')})`;
+      cfgBreakdownText.textContent = `${currentTier.title} ($${currentTier.price.toLocaleString('en-US')}) + ${addonCount} Extras (+$${addonSum.toLocaleString('en-US')}) • Total Scope: $${totalScope.toLocaleString('en-US')}`;
     }
 
-    return { total, checkedAddons };
+    return { totalScope, payableNow, balanceDue, isDeposit, checkedAddons };
   }
 
   // Tier pill click handlers
@@ -780,13 +821,23 @@
     });
   });
 
+  // Settlement radio change handlers
+  settleRadios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.settle-option-card').forEach((lbl) => lbl.classList.remove('selected'));
+      const parentCard = radio.closest('.settle-option-card');
+      if (parentCard) parentCard.classList.add('selected');
+      recalculateConfigurator();
+    });
+  });
+
   // Initial calculation on page load
   recalculateConfigurator();
 
   // Generate & Render Brutally Beautiful Invoice
   if (btnTriggerCustomInvoice) {
     btnTriggerCustomInvoice.addEventListener('click', () => {
-      const { total, checkedAddons } = recalculateConfigurator();
+      const { totalScope, payableNow, balanceDue, isDeposit, checkedAddons } = recalculateConfigurator();
 
       // Dynamic Invoice Details
       const invRand = Math.floor(1000 + Math.random() * 9000);
@@ -794,15 +845,39 @@
       const now = new Date();
       const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 
+      // Client input values
+      const clientCompany = document.getElementById('cfgClientCompany')?.value.trim();
+      const clientVat = document.getElementById('cfgClientVat')?.value.trim();
+      const clientAddress = document.getElementById('cfgClientAddress')?.value.trim();
+      const clientContact = document.getElementById('cfgClientContact')?.value.trim();
+
       // Elements inside invoice modal
       const invRenderNumber = document.getElementById('invRenderNumber');
       const invRenderDate = document.getElementById('invRenderDate');
       const invItemsTableBody = document.getElementById('invItemsTableBody');
-      const invRenderSubtotal = document.getElementById('invRenderSubtotal');
+      const invRenderTotalScope = document.getElementById('invRenderTotalScope');
+      const invRenderScheduleLabel = document.getElementById('invRenderScheduleLabel');
+      const invRenderScheduleAmount = document.getElementById('invRenderScheduleAmount');
+      const invRowBalanceDue = document.getElementById('invRowBalanceDue');
+      const invRenderBalanceDue = document.getElementById('invRenderBalanceDue');
+      const invRenderGrandLabel = document.getElementById('invRenderGrandLabel');
       const invRenderGrandTotal = document.getElementById('invRenderGrandTotal');
       const invRenderMaintPlan = document.getElementById('invRenderMaintPlan');
+      const invDynamicStripeLink = document.getElementById('invDynamicStripeLink');
       const invDynamicPayPalLink = document.getElementById('invDynamicPayPalLink');
+      const invStripeBtnAmount = document.getElementById('invStripeBtnAmount');
       const invPayBtnAmount = document.getElementById('invPayBtnAmount');
+
+      // Populate Client Details in Invoice
+      const invClientRenderCompany = document.getElementById('invClientRenderCompany');
+      const invClientRenderTax = document.getElementById('invClientRenderTax');
+      const invClientRenderAddress = document.getElementById('invClientRenderAddress');
+      const invClientRenderContact = document.getElementById('invClientRenderContact');
+
+      if (invClientRenderCompany) invClientRenderCompany.textContent = clientCompany || 'Private Client / Visionary Enterprise';
+      if (invClientRenderTax) invClientRenderTax.innerHTML = clientVat ? `Corporate Tax / VAT ID: <strong>${clientVat}</strong>` : 'VAT / Tax ID: B2B Cross-Border / Reverse Charge';
+      if (invClientRenderAddress) invClientRenderAddress.textContent = clientAddress || 'International Client Corporate Jurisdiction';
+      if (invClientRenderContact) invClientRenderContact.textContent = clientContact ? `Attn: ${clientContact} • Turnkey Digital Commission` : 'Attn: Corporate Procurement • Turnkey Digital Commission';
 
       if (invRenderNumber) invRenderNumber.textContent = invNum;
       if (invRenderDate) invRenderDate.textContent = `Date: ${dateStr}`;
@@ -838,11 +913,27 @@
         });
       }
 
-      // Totals
-      const totalFormatted = `$${total.toLocaleString('en-US')}.00`;
-      if (invRenderSubtotal) invRenderSubtotal.textContent = totalFormatted;
-      if (invRenderGrandTotal) invRenderGrandTotal.textContent = `${totalFormatted} USD`;
-      if (invPayBtnAmount) invPayBtnAmount.textContent = `${totalFormatted} USD`;
+      // Calculations in totals table
+      if (invRenderTotalScope) invRenderTotalScope.textContent = `$${totalScope.toLocaleString('en-US')}.00`;
+      
+      if (isDeposit) {
+        if (invRenderScheduleLabel) invRenderScheduleLabel.textContent = 'Settlement Schedule (50% Upfront Production Deposit):';
+        if (invRenderScheduleAmount) invRenderScheduleAmount.textContent = `$${payableNow.toLocaleString('en-US')}.00`;
+        if (invRowBalanceDue) invRowBalanceDue.style.display = 'flex';
+        if (invRenderBalanceDue) invRenderBalanceDue.textContent = `$${balanceDue.toLocaleString('en-US')}.00 (Due upon final delivery)`;
+        if (invRenderGrandLabel) invRenderGrandLabel.textContent = 'AMOUNT DUE TODAY (50% DEPOSIT):';
+        if (invRenderGrandTotal) invRenderGrandTotal.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
+      } else {
+        const discountAmt = totalScope - payableNow;
+        if (invRenderScheduleLabel) invRenderScheduleLabel.textContent = 'Prepayment Incentive (5% Immediate Cash Discount):';
+        if (invRenderScheduleAmount) invRenderScheduleAmount.textContent = `-$${discountAmt.toLocaleString('en-US')}.00`;
+        if (invRowBalanceDue) invRowBalanceDue.style.display = 'none';
+        if (invRenderGrandLabel) invRenderGrandLabel.textContent = 'AMOUNT DUE TODAY (FULL SETTLEMENT):';
+        if (invRenderGrandTotal) invRenderGrandTotal.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
+      }
+
+      if (invStripeBtnAmount) invStripeBtnAmount.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
+      if (invPayBtnAmount) invPayBtnAmount.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
 
       // Maintenance description
       const selectedMaint = document.querySelector('input[name="maintPlan"]:checked')?.value;
@@ -854,8 +945,15 @@
         }
       }
 
-      // PayPal Instant Link configuration
-      const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=USD&amount=${total}&item_name=${encodeURIComponent(`Aeterna Invoice ${invNum} - ${currentTier.title}`)}`;
+      // Dual Gateways checkout URLs
+      const tierMap = STRIPE_LINKS[currentTier.id] || STRIPE_LINKS.tier1;
+      const stripeUrl = isDeposit ? tierMap.deposit : tierMap.full;
+      if (invDynamicStripeLink) {
+        invDynamicStripeLink.href = stripeUrl;
+      }
+
+      const scheduleLabel = isDeposit ? '50% Production Deposit' : 'Full Settlement';
+      const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=${payableNow}&item_name=${encodeURIComponent(`Aeterna Invoice ${invNum} - ${currentTier.title} (${scheduleLabel})`)}`;
       if (invDynamicPayPalLink) {
         invDynamicPayPalLink.href = paypalUrl;
       }
@@ -873,15 +971,15 @@
     });
   }
 
-  // Invoice Copy Link Action
+  // Invoice Copy Link Action (Copies Stripe Checkout Link)
   const btnInvoiceCopyLink = document.getElementById('btnInvoiceCopyLink');
   if (btnInvoiceCopyLink) {
     btnInvoiceCopyLink.addEventListener('click', () => {
-      const link = document.getElementById('invDynamicPayPalLink')?.href;
+      const link = document.getElementById('invDynamicStripeLink')?.href || document.getElementById('invDynamicPayPalLink')?.href;
       if (link) {
         navigator.clipboard.writeText(link).then(() => {
           const originalText = btnInvoiceCopyLink.innerHTML;
-          btnInvoiceCopyLink.innerHTML = '<span>✓ LINK COPIED TO CLIPBOARD!</span>';
+          btnInvoiceCopyLink.innerHTML = '<span>✓ DIRECT LINK COPIED!</span>';
           btnInvoiceCopyLink.style.borderColor = '#16833b';
           btnInvoiceCopyLink.style.color = '#38e370';
           setTimeout(() => {
@@ -890,6 +988,415 @@
             btnInvoiceCopyLink.style.color = '';
           }, 2500);
         });
+      }
+    });
+  }
+
+  // ==========================================================================
+  // 8d. THREE.JS LUXURY 3D INTERACTIVE SANDBOX ENGINE
+  // ==========================================================================
+  const modal3dDemo = document.getElementById('modal3dDemo');
+  const canvas3dDemo = document.getElementById('canvas3dDemo');
+  const demo3dTitle = document.getElementById('demo3dTitle');
+  const demoFpsCounter = document.getElementById('demoFpsCounter');
+  const btnAdopt3dAddon = document.getElementById('btnAdopt3dAddon');
+
+  let renderer3d = null;
+  let scene3d = null;
+  let camera3d = null;
+  let currentMeshGroup = null;
+  let animFrameId = null;
+  let activeModelKey = 'watch';
+  let is3dDragging = false;
+  let prevMousePos = { x: 0, y: 0 };
+  let targetRotation = { x: 0.3, y: 0.4 };
+  let currentRotation = { x: 0.3, y: 0.4 };
+  let targetZoom = 5.0;
+  let currentZoom = 5.0;
+  let frameCount = 0;
+  let lastFpsTime = performance.now();
+
+  const MODEL_META = {
+    watch: {
+      title: 'Aura Monaco // Tourbillon Spatial Atelier',
+    },
+    gem: {
+      title: 'Kallos Atelier // 4D Brilliant Diamond & Living Gold',
+    },
+    globe: {
+      title: 'Vance & Sterling // Sovereign Asset Topology',
+    }
+  };
+
+  function initThreeJsSandbox() {
+    if (!window.THREE || !canvas3dDemo) return;
+    if (renderer3d) return;
+
+    scene3d = new THREE.Scene();
+    camera3d = new THREE.PerspectiveCamera(45, canvas3dDemo.clientWidth / (canvas3dDemo.clientHeight || 450), 0.1, 100);
+    camera3d.position.set(0, 0, currentZoom);
+
+    renderer3d = new THREE.WebGLRenderer({
+      canvas: canvas3dDemo,
+      antialias: true,
+      alpha: true,
+      powerPreference: 'high-performance'
+    });
+    renderer3d.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer3d.setSize(canvas3dDemo.clientWidth, canvas3dDemo.clientHeight || 450);
+    renderer3d.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer3d.toneMappingExposure = 1.25;
+
+    // Ambient + Directional lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene3d.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xd4af37, 2.2);
+    dirLight1.position.set(6, 8, 6);
+    scene3d.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x70baff, 1.4);
+    dirLight2.position.set(-6, -4, -6);
+    scene3d.add(dirLight2);
+
+    const pointLight = new THREE.PointLight(0xffeedd, 1.8, 25);
+    pointLight.position.set(0, 3, 5);
+    scene3d.add(pointLight);
+
+    // Build initial model
+    loadModelScene(activeModelKey);
+
+    // Mouse & Touch events
+    canvas3dDemo.addEventListener('pointerdown', (e) => {
+      is3dDragging = true;
+      prevMousePos = { x: e.clientX, y: e.clientY };
+      canvas3dDemo.setPointerCapture(e.pointerId);
+    });
+
+    canvas3dDemo.addEventListener('pointermove', (e) => {
+      if (!is3dDragging) return;
+      const deltaX = e.clientX - prevMousePos.x;
+      const deltaY = e.clientY - prevMousePos.y;
+      prevMousePos = { x: e.clientX, y: e.clientY };
+
+      targetRotation.y += deltaX * 0.008;
+      targetRotation.x += deltaY * 0.008;
+      targetRotation.x = Math.max(-1.4, Math.min(1.4, targetRotation.x));
+    });
+
+    const stopDrag = () => { is3dDragging = false; };
+    canvas3dDemo.addEventListener('pointerup', stopDrag);
+    canvas3dDemo.addEventListener('pointercancel', stopDrag);
+
+    canvas3dDemo.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      targetZoom += e.deltaY * 0.004;
+      targetZoom = Math.max(2.5, Math.min(8.0, targetZoom));
+    }, { passive: false });
+
+    // Render loop
+    function renderLoop() {
+      animFrameId = requestAnimationFrame(renderLoop);
+
+      // Smooth damping
+      currentRotation.x += (targetRotation.x - currentRotation.x) * 0.08;
+      currentRotation.y += (targetRotation.y - currentRotation.y) * 0.08;
+      currentZoom += (targetZoom - currentZoom) * 0.1;
+
+      camera3d.position.z = currentZoom;
+
+      if (currentMeshGroup) {
+        currentMeshGroup.rotation.x = currentRotation.x;
+        currentMeshGroup.rotation.y = currentRotation.y;
+
+        if (!is3dDragging) {
+          targetRotation.y += 0.003;
+        }
+
+        // Sub-mesh animations
+        if (activeModelKey === 'watch') {
+          const escapement = currentMeshGroup.getObjectByName('escapement');
+          if (escapement) escapement.rotation.z += 0.08;
+          const tourbillonCage = currentMeshGroup.getObjectByName('tourbillonCage');
+          if (tourbillonCage) tourbillonCage.rotation.z -= 0.02;
+          const secondsHand = currentMeshGroup.getObjectByName('secondsHand');
+          if (secondsHand) secondsHand.rotation.z -= 0.03;
+        } else if (activeModelKey === 'gem') {
+          const goldRings = currentMeshGroup.getObjectByName('goldRings');
+          if (goldRings) {
+            goldRings.rotation.x += 0.01;
+            goldRings.rotation.y += 0.015;
+          }
+        } else if (activeModelKey === 'globe') {
+          const ringMesh = currentMeshGroup.getObjectByName('orbitalRings');
+          if (ringMesh) ringMesh.rotation.y += 0.02;
+        }
+      }
+
+      renderer3d.render(scene3d, camera3d);
+
+      // FPS counter
+      frameCount++;
+      const now = performance.now();
+      if (now - lastFpsTime >= 1000) {
+        const fps = Math.round((frameCount * 1000) / (now - lastFpsTime));
+        if (demoFpsCounter) demoFpsCounter.textContent = `${fps} FPS`;
+        frameCount = 0;
+        lastFpsTime = now;
+      }
+    }
+    renderLoop();
+  }
+
+  function loadModelScene(modelKey) {
+    if (!scene3d) return;
+    activeModelKey = modelKey;
+
+    if (currentMeshGroup) {
+      scene3d.remove(currentMeshGroup);
+      currentMeshGroup.traverse((obj) => {
+        if (obj.geometry) obj.geometry.dispose();
+        if (obj.material) {
+          if (Array.isArray(obj.material)) obj.material.forEach((m) => m.dispose());
+          else obj.material.dispose();
+        }
+      });
+    }
+
+    currentMeshGroup = new THREE.Group();
+
+    if (modelKey === 'watch') {
+      // 1. AURA MONACO TOURBILLON
+      const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xd4af37,
+        metalness: 0.95,
+        roughness: 0.2,
+      });
+      const steelMat = new THREE.MeshStandardMaterial({
+        color: 0xcccccc,
+        metalness: 0.9,
+        roughness: 0.3,
+      });
+      const rubyMat = new THREE.MeshStandardMaterial({
+        color: 0xc80815,
+        metalness: 0.1,
+        roughness: 0.1,
+        transparent: true,
+        opacity: 0.85,
+      });
+      const blueSteelMat = new THREE.MeshStandardMaterial({
+        color: 0x1b3f8b,
+        metalness: 0.85,
+        roughness: 0.2,
+      });
+
+      // Outer bezel ring
+      const bezelGeo = new THREE.TorusGeometry(1.5, 0.18, 24, 64);
+      const bezel = new THREE.Mesh(bezelGeo, goldMat);
+      currentMeshGroup.add(bezel);
+
+      // Dial Plate
+      const dialGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.08, 48);
+      const dialMat = new THREE.MeshStandardMaterial({ color: 0x111116, metalness: 0.6, roughness: 0.4 });
+      const dial = new THREE.Mesh(dialGeo, dialMat);
+      dial.rotation.x = Math.PI / 2;
+      currentMeshGroup.add(dial);
+
+      // Tourbillon Cage & Balance Wheel
+      const cageGroup = new THREE.Group();
+      cageGroup.name = 'tourbillonCage';
+      cageGroup.position.set(0, -0.4, 0.08);
+
+      const cageRing = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.04, 16, 32), goldMat);
+      cageGroup.add(cageRing);
+
+      const escapement = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.03, 12), steelMat);
+      escapement.name = 'escapement';
+      escapement.rotation.x = Math.PI / 2;
+      cageGroup.add(escapement);
+
+      const ruby = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), rubyMat);
+      ruby.position.z = 0.04;
+      cageGroup.add(ruby);
+
+      currentMeshGroup.add(cageGroup);
+
+      // Hands
+      const hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.75, 0.02), blueSteelMat);
+      hourHand.position.set(0, 0.3, 0.08);
+      currentMeshGroup.add(hourHand);
+
+      const secHand = new THREE.Mesh(new THREE.BoxGeometry(0.025, 1.1, 0.02), goldMat);
+      secHand.name = 'secondsHand';
+      secHand.position.set(0, 0.2, 0.1);
+      currentMeshGroup.add(secHand);
+
+    } else if (modelKey === 'gem') {
+      // 2. KALLOS ATELIER BRILLIANT DIAMOND & LIVING GOLD
+      const diamondMat = new THREE.MeshPhysicalMaterial({
+        color: 0xffffff,
+        metalness: 0.1,
+        roughness: 0.05,
+        transmission: 0.9,
+        thickness: 1.2,
+        reflectivity: 0.9,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.1,
+      });
+
+      const goldMat = new THREE.MeshStandardMaterial({
+        color: 0xe6b800,
+        metalness: 0.95,
+        roughness: 0.18,
+      });
+
+      const gemGeo = new THREE.OctahedronGeometry(1.2, 1);
+      const gem = new THREE.Mesh(gemGeo, diamondMat);
+      currentMeshGroup.add(gem);
+
+      const goldRingsGroup = new THREE.Group();
+      goldRingsGroup.name = 'goldRings';
+
+      const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.7, 0.05, 16, 64), goldMat);
+      ring1.rotation.x = 0.8;
+      goldRingsGroup.add(ring1);
+
+      const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.04, 16, 64), goldMat);
+      ring2.rotation.y = 1.1;
+      goldRingsGroup.add(ring2);
+
+      for (let i = 0; i < 6; i++) {
+        const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), goldMat);
+        const angle = (i / 6) * Math.PI * 2;
+        sphere.position.set(Math.cos(angle) * 1.7, Math.sin(angle) * 0.4, Math.sin(angle) * 1.7);
+        goldRingsGroup.add(sphere);
+      }
+
+      currentMeshGroup.add(goldRingsGroup);
+
+    } else if (modelKey === 'globe') {
+      // 3. VANCE & STERLING SOVEREIGN ASSET TERMINAL
+      const obsidianMat = new THREE.MeshStandardMaterial({
+        color: 0x0a0c10,
+        metalness: 0.8,
+        roughness: 0.3,
+      });
+      const wireMat = new THREE.MeshBasicMaterial({
+        color: 0x00e5ff,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.35,
+      });
+      const cyanGlowMat = new THREE.MeshBasicMaterial({
+        color: 0x00ffff,
+      });
+
+      const coreGlobe = new THREE.Mesh(new THREE.SphereGeometry(1.3, 32, 32), obsidianMat);
+      currentMeshGroup.add(coreGlobe);
+
+      const wireGlobe = new THREE.Mesh(new THREE.SphereGeometry(1.32, 24, 24), wireMat);
+      currentMeshGroup.add(wireGlobe);
+
+      const hubCoords = [
+        [0.7, 0.8, 0.7],
+        [0.2, 1.1, 0.6],
+        [0.9, 0.3, -0.8],
+        [-0.8, 0.7, 0.8],
+        [-0.6, -0.2, 1.1],
+        [0.4, 0.5, -1.1]
+      ];
+
+      hubCoords.forEach(([x, y, z]) => {
+        const hub = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), cyanGlowMat);
+        hub.position.set(x, y, z);
+        currentMeshGroup.add(hub);
+      });
+
+      const ringsGroup = new THREE.Group();
+      ringsGroup.name = 'orbitalRings';
+      const orbitRing = new THREE.Mesh(new THREE.TorusGeometry(1.8, 0.025, 12, 64), new THREE.MeshBasicMaterial({
+        color: 0x00e5ff,
+        transparent: true,
+        opacity: 0.6
+      }));
+      orbitRing.rotation.x = Math.PI / 3;
+      ringsGroup.add(orbitRing);
+      currentMeshGroup.add(ringsGroup);
+    }
+
+    scene3d.add(currentMeshGroup);
+
+    const meta = MODEL_META[modelKey] || MODEL_META.watch;
+    if (demo3dTitle) demo3dTitle.textContent = meta.title;
+  }
+
+  function open3dDemoModal(modelKey = 'watch') {
+    if (!modal3dDemo) return;
+    modal3dDemo.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    document.querySelectorAll('.btn-demo-tab').forEach((tab) => {
+      if (tab.getAttribute('data-model') === modelKey) {
+        tab.classList.add('active');
+      } else {
+        tab.classList.remove('active');
+      }
+    });
+
+    setTimeout(() => {
+      initThreeJsSandbox();
+      loadModelScene(modelKey);
+      if (renderer3d && canvas3dDemo) {
+        renderer3d.setSize(canvas3dDemo.clientWidth, canvas3dDemo.clientHeight || 450);
+        camera3d.aspect = canvas3dDemo.clientWidth / (canvas3dDemo.clientHeight || 450);
+        camera3d.updateProjectionMatrix();
+      }
+    }, 60);
+  }
+
+  function close3dDemoModal() {
+    if (!modal3dDemo) return;
+    modal3dDemo.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // Model switch tabs
+  document.querySelectorAll('.btn-demo-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.btn-demo-tab').forEach((t) => t.classList.remove('active'));
+      tab.classList.add('active');
+      const model = tab.getAttribute('data-model') || 'watch';
+      loadModelScene(model);
+    });
+  });
+
+  // Modal triggers on cards and configurator
+  document.querySelectorAll('.btn-case-demo-trigger, .btn-card-launch-3d, .btn-addon-preview-3d').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const model = btn.getAttribute('data-demo') || 'watch';
+      open3dDemoModal(model);
+    });
+  });
+
+  if (modal3dDemo) {
+    modal3dDemo.querySelector('.modal-close-btn')?.addEventListener('click', close3dDemoModal);
+    modal3dDemo.addEventListener('click', (e) => {
+      if (e.target === modal3dDemo) close3dDemoModal();
+    });
+  }
+
+  if (btnAdopt3dAddon) {
+    btnAdopt3dAddon.addEventListener('click', () => {
+      close3dDemoModal();
+      const chk3d = document.querySelector('.cfg-addon-check[data-price="800"]');
+      if (chk3d) {
+        chk3d.checked = true;
+        recalculateConfigurator();
+      }
+      const cfgElem = document.getElementById('quoteConfigurator');
+      if (cfgElem) {
+        cfgElem.scrollIntoView({ behavior: 'smooth' });
       }
     });
   }
@@ -948,7 +1455,7 @@
       const ndaChecked = document.getElementById('ndaCheck')?.checked ? 'YES' : 'NO';
 
       const selectedService = document.querySelector('.pill-service.selected')?.textContent.trim() || 'Interactive 3D Spatial World';
-      const selectedBudget = document.querySelector('.pill-budget.selected')?.textContent.trim() || '&euro;15,000+';
+      const selectedBudget = document.querySelector('.pill-budget.selected')?.textContent.trim() || '$7,500 – $15,000+';
 
       const subject = encodeURIComponent(`Executive Project Brief: ${company} // ${name}`);
       const body = encodeURIComponent(

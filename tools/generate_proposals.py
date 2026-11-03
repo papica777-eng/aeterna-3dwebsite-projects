@@ -219,17 +219,19 @@ def create_proposal_pdf(output_path, data):
     story.append(Spacer(1, 5))
 
     # 4. Terms, Pricing & Instant Checkout
-    story.append(Paragraph("4. OWNERSHIP COVENANT, INVOICING & INSTANT PAYPAL SETTLEMENT", style_h2))
+    story.append(Paragraph("4. OWNERSHIP COVENANT, TAX INVOICING & INSTANT SETTLEMENT (STRIPE & PAYPAL)", style_h2))
     
     pay_content = (
-        f"<b>Base Fixed Investment:</b> <font color='#8c6f28' size='10.5'><b>{data['price_usd']} ({data['price_eur']})</b></font><br/>"
+        f"<b>Base Turnkey Investment:</b> <font color='#8c6f28' size='10.5'><b>{data['price_usd']} ({data['price_eur']})</b></font><br/>"
         f"<b>100% Code & Asset Ownership:</b> Upon project completion and final settlement, the entire codebase, domain, and database become 100% your unrestricted legal and technical property with zero licensing fees or platform lock-in.<br/>"
         f"<b>Warranty & Ongoing Care:</b> First 3 months are included free ($0). Starting month 4, ongoing maintenance is optionally $200/month (Standard Maintenance) or $500/month (Enterprise Maintenance + Active Monthly Google SEO).<br/>"
-        f"<b>Payment Milestone:</b> 50% deposit to commence / 50% upon final sign-off.<br/>"
-        f"<b>Official Tax Invoice:</b> Issued automatically immediately to your email via PayPal Merchant Services.<br/><br/>"
-        f"<b>INSTANT CHECKOUT:</b><br/>"
-        f"• <b>Pay via PayPal, Visa, Mastercard, or AMEX:</b> <font color='#003087'><u><a href='{data['paypal_link']}'>[ CLICK HERE TO PAY ONLINE & RECEIVE INSTANT TAX INVOICE ]</a></u></font><br/>"
-        f"• <b>Corporate Wire Transfer (IBAN / SEPA / SWIFT):</b> Available upon request; pro-forma issued to your accounting team."
+        f"<b>Payment Milestone:</b> Flexible choice: 50% upfront deposit to initiate production (50% on final delivery) or 100% full turnkey settlement.<br/>"
+        f"<b>Official Tax Invoice:</b> Issued automatically immediately to your email via Stripe & PayPal Merchant Services.<br/><br/>"
+        f"<b>SECURE ONLINE CHECKOUT (CREDIT CARDS, APPLE PAY & PAYPAL):</b><br/>"
+        f"• <b>Stripe 50% Upfront Deposit:</b> <font color='#003087'><u><a href='{data.get('stripe_dep_link', '#')}'>[ PAY 50% DEPOSIT VIA STRIPE ]</a></u></font><br/>"
+        f"• <b>Stripe 100% Full Settlement:</b> <font color='#003087'><u><a href='{data.get('stripe_full_link', '#')}'>[ PAY 100% FULL SETTLEMENT VIA STRIPE ]</a></u></font><br/>"
+        f"• <b>PayPal Official Checkout:</b> <font color='#003087'><u><a href='{data['paypal_link']}'>[ PAY VIA PAYPAL & DEBIT/CREDIT CARDS ]</a></u></font><br/>"
+        f"• <b>Corporate Wire Transfer (SEPA / SWIFT):</b> Available upon request; pro-forma issued to your corporate billing department."
     )
     t_pay = Table([[Paragraph(pay_content, style_body)]], colWidths=[174*mm])
     t_pay.setStyle(TableStyle([
@@ -243,7 +245,7 @@ def create_proposal_pdf(output_path, data):
     # 5. Bilateral Agreement Block
     sign_data = [
         [
-            Paragraph("<b>EXECUTED BY STUDIO:</b><br/>AETERNA Technologies EOOD // Pomorie HQ<br/>Dimitar Stavrev Prodromov (ID: 101327948)<br/>Trapezitsa St. No. 6, 8200 Pomorie, Bulgaria<br/>Direct Tel: +359 884 638 640 / +359 896 849 882<br/>Official Email: dimitar@aeterna.website", style_body),
+            Paragraph("<b>EXECUTED BY STUDIO:</b><br/>AETERNA Technologies EOOD // Pomorie HQ<br/>Dimitar Stavrev Prodromov (EU PIC: 865986222)<br/>UIC / VAT: BG101327948<br/>Trapezitsa St. No. 6, 8200 Pomorie, Bulgaria<br/>Direct Tel: +359 884 638 640 / +359 896 849 882<br/>Official Email: billing@aeterna.website", style_body),
             Paragraph("<b>ACCEPTED & CONFIRMED BY CLIENT:</b><br/>Company Name: __________________________<br/>Authorized Signatory: ___________________<br/>Date: ________________________ 2026", style_body)
         ]
     ]
@@ -274,7 +276,9 @@ PROPOSALS_V2 = [
         'price_usd': '$1,500 USD',
         'price_eur': '€1,390 EUR',
         'sla': 'First 3 months free, then $200/mo (or $500/mo with SEO)',
-        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=USD&amount=1500&item_name=Aeterna+Web+Development+Package+1+Express+Start',
+        'stripe_full_link': 'https://buy.stripe.com/9B6cMZga86Qa9IE8gDfAc00',
+        'stripe_dep_link': 'https://buy.stripe.com/dRm5kx7DCcau5soeF1fAc06',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=1500&item_name=Aeterna+Web+Development+Package+1+Express+Start',
         'what_you_get_intro': (
             'Engineered for businesses that need a clean, authoritative, and rock-solid digital presence without '
             'overpaying or waiting months. You receive a high-converting digital asset that turns casual visitors into paying customers.'
@@ -310,7 +314,9 @@ PROPOSALS_V2 = [
         'price_usd': '$2,800 USD',
         'price_eur': '€2,590 EUR',
         'sla': 'First 3 months free, then $200/mo (or $500/mo with SEO)',
-        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=USD&amount=2800&item_name=Aeterna+Web+Development+Package+2+Business+Pro',
+        'stripe_full_link': 'https://buy.stripe.com/9B614hcXW4I25sodAXfAc01',
+        'stripe_dep_link': 'https://buy.stripe.com/8x27sF1fegqKg72eF1fAc07',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=2800&item_name=Aeterna+Web+Development+Package+2+Business+Pro',
         'what_you_get_intro': (
             'Package 02 establishes your company as an undisputed industry leader. '
             'Designed specifically for brands that want to command prestige, justify premium pricing, and attract high-net-worth clientele.'
@@ -346,7 +352,9 @@ PROPOSALS_V2 = [
         'price_usd': '$4,900 USD',
         'price_eur': '€4,550 EUR',
         'sla': 'First 3 months free, then $200/mo (or $500/mo with SEO)',
-        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=USD&amount=4900&item_name=Aeterna+Web+Development+Package+3+Spatial+3D',
+        'stripe_full_link': 'https://buy.stripe.com/9B6cMZ5vub6q0840ObfAc02',
+        'stripe_dep_link': 'https://buy.stripe.com/fZu3cp7DC0rMdYU0ObfAc08',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=4900&item_name=Aeterna+Web+Development+Package+3+Spatial+3D',
         'what_you_get_intro': (
             'The highest echelon of digital craft. Your website ceases to be an ordinary page and becomes an interactive digital showpiece. '
             'Clients can rotate your creations in full 3D, inspect micron-level metallic reflections, and experience your brand on par with Apple, Rolex, or Cartier.'
@@ -382,7 +390,9 @@ PROPOSALS_V2 = [
         'price_usd': '$8,900 USD',
         'price_eur': '€8,250 EUR',
         'sla': 'First 3 months free, then $200/mo (or $500/mo with SEO)',
-        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=USD&amount=8900&item_name=Aeterna+Web+Development+Package+4+Enterprise+Platform',
+        'stripe_full_link': 'https://buy.stripe.com/aFa5kx8HG1vQ7AwbsPfAc03',
+        'stripe_dep_link': 'https://buy.stripe.com/4gMaERga80rMcUQ0ObfAc09',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=8900&item_name=Aeterna+Web+Development+Package+4+Enterprise+Platform',
         'what_you_get_intro': (
             'Not just a website, but an autonomous revenue machine. '
             'Includes a full-fledged global store or member portal with multi-currency checkout, automated tax invoicing, '
