@@ -1378,10 +1378,129 @@ body.vortex-mode .vortex-card {
 }
 
 body.vortex-mode .vortex-headline {
-  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.95), 0 0 80px rgba(197, 163, 78, 0.5);
+  font-family: var(--font-serif);
+  font-size: clamp(40px, 6vw, 76px);
+  font-weight: 400;
+  line-height: 1.05;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.vortex-row-gold {
+  color: #d4af37;
+  letter-spacing: 0.04em;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.95), 0 0 50px rgba(212, 175, 55, 0.4);
+}
+
+.vortex-row-white {
+  color: #ffffff;
+  letter-spacing: 0.08em;
+  text-shadow: 0 4px 30px rgba(0, 0, 0, 0.95), 0 0 60px rgba(255, 255, 255, 0.5);
 }
 
 body.vortex-mode .vortex-sub {
   text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
+  max-width: 600px;
+  margin: 0 auto 36px;
 }
+
+/* Photoreal Video Elements */
+.hero-live-video-stage {
+  position: relative;
+  width: 100%;
+  height: 640px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+.hero-live-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  filter: contrast(1.15) brightness(1.05);
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0.6) 70%, transparent 88%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, rgba(0, 0, 0, 1) 45%, rgba(0, 0, 0, 0.6) 70%, transparent 88%);
+  transition: transform 0.15s ease-out;
+}
+
+/* ==========================================================================
+   EXACT PHOTOREAL VORTEX STAGE (1:1 FIDELITY WITH GEMINI VIDEO)
+   ========================================================================== */
+.vortex-stage-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+  aspect-ratio: 9 / 16;
+  max-height: 960px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 36px;
+  overflow: hidden;
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.95), 0 0 120px rgba(197, 163, 78, 0.2);
+  border: 1px solid rgba(197, 163, 78, 0.3);
+  background-color: #060708;
+}
+
+.vortex-exact-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.vortex-interactive-layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 21%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.vortex-hotspot-btn {
+  pointer-events: auto;
+  cursor: pointer;
+  background: rgba(197, 163, 78, 0.15);
+  border: 1px solid rgba(255, 235, 175, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 14px 44px;
+  border-radius: 9999px;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 30px rgba(212, 175, 55, 0.4), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.vortex-hotspot-btn:hover {
+  transform: scale(1.06);
+  background: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 8px 45px rgba(212, 175, 55, 0.7);
+}
+
+  box-shadow: 0 4px 25px rgba(212, 175, 55, 0.45), inset 0 1px 2px rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.btn-gold-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 8px 35px rgba(212, 175, 55, 0.65), inset 0 1px 4px rgba(255, 255, 255, 0.7);
+}
+
 
