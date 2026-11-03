@@ -969,7 +969,7 @@
         `Dispatched via APEX DIGITAL Sovereign Spatial Terminal.`
       );
 
-      window.location.href = `mailto:inquire@apexdigital.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:dimitar@aeterna.website?subject=${subject}&body=${body}`;
       alert(`Thank you, ${name}. Your executive brief has been dispatched. An NDA confirmation will be issued to ${email} within 24 hours.`);
       closeModal();
       inquiryForm.reset();

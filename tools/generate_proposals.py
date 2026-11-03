@@ -96,7 +96,7 @@ class NumberedCanvas(canvas.Canvas):
         self.line(18*mm, 14*mm, w - 18*mm, 14*mm)
         self.setFont(SANS_FONT, 7)
         self.setFillColor(COLOR_TEXT_MUTED)
-        self.drawString(18*mm, 9*mm, "Aeterna Digital Studio • Dimitar Prodromov • Direct Phone: +359 888 888 888 • billing@aeterna.digital")
+        self.drawString(18*mm, 9*mm, "AETERNA Technologies EOOD • Dimitar Stavrev Prodromov • Pomorie HQ • Direct Tel: +359 884 638 640 / +359 896 849 882 • dimitar@aeterna.website")
         page_str = f"Page {self._pageNumber} of {page_count}"
         self.drawRightString(w - 18*mm, 9*mm, page_str)
 
@@ -243,7 +243,7 @@ def create_proposal_pdf(output_path, data):
     # 5. Bilateral Agreement Block
     sign_data = [
         [
-            Paragraph("<b>EXECUTED BY STUDIO:</b><br/>Aeterna Digital Studio // Europe HQ<br/>Dimitar Prodromov<br/>Phone: +359 888 888 888<br/>Email: billing@aeterna.digital", style_body),
+            Paragraph("<b>EXECUTED BY STUDIO:</b><br/>AETERNA Technologies EOOD // Pomorie HQ<br/>Dimitar Stavrev Prodromov (ID: 101327948)<br/>Trapezitsa St. No. 6, 8200 Pomorie, Bulgaria<br/>Direct Tel: +359 884 638 640 / +359 896 849 882<br/>Official Email: dimitar@aeterna.website", style_body),
             Paragraph("<b>ACCEPTED & CONFIRMED BY CLIENT:</b><br/>Company Name: __________________________<br/>Authorized Signatory: ___________________<br/>Date: ________________________ 2026", style_body)
         ]
     ]
