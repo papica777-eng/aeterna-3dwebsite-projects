@@ -538,10 +538,50 @@
     requestAnimationFrame(fluidLoop);
   }
 
-  window.addEventListener('resize', resizeCanvases);
-  resizeCanvases();
-  preloadFrames();
-  requestAnimationFrame(fluidLoop);
+  // Legacy frame-scrubber stage is superseded by the full-screen GPU vortex
+  // (body.vortex-mode). Only boot it when the vortex engine is not active.
+  if (!document.body.classList.contains('vortex-mode')) {
+    window.addEventListener('resize', resizeCanvases);
+    resizeCanvases();
+    preloadFrames();
+    requestAnimationFrame(fluidLoop);
+  }
+
+  // ==========================================================================
+  // 6b. AETERNA LIQUID VORTEX — FULL-SCREEN GPU BACKGROUND
+  // ==========================================================================
+  (function initVortexBackground() {
+    const vCanvas = document.getElementById('aeternaVortexBg');
+    if (!vCanvas || typeof AeternaLiquidVortex === 'undefined') return;
+    let vortex = null;
+    try {
+      vortex = AeternaLiquidVortex.mount(vCanvas, { center: [0.66, 0.5], zoom: 1.0, maxDpr: 2 });
+    } catch (err) {
+      console.error(err);
+    }
+    if (!vortex) { document.body.classList.add('vortex-fallback'); return; }
+
+    const isMobile = () => window.innerWidth < 900;
+    const heroPose = () => (isMobile() ? { center: [0.5, 0.66], zoom: 0.85 } : { center: [0.66, 0.5], zoom: 1.0 });
+    const ctaPose = () => (isMobile() ? { center: [0.5, 0.55], zoom: 0.9 } : { center: [0.5, 0.5], zoom: 1.12 });
+    const midPose = () => (isMobile() ? { center: [0.5, 0.5], zoom: 0.8 } : { center: [0.78, 0.5], zoom: 0.9 });
+
+    const hero = document.getElementById('hero');
+    const cta = document.getElementById('insights');
+
+    function updatePose() {
+      const vh = window.innerHeight;
+      vortex.setScroll(window.scrollY);
+      const ctaRect = cta ? cta.getBoundingClientRect() : null;
+      const heroRect = hero ? hero.getBoundingClientRect() : null;
+      if (ctaRect && ctaRect.top < vh * 0.6 && ctaRect.bottom > vh * 0.3) vortex.setTarget(ctaPose());
+      else if (heroRect && heroRect.bottom > vh * 0.45) vortex.setTarget(heroPose());
+      else vortex.setTarget(midPose());
+    }
+    window.addEventListener('scroll', updatePose, { passive: true });
+    window.addEventListener('resize', updatePose);
+    updatePose();
+  })();
 
   // ==========================================================================
   // 7. HOVER-SCRUBBING VIDEO CARDS (SELECTED WORKS)

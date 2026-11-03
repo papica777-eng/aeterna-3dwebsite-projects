@@ -1281,3 +1281,107 @@ body {
     padding: 0 20px;
   }
 }
+
+/* ==========================================================================
+   AETERNA LIQUID VORTEX // GPU FULL-SCREEN BACKGROUND SYSTEM
+   Living procedural 3D gold & black lacquer vortex (Resolution-Independent)
+   ========================================================================== */
+.aeterna-vortex-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  display: block;
+}
+
+body.vortex-mode {
+  background-color: #060708;
+}
+
+body.vortex-mode .site-header {
+  z-index: 100;
+  background-color: rgba(6, 7, 8, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+body.vortex-mode .hero-section {
+  background: transparent;
+  z-index: 2;
+  position: relative;
+  min-height: 100vh;
+}
+
+body.vortex-mode .hero-grid-overlay {
+  opacity: 0.12;
+}
+
+body.vortex-mode .hero-right {
+  background: transparent;
+}
+
+body.vortex-mode .sculpture-liquid-stage {
+  display: none !important;
+}
+
+body.vortex-mode .hero-left {
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.85);
+}
+
+body.vortex-mode .hero-headline {
+  text-shadow: 0 8px 32px rgba(0, 0, 0, 0.9);
+}
+
+body.vortex-mode .services-section,
+body.vortex-mode .philosophy-section,
+body.vortex-mode .portfolio-section,
+body.vortex-mode .vortex-section,
+body.vortex-mode .site-footer {
+  position: relative;
+  z-index: 2;
+}
+
+body.vortex-mode .services-section {
+  background: rgba(6, 7, 8, 0.72);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body.vortex-mode .philosophy-section {
+  background: rgba(6, 7, 8, 0.65);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+body.vortex-mode .portfolio-section {
+  background: rgba(6, 7, 8, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+body.vortex-mode .vortex-section {
+  background: transparent;
+  padding: 120px 0 160px;
+}
+
+body.vortex-mode .vortex-bg-image {
+  display: none !important;
+}
+
+body.vortex-mode .vortex-card {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+}
+
+body.vortex-mode .vortex-headline {
+  text-shadow: 0 4px 40px rgba(0, 0, 0, 0.95), 0 0 80px rgba(197, 163, 78, 0.5);
+}
+
+body.vortex-mode .vortex-sub {
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.9);
+}
+
