@@ -681,7 +681,7 @@ body {
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(212, 175, 55, 0.15);
 }
 
-/* Interactive Hover-Scrubbing Video Container (Organic Living Bleed) */
+/* Continuous Autoplay Video Container (Organic Living Bleed) */
 .card-video-box {
   position: relative;
   width: 100%;
@@ -690,7 +690,7 @@ body {
   overflow: hidden;
   margin-bottom: 22px;
   background: transparent;
-  cursor: ew-resize;
+  cursor: default;
   border: none;
   mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, rgba(0, 0, 0, 1) 75%, transparent 100%);
   -webkit-mask-image: radial-gradient(ellipse 95% 95% at 50% 50%, rgba(0, 0, 0, 1) 75%, transparent 100%);

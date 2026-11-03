@@ -554,97 +554,76 @@
     const vCanvas = document.getElementById('aeternaVortexBg');
     if (!vCanvas || typeof AeternaLiquidVortex === 'undefined') return;
     let vortex = null;
+
+    const isMobile = window.innerWidth < 900;
+    // Rock-solid fixed center: centered on the right on desktop, centered on mobile
+    const fixedCenter = isMobile ? [0.5, 0.5] : [0.72, 0.5];
+    const fixedZoom = isMobile ? 0.95 : 1.15;
+
     try {
-      vortex = AeternaLiquidVortex.mount(vCanvas, { center: [0.66, 0.5], zoom: 1.0, maxDpr: 2 });
+      vortex = AeternaLiquidVortex.mount(vCanvas, {
+        center: fixedCenter,
+        zoom: fixedZoom,
+        maxDpr: 2,
+      });
     } catch (err) {
       console.error(err);
     }
     if (!vortex) { document.body.classList.add('vortex-fallback'); return; }
 
-    const isMobile = () => window.innerWidth < 900;
-    const heroPose = () => (isMobile() ? { center: [0.5, 0.66], zoom: 0.85 } : { center: [0.66, 0.5], zoom: 1.0 });
-    const ctaPose = () => (isMobile() ? { center: [0.5, 0.55], zoom: 0.9 } : { center: [0.5, 0.5], zoom: 1.12 });
-    const midPose = () => (isMobile() ? { center: [0.5, 0.5], zoom: 0.8 } : { center: [0.78, 0.5], zoom: 0.9 });
-
-    const hero = document.getElementById('hero');
-    const cta = document.getElementById('insights');
-
-    function updatePose() {
-      const vh = window.innerHeight;
-      vortex.setScroll(window.scrollY);
-      const ctaRect = cta ? cta.getBoundingClientRect() : null;
-      const heroRect = hero ? hero.getBoundingClientRect() : null;
-      if (ctaRect && ctaRect.top < vh * 0.6 && ctaRect.bottom > vh * 0.3) vortex.setTarget(ctaPose());
-      else if (heroRect && heroRect.bottom > vh * 0.45) vortex.setTarget(heroPose());
-      else vortex.setTarget(midPose());
-    }
-    window.addEventListener('scroll', updatePose, { passive: true });
-    window.addEventListener('resize', updatePose);
-    updatePose();
+    // STABLE: Do NOT shift, twist or move the vortex on scroll!
+    // It rotates smoothly and majestically in place with zero user-induced jitter.
+    window.addEventListener('resize', () => {
+      const mobile = window.innerWidth < 900;
+      vortex.setTarget({
+        center: mobile ? [0.5, 0.5] : [0.72, 0.5],
+        zoom: mobile ? 0.95 : 1.15,
+      });
+    });
   })();
 
   // ==========================================================================
-  // 7. HOVER-SCRUBBING VIDEO CARDS (SELECTED WORKS)
+  // 7. CONTINUOUS AUTOPLAY VIDEO CARDS (SELECTED WORKS)
   // ==========================================================================
-  function initHoverScrubVideos() {
-    const videoBoxes = document.querySelectorAll('.card-video-box');
-
-    videoBoxes.forEach((box) => {
-      const video = box.querySelector('.portfolio-video');
-      const scrubFill = box.querySelector('.card-scrub-fill');
-      const backlight = box.querySelector('.card-backlight');
-      let isHovered = false;
-
-      if (!video) return;
+  function initAutoPlayPortfolioVideos() {
+    const videos = document.querySelectorAll('.portfolio-video');
+    videos.forEach((video) => {
       video.muted = true;
+      video.loop = true;
       video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      video.setAttribute('muted', '');
+      video.setAttribute('loop', '');
+      video.setAttribute('autoplay', '');
 
-      video.addEventListener('timeupdate', () => {
-        if (!isHovered && video.duration) {
-          const pct = (video.currentTime / video.duration) * 100;
-          if (scrubFill) scrubFill.style.width = `${pct}%`;
-        }
-      });
-
-      box.addEventListener('mousemove', (e) => {
-        isHovered = true;
-        const rect = box.getBoundingClientRect();
-        const pct = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
-
-        if (video.duration) {
-          video.currentTime = pct * video.duration;
-          if (scrubFill) scrubFill.style.width = `${pct * 100}%`;
-        }
-
-        if (backlight) {
-          const shiftX = (pct - 0.5) * 24;
-          backlight.style.transform = `translateX(${shiftX.toFixed(1)}px) scale(1.08)`;
-          backlight.style.opacity = '0.9';
-        }
-      });
-
-      box.addEventListener('mouseenter', () => {
-        isHovered = true;
+      const startPlay = () => {
+        video.muted = true;
         const p = video.play();
-        if (p !== undefined) p.catch(() => { video.muted = true; video.play(); });
-        if (backlight) backlight.style.opacity = '0.85';
-      });
+        if (p !== undefined) p.catch(() => {});
+      };
 
-      box.addEventListener('mouseleave', () => {
-        isHovered = false;
-        video.pause();
-        if (backlight) {
-          backlight.style.transform = 'translateX(0) scale(1)';
-          backlight.style.opacity = '0.35';
-        }
+      startPlay();
+
+      // Completely autonomous continuous playback: resume immediately if paused
+      video.addEventListener('pause', () => {
+        if (!document.hidden) startPlay();
       });
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) {
+        videos.forEach((v) => {
+          v.muted = true;
+          v.play().catch(() => {});
+        });
+      }
     });
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initHoverScrubVideos);
+    document.addEventListener('DOMContentLoaded', initAutoPlayPortfolioVideos);
   } else {
-    initHoverScrubVideos();
+    initAutoPlayPortfolioVideos();
   }
 
   // ==========================================================================

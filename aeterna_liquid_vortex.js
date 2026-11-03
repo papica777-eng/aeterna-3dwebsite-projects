@@ -1,6 +1,6 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   AETERNA 3D SOVEREIGN STUDIO // HYPER-REALISTIC LIQUID GOLD PBR ENGINE v2.0
-   Physical Anisotropic Gold & Obsidian Lacquer | Viscous Droplets | Studio PBR
+   AETERNA 3D SOVEREIGN STUDIO // HYPER-REALISTIC LIQUID GOLD PBR ENGINE v3.1
+   Alternating 24K Gold & Glossy Obsidian Ribbons | Studio PBR | Zero Blur
    ═══════════════════════════════════════════════════════════════════════════ */
 (function (global) {
   'use strict';
@@ -16,175 +16,202 @@ uniform float uTime;
 uniform vec2  uMouse;
 uniform vec2  uCenter;
 uniform float uZoom;
-uniform float uTwist;
 
 const float TAU = 6.28318530718;
 
-// True 24K Liquid Bullion Gold Spectral Constants
-const vec3  GOLD_BASE = vec3(1.00, 0.766, 0.336);
-const vec3  GOLD_EDGE = vec3(1.00, 0.94, 0.78);
-const vec3  GOLD_AMB  = vec3(0.35, 0.22, 0.06);
+// True 24K Liquid Bullion Gold Spectral Constants (Exact Match to Reference Video)
+const vec3 GOLD_BASE   = vec3(1.00, 0.76, 0.30);
+const vec3 GOLD_EDGE   = vec3(1.00, 0.96, 0.82);
+const vec3 GOLD_SHADOW = vec3(0.18, 0.10, 0.03);
 
-// Deep Obsidian Piano Lacquer
-const vec3  OBSIDIAN_BASE = vec3(0.003, 0.003, 0.004);
+// Deep Obsidian Piano Lacquer (Jet black satin core + mirror gloss)
+const vec3 OBSIDIAN_BASE  = vec3(0.008, 0.008, 0.010);
+const vec3 OBSIDIAN_CREST = vec3(0.040, 0.040, 0.050);
 
 float hash(vec2 p){ p = fract(p*vec2(123.34, 456.21)); p += dot(p, p+45.32); return fract(p.x*p.y); }
+
 float noise(vec2 p){
   vec2 i = floor(p), f = fract(p);
-  vec2 u = f*f*(3.0-2.0*f);
+  vec2 u = f*f*(3.0 - 2.0*f);
   return mix(mix(hash(i), hash(i+vec2(1,0)), u.x), mix(hash(i+vec2(0,1)), hash(i+vec2(1,1)), u.x), u.y);
 }
+
 float fbm(vec2 p){
   float v = 0.0, a = 0.5;
   mat2 m = mat2(1.6, 1.2, -1.2, 1.6);
-  for (int i = 0; i < 4; i++){ v += a*noise(p); p = m*p; a *= 0.5; }
+  for (int i = 0; i < 3; i++){ v += a*noise(p); p = m*p; a *= 0.5; }
   return v;
 }
+
 mat2 rot(float a){ float c = cos(a), s = sin(a); return mat2(c, -s, s, c); }
 
 /* Hyper-Realistic PBR Studio Lighting Rig:
-   1. Overhead Softbox Key Light (Cream white, broad gradient)
-   2. Right Rim Strip Light (Sharp metallic razor edge)
-   3. Amber Floor Bounce (Radiant warm fill)
-   4. Specular Pin Glints (Diamond-like sparks) */
-vec3 studioPbr(vec3 R, vec3 N, float roughness){
-  vec3 LKey = normalize(vec3(-0.45, 0.75, 0.65));
+   - Key light: Overhead softbox with broad cream highlight
+   - Rim light: Right sharp metallic rim
+   - Fill: Subtle warm amber floor bounce */
+vec3 studioPbr(vec3 R, vec3 N, vec2 mouseOffset, float roughness){
+  vec3 LKey = normalize(vec3(-0.45 + mouseOffset.x*0.10, 0.80 + mouseOffset.y*0.10, 0.60));
   vec3 LRim = normalize(vec3(0.85, -0.10, 0.45));
-  vec3 LAmb = normalize(vec3(0.10, -0.85, 0.50));
+  vec3 LAmb = normalize(vec3(0.10, -0.80, 0.35));
 
   float ndKey = max(dot(N, LKey), 0.0);
   float ndRim = max(dot(N, LRim), 0.0);
   float ndAmb = max(dot(N, LAmb), 0.0);
 
-  float spKey = pow(max(dot(R, LKey), 0.0), mix(40.0, 4.0, roughness));
-  float spRim = pow(max(dot(R, LRim), 0.0), mix(90.0, 16.0, roughness));
+  float spKey = pow(max(dot(R, LKey), 0.0), mix(64.0, 8.0, roughness));
+  float spRim = pow(max(dot(R, LRim), 0.0), mix(128.0, 24.0, roughness));
 
-  // Softbox area diffusion
-  float softbox = smoothstep(0.70, 0.98, dot(R, LKey));
+  // Softbox area light sheen
+  float softbox = smoothstep(0.65, 0.98, dot(R, LKey));
 
-  vec3 light = vec3(1.00, 0.98, 0.92) * (spKey * 2.8 + softbox * 1.4)
-             + vec3(0.95, 0.88, 0.75) * (spRim * 2.2 + ndRim * 0.4)
+  vec3 light = vec3(1.00, 0.98, 0.95) * (spKey * 3.5 + softbox * 1.8)
+             + vec3(0.96, 0.90, 0.80) * (spRim * 2.8 + ndRim * 0.5)
              + vec3(0.40, 0.28, 0.12) * (ndAmb * 0.35)
-             + vec3(0.015, 0.012, 0.010);
+             + vec3(0.020, 0.016, 0.014);
   return light;
 }
 
-/* Spiral ribbon field with Viscous Liquid Droplets & Anisotropic Folds */
-vec3 ribbons(vec2 p, float t, float arms, float wind, float seed, float cover){
+/* Sculptural Molten Ribbons: Exactly 4 distinct flowing streams
+   Arm 0: 24K Gold
+   Arm 1: Jet Obsidian Lacquer
+   Arm 2: 24K Gold
+   Arm 3: Jet Obsidian Lacquer */
+vec4 ribbons(vec2 p, float t, float seed){
   float r  = length(p) + 1e-4;
   float a  = atan(p.y, p.x);
+  
+  // Smooth logarithmic vortex twist
+  float wind = 1.35;
   float aw = a + wind*log(r) - t;
-  vec2  q  = vec2(cos(aw), sin(aw))*(0.5 + r*0.8);
-  float w  = fbm(q*1.2 + seed);
-  float ph = aw*arms + w*2.4 - r*3.6;
-
+  
+  // Macroscopic organic breathing (fluid dynamics without high-frequency ripples)
+  vec2  q  = vec2(cos(aw), sin(aw))*(0.65 + r*0.45);
+  float w  = fbm(q*0.8 + seed);
+  
+  // Exactly 4 arms
+  float arms = 4.0;
+  float ph = aw*arms + w*1.5 - r*2.6;
   float cyc = fract(ph/TAU);
   float idx = floor(ph/TAU);
-  float rid = mod(idx, arms);
+  float armId = mod(idx, arms);
 
-  // Viscous fluid droplet tear-off along edge
-  float dropNoise = fbm(q*6.0 + t*0.8);
-  float edgeTendril = sin(ph*12.0 + w*7.0)*0.045*smoothstep(0.15, 0.8, r);
+  // Broad, majestic ribbon coverage (each ribbon covers ~70% of its cycle slot)
+  float c = 0.72 + 0.18*w;
+  float distToCenter = abs(cyc - 0.5);
+  float halfW = c * 0.5;
 
-  float c   = cover*(0.76 + 0.48*w)*(0.48 + 0.75*hash(vec2(rid, seed)));
-  float x   = clamp((cyc - (1.0 - c)*0.5 + edgeTendril)/c, 0.0, 1.0);
+  // Normalized width across ribbon [-1, 1]
+  float uSym = clamp((cyc - 0.5) / halfW, -1.0, 1.0);
+  
+  // Physical cylindrical cross section: parabolic arch
+  float h = sqrt(max(0.0, 1.0 - uSym*uSym));
+  h = h * h * (3.0 - 2.0 * h); // Hermite smoothing
 
-  // 3D Tubular Rolling Sheet
-  float roll = 0.5 + 0.36*sin(r*5.0 + w*4.0 + seed);
-  float h  = x < roll ? sin(x/roll*1.5707963) : cos((x - roll)/(1.0 - roll)*1.5707963);
-  h = h*h*(3.0 - 2.0*h);
+  // Eye of the vortex in the very center
+  h *= smoothstep(0.035, 0.25, r);
 
-  // Brushed satin silk anisotropic micro-grooves
-  h += 0.035*sin(x*TAU*(4.0 + 3.0*r) + w*4.0)*h;
-  h *= smoothstep(0.018, 0.22, r); // Center vortex eye opening
+  // Sharp, clean ribbon edge
+  float edgeDist = halfW - distToCenter;
+  float cov = smoothstep(0.0, 0.040, edgeDist) * smoothstep(0.030, 0.12, r);
 
-  float gold = mod(rid + floor(seed), 2.0);
-  float edge = min(cyc - (1.0 - c)*0.5 + edgeTendril, (1.0 + c)*0.5 - cyc - edgeTendril);
-  float cov  = smoothstep(0.0, 0.020, edge)*smoothstep(0.018, 0.07, r);
-  return vec3(h, gold, cov);
+  // Left-side negative space fade (keeps hero text 100% clean over obsidian void)
+  float leftFade = smoothstep(-0.65, 0.05, p.x);
+  cov *= leftFade;
+
+  // Arm 0 & 2 = Gold (1.0), Arm 1 & 3 = Obsidian (0.0)
+  float isGold = (armId == 0.0 || armId == 2.0) ? 1.0 : 0.0;
+
+  return vec4(h, isGold, cov, r);
 }
 
-vec3 shadeRibbon(vec2 p, float t, float arms, float wind, float seed, float cover, float e, out float alpha){
-  vec3 f0 = ribbons(p, t, arms, wind, seed, cover);
+vec3 shadeRibbons(vec2 p, float t, float seed, float e, vec2 mouseOffset, out float alpha){
+  vec4 f0 = ribbons(p, t, seed);
   alpha = f0.z;
   if (alpha <= 0.001) return vec3(0.0);
 
-  float hx = ribbons(p + vec2(e, 0.0), t, arms, wind, seed, cover).x;
-  float hy = ribbons(p + vec2(0.0, e), t, arms, wind, seed, cover).x;
-  vec2 g = vec2(hx - f0.x, hy - f0.x)/e*0.052;
+  float hx = ribbons(p + vec2(e, 0.0), t, seed).x;
+  float hy = ribbons(p + vec2(0.0, e), t, seed).x;
+  
+  vec2 g = vec2(hx - f0.x, hy - f0.x) / e * 0.062;
   float gl = length(g);
-  if (gl > 2.8) g *= 2.8/gl;
+  if (gl > 2.6) g *= 2.6 / gl;
 
   vec3 N = normalize(vec3(-g, 1.0));
   vec3 R = reflect(vec3(0.0, 0.0, -1.0), N);
-  float fr = pow(1.0 - clamp(N.z, 0.0, 1.0), 4.5);
+  float fr = pow(1.0 - clamp(N.z, 0.0, 1.0), 4.2);
 
-  // PBR Surface Response
-  vec3 PbrKey = studioPbr(R, N, mix(0.12, 0.02, f0.y));
-
-  // Liquid Gold: Deep Metallic Conductor Fresnel (Schlick Complex)
-  vec3 goldColor = mix(GOLD_BASE, GOLD_EDGE, fr) * PbrKey + GOLD_AMB*0.4;
-
-  // Obsidian Clearcoat Lacquer: Pure Deep Black with Brilliant White Mirror Sheen
-  vec3 obsidianColor = OBSIDIAN_BASE + PbrKey * (0.04 + 0.96*fr);
-
-  vec3 col = mix(obsidianColor, goldColor, f0.y);
-
-  // Ambient Occlusion in deep fluid folds
-  float ao = smoothstep(0.0, 0.60, f0.x);
-  col *= mix(0.20, 1.0, ao);
-  return col;
+  // Gold vs Obsidian PBR response
+  if (f0.y > 0.5) {
+    // 24K Liquid Gold
+    vec3 pbrLight = studioPbr(R, N, mouseOffset, 0.03);
+    vec3 col = mix(GOLD_BASE, GOLD_EDGE, fr) * pbrLight + GOLD_SHADOW * 0.5;
+    // Ambient occlusion in deep folds
+    col *= mix(0.25, 1.0, smoothstep(0.0, 0.65, f0.x));
+    return col;
+  } else {
+    // Deep Obsidian Piano Lacquer (Ultra-gloss mirror finish with chrome rim)
+    vec3 pbrLight = studioPbr(R, N, mouseOffset, 0.015);
+    vec3 col = mix(OBSIDIAN_BASE, OBSIDIAN_CREST, fr*0.6) + pbrLight * (0.04 + 0.96*fr);
+    col *= mix(0.30, 1.0, smoothstep(0.0, 0.55, f0.x));
+    return col;
+  }
 }
 
-void sphereLayer(vec2 p, float t, bool front, inout vec3 col){
-  for (int i = 0; i < 14; i++){
+/* Floating mirror-polished 24K gold spheres */
+void sphereLayer(vec2 p, float t, bool front, vec2 mouseOffset, inout vec3 col){
+  for (int i = 0; i < 12; i++){
     float fi = float(i);
-    float h1 = hash(vec2(fi, 1.3)), h2 = hash(vec2(fi, 7.1)), z = hash(vec2(fi, 3.7));
-    if (front != (z > 0.52)) continue;
-    float orbit = 0.24 + h1*1.15;
-    float ang = h2*TAU + t*(0.50 - 0.22*h1);
-    vec2  c = vec2(cos(ang), sin(ang)*0.84)*orbit
-            + vec2(sin(t*1.2 + fi), cos(t*1.0 + fi*1.7))*0.03;
-    float rad  = mix(0.016, 0.095, z*z)*(0.75 + 0.55*h2);
-    float blur = 0.04 + 0.55*smoothstep(0.82, 1.0, z) + 0.35*smoothstep(0.25, 0.0, z);
+    float h1 = hash(vec2(fi, 1.37)), h2 = hash(vec2(fi, 7.19)), z = hash(vec2(fi, 3.73));
+    if (front != (z > 0.50)) continue;
+
+    float orbit = 0.28 + h1*1.15;
+    float ang = h2*TAU + t*(0.35 - 0.15*h1);
+    vec2  c = vec2(cos(ang), sin(ang)*0.82)*orbit;
+    
+    // Negative space protection
+    if (c.x < -0.75) continue;
+
+    float rad  = mix(0.024, 0.075, z*z)*(0.85 + 0.45*h2);
     float d = length(p - c)/rad;
-    float a = 1.0 - smoothstep(1.0 - blur, 1.0, d);
+    float a = 1.0 - smoothstep(0.92, 1.0, d);
     if (a <= 0.0) continue;
 
     float dd = min(d, 0.999);
-    vec3 n = vec3((p - c)/rad, sqrt(1.0 - dd*dd));
-    n = normalize(n);
+    vec3 n = normalize(vec3((p - c)/rad, sqrt(1.0 - dd*dd)));
     vec3 R = reflect(vec3(0.0, 0.0, -1.0), n);
-    float fr = pow(1.0 - n.z, 4.0);
+    float fr = pow(1.0 - n.z, 3.8);
 
-    vec3 pbrLight = studioPbr(R, n, 0.05);
-    vec3 sc = mix(GOLD_BASE, GOLD_EDGE, fr) * pbrLight + GOLD_AMB*0.35;
-    sc *= mix(0.35, 1.0, z); // Depth shading
+    vec3 pbrLight = studioPbr(R, n, mouseOffset, 0.03);
+    vec3 sc = mix(GOLD_BASE, GOLD_EDGE, fr) * pbrLight + GOLD_SHADOW * 0.4;
+    sc *= mix(0.45, 1.0, z);
 
-    // Realistic Contact Shadow under front spheres
+    // Drop shadow
+    float shadow = exp(-length(p - (c + vec2(0.025, -0.030)))*14.0/rad);
+    col *= 1.0 - shadow*0.45*(1.0 - a);
+
     col = mix(col, sc, a);
   }
 }
 
-float dust(vec2 p, float t){
+/* Ambient Gold Micro-Dust */
+float goldDust(vec2 p, float t){
   float r = length(p);
-  vec2 q = rot(t*0.55 + 0.50/(r + 0.22))*p;
+  vec2 q = rot(t*0.30 + 0.35/(r + 0.25))*p;
   float acc = 0.0;
   for (int k = 0; k < 2; k++){
-    float sc = (k == 0) ? 52.0 : 110.0;
-    vec2 g  = q*sc + float(k)*13.1;
+    float sc = (k == 0) ? 42.0 : 90.0;
+    vec2 g  = q*sc + float(k)*17.3;
     vec2 id = floor(g), f = fract(g) - 0.5;
     float rn = hash(id);
-    if (rn > 0.92){
-      vec2 o = vec2(hash(id + 3.1), hash(id + 7.7)) - 0.5;
-      float d = length(f - o*0.7);
-      float tw = 0.45 + 0.55*sin(t*9.0 + rn*40.0);
-      acc += exp(-d*d*((k == 0) ? 80.0 : 160.0))*tw*((k == 0) ? 1.0 : 0.6);
+    if (rn > 0.93){
+      vec2 o = vec2(hash(id + 2.7), hash(id + 8.1)) - 0.5;
+      float d = length(f - o*0.65);
+      float tw = 0.4 + 0.6*sin(t*7.0 + rn*30.0);
+      acc += exp(-d*d*((k == 0) ? 75.0 : 150.0))*tw*((k == 0) ? 1.0 : 0.55);
     }
   }
-  float band = smoothstep(0.10, 0.45, r)*smoothstep(1.7, 0.7, r);
-  float lane = 0.35 + 0.65*smoothstep(0.2, 0.8, fbm(q*2.0 + 4.0));
-  return acc*band*lane;
+  float band = smoothstep(0.12, 0.40, r)*smoothstep(1.8, 0.8, r);
+  return acc*band;
 }
 
 vec3 aces(vec3 x){ return clamp((x*(2.51*x + 0.03))/(x*(2.43*x + 0.59) + 0.14), 0.0, 1.0); }
@@ -192,43 +219,49 @@ vec3 aces(vec3 x){ return clamp((x*(2.51*x + 0.03))/(x*(2.43*x + 0.59) + 0.14), 
 void main(){
   vec2 m = (uMouse - 0.5);
   vec2 frag = gl_FragCoord.xy;
-  vec2 p  = (frag - uRes*uCenter)/uRes.y*2.0/uZoom;
-  float e = 1.6/uRes.y*2.0/uZoom;
-  float t = uTime*0.18 + uTwist;
+  
+  vec2 p = (frag - uRes*uCenter)/uRes.y*2.0/uZoom;
+  float e = 1.3/uRes.y*2.0/uZoom;
+  
+  // Autonomous fluid rotation
+  float t = uTime * 0.14;
 
   float r0 = length(p);
-  // Deep warm obsidian room glow
-  vec3 col = vec3(0.010, 0.009, 0.008) + GOLD_BASE*0.022*exp(-r0*1.3);
+  // Warm obsidian room ambiance
+  vec3 col = vec3(0.008, 0.007, 0.006) + GOLD_BASE*0.015*exp(-r0*1.3);
 
-  /* Back spiral — deeper, darker, parallax delayed */
+  /* Deep background spiral layer */
   float aB;
-  vec2 pB = rot(1.35)*(p*1.18 + m*0.03);
-  vec3 cB = shadeRibbon(pB, t*0.7, 7.0, 1.7, 6.0, 0.56, e*1.15, aB);
-  col = mix(col, cB*0.48, aB*0.92);
+  vec2 pB = rot(0.85)*p;
+  vec3 cB = shadeRibbons(pB, t*0.88, 7.3, e*1.2, m, aB);
+  col = mix(col, cB*0.45, aB*0.90);
 
-  vec2 pS = p + m*0.05;
-  sphereLayer(pS, t, false, col);
+  /* Back floating spheres */
+  sphereLayer(p, t, false, m, col);
 
-  /* Front spiral — full physical studio gloss */
+  /* Main foreground sculptural ribbons (Obsidian & Gold) */
   float aF;
-  vec2 pF = p + m*0.07;
-  vec3 cF = shadeRibbon(pF, t, 6.0, 1.5, 1.0, 0.64, e, aF);
+  vec3 cF = shadeRibbons(p, t, 1.0, e, m, aF);
 
-  // Cast deep contact occlusion shadow onto layers underneath
-  col *= 1.0 - 0.65*smoothstep(0.0, 0.8, aF);
+  // Ambient occlusion shadow cast onto underlying layers
+  col *= 1.0 - 0.65*smoothstep(0.0, 0.70, aF);
   col = mix(col, cF, aF);
 
-  sphereLayer(p + m*0.10, t, true, col);
+  /* Foreground floating spheres */
+  sphereLayer(p, t, true, m, col);
 
   // Micro Gold Dust
-  col += vec3(1.0, 0.86, 0.52)*dust(p + m*0.06, t)*1.8*(1.0 - 0.7*aF);
+  col += vec3(1.0, 0.88, 0.55) * goldDust(p, t) * 1.5 * (1.0 - 0.5*aF);
 
-  // Cinematic Vignette & ACES Film Tone Mapping
+  // Vignette & ACES Tone Mapping
   vec2 sv = frag/uRes - 0.5;
-  col *= 1.0 - 0.52*dot(sv, sv)*1.5;
-  col = aces(col*1.20);
+  col *= 1.0 - 0.42*dot(sv, sv)*1.4;
+  col = aces(col*1.22);
   col = pow(col, vec3(1.0/2.2));
-  col += (hash(frag + fract(uTime)*91.7) - 0.5)*0.014;
+  
+  // Dither
+  col += (hash(frag + fract(uTime)*73.1) - 0.5)*0.008;
+  
   gl_FragColor = vec4(col, 1.0);
 }`;
 
@@ -246,7 +279,7 @@ void main(){
 
   function mount(canvas, opts) {
     opts = opts || {};
-    const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: !!opts.preserve });
+    const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance' });
     if (!gl) { canvas.classList.add('vortex-fallback'); return null; }
 
     const prog = gl.createProgram();
@@ -264,23 +297,26 @@ void main(){
     gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
 
     const U = {};
-    ['uRes', 'uTime', 'uMouse', 'uCenter', 'uZoom', 'uTwist'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
+    ['uRes', 'uTime', 'uMouse', 'uCenter', 'uZoom'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
 
+    // ZERO BLUR: Locked full crisp native resolution (capped at 2.0 for Retina/4K)
     const maxDpr = opts.maxDpr || 2;
-    let scale = Math.min(global.devicePixelRatio || 1, maxDpr);
+    const scale = Math.min(global.devicePixelRatio || 1, maxDpr);
+
     const state = {
-      center: (opts.center || [0.5, 0.5]).slice(),
-      zoom: opts.zoom || 1,
-      tCenter: (opts.center || [0.5, 0.5]).slice(),
-      tZoom: opts.zoom || 1,
-      mouse: [0.5, 0.5], tMouse: [0.5, 0.5],
-      twist: 0, tTwist: 0,
+      center: (opts.center || [0.72, 0.50]).slice(),
+      zoom: opts.zoom || 1.15,
+      mouse: [0.5, 0.5],
+      tMouse: [0.5, 0.5],
     };
 
     function resize() {
       const w = Math.max(1, Math.round(canvas.clientWidth * scale));
       const h = Math.max(1, Math.round(canvas.clientHeight * scale));
-      if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
       gl.viewport(0, 0, canvas.width, canvas.height);
     }
 
@@ -293,32 +329,22 @@ void main(){
 
     const reduced = global.matchMedia && global.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const t0 = performance.now();
-    let raf = 0, last = t0, slow = 0, fast = 0;
+    let raf = 0;
 
     function frame(now) {
       raf = requestAnimationFrame(frame);
       if (document.hidden) return;
-      const dt = now - last; last = now;
 
-      /* adaptive resolution: keep ~60 fps on any GPU, max out on strong ones */
-      if (dt > 24) { slow++; fast = 0; } else if (dt < 14) { fast++; slow = 0; }
-      if (slow > 20 && scale > 0.5) { scale = Math.max(0.5, scale * 0.85); slow = 0; resize(); }
-      if (fast > 120 && scale < Math.min(global.devicePixelRatio || 1, maxDpr)) { scale = Math.min(maxDpr, scale * 1.1); fast = 0; resize(); }
-
-      const k = 0.06;
-      state.center[0] += (state.tCenter[0] - state.center[0]) * k;
-      state.center[1] += (state.tCenter[1] - state.center[1]) * k;
-      state.zoom += (state.tZoom - state.zoom) * k;
-      state.mouse[0] += (state.tMouse[0] - state.mouse[0]) * 0.05;
-      state.mouse[1] += (state.tMouse[1] - state.mouse[1]) * 0.05;
-      state.twist += (state.tTwist - state.twist) * 0.08;
+      // Smooth studio light specular response
+      state.mouse[0] += (state.tMouse[0] - state.mouse[0]) * 0.04;
+      state.mouse[1] += (state.tMouse[1] - state.mouse[1]) * 0.04;
 
       gl.uniform2f(U.uRes, canvas.width, canvas.height);
       gl.uniform1f(U.uTime, reduced ? 0 : (now - t0) / 1000);
       gl.uniform2f(U.uMouse, state.mouse[0], state.mouse[1]);
       gl.uniform2f(U.uCenter, state.center[0], state.center[1]);
       gl.uniform1f(U.uZoom, state.zoom);
-      gl.uniform1f(U.uTwist, state.twist);
+
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     }
 
@@ -327,10 +353,10 @@ void main(){
 
     return {
       setTarget(t) {
-        if (t.center) { state.tCenter[0] = t.center[0]; state.tCenter[1] = t.center[1]; }
-        if (typeof t.zoom === 'number') state.tZoom = t.zoom;
+        if (t.center) { state.center[0] = t.center[0]; state.center[1] = t.center[1]; }
+        if (typeof t.zoom === 'number') state.zoom = t.zoom;
       },
-      setScroll(px) { state.tTwist = px * 0.0009; },
+      setScroll() {},
       getScale() { return scale; },
       destroy() {
         cancelAnimationFrame(raf);
