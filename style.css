@@ -4132,16 +4132,6 @@ body.vortex-mode .vortex-sub {
   padding: 0 !important;
   border: none !important;
 }
-  border: 1px solid rgba(56, 227, 112, 0.35);
-  padding: 8px 18px;
-  border-radius: 30px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: #38e370;
-  letter-spacing: 0.06em;
-  margin-bottom: 20px;
-  box-shadow: 0 0 25px rgba(56, 227, 112, 0.15);
-}
 
 .editions-verification-row {
   margin-top: 18px;
@@ -5336,4 +5326,71 @@ button[class*="gold"], a[class*="gold"], .aeterna-btn-gold {
   flex-wrap: wrap !important;
   gap: 14px !important;
   margin: 24px 0 28px 0 !important;
+}
+
+/* 8K ARCHITECTURAL BACKGROUND GRID & AMBIENT DEPTH */
+body {
+  background-image: 
+    radial-gradient(circle at 50% 35%, rgba(212, 175, 55, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 15% 75%, rgba(212, 175, 55, 0.05) 0%, transparent 50%),
+    radial-gradient(circle at 85% 90%, rgba(56, 189, 248, 0.03) 0%, transparent 45%),
+    linear-gradient(rgba(255, 255, 255, 0.014) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px) !important;
+  background-size: 100% 100%, 100% 100%, 100% 100%, 64px 64px, 64px 64px !important;
+  background-attachment: fixed !important;
+}
+
+/* HARDWARE-STYLE FORM INPUTS & 24K GOLD SWITCHES */
+input[type="text"], input[type="email"], input[type="tel"], input[type="number"], select, textarea {
+  background: rgba(13, 16, 23, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-top: 1px solid rgba(212, 175, 55, 0.35) !important;
+  color: #f3f4f6 !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6) !important;
+  transition: border-color 0.25s, box-shadow 0.25s !important;
+}
+input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="number"]:focus, select:focus, textarea:focus {
+  border-color: #d4af37 !important;
+  outline: none !important;
+  box-shadow: 0 0 15px rgba(212, 175, 55, 0.35), inset 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+input[type="checkbox"], input[type="radio"] {
+  accent-color: #d4af37 !important;
+  filter: drop-shadow(0 0 6px rgba(212, 175, 55, 0.5)) !important;
+  cursor: pointer !important;
+}
+
+/* SWISS PRIVATE BANK LUXURY MODALS & PROPOSALS */
+div[class*="modal"] > div, div[id*="modal"] > div {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12), transparent 70%),
+    linear-gradient(180deg, #0d1017 0%, #050608 100%) !important;
+  border: 1px solid rgba(212, 175, 55, 0.45) !important;
+  box-shadow: 
+    0 50px 140px rgba(0, 0, 0, 0.98),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  backdrop-filter: blur(40px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(190%) !important;
+}
+table, .proposal-table, .invoice-table {
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 6px !important;
+}
+table tr, .proposal-table tr {
+  background: rgba(255, 255, 255, 0.02) !important;
+  transition: background 0.2s ease !important;
+}
+table tr:hover, .proposal-table tr:hover {
+  background: rgba(212, 175, 55, 0.06) !important;
+}
+table th {
+  color: #d4af37 !important;
+  font-family: var(--font-mono, monospace) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.1em !important;
+  text-transform: uppercase !important;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.25) !important;
 }
