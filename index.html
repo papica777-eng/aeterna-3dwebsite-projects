@@ -1834,13 +1834,65 @@
 
       <div class="demo-3d-viewport-box">
         <canvas id="canvas3dDemo"></canvas>
-        <div class="demo-3d-overlay-hint">
-          <span>👆 Drag to Rotate 360&deg; &bull; Scroll to Zoom &bull; Touch-Responsive</span>
+        
+        <!-- Live HUD Telemetry Benchmark -->
+        <div class="demo-3d-live-bench">
+          <div class="bench-header">
+            <span class="bench-pulse-dot"></span>
+            <span class="bench-title">SPATIAL TELEMETRY</span>
+          </div>
+          <div class="bench-metrics">
+            <span class="bench-metric"><b id="demoFpsCounter">60</b> FPS</span>
+            <span class="bench-sep">&bull;</span>
+            <span class="bench-metric"><b id="demoLatencyCounter">0.6</b> ms</span>
+            <span class="bench-sep">&bull;</span>
+            <span class="bench-metric" id="demoShaderCounter">PBR RAYTRACED</span>
+          </div>
         </div>
-        <div class="demo-3d-telemetry">
-          <span class="telemetry-pill">WebGL 2.0 PBR</span>
-          <span class="telemetry-pill" id="demoFpsCounter">60 FPS</span>
-          <span class="telemetry-pill">Metallic Specular Shader</span>
+
+        <div class="demo-3d-overlay-hint">
+          <span>👆 Drag to Rotate 360&deg; &bull; Scroll to Zoom</span>
+        </div>
+
+        <!-- Floating 4D & Explode Controls Overlay -->
+        <div class="demo-3d-floating-toolbar">
+          <div class="hud-tool-row">
+            <!-- Explode View Trigger & Slider -->
+            <button type="button" class="btn-hud-tool" id="btnToggleExplode" title="Disassemble internal mechanical components">
+              <span class="tool-icon">💥</span> EXPLODE VIEW
+            </button>
+            <div class="hud-slider-wrap" id="hudSliderWrap">
+              <span class="hud-slider-label">EXP:</span>
+              <input type="range" id="sliderExplode" min="0" max="100" value="0" class="hud-mini-slider" aria-label="Explode Percentage">
+              <span class="hud-slider-val" id="valExplode">0%</span>
+            </div>
+
+            <!-- 4D Living Fluid Morphing -->
+            <button type="button" class="btn-hud-tool" id="btnToggle4d" title="4D Living Wave Mesh Displacement">
+              <span class="tool-icon">🌊</span> <span id="label4d">4D FLOW: OFF</span>
+            </button>
+
+            <!-- Web Audio Spatial Sound -->
+            <button type="button" class="btn-hud-tool" id="btnToggleAudio" title="Toggle Mechanical Escapement & Crystal Sound">
+              <span class="tool-icon" id="audioIcon">🔊</span> <span id="labelAudio">AUDIO: ON</span>
+            </button>
+          </div>
+
+          <!-- PBR Material Switcher -->
+          <div class="hud-tool-row mat-row">
+            <span class="hud-row-title">MATERIAL PBR:</span>
+            <div class="hud-mat-group">
+              <button type="button" class="btn-hud-mat active" data-mat="gold" title="24K Haute Horlogerie Gold">
+                🟡 24K Swiss Gold
+              </button>
+              <button type="button" class="btn-hud-mat" data-mat="diamond" title="High-Refraction Diamond Crystal">
+                💎 Diamond Refract
+              </button>
+              <button type="button" class="btn-hud-mat" data-mat="obsidian" title="Black Ceramic Obsidian">
+                ⚫ Dark Obsidian
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -1294,13 +1294,24 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
   });
 
   // ==========================================================================
-  // 8d. THREE.JS LUXURY 3D INTERACTIVE SANDBOX ENGINE
+  // 8d. THREE.JS LUXURY 3D INTERACTIVE SANDBOX ENGINE (4D PBR & SPATIAL AUDIO)
   // ==========================================================================
   const modal3dDemo = document.getElementById('modal3dDemo');
   const canvas3dDemo = document.getElementById('canvas3dDemo');
   const demo3dTitle = document.getElementById('demo3dTitle');
   const demoFpsCounter = document.getElementById('demoFpsCounter');
+  const demoLatencyCounter = document.getElementById('demoLatencyCounter');
+  const demoShaderCounter = document.getElementById('demoShaderCounter');
   const btnAdopt3dAddon = document.getElementById('btnAdopt3dAddon');
+
+  const btnToggleExplode = document.getElementById('btnToggleExplode');
+  const sliderExplode = document.getElementById('sliderExplode');
+  const valExplode = document.getElementById('valExplode');
+  const btnToggle4d = document.getElementById('btnToggle4d');
+  const label4d = document.getElementById('label4d');
+  const btnToggleAudio = document.getElementById('btnToggleAudio');
+  const audioIcon = document.getElementById('audioIcon');
+  const labelAudio = document.getElementById('labelAudio');
 
   let renderer3d = null;
   let scene3d = null;
@@ -1316,6 +1327,107 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
   let currentZoom = 5.0;
   let frameCount = 0;
   let lastFpsTime = performance.now();
+  let avgLatency = 0.6;
+
+  // 4D & Explode & Material States
+  let targetExplodeFactor = 0.0;
+  let currentExplodeFactor = 0.0;
+  let is4dFlowActive = false;
+  let activeMaterialTheme = 'gold';
+
+  // Spatial Audio Engine (Web Audio API - Zero External Audio Files)
+  let audioCtx = null;
+  let isAudioEnabled = true;
+  let lastAudioTickTime = 0;
+  let accumulatedDragDist = 0;
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass();
+      }
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function playMechanicalClick(freq = 2400) {
+    if (!isAudioEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.015);
+
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(freq, ctx.currentTime);
+      filter.Q.setValueAtTime(4.0, ctx.currentTime);
+
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.025);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + 0.03);
+    } catch (_) {}
+  }
+
+  function playCrystalChime(baseFreq = 880) {
+    if (!isAudioEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      [baseFreq, baseFreq * 1.5, baseFreq * 2.0].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+        const vol = 0.05 / (idx + 1);
+        gain.gain.setValueAtTime(vol, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.5);
+      });
+    } catch (_) {}
+  }
+
+  function playExplodeWhoosh(isExpanding) {
+    if (!isAudioEnabled) return;
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      const startFreq = isExpanding ? 160 : 640;
+      const endFreq = isExpanding ? 640 : 160;
+      osc.frequency.setValueAtTime(startFreq, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + 0.18);
+
+      gain.gain.setValueAtTime(0.05, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.2);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.22);
+    } catch (_) {}
+  }
 
   const MODEL_META = {
     watch: {
@@ -1329,12 +1441,76 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
     }
   };
 
+  function applyMaterialTheme(matKey) {
+    activeMaterialTheme = matKey;
+    if (!currentMeshGroup) return;
+
+    let matProps = {};
+    let shaderDesc = 'PBR 24K GOLD ACTIVE';
+
+    if (matKey === 'gold') {
+      matProps = {
+        color: 0xd4af37,
+        metalness: 0.95,
+        roughness: 0.18,
+        transmission: 0.0,
+        clearcoat: 0.4
+      };
+      shaderDesc = 'PBR 24K GOLD ACTIVE';
+    } else if (matKey === 'diamond') {
+      matProps = {
+        color: 0xffffff,
+        metalness: 0.05,
+        roughness: 0.03,
+        transmission: 0.92,
+        thickness: 1.2,
+        clearcoat: 1.0,
+        clearcoatRoughness: 0.05
+      };
+      shaderDesc = 'PBR DIAMOND TRANSMISSION';
+    } else if (matKey === 'obsidian') {
+      matProps = {
+        color: 0x090a10,
+        metalness: 0.88,
+        roughness: 0.14,
+        transmission: 0.0,
+        clearcoat: 0.9,
+        clearcoatRoughness: 0.1
+      };
+      shaderDesc = 'PBR OBSIDIAN CERAMIC';
+    }
+
+    if (demoShaderCounter) demoShaderCounter.textContent = shaderDesc;
+
+    currentMeshGroup.traverse((obj) => {
+      if (obj.isMesh && obj.material && obj.name !== 'ruby') {
+        if (matKey === 'diamond') {
+          if (!(obj.material instanceof THREE.MeshPhysicalMaterial)) {
+            obj.material = new THREE.MeshPhysicalMaterial(matProps);
+          } else {
+            Object.assign(obj.material, matProps);
+            obj.material.needsUpdate = true;
+          }
+        } else {
+          if (!(obj.material instanceof THREE.MeshStandardMaterial)) {
+            obj.material = new THREE.MeshStandardMaterial(matProps);
+          } else {
+            Object.assign(obj.material, matProps);
+            obj.material.needsUpdate = true;
+          }
+        }
+      }
+    });
+
+    playCrystalChime(matKey === 'gold' ? 880 : matKey === 'diamond' ? 1320 : 660);
+  }
+
   function initThreeJsSandbox() {
     if (!window.THREE || !canvas3dDemo) return;
     if (renderer3d) return;
 
     scene3d = new THREE.Scene();
-    camera3d = new THREE.PerspectiveCamera(45, canvas3dDemo.clientWidth / (canvas3dDemo.clientHeight || 450), 0.1, 100);
+    camera3d = new THREE.PerspectiveCamera(45, canvas3dDemo.clientWidth / (canvas3dDemo.clientHeight || 480), 0.1, 100);
     camera3d.position.set(0, 0, currentZoom);
 
     renderer3d = new THREE.WebGLRenderer({
@@ -1344,7 +1520,7 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       powerPreference: 'high-performance'
     });
     renderer3d.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer3d.setSize(canvas3dDemo.clientWidth, canvas3dDemo.clientHeight || 450);
+    renderer3d.setSize(canvas3dDemo.clientWidth, canvas3dDemo.clientHeight || 480);
     renderer3d.toneMapping = THREE.ACESFilmicToneMapping;
     renderer3d.toneMappingExposure = 1.25;
 
@@ -1372,6 +1548,7 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       is3dDragging = true;
       prevMousePos = { x: e.clientX, y: e.clientY };
       canvas3dDemo.setPointerCapture(e.pointerId);
+      getAudioContext(); // Initialize audio context on user gesture
     });
 
     canvas3dDemo.addEventListener('pointermove', (e) => {
@@ -1383,6 +1560,15 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       targetRotation.y += deltaX * 0.008;
       targetRotation.x += deltaY * 0.008;
       targetRotation.x = Math.max(-1.4, Math.min(1.4, targetRotation.x));
+
+      // Audio click on rotation
+      accumulatedDragDist += Math.hypot(deltaX, deltaY);
+      const now = performance.now();
+      if (accumulatedDragDist > 30 && now - lastAudioTickTime > 50) {
+        playMechanicalClick(2100 + Math.random() * 500);
+        accumulatedDragDist = 0;
+        lastAudioTickTime = now;
+      }
     });
 
     const stopDrag = () => { is3dDragging = false; };
@@ -1404,6 +1590,9 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       currentRotation.y += (targetRotation.y - currentRotation.y) * 0.08;
       currentZoom += (targetZoom - currentZoom) * 0.1;
 
+      // Explode smooth lerp
+      currentExplodeFactor += (targetExplodeFactor - currentExplodeFactor) * 0.12;
+
       camera3d.position.z = currentZoom;
 
       if (currentMeshGroup) {
@@ -1414,34 +1603,102 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
           targetRotation.y += 0.003;
         }
 
-        // Sub-mesh animations
+        // Sub-mesh animations & Explode View Displacements
         if (activeModelKey === 'watch') {
           const escapement = currentMeshGroup.getObjectByName('escapement');
-          if (escapement) escapement.rotation.z += 0.08;
+          if (escapement) {
+            escapement.rotation.z += 0.08;
+            escapement.position.z = currentExplodeFactor * 0.8;
+          }
           const tourbillonCage = currentMeshGroup.getObjectByName('tourbillonCage');
-          if (tourbillonCage) tourbillonCage.rotation.z -= 0.02;
+          if (tourbillonCage) {
+            tourbillonCage.rotation.z -= 0.02;
+            tourbillonCage.position.z = 0.08 + currentExplodeFactor * 1.1;
+            tourbillonCage.position.y = -0.4 - currentExplodeFactor * 0.2;
+          }
           const secondsHand = currentMeshGroup.getObjectByName('secondsHand');
-          if (secondsHand) secondsHand.rotation.z -= 0.03;
+          if (secondsHand) {
+            secondsHand.rotation.z -= 0.03;
+            secondsHand.position.z = 0.1 + currentExplodeFactor * 2.3;
+          }
+          const hourHand = currentMeshGroup.getObjectByName('hourHand');
+          if (hourHand) {
+            hourHand.position.z = 0.08 + currentExplodeFactor * 1.8;
+          }
+          const bezel = currentMeshGroup.getObjectByName('bezel');
+          if (bezel) {
+            bezel.position.z = currentExplodeFactor * 1.4;
+          }
+          const dial = currentMeshGroup.getObjectByName('dial');
+          if (dial) {
+            dial.position.z = -currentExplodeFactor * 0.35;
+          }
         } else if (activeModelKey === 'gem') {
           const goldRings = currentMeshGroup.getObjectByName('goldRings');
           if (goldRings) {
             goldRings.rotation.x += 0.01;
             goldRings.rotation.y += 0.015;
+            const scaleVal = 1.0 + currentExplodeFactor * 0.65;
+            goldRings.scale.set(scaleVal, scaleVal, scaleVal);
+          }
+          const gemCore = currentMeshGroup.getObjectByName('gemCore');
+          if (gemCore) {
+            gemCore.position.y = currentExplodeFactor * 0.8;
           }
         } else if (activeModelKey === 'globe') {
           const ringMesh = currentMeshGroup.getObjectByName('orbitalRings');
-          if (ringMesh) ringMesh.rotation.y += 0.02;
+          if (ringMesh) {
+            ringMesh.rotation.y += 0.02;
+            const scaleVal = 1.0 + currentExplodeFactor * 0.75;
+            ringMesh.scale.set(scaleVal, scaleVal, scaleVal);
+          }
+          const wireGlobe = currentMeshGroup.getObjectByName('wireGlobe');
+          if (wireGlobe) {
+            const scaleVal = 1.0 + currentExplodeFactor * 0.4;
+            wireGlobe.scale.set(scaleVal, scaleVal, scaleVal);
+          }
+        }
+
+        // 4D Living Fluid / Wave Morphing
+        if (is4dFlowActive) {
+          const t = performance.now() * 0.0028;
+          const pulse = 1.0 + Math.sin(t * 1.8) * 0.045;
+          const waveZ = Math.cos(t * 1.4) * 0.03;
+
+          if (activeModelKey === 'gem') {
+            const gemCore = currentMeshGroup.getObjectByName('gemCore');
+            if (gemCore) {
+              gemCore.scale.set(pulse, 1.0 + Math.sin(t * 2.4) * 0.06, pulse);
+              gemCore.rotation.z = waveZ;
+            }
+          } else if (activeModelKey === 'watch') {
+            const bezel = currentMeshGroup.getObjectByName('bezel');
+            if (bezel) {
+              bezel.scale.set(pulse, pulse, 1.0 + waveZ * 2.0);
+            }
+          } else if (activeModelKey === 'globe') {
+            const coreGlobe = currentMeshGroup.getObjectByName('coreGlobe');
+            if (coreGlobe) {
+              coreGlobe.scale.set(pulse, pulse, pulse);
+            }
+          }
         }
       }
 
+      const tStart = performance.now();
       renderer3d.render(scene3d, camera3d);
+      const tRender = performance.now() - tStart;
 
-      // FPS counter
+      // Moving average for latency
+      avgLatency = avgLatency * 0.9 + tRender * 0.1;
+
+      // FPS & Telemetry counter
       frameCount++;
       const now = performance.now();
-      if (now - lastFpsTime >= 1000) {
+      if (now - lastFpsTime >= 500) {
         const fps = Math.round((frameCount * 1000) / (now - lastFpsTime));
-        if (demoFpsCounter) demoFpsCounter.textContent = `${fps} FPS`;
+        if (demoFpsCounter) demoFpsCounter.textContent = `${fps}`;
+        if (demoLatencyCounter) demoLatencyCounter.textContent = avgLatency.toFixed(2);
         frameCount = 0;
         lastFpsTime = now;
       }
@@ -1452,6 +1709,13 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
   function loadModelScene(modelKey) {
     if (!scene3d) return;
     activeModelKey = modelKey;
+
+    // Reset Explode & 4D states for newly loaded scene
+    targetExplodeFactor = 0.0;
+    currentExplodeFactor = 0.0;
+    if (sliderExplode) sliderExplode.value = 0;
+    if (valExplode) valExplode.textContent = '0%';
+    if (btnToggleExplode) btnToggleExplode.classList.remove('active');
 
     if (currentMeshGroup) {
       scene3d.remove(currentMeshGroup);
@@ -1494,12 +1758,14 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       // Outer bezel ring
       const bezelGeo = new THREE.TorusGeometry(1.5, 0.18, 24, 64);
       const bezel = new THREE.Mesh(bezelGeo, goldMat);
+      bezel.name = 'bezel';
       currentMeshGroup.add(bezel);
 
       // Dial Plate
       const dialGeo = new THREE.CylinderGeometry(1.4, 1.4, 0.08, 48);
       const dialMat = new THREE.MeshStandardMaterial({ color: 0x111116, metalness: 0.6, roughness: 0.4 });
       const dial = new THREE.Mesh(dialGeo, dialMat);
+      dial.name = 'dial';
       dial.rotation.x = Math.PI / 2;
       currentMeshGroup.add(dial);
 
@@ -1509,6 +1775,7 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       cageGroup.position.set(0, -0.4, 0.08);
 
       const cageRing = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.04, 16, 32), goldMat);
+      cageRing.name = 'cageRing';
       cageGroup.add(cageRing);
 
       const escapement = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.03, 12), steelMat);
@@ -1517,6 +1784,7 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       cageGroup.add(escapement);
 
       const ruby = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 16), rubyMat);
+      ruby.name = 'ruby';
       ruby.position.z = 0.04;
       cageGroup.add(ruby);
 
@@ -1524,6 +1792,7 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
 
       // Hands
       const hourHand = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.75, 0.02), blueSteelMat);
+      hourHand.name = 'hourHand';
       hourHand.position.set(0, 0.3, 0.08);
       currentMeshGroup.add(hourHand);
 
@@ -1553,21 +1822,25 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
 
       const gemGeo = new THREE.OctahedronGeometry(1.2, 1);
       const gem = new THREE.Mesh(gemGeo, diamondMat);
+      gem.name = 'gemCore';
       currentMeshGroup.add(gem);
 
       const goldRingsGroup = new THREE.Group();
       goldRingsGroup.name = 'goldRings';
 
       const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.7, 0.05, 16, 64), goldMat);
+      ring1.name = 'ring1';
       ring1.rotation.x = 0.8;
       goldRingsGroup.add(ring1);
 
       const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.04, 16, 64), goldMat);
+      ring2.name = 'ring2';
       ring2.rotation.y = 1.1;
       goldRingsGroup.add(ring2);
 
       for (let i = 0; i < 6; i++) {
         const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.09, 16, 16), goldMat);
+        sphere.name = `satellite_${i}`;
         const angle = (i / 6) * Math.PI * 2;
         sphere.position.set(Math.cos(angle) * 1.7, Math.sin(angle) * 0.4, Math.sin(angle) * 1.7);
         goldRingsGroup.add(sphere);
@@ -1593,9 +1866,11 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
       });
 
       const coreGlobe = new THREE.Mesh(new THREE.SphereGeometry(1.3, 32, 32), obsidianMat);
+      coreGlobe.name = 'coreGlobe';
       currentMeshGroup.add(coreGlobe);
 
       const wireGlobe = new THREE.Mesh(new THREE.SphereGeometry(1.32, 24, 24), wireMat);
+      wireGlobe.name = 'wireGlobe';
       currentMeshGroup.add(wireGlobe);
 
       const hubCoords = [
@@ -1607,8 +1882,9 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
         [0.4, 0.5, -1.1]
       ];
 
-      hubCoords.forEach(([x, y, z]) => {
+      hubCoords.forEach(([x, y, z], idx) => {
         const hub = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 12), cyanGlowMat);
+        hub.name = `hubNode_${idx}`;
         hub.position.set(x, y, z);
         currentMeshGroup.add(hub);
       });
@@ -1620,6 +1896,7 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
         transparent: true,
         opacity: 0.6
       }));
+      orbitRing.name = 'orbitRing';
       orbitRing.rotation.x = Math.PI / 3;
       ringsGroup.add(orbitRing);
       currentMeshGroup.add(ringsGroup);
@@ -1627,9 +1904,63 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
 
     scene3d.add(currentMeshGroup);
 
+    // Apply active material theme to newly created meshes if not gold
+    if (activeMaterialTheme !== 'gold') {
+      applyMaterialTheme(activeMaterialTheme);
+    }
+
     const meta = MODEL_META[modelKey] || MODEL_META.watch;
     if (demo3dTitle) demo3dTitle.textContent = meta.title;
   }
+
+  // Hook up Floating HUD Interactive Controls
+  if (btnToggleExplode) {
+    btnToggleExplode.addEventListener('click', () => {
+      targetExplodeFactor = (targetExplodeFactor > 0.05 ? 0.0 : 1.0);
+      const isExp = targetExplodeFactor > 0.05;
+      btnToggleExplode.classList.toggle('active', isExp);
+      if (sliderExplode) sliderExplode.value = Math.round(targetExplodeFactor * 100);
+      if (valExplode) valExplode.textContent = `${Math.round(targetExplodeFactor * 100)}%`;
+      playExplodeWhoosh(isExp);
+    });
+  }
+
+  if (sliderExplode) {
+    sliderExplode.addEventListener('input', (e) => {
+      targetExplodeFactor = parseFloat(e.target.value) / 100;
+      if (valExplode) valExplode.textContent = `${Math.round(targetExplodeFactor * 100)}%`;
+      if (btnToggleExplode) btnToggleExplode.classList.toggle('active', targetExplodeFactor > 0.05);
+      if (Math.random() > 0.65) playMechanicalClick(2000 + targetExplodeFactor * 1000);
+    });
+  }
+
+  if (btnToggle4d) {
+    btnToggle4d.addEventListener('click', () => {
+      is4dFlowActive = !is4dFlowActive;
+      btnToggle4d.classList.toggle('active', is4dFlowActive);
+      if (label4d) label4d.textContent = is4dFlowActive ? '4D FLOW: ON' : '4D FLOW: OFF';
+      playCrystalChime(is4dFlowActive ? 1100 : 700);
+    });
+  }
+
+  if (btnToggleAudio) {
+    btnToggleAudio.addEventListener('click', () => {
+      isAudioEnabled = !isAudioEnabled;
+      btnToggleAudio.classList.toggle('active', isAudioEnabled);
+      if (audioIcon) audioIcon.textContent = isAudioEnabled ? '🔊' : '🔇';
+      if (labelAudio) labelAudio.textContent = isAudioEnabled ? 'AUDIO: ON' : 'AUDIO: OFF';
+      if (isAudioEnabled) playMechanicalClick(2600);
+    });
+  }
+
+  document.querySelectorAll('.btn-hud-mat').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.btn-hud-mat').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const mat = btn.getAttribute('data-mat') || 'gold';
+      applyMaterialTheme(mat);
+    });
+  });
 
   function open3dDemoModal(modelKey = 'watch') {
     if (!modal3dDemo) return;

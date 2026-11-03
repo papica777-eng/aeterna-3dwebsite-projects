@@ -3466,12 +3466,13 @@ body.vortex-mode .vortex-sub {
 .demo-3d-viewport-box {
   position: relative;
   width: 100%;
-  height: 440px;
-  background: radial-gradient(circle at center, #181822 0%, #07070a 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 6px;
+  height: 480px;
+  background: radial-gradient(circle at center, #151522 0%, #060609 100%);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
   overflow: hidden;
   margin-bottom: 18px;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8), 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 #canvas3dDemo {
@@ -3491,32 +3492,255 @@ body.vortex-mode .vortex-sub {
   left: 16px;
   font-family: var(--font-mono);
   font-size: 10px;
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(255, 255, 255, 0.7);
   pointer-events: none;
-  background: rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 4px 10px;
   border-radius: 12px;
+  backdrop-filter: blur(8px);
+  z-index: 5;
 }
 
-.demo-3d-telemetry {
+/* Live Spatial Telemetry HUD */
+.demo-3d-live-bench {
   position: absolute;
-  bottom: 14px;
+  top: 14px;
   right: 16px;
-  display: flex;
-  gap: 8px;
+  background: rgba(8, 10, 16, 0.85);
+  border: 1px solid rgba(0, 255, 170, 0.28);
+  border-radius: 8px;
+  padding: 6px 12px;
+  backdrop-filter: blur(10px);
+  font-family: var(--font-mono);
+  z-index: 5;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.6);
   pointer-events: none;
 }
 
-.telemetry-pill {
+.bench-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 3px;
+}
+
+.bench-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00ffaa;
+  box-shadow: 0 0 10px #00ffaa;
+  animation: benchGlow 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes benchGlow {
+  0% { opacity: 0.4; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+
+.bench-title {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #a0aec0;
+}
+
+.bench-metrics {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 10.5px;
+  color: #00ffaa;
+  letter-spacing: 0.03em;
+}
+
+.bench-metric b {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.bench-sep {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+/* Floating 4D & Explode Controls Overlay */
+.demo-3d-floating-toolbar {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(10, 12, 18, 0.88);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  border-radius: 8px;
+  padding: 10px 14px;
+  backdrop-filter: blur(14px);
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.7);
+}
+
+.hud-tool-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.btn-hud-tool {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btn-hud-tool:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: #ffd700;
+  color: #ffd700;
+  transform: translateY(-1px);
+}
+
+.btn-hud-tool.active {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #ffd700;
+  color: #ffd700;
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.35);
+}
+
+.hud-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.hud-slider-label {
   font-family: var(--font-mono);
   font-size: 9.5px;
-  color: #70baff;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid rgba(112, 186, 255, 0.3);
-  padding: 3px 8px;
-  border-radius: 10px;
-  letter-spacing: 0.04em;
+  color: #d4af37;
+  font-weight: 700;
+}
+
+.hud-mini-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 90px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.hud-mini-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #ffd700;
+  box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+  cursor: pointer;
+}
+
+.hud-slider-val {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: #ffffff;
+  min-width: 30px;
+  text-align: right;
+}
+
+.hud-tool-row.mat-row {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
+}
+
+.hud-row-title {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+}
+
+.hud-mat-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-hud-mat {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.8);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hud-mat:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  color: #ffd700;
+}
+
+.btn-hud-mat.active {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #ffd700;
+  color: #ffd700;
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+@media (max-width: 640px) {
+  .demo-3d-viewport-box {
+    height: 430px;
+  }
+  .demo-3d-floating-toolbar {
+    padding: 8px;
+    gap: 6px;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
+  }
+  .hud-tool-row {
+    gap: 6px;
+  }
+  .btn-hud-tool {
+    font-size: 9.5px;
+    padding: 5px 8px;
+  }
+  .hud-mini-slider {
+    width: 60px;
+  }
+  .demo-3d-live-bench {
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+  }
+  .bench-metrics {
+    font-size: 9px;
+    gap: 4px;
+  }
 }
 
 .demo-3d-footer {
