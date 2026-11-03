@@ -5595,3 +5595,328 @@ table th {
     display: none !important;
   }
 }
+
+/* ==========================================================================
+   AETERNA 8K SPATIAL HUD & WALL-OF-TEXT ELIMINATION ENGINE
+   ========================================================================== */
+
+/* 1. COMPACT SECTION PACING & CONTAINER REFINEMENT */
+section {
+  padding-top: 56px !important;
+  padding-bottom: 56px !important;
+}
+
+.hero-section {
+  padding-top: 80px !important;
+  padding-bottom: 60px !important;
+  min-height: 82vh !important;
+}
+
+/* 2. HERO GPU & EDGE TELEMETRY COMMAND DECK */
+.hero-telemetry-deck {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 22px 0 28px 0;
+}
+
+.telemetry-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(14, 18, 26, 0.85);
+  border: 1px solid rgba(212, 175, 55, 0.28);
+  border-radius: 99px;
+  padding: 6px 14px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: #9ca3af;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 4px 14px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+}
+
+.telemetry-dot.live-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: telemetryPulse 1.6s infinite ease-in-out;
+}
+
+@keyframes telemetryPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.4); opacity: 0.5; }
+}
+
+.telemetry-k {
+  color: rgba(212, 175, 55, 0.85);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+}
+
+.telemetry-v {
+  color: #f3f4f6;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+}
+
+/* 3. ATELIER WORKSTATION (CONSOLIDATED TABBED HUD) */
+.atelier-hud-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.atelier-hud-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.atelier-hud-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.hud-eyebrow-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.hud-status-pill {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hud-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 6px #34d399;
+}
+
+.atelier-hud-title {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3.6vw, 46px);
+  color: #ffffff;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.15;
+  margin: 0 0 12px 0;
+}
+
+.atelier-hud-lead {
+  color: #9ca3af;
+  font-size: 15px;
+  max-width: 680px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Tab Bar */
+.atelier-tabs-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.atelier-tab-btn {
+  background: rgba(15, 18, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #9ca3af;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.atelier-tab-btn .tab-index {
+  color: #d4af37;
+  font-size: 11px;
+}
+
+.atelier-tab-btn:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.atelier-tab-btn.active {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.22), transparent 70%),
+    linear-gradient(135deg, #181c26 0%, #0d1017 100%) !important;
+  border-color: #d4af37 !important;
+  color: #ffffff !important;
+  box-shadow: 
+    0 14px 35px rgba(0, 0, 0, 0.75),
+    0 0 25px rgba(212, 175, 55, 0.25),
+    inset 0 1px 0 rgba(255, 240, 180, 0.4) !important;
+}
+
+/* Panel Deck */
+.atelier-panels-deck {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12), transparent 60%),
+    linear-gradient(145deg, #0e111a 0%, #06070a 100%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 20px;
+  padding: 38px 42px;
+  box-shadow: 
+    0 40px 100px rgba(0, 0, 0, 0.9),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 0 50px rgba(212, 175, 55, 0.04);
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: 1.35fr 0.85fr;
+  gap: 36px;
+  align-items: center;
+}
+
+@media (max-width: 900px) {
+  .panel-grid { grid-template-columns: 1fr; gap: 24px; }
+  .atelier-panels-deck { padding: 24px; }
+}
+
+.panel-badge {
+  display: inline-block;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  color: #d4af37;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+
+.panel-title {
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 2.5vw, 32px);
+  color: #ffffff;
+  margin: 0 0 14px 0;
+  line-height: 1.25;
+}
+
+.panel-desc {
+  color: #9ca3af;
+  font-size: 15px;
+  line-height: 1.65;
+  margin: 0 0 22px 0;
+}
+
+.panel-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.panel-tag {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 5px 11px;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.8px;
+  color: #e5e7eb;
+}
+
+/* Metric HUD Card */
+.hud-metric-card {
+  background: rgba(7, 9, 14, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.hud-metric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+}
+
+.hud-metric-row:last-child {
+  border-bottom: none;
+}
+
+.hud-metric-row .m-k {
+  color: #9ca3af;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.8px;
+  font-size: 11px;
+}
+
+.hud-metric-row .m-v {
+  color: #ffffff;
+  font-weight: 700;
+  font-family: var(--font-mono, monospace);
+}
+
+.hud-metric-row .m-v.gold {
+  color: #f5d77f;
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+}
+
+/* 4. HORIZONTAL COMPACT PROCESS COVENANT TIMELINE */
+.process-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: 16px !important;
+  position: relative;
+}
+
+.process-step-card {
+  padding: 20px 18px !important;
+  min-height: auto !important;
+  border-radius: 14px !important;
+}
+
+.process-step-card .step-title {
+  font-size: 15px !important;
+  margin: 10px 0 8px !important;
+}
+
+.process-step-card .step-desc {
+  font-size: 12.5px !important;
+  line-height: 1.55 !important;
+  color: #9ca3af !important;
+}
+
+@media (max-width: 900px) {
+  .process-steps-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .process-steps-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

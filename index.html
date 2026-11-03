@@ -118,12 +118,29 @@
         </h1>
 
         <p class="hero-subtitle">
-          We engineer high-caliber digital products and bespoke web architecture for visionary brands.
+          We engineer high-caliber digital products, bespoke Three.js WebGL spatial realities, and turnkey digital flagships for visionary brands.
         </p>
+
+        <!-- 8K Telemetry Command Deck -->
+        <div class="hero-telemetry-deck">
+          <div class="telemetry-pill">
+            <span class="telemetry-dot live-pulse"></span>
+            <span class="telemetry-k">GPU RENDER:</span>
+            <strong class="telemetry-v">WebGL2 &bull; 120 FPS</strong>
+          </div>
+          <div class="telemetry-pill">
+            <span class="telemetry-k">EDGE LATENCY:</span>
+            <strong class="telemetry-v">&lt; 0.4s ANYCAST</strong>
+          </div>
+          <div class="telemetry-pill">
+            <span class="telemetry-k">ACTIVE NODES:</span>
+            <strong class="telemetry-v">BG-POMORIE &bull; EU-FRANKFURT &bull; CH-ZURICH</strong>
+          </div>
+        </div>
 
         <div class="hero-cta-group">
           <button class="btn btn-gold trigger-inquire-modal">START A PROJECT</button>
-          <a href="#services" class="btn btn-outline">DISCOVER MORE</a>
+          <a href="#services" class="btn btn-outline">EXPLORE CAPABILITIES</a>
         </div>
       </div>
 
@@ -145,154 +162,157 @@
 
   </section>
 
-  <!-- ==================== SERVICES SECTION ==================== -->
-  <section class="services-section" id="services">
-    <div class="services-container">
+  <!-- ==================== ATELIER WORKSTATION (CONSOLIDATED 8K HUD) ==================== -->
+  <section class="services-section atelier-hud-section" id="services">
+    <div class="atelier-hud-container">
       
-      <div class="services-header">
-        <h2 class="services-title">SERVICES</h2>
+      <div class="atelier-hud-header">
+        <div class="hud-eyebrow-row">
+          <span class="gold-eyebrow">AETERNA ATELIER WORKSTATION // CAPABILITIES &amp; ARCHITECTURE</span>
+          <span class="hud-status-pill"><span class="hud-dot"></span> 8K GPU ACCELERATED</span>
+        </div>
+        <h2 class="atelier-hud-title">Where Bare-Metal Code Meets Haute Aesthetics</h2>
+        <p class="atelier-hud-lead">
+          We reject off-the-shelf templates and bloated CMS monoliths. Inspect our compiled capabilities across three operational domains:
+        </p>
       </div>
 
-      <!-- The Exact 2x3 Architectural Glass Card Grid -->
-      <div class="services-glass-box">
+      <!-- Interactive Workstation Tab Bar -->
+      <div class="atelier-tabs-bar" role="tablist">
+        <button type="button" class="atelier-tab-btn active" data-tab="tab-spatial" role="tab" aria-selected="true">
+          <span class="tab-index">01</span>
+          <span class="tab-label">3D SPATIAL WEBGL</span>
+        </button>
+        <button type="button" class="atelier-tab-btn" data-tab="tab-commerce" role="tab" aria-selected="false">
+          <span class="tab-index">02</span>
+          <span class="tab-label">LUXURY COMMERCE</span>
+        </button>
+        <button type="button" class="atelier-tab-btn" data-tab="tab-performance" role="tab" aria-selected="false">
+          <span class="tab-index">03</span>
+          <span class="tab-label">BARE-METAL SPEED</span>
+        </button>
+      </div>
+
+      <!-- Tab Content Panels -->
+      <div class="atelier-panels-deck">
         
-        <!-- Row 1, Column 1: Premium Web Architecture -->
-        <div class="service-cell">
-          <div class="service-icon-box">
-            <!-- Code Editor Window Icon [ < / > ] -->
-            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
-              <rect x="6" y="8" width="36" height="32" rx="4"/>
-              <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
-              <circle cx="17" cy="14" r="1.5" fill="currentColor"/>
-              <circle cx="22" cy="14" r="1.5" fill="currentColor"/>
-              <path d="M18 24l-4 4 4 4M30 24l4 4-4 4M26 21l-4 14" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
+        <!-- Panel 1: 3D Spatial WebGL -->
+        <div class="atelier-panel active" id="tab-spatial" role="tabpanel">
+          <div class="panel-grid">
+            <div class="panel-left">
+              <span class="panel-badge">&#9672; HARDWARE-ACCELERATED GRAPHICS</span>
+              <h3 class="panel-title">Living Three.js Shaders &amp; 3D Realities</h3>
+              <p class="panel-desc">
+                We engineer bespoke WebGL2 shader pipelines that transform standard web pages into fluid, living 3D environments. Real-time organic vortexes, refractive crystal shaders, and interactive camera physics running at permanent 60–120 FPS.
+              </p>
+              <div class="panel-tags">
+                <span class="panel-tag">GLSL FRAGMENT SHADERS</span>
+                <span class="panel-tag">ORGANIC FLUID PHYSICS</span>
+                <span class="panel-tag">8K SUPERSAMPLING</span>
+                <span class="panel-tag">ZERO LATENCY DROPS</span>
+              </div>
+            </div>
+            <div class="panel-right">
+              <div class="hud-metric-card">
+                <div class="hud-metric-row">
+                  <span class="m-k">FRAME STABILITY</span>
+                  <span class="m-v gold">120 FPS LOCK</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">SHADER LATENCY</span>
+                  <span class="m-v">&lt; 1.2ms / frame</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">MEMORY FOOTPRINT</span>
+                  <span class="m-v">&lt; 38 MB VRAM</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">MOBILE FALLBACK</span>
+                  <span class="m-v">GPU AUTO-SCALED</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="service-heading">Premium Web Architecture</h3>
-          <p class="service-desc">Robust, elegant development</p>
         </div>
 
-        <!-- Row 1, Column 2: High-End UI/UX -->
-        <div class="service-cell">
-          <div class="service-icon-box">
-            <!-- Vector Bezier Pen Tool Icon -->
-            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M24 10l-6 12 6 6 6-6-6-12z" stroke-linejoin="round"/>
-              <circle cx="24" cy="22" r="1.5" fill="currentColor"/>
-              <path d="M10 32c4-10 10-14 14-14s10 4 14 14" stroke-linecap="round"/>
-              <rect x="8" y="30" width="4" height="4"/>
-              <rect x="36" y="30" width="4" height="4"/>
-              <path d="M12 32h24" stroke-dasharray="2 2"/>
-            </svg>
+        <!-- Panel 2: Luxury Commerce -->
+        <div class="atelier-panel" id="tab-commerce" role="tabpanel" style="display: none;">
+          <div class="panel-grid">
+            <div class="panel-left">
+              <span class="panel-badge">&#9670; CONVERSION ENGINE</span>
+              <h3 class="panel-title">High-Prestige Digital Flagships &amp; Turnkey Settlement</h3>
+              <p class="panel-desc">
+                Engineered for luxury houses, high-end clinics, academies, and private ventures. Instant frictionless checkout via Stripe, PayPal, and Apple Pay, integrated pro-forma tax invoicing, and verified appointment scheduling engines.
+              </p>
+              <div class="panel-tags">
+                <span class="panel-tag">STRIPE &amp; PAYPAL NATIVE</span>
+                <span class="panel-tag">PRO-FORMA GENERATOR</span>
+                <span class="panel-tag">CALENDAR BOOKINGS</span>
+                <span class="panel-tag">MULTI-CURRENCY</span>
+              </div>
+            </div>
+            <div class="panel-right">
+              <div class="hud-metric-card">
+                <div class="hud-metric-row">
+                  <span class="m-k">CHECKOUT CONVERSION</span>
+                  <span class="m-v gold">+42.8% LIFT</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">INVOICE GENERATION</span>
+                  <span class="m-v">&lt; 0.1s INSTANT</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">SECURITY STANDARD</span>
+                  <span class="m-v">MILITARY HTTPS / HSTS</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">CLIENT RETENTION</span>
+                  <span class="m-v">100% IP ASSIGNMENT</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="service-heading">High-End UI/UX</h3>
-          <p class="service-desc">Imaginative, bespoke interfaces</p>
         </div>
 
-        <!-- Row 1, Column 3: Strategic Branding -->
-        <div class="service-cell">
-          <div class="service-icon-box">
-            <!-- 4-Point Celestial Star with Circle Icon -->
-            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
-              <circle cx="24" cy="24" r="15"/>
-              <path d="M24 12v24M12 24h24" stroke-linecap="round"/>
-              <path d="M24 18c0 3-3 6-6 6 3 0 6 3 6 6 0-3 3-6 6-6-3 0-6-3-6-6z" fill="currentColor"/>
-              <ellipse cx="24" cy="24" rx="18" ry="7" transform="rotate(-25 24 24)"/>
-            </svg>
+        <!-- Panel 3: Bare-Metal Speed -->
+        <div class="atelier-panel" id="tab-performance" role="tabpanel" style="display: none;">
+          <div class="panel-grid">
+            <div class="panel-left">
+              <span class="panel-badge">&#10070; PURE ENGINEERING</span>
+              <h3 class="panel-title">100/100 Lighthouse &amp; Unrestricted Code Sovereignty</h3>
+              <p class="panel-desc">
+                We reject bloated CMS monoliths (WordPress, Shopify liquid bloat, fragile plugin dependencies). Every flagship is compiled from bare code with critical CSS, WebP/AVIF asset compression, and permanent transfer of 100% intellectual property.
+              </p>
+              <div class="panel-tags">
+                <span class="panel-tag">100/100 LIGHTHOUSE</span>
+                <span class="panel-tag">&lt; 0.4s EDGE LOAD</span>
+                <span class="panel-tag">ZERO PLUGIN DEPENDENCIES</span>
+                <span class="panel-tag">100% GIT IP TRANSFER</span>
+              </div>
+            </div>
+            <div class="panel-right">
+              <div class="hud-metric-card">
+                <div class="hud-metric-row">
+                  <span class="m-k">PERFORMANCE AUDIT</span>
+                  <span class="m-v gold">100 / 100 SCORE</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">TIME TO FIRST BYTE</span>
+                  <span class="m-v">&lt; 45ms ANYCAST</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">MAINTENANCE BURDEN</span>
+                  <span class="m-v">0 MONTHLY BREAKS</span>
+                </div>
+                <div class="hud-metric-row">
+                  <span class="m-k">CODE OWNERSHIP</span>
+                  <span class="m-v">100% RESTRICTED IP</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <h3 class="service-heading">Strategic Branding</h3>
-          <p class="service-desc">High-level identity and story-driven branding</p>
         </div>
 
-        <!-- Row 2, Column 1: Bespoke CMS & Platforms -->
-        <div class="service-cell">
-          <div class="service-icon-box">
-            <!-- Document Page Icon with Folded Corner -->
-            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
-              <path d="M14 6h14l10 10v26H14V6z" stroke-linejoin="round"/>
-              <path d="M28 6v10h10M20 22h14M20 28h14M20 34h8" stroke-linecap="round"/>
-            </svg>
-          </div>
-          <h3 class="service-heading">Custom CMS &amp; Platforms</h3>
-          <p class="service-desc">Tailored, scalable backend solutions</p>
-        </div>
-
-        <!-- Row 2, Column 2: Performance & SEO -->
-        <div class="service-cell">
-          <div class="service-icon-box">
-            <!-- Monitor with Ascending Chart Line -->
-            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
-              <rect x="6" y="8" width="36" height="24" rx="3"/>
-              <path d="M24 32v8M16 40h16M12 24l7-7 6 6 11-10M32 13h4v4" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3 class="service-heading">Performance &amp; SEO</h3>
-          <p class="service-desc">Sub-second load times &amp; conversion dominance</p>
-        </div>
-
-        <!-- Row 2, Column 3: Conversion Strategy -->
-        <div class="service-cell">
-          <div class="service-icon-box">
-            <!-- Target Dartboard with Arrow -->
-            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
-              <circle cx="24" cy="24" r="16"/>
-              <circle cx="24" cy="24" r="10"/>
-              <circle cx="24" cy="24" r="4" fill="currentColor"/>
-              <path d="M36 12l-10 10M36 12h-6M36 12v6" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <h3 class="service-heading">Conversion Strategy</h3>
-          <p class="service-desc">Data-backed digital acquisition &amp; ROI</p>
-        </div>
-
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ==================== OUR PHILOSOPHY SECTION ==================== -->
-  <section class="philosophy-section" id="philosophy">
-    <div class="philosophy-container">
-      
-      <div class="philosophy-banner-card">
-        <img 
-          src="./assets/philosophy_clean_bg.jpg" 
-          alt="Our Philosophy - Golden Lightning Energy" 
-          class="philosophy-bg-image"
-        >
-        <div class="philosophy-content-overlay">
-          <span class="gold-eyebrow">OUR PHILOSOPHY</span>
-          <h2 class="philosophy-title">Where Engineering Precision<br>Meets Haute Aesthetics</h2>
-          <p class="philosophy-lead">
-            We reject off-the-shelf templates and bloated frameworks. Every line of code, interaction vector, and 3D shader is custom-engineered to create enduring digital distinction.
-          </p>
-          <button class="btn btn-gold trigger-inquire-modal">DISCOVER OUR PRINCIPLES</button>
-        </div>
-      </div>
-
-      <!-- 3 Pillars Grid -->
-      <div class="pillars-grid">
-        <div class="pillar-card">
-          <span class="pillar-num">01</span>
-          <h4 class="pillar-title">Sub-Second Edge Execution</h4>
-          <p class="pillar-desc">
-            Optimized for 100/100 Lighthouse performance, instant hydration, and silky 60-120 FPS render pipelines.
-          </p>
-        </div>
-        <div class="pillar-card">
-          <span class="pillar-num">02</span>
-          <h4 class="pillar-title">Architectural Distinction</h4>
-          <p class="pillar-desc">
-            Bespoke visual narratives, fluid physics, and tactile micro-interactions that elevate brand prestige.
-          </p>
-        </div>
-        <div class="pillar-card">
-          <span class="pillar-num">03</span>
-          <h4 class="pillar-title">Enterprise Security</h4>
-          <p class="pillar-desc">
-            Hardened deployments, zero third-party vulnerability bloat, and complete IP sovereignty.
-          </p>
-        </div>
       </div>
 
     </div>
@@ -2789,6 +2809,42 @@
       document.addEventListener("DOMContentLoaded", apply8KLuxuryConfigurator);
     } else {
       apply8KLuxuryConfigurator();
+    }
+  })();
+
+  // ================== ATELIER WORKSTATION TAB SWITCHER ==================
+  (function() {
+    function initAtelierTabs() {
+      var tabBtns = document.querySelectorAll(".atelier-tab-btn");
+      var panels = document.querySelectorAll(".atelier-panel");
+      if (!tabBtns.length || !panels.length) return;
+
+      tabBtns.forEach(function(btn) {
+        btn.addEventListener("click", function() {
+          var targetId = btn.getAttribute("data-tab");
+          tabBtns.forEach(function(b) {
+            b.classList.remove("active");
+            b.setAttribute("aria-selected", "false");
+          });
+          panels.forEach(function(p) {
+            p.classList.remove("active");
+            p.style.display = "none";
+          });
+          btn.classList.add("active");
+          btn.setAttribute("aria-selected", "true");
+          var targetPanel = document.getElementById(targetId);
+          if (targetPanel) {
+            targetPanel.classList.add("active");
+            targetPanel.style.display = "block";
+          }
+        });
+      });
+    }
+
+    if (document.readyState === "loading") {
+      document.addEventListener("DOMContentLoaded", initAtelierTabs);
+    } else {
+      initAtelierTabs();
     }
   })();
 
