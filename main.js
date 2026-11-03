@@ -656,9 +656,87 @@
     });
   }
   window.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && modalOverlay && modalOverlay.classList.contains('active')) {
-      closeModal();
+    if (e.key === 'Escape') {
+      if (modalOverlay && modalOverlay.classList.contains('active')) closeModal();
+      closeAllProposalModals();
     }
+  });
+
+  // ==========================================================================
+  // 8b. PROPOSAL MODALS (TIER 01, TIER 02, TIER 03)
+  // ==========================================================================
+  const proposalModals = {
+    tier1: document.getElementById('modalProposalTier1'),
+    tier2: document.getElementById('modalProposalTier2'),
+    tier3: document.getElementById('modalProposalTier3'),
+  };
+
+  function openProposalModal(tierKey) {
+    const targetModal = proposalModals[tierKey];
+    if (!targetModal) return;
+    targetModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    if (lenis) lenis.stop();
+  }
+
+  function closeAllProposalModals() {
+    Object.values(proposalModals).forEach((m) => {
+      if (m) m.classList.remove('active');
+    });
+    if (!modalOverlay || !modalOverlay.classList.contains('active')) {
+      document.body.style.overflow = '';
+      if (lenis) lenis.start();
+    }
+  }
+
+  document.querySelectorAll('.trigger-proposal-modal').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const tier = btn.getAttribute('data-tier');
+      if (tier) openProposalModal(tier);
+    });
+  });
+
+  document.querySelectorAll('.proposal-modal .modal-close-btn').forEach((btn) => {
+    btn.addEventListener('click', closeAllProposalModals);
+  });
+
+  document.querySelectorAll('.proposal-modal').forEach((modal) => {
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeAllProposalModals();
+    });
+  });
+
+  // "INITIATE THIS TIER WITH NDA" button inside proposal modals
+  document.querySelectorAll('.initiate-tier-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const scopeChoice = btn.getAttribute('data-tier-choice');
+      const budgetChoice = btn.getAttribute('data-budget-choice');
+
+      closeAllProposalModals();
+
+      // Pre-select scope pill in inquiry modal
+      if (scopeChoice) {
+        document.querySelectorAll('.pill-service').forEach((p) => {
+          if (p.textContent.trim().includes(scopeChoice) || scopeChoice.includes(p.textContent.trim())) {
+            p.parentElement.querySelectorAll('.pill').forEach((x) => x.classList.remove('selected'));
+            p.classList.add('selected');
+          }
+        });
+      }
+
+      // Pre-select budget pill in inquiry modal
+      if (budgetChoice) {
+        document.querySelectorAll('.pill-budget').forEach((p) => {
+          if (p.innerHTML.includes(budgetChoice) || budgetChoice.includes(p.innerHTML)) {
+            p.parentElement.querySelectorAll('.pill').forEach((x) => x.classList.remove('selected'));
+            p.classList.add('selected');
+          }
+        });
+      }
+
+      // Open inquiry modal with selected tier prefilled
+      setTimeout(openModal, 120);
+    });
   });
 
   // Pill selectors
