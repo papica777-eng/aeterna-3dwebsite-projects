@@ -669,6 +669,7 @@
     tier1: document.getElementById('modalProposalTier1'),
     tier2: document.getElementById('modalProposalTier2'),
     tier3: document.getElementById('modalProposalTier3'),
+    tier4: document.getElementById('modalProposalTier4'),
   };
 
   function openProposalModal(tierKey) {

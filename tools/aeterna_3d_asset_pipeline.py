@@ -137,3 +137,4 @@ if __name__ == "__main__":
                 process_file(f)
                 break
         log("Single pass complete. Run with --watch to keep resident.")
+

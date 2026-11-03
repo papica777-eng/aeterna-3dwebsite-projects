@@ -1540,12 +1540,17 @@ body.vortex-mode .vortex-sub {
   color: var(--text-muted);
 }
 
-/* 3-Column Luxury Editions Grid */
+/* 3-Column / 4-Column Luxury Editions Grid */
 .editions-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 32px;
   align-items: stretch;
+}
+
+.editions-grid.four-col {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
 }
 
 .edition-card {
@@ -1729,6 +1734,32 @@ body.vortex-mode .vortex-sub {
   color: #ffffff;
 }
 
+.btn-paypal-direct {
+  background: rgba(0, 48, 135, 0.22);
+  border: 1px solid rgba(0, 112, 186, 0.5);
+  color: #70baff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  padding: 11px 14px;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-paypal-direct:hover {
+  background: #003087;
+  border-color: #0070ba;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(0, 112, 186, 0.35);
+}
+
 .pdf-icon {
   font-size: 14px;
 }
@@ -1864,7 +1895,61 @@ body.vortex-mode .vortex-sub {
   font-size: 12.5px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 24px;
+}
+
+.proposal-payment-box {
+  background: rgba(0, 48, 135, 0.14);
+  border: 1px solid rgba(0, 112, 186, 0.45);
+  border-radius: 8px;
+  padding: 18px 22px;
   margin-bottom: 28px;
+}
+
+.p-pay-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #70baff;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+}
+
+.p-pay-desc {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+
+.p-pay-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-paypal {
+  background: linear-gradient(90deg, #003087, #0070ba);
+  color: #ffffff !important;
+  border: 1px solid #0070ba;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.25s ease;
+  width: 100%;
+}
+
+.btn-paypal:hover {
+  background: linear-gradient(90deg, #002266, #005599);
+  border-color: #3399ff;
+  box-shadow: 0 4px 20px rgba(0, 112, 186, 0.45);
 }
 
 .proposal-modal-actions {
@@ -1883,10 +1968,24 @@ body.vortex-mode .vortex-sub {
 }
 
 /* Responsive adjustments for proposals */
+@media (max-width: 1360px) {
+  .editions-grid.four-col {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 1080px) {
   .editions-grid {
     grid-template-columns: 1fr;
     max-width: 620px;
+    margin: 0 auto;
+  }
+  .editions-grid.four-col {
+    grid-template-columns: 1fr;
+    max-width: 580px;
     margin: 0 auto;
   }
   .edition-card.featured {

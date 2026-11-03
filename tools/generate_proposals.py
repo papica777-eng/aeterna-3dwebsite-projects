@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
 """
 ═══════════════════════════════════════════════════════════════════════════════
-🔱 AETERNA DIGITAL // HAUTE COMMERCIAL PROPOSALS GENERATOR
-Generates 3 Official Executive PDF Proposals for Website & Spatial Engineering:
-  - TIER I:   Haute Identity & Bespoke Digital Presence (€4,800 EUR)
-  - TIER II:  3D Spatial Web & Living PBR Shader Reality (€14,500 EUR)
-  - TIER III: Sovereign Enterprise HUD & Mission-Critical Terminal (€38,000 EUR)
+🔱 AETERNA DIGITAL // HAUTE COMMERCIAL PROPOSALS GENERATOR v2.0
+Ясни, разбираеми за всеки клиент оферти с реални, атрактивни цени:
+  - ОФЕРТА 01: Бърз Старт & Фирмен Сайт (€890 EUR / 1,740 лв.)
+  - ОФЕРТА 02: Премиум Бизнес Сайт & Бранд (€1,850 EUR / 3,620 лв.)
+  - ОФЕРТА 03: 3D Пространствен Сайт & Ефекти (€3,900 EUR / 7,630 лв.)
+  - ОФЕРТА 04: Специализирана Платформа & Магазин (€7,800 EUR / 15,250 лв.)
+Включва:
+  - Какво получава клиентът на достъпен език (без програмистки термини)
+  - С какво сме по-добри от 90% от останалите уеб дизайнери
+  - PayPal & Банков линк за директно плащане и автоматично издаване на фактура
 ═══════════════════════════════════════════════════════════════════════════════
 """
 
@@ -14,7 +19,7 @@ import sys
 from reportlab.lib.pagesizes import A4
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import mm, inch
+from reportlab.lib.units import mm
 from reportlab.platypus import (
     SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, HRFlowable, KeepTogether
 )
@@ -22,7 +27,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
-# Register Unicode fonts from Windows
 FONT_DIR = r"C:\Windows\Fonts"
 try:
     pdfmetrics.registerFont(TTFont('Georgia', os.path.join(FONT_DIR, 'georgia.ttf')))
@@ -34,28 +38,23 @@ try:
     SANS_FONT = 'Arial'
     SANS_BOLD = 'Arial-Bold'
 except Exception as e:
-    print(f"[!] Warning registering fonts: {e}")
     SERIF_FONT = 'Times-Roman'
     SERIF_BOLD = 'Times-Bold'
     SANS_FONT = 'Helvetica'
     SANS_BOLD = 'Helvetica-Bold'
 
-# Color Palette: Luxury Obsidian & 24K Bullion Gold
 COLOR_OBSIDIAN = colors.HexColor('#0a0b0e')
-COLOR_DARK_SURFACE = colors.HexColor('#13151a')
 COLOR_GOLD = colors.HexColor('#c5a34e')
-COLOR_GOLD_LIGHT = colors.HexColor('#dfc376')
 COLOR_GOLD_DARK = colors.HexColor('#8c6f28')
-COLOR_TEXT_WHITE = colors.HexColor('#ffffff')
 COLOR_TEXT_BODY = colors.HexColor('#2c2f35')
 COLOR_TEXT_MUTED = colors.HexColor('#6b707b')
-COLOR_BG_CARD = colors.HexColor('#f7f8fa')
-COLOR_BORDER = colors.HexColor('#e3e6ec')
-COLOR_SUCCESS = colors.HexColor('#1e7e34')
+COLOR_BG_CARD = colors.HexColor('#f8f9fb')
+COLOR_BORDER = colors.HexColor('#e2e5eb')
+COLOR_GREEN = colors.HexColor('#16833b')
+COLOR_PAYPAL_BLUE = colors.HexColor('#003087')
 
 
 class NumberedCanvas(canvas.Canvas):
-    """Two-pass canvas for total page count & luxury corporate header/footer"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._saved_page_states = []
@@ -76,389 +75,327 @@ class NumberedCanvas(canvas.Canvas):
         self.saveState()
         w, h = A4
 
-        # Top luxury gold accent line
+        # Top Gold Strip
         self.setFillColor(COLOR_GOLD)
         self.rect(0, h - 4*mm, w, 4*mm, fill=1, stroke=0)
 
-        # Header running text
+        # Header running line
         self.setFont(SANS_BOLD, 7)
         self.setFillColor(COLOR_GOLD_DARK)
-        self.drawString(20*mm, h - 11*mm, "▲ AETERNA DIGITAL // HAUTE WEB ARCHITECTURE")
+        self.drawString(18*mm, h - 11*mm, "▲ AETERNA DIGITAL // ОФИЦИАЛНА ТЪРГОВСКА ОФЕРТА")
         self.setFont(SANS_FONT, 7)
         self.setFillColor(COLOR_TEXT_MUTED)
-        self.drawRightString(w - 20*mm, h - 11*mm, "OFFICIAL COMMERCIAL PROPOSAL // 2026")
+        self.drawRightString(w - 18*mm, h - 11*mm, "ИЗРАБОТКА НА УЕБСАЙТ И ДИГИТАЛНО ПРИСЪСТВИЕ // 2026")
 
-        # Thin header divider line
         self.setStrokeColor(COLOR_BORDER)
         self.setLineWidth(0.5)
-        self.line(20*mm, h - 13*mm, w - 20*mm, h - 13*mm)
+        self.line(18*mm, h - 13*mm, w - 18*mm, h - 13*mm)
 
-        # Footer running text
-        self.line(20*mm, 15*mm, w - 20*mm, 15*mm)
+        # Footer running line
+        self.line(18*mm, 14*mm, w - 18*mm, 14*mm)
         self.setFont(SANS_FONT, 7)
         self.setFillColor(COLOR_TEXT_MUTED)
-        self.drawString(20*mm, 10*mm, "Aeterna Digital Atelier • Pomorie HQ • Dimitar Prodromov • Confidential Client Dispatch")
-        page_str = f"Page {self._pageNumber} of {page_count}"
-        self.drawRightString(w - 20*mm, 10*mm, page_str)
+        self.drawString(18*mm, 9*mm, "Aeterna Digital Studio • Поморие / София • Димитър Продромов • Тел: +359 888 888 888 • inquire@aeterna.digital")
+        page_str = f"Страница {self._pageNumber} от {page_count}"
+        self.drawRightString(w - 18*mm, 9*mm, page_str)
 
         self.restoreState()
 
 
 def create_proposal_pdf(output_path, data):
-    """Builds a complete multi-page branded luxury PDF proposal"""
     doc = SimpleDocTemplate(
         output_path,
         pagesize=A4,
-        leftMargin=20*mm,
-        rightMargin=20*mm,
-        topMargin=20*mm,
-        bottomMargin=22*mm
+        leftMargin=18*mm,
+        rightMargin=18*mm,
+        topMargin=18*mm,
+        bottomMargin=18*mm
     )
 
-    styles = getSampleStyleSheet()
-
-    # Custom Luxury Styles
-    style_eyebrow = ParagraphStyle(
-        'Eyebrow',
-        fontName=SANS_BOLD,
-        fontSize=8,
-        leading=10,
-        textColor=COLOR_GOLD_DARK,
-        textTransform='uppercase',
-        spaceAfter=4
-    )
-    style_title = ParagraphStyle(
-        'ProposalTitle',
-        fontName=SERIF_BOLD,
-        fontSize=22,
-        leading=26,
-        textColor=COLOR_OBSIDIAN,
-        spaceAfter=6
-    )
-    style_subtitle = ParagraphStyle(
-        'ProposalSubtitle',
-        fontName=SERIF_FONT,
-        fontSize=12,
-        leading=16,
-        textColor=COLOR_TEXT_MUTED,
-        spaceAfter=14
-    )
-    style_h2 = ParagraphStyle(
-        'Heading2',
-        fontName=SERIF_BOLD,
-        fontSize=13,
-        leading=17,
-        textColor=COLOR_OBSIDIAN,
-        spaceBefore=12,
-        spaceAfter=6
-    )
-    style_body = ParagraphStyle(
-        'BodyDark',
-        fontName=SANS_FONT,
-        fontSize=9,
-        leading=13.5,
-        textColor=COLOR_TEXT_BODY,
-        spaceAfter=6
-    )
-    style_body_bold = ParagraphStyle(
-        'BodyDarkBold',
-        fontName=SANS_BOLD,
-        fontSize=9,
-        leading=13.5,
-        textColor=COLOR_OBSIDIAN
-    )
-    style_table_cell = ParagraphStyle(
-        'TableCell',
-        fontName=SANS_FONT,
-        fontSize=8.5,
-        leading=12,
-        textColor=COLOR_TEXT_BODY
-    )
-    style_table_cell_bold = ParagraphStyle(
-        'TableCellBold',
-        fontName=SANS_BOLD,
-        fontSize=8.5,
-        leading=12,
-        textColor=COLOR_OBSIDIAN
-    )
-    style_investment_num = ParagraphStyle(
-        'InvestmentNum',
-        fontName=SERIF_BOLD,
-        fontSize=24,
-        leading=28,
-        textColor=COLOR_GOLD_DARK,
-        alignment=1
-    )
+    style_eyebrow = ParagraphStyle('Eyebrow', fontName=SANS_BOLD, fontSize=8, leading=10, textColor=COLOR_GOLD_DARK)
+    style_title = ParagraphStyle('Title', fontName=SERIF_BOLD, fontSize=20, leading=24, textColor=COLOR_OBSIDIAN, spaceAfter=4)
+    style_subtitle = ParagraphStyle('Subtitle', fontName=SERIF_FONT, fontSize=11, leading=15, textColor=COLOR_TEXT_MUTED, spaceAfter=10)
+    style_h2 = ParagraphStyle('H2', fontName=SERIF_BOLD, fontSize=12, leading=15, textColor=COLOR_OBSIDIAN, spaceBefore=8, spaceAfter=4)
+    style_body = ParagraphStyle('Body', fontName=SANS_FONT, fontSize=8.5, leading=12.5, textColor=COLOR_TEXT_BODY, spaceAfter=4)
+    style_body_bold = ParagraphStyle('BodyBold', fontName=SANS_BOLD, fontSize=8.5, leading=12.5, textColor=COLOR_OBSIDIAN)
+    style_cell = ParagraphStyle('Cell', fontName=SANS_FONT, fontSize=8, leading=11, textColor=COLOR_TEXT_BODY)
+    style_cell_bold = ParagraphStyle('CellBold', fontName=SANS_BOLD, fontSize=8, leading=11, textColor=COLOR_OBSIDIAN)
+    style_cell_green = ParagraphStyle('CellGreen', fontName=SANS_BOLD, fontSize=8, leading=11, textColor=COLOR_GREEN)
 
     story = []
 
-    # Title & Metadata
+    # Title & Header
     story.append(Paragraph(data['eyebrow'], style_eyebrow))
     story.append(Paragraph(data['title'], style_title))
     story.append(Paragraph(data['subtitle'], style_subtitle))
-    story.append(HRFlowable(width="100%", thickness=1, color=COLOR_GOLD, spaceBefore=0, spaceAfter=12))
+    story.append(HRFlowable(width="100%", thickness=1, color=COLOR_GOLD, spaceBefore=0, spaceAfter=8))
 
-    # Meta Info Grid Table
-    meta_data = [
+    # Meta Quick Info Box
+    meta_box = [
         [
-            Paragraph("<b>Target Sector:</b> " + data['sector'], style_body),
-            Paragraph("<b>Timeline:</b> " + data['timeline'], style_body)
+            Paragraph("<b>За кого е подходящо:</b> " + data['target'], style_body),
+            Paragraph("<b>Срок за изпълнение:</b> " + data['timeline'], style_body)
         ],
         [
-            Paragraph("<b>Indicative Investment:</b> " + data['investment_short'], style_body),
-            Paragraph("<b>SLA & Sovereignty:</b> " + data['sla_short'], style_body)
-        ],
+            Paragraph("<b>Крайна цена (фиксирана):</b> <font color='#8c6f28'><b>" + data['price_eur'] + "</b> (" + data['price_bgn'] + ")</font>", style_body),
+            Paragraph("<b>Включена поддръжка:</b> " + data['sla'], style_body)
+        ]
     ]
-    t_meta = Table(meta_data, colWidths=[85*mm, 85*mm])
+    t_meta = Table(meta_box, colWidths=[87*mm, 87*mm])
     t_meta.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1), COLOR_BG_CARD),
         ('BOX', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-        ('LEFTPADDING', (0, 0), (-1, -1), 8),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+        ('PADDING', (0, 0), (-1, -1), 5),
     ]))
     story.append(t_meta)
-    story.append(Spacer(1, 10))
-
-    # 1. Executive Summary
-    story.append(Paragraph("1. EXECUTIVE SUMMARY & STRATEGIC MISSION", style_h2))
-    story.append(Paragraph(data['exec_summary'], style_body))
     story.append(Spacer(1, 6))
 
-    # 2. Architectural Stack & Capabilities Table
-    story.append(Paragraph("2. ARCHITECTURAL STACK & PERFORMANCE ENGINE", style_h2))
-    stack_rows = [[Paragraph("<b>Component / Layer</b>", style_table_cell_bold), Paragraph("<b>Technology & Specifications</b>", style_table_cell_bold)]]
-    for layer, tech in data['stack']:
-        stack_rows.append([Paragraph(layer, style_table_cell_bold), Paragraph(tech, style_table_cell)])
-    t_stack = Table(stack_rows, colWidths=[50*mm, 120*mm])
-    t_stack.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), COLOR_OBSIDIAN),
-        ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_TEXT_WHITE),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('GRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
-        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, COLOR_BG_CARD]),
-    ]))
-    story.append(t_stack)
-    story.append(Spacer(1, 8))
+    # 1. Какво реално получавате (Plain human language)
+    story.append(Paragraph("1. КАКВО РЕАЛНО ПОЛУЧАВАТЕ ВИЕ КАТО КЛИЕНТ (ЯСНО И ТОЧНО)", style_h2))
+    story.append(Paragraph(data['what_you_get_intro'], style_body))
 
-    # 3. Deliverables & Production Modules
-    story.append(Paragraph("3. SCOPE OF DELIVERABLES & CORE MODULES", style_h2))
-    deliv_rows = [[Paragraph("<b>#</b>", style_table_cell_bold), Paragraph("<b>Module / Specification</b>", style_table_cell_bold), Paragraph("<b>Scope & Deliverable Description</b>", style_table_cell_bold)]]
-    for i, (mod, desc) in enumerate(data['deliverables'], 1):
-        deliv_rows.append([Paragraph(f"<b>{i:02d}</b>", style_table_cell_bold), Paragraph(mod, style_table_cell_bold), Paragraph(desc, style_table_cell)])
-    t_deliv = Table(deliv_rows, colWidths=[10*mm, 55*mm, 105*mm])
+    deliv_rows = [[Paragraph("<b>#</b>", style_cell_bold), Paragraph("<b>Елемент от сайта</b>", style_cell_bold), Paragraph("<b>Каква е ползата за Вашия бизнес</b>", style_cell_bold)]]
+    for i, (item, benefit) in enumerate(data['deliverables'], 1):
+        deliv_rows.append([Paragraph(f"<b>{i:02d}</b>", style_cell_bold), Paragraph(item, style_cell_bold), Paragraph(benefit, style_cell)])
+    t_deliv = Table(deliv_rows, colWidths=[10*mm, 52*mm, 112*mm])
     t_deliv.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), COLOR_OBSIDIAN),
-        ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_TEXT_WHITE),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('GRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
+        ('PADDING', (0, 0), (-1, -1), 4),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, COLOR_BG_CARD]),
     ]))
     story.append(t_deliv)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
-    # 4. Phased Milestones & Delivery Roadmap
-    story.append(Paragraph("4. ROADMAP & DELIVERY PHASES", style_h2))
-    phase_rows = [[Paragraph("<b>Phase</b>", style_table_cell_bold), Paragraph("<b>Duration</b>", style_table_cell_bold), Paragraph("<b>Key Milestones & Verification Protocol</b>", style_table_cell_bold)]]
-    for phase, dur, desc in data['phases']:
-        phase_rows.append([Paragraph(phase, style_table_cell_bold), Paragraph(dur, style_table_cell), Paragraph(desc, style_table_cell)])
-    t_phase = Table(phase_rows, colWidths=[30*mm, 25*mm, 115*mm])
+    # 2. С какво сме по-добри от останалите (Comparison)
+    story.append(Paragraph("2. С КАКВО СМЕ ПО-ДОБРИ ОТ 90% ОТ ОСТАНАЛИТЕ В БРАНША", style_h2))
+    comp_rows = [
+        [Paragraph("<b>Показател / Качество</b>", style_cell_bold), Paragraph("<b>Обикновени агенции (WordPress шаблони)</b>", style_cell_bold), Paragraph("<b>Aeterna Digital (Нашият стандарт)</b>", style_cell_bold)]
+    ]
+    for param, bad, good in data['comparison']:
+        comp_rows.append([
+            Paragraph(param, style_cell_bold),
+            Paragraph(bad, style_cell),
+            Paragraph(good, style_cell_green)
+        ])
+    t_comp = Table(comp_rows, colWidths=[42*mm, 66*mm, 66*mm])
+    t_comp.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), COLOR_OBSIDIAN),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
+        ('PADDING', (0, 0), (-1, -1), 4),
+        ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, COLOR_BG_CARD]),
+    ]))
+    story.append(t_comp)
+    story.append(Spacer(1, 6))
+
+    # 3. Етапи на изработка (Timeline)
+    story.append(Paragraph("3. КАК ПРОТИЧА РАБОТАТА (ЕТАПИ И СРОКОВЕ)", style_h2))
+    phase_rows = [[Paragraph("<b>Етап</b>", style_cell_bold), Paragraph("<b>Време</b>", style_cell_bold), Paragraph("<b>Какво правим и какво одобрявате Вие</b>", style_cell_bold)]]
+    for p_name, p_time, p_desc in data['phases']:
+        phase_rows.append([Paragraph(p_name, style_cell_bold), Paragraph(p_time, style_cell), Paragraph(p_desc, style_cell)])
+    t_phase = Table(phase_rows, colWidths=[36*mm, 26*mm, 112*mm])
     t_phase.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), COLOR_OBSIDIAN),
-        ('TEXTCOLOR', (0, 0), (-1, 0), COLOR_TEXT_WHITE),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('GRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
+        ('PADDING', (0, 0), (-1, -1), 4),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, COLOR_BG_CARD]),
     ]))
     story.append(t_phase)
-    story.append(Spacer(1, 8))
+    story.append(Spacer(1, 6))
 
-    # 5. Commercial Investment & Payment Schedule
-    story.append(Paragraph("5. COMMERCIAL INVESTMENT & COMMISSION STRUCTURE", style_h2))
+    # 4. Цена, Плащане & Автоматична Фактура (PayPal Payment Link Integration)
+    story.append(Paragraph("4. ЦЕНА, ОНЛАЙН ПЛАЩАНЕ И АВТОМАТИЧНО ИЗДАВАНЕ НА ФАКТУРА", style_h2))
     
-    inv_box = [
-        [
-            Paragraph("<b>TOTAL FIXED INVESTMENT TIER</b>", style_body_bold),
-            Paragraph("<b>DEPLOYMENT TERMS</b>", style_body_bold)
-        ],
-        [
-            Paragraph(f"<font color='{COLOR_GOLD_DARK.hexval()}'><b>{data['total_investment']}</b></font><br/><font size='7' color='#6b707b'>{data['total_bgn']}</font>", style_title),
-            Paragraph(data['payment_terms'], style_body)
-        ]
-    ]
-    t_inv = Table(inv_box, colWidths=[85*mm, 85*mm])
-    t_inv.setStyle(TableStyle([
+    pay_content = (
+        f"<b>Фиксирана крайна цена за целия проект:</b> <font color='#8c6f28' size='11'><b>{data['price_eur']} ({data['price_bgn']})</b></font><br/>"
+        f"<b>Схема на плащане:</b> 50% авансово стартиране / 50% след като одобрите напълно готовия сайт.<br/>"
+        f"<b>Официална фактура:</b> Издава се автоматично веднага с ДДС или без ДДС за фирма или физическо лице.<br/><br/>"
+        f"<b>НАЧИНИ ЗА ПЛАЩАНЕ:</b><br/>"
+        f"• <b>Онлайн с PayPal или банкова карта:</b> <font color='#003087'><u><a href='{data['paypal_link']}'>[ КЛИКНЕТЕ ТУК ЗА ДИРЕКТНО ОНЛАЙН ПЛАЩАНЕ / ИЗДАВАНЕ НА ФАКТУРА ]</a></u></font><br/>"
+        f"• <b>Директен банков превод (IBAN/SEPA):</b> Получавате фактура-проформа по имейл с фирмени банкови данни.<br/>"
+        f"• <b>100% Ваши права:</b> След финално плащане целият сайт, кодът и домейнът стават 100% Ваша собственост завинаги, без месечни абонаменти или скрити такси."
+    )
+    t_pay = Table([[Paragraph(pay_content, style_body)]], colWidths=[174*mm])
+    t_pay.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, -1), COLOR_BG_CARD),
         ('BOX', (0, 0), (-1, -1), 1, COLOR_GOLD),
-        ('INNERGRID', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
-        ('TOPPADDING', (0, 0), (-1, -1), 6),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('LEFTPADDING', (0, 0), (-1, -1), 8),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+        ('PADDING', (0, 0), (-1, -1), 7),
     ]))
-    story.append(t_inv)
+    story.append(t_pay)
     story.append(Spacer(1, 8))
 
-    # 6. Intellectual Property & Sovereign SLA Guarantees
-    story.append(Paragraph("6. IP OWNERSHIP & SOVEREIGN GUARANTEES", style_h2))
-    story.append(Paragraph(
-        "<b>100% Client Intellectual Property:</b> Upon final milestone release, all source code, WebGL shaders, 3D assets, design systems, and documentation are transferred in full to the client without third-party vendor lock-in.<br/>"
-        "<b>Zero Dependency Bloat:</b> Hand-crafted architecture with 0 unnecessary npm bloat, guaranteed 100/100 Lighthouse performance, sub-second edge distribution, and guaranteed sub-16ms render frames (60-120 FPS).<br/>"
-        "<b>Executive SLA:</b> Includes dedicated priority engineering support, monthly security patches, and direct architectural concierge access.",
-        style_body
-    ))
-    story.append(Spacer(1, 10))
-
-    # 7. Signature Block
-    sign_table_data = [
+    # 5. Двустранен подпис
+    sign_data = [
         [
-            Paragraph("<b>ISSUED BY:</b><br/>Aeterna Digital Haute Atelier<br/>Dimitar Prodromov, Principal Architect<br/>Pomorie HQ // Global Digital Network", style_body),
-            Paragraph("<b>ACCEPTED & CONFIRMED BY:</b><br/>Principal Client Signature / Corporate Seal<br/><br/>___________________________________<br/>Date: ________________________", style_body)
+            Paragraph("<b>ИЗПЪЛНИТЕЛ:</b><br/>Aeterna Digital Studio // Поморие HQ<br/>Димитър Продромов<br/>Тел: +359 888 888 888", style_body),
+            Paragraph("<b>ПРИЕТО И ПОТВЪРДЕНО ОТ КЛИЕНТА:</b><br/>Име на фирмата: __________________________<br/>МОЛ / Подпис: ____________________________<br/>Дата: ________________________ 2026 г.", style_body)
         ]
     ]
-    t_sign = Table(sign_table_data, colWidths=[85*mm, 85*mm])
+    t_sign = Table(sign_data, colWidths=[87*mm, 87*mm])
     t_sign.setStyle(TableStyle([
         ('BOX', (0, 0), (-1, -1), 0.5, COLOR_BORDER),
         ('BACKGROUND', (0, 0), (-1, -1), colors.white),
-        ('TOPPADDING', (0, 0), (-1, -1), 8),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-        ('LEFTPADDING', (0, 0), (-1, -1), 8),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 8),
+        ('PADDING', (0, 0), (-1, -1), 6),
     ]))
     story.append(KeepTogether([t_sign]))
 
     doc.build(story, canvasmaker=NumberedCanvas)
-    print(f"[✓] Generated: {output_path} ({os.path.getsize(output_path):,} bytes)")
+    print(f"[✓] Генериран PDF: {output_path} ({os.path.getsize(output_path):,} bytes)")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# PROPOSAL DATA DICTIONARIES
+# 4-ТЕ КАЛИБРИРАНИ ОФЕРТИ (ЧОВЕШКИ ЕЗИК, РЕАЛНИ ЦЕНИ)
 # ─────────────────────────────────────────────────────────────────────────────
 
-PROPOSALS = [
+PROPOSALS_V2 = [
     {
-        'filename': 'PROPOSAL_TIER_1_HAUTE_PRESENCE.pdf',
-        'eyebrow': 'COMMERCIAL PROPOSAL // TIER I',
-        'title': 'HAUTE IDENTITY & BESPOKE WEB PRESENCE',
-        'subtitle': 'Editorial Luxury Aesthetics • Sub-Second Edge Performance • Bespoke Corporate Presence',
-        'sector': 'Luxury Boutiques, Private Medical & Legal Practices, Haute Architecture',
-        'timeline': '14 – 21 Business Days',
-        'investment_short': '€4,800 EUR Fixed',
-        'sla_short': '6 Months Dedicated SLA Included',
-        'total_investment': '€4,800 EUR',
-        'total_bgn': 'Equivalent: 9,388 BGN (Excl. VAT)',
-        'payment_terms': '• 40% Mobilization Deposit<br/>• 30% Mid-Phase Delivery<br/>• 30% Final Launch & Edge Cutover',
-        'exec_summary': (
-            'Tier I is engineered for luxury brands and executive practices that reject boilerplate WordPress templates '
-            'and bloated frameworks. We architect a custom, hand-coded digital flagship combining high-fashion editorial typography, '
-            'cinematic micro-interactions, silky smooth scrolling physics, and instant sub-second edge delivery. '
-            'The result is an enduring digital asset that commands immediate prestige and delivers 100/100 Lighthouse benchmark scores.'
+        'filename': 'PROPOSAL_TIER_1_EXPRESS_START.pdf',
+        'eyebrow': 'ОФЕРТА ЗА ИЗРАБОТКА НА УЕБСАЙТ // ВАРИАНТ 01 (БЪРЗ СТАРТ)',
+        'title': 'ПАКЕТ "БЪРЗ СТАРТ" ЗА МАЛЪК И СРЕДЕН БИЗНЕС',
+        'subtitle': 'Модерен, светкавично бърз фирмен уебсайт (до 5 страници) • Готов само за 7 до 10 дни',
+        'target': 'Магазини, лекари, адвокати, салони за красота, ресторанти, занаятчии, стартиращи фирми',
+        'timeline': '7 – 10 работни дни',
+        'price_eur': '€890 EUR',
+        'price_bgn': '1,740 лв.',
+        'sla': '3 месеца безплатна поддръжка',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=EUR&amount=890&item_name=Aeterna+Web+Development+Package+1+Express+Start',
+        'what_you_get_intro': (
+            'Този пакет е създаден за всеки бизнес, който иска да има чист, професионален и надежден уебсайт, '
+            'без да плаща хиляди левове и без да чака с месеци. Получавате готов работещ инструмент за привличане на клиенти.'
         ),
-        'stack': [
-            ('Frontend Architecture', 'Hand-Crafted HTML5 / TypeScript / Modular ESNext (Zero Framework Bloat)'),
-            ('Motion & Physics', 'Lenis Smooth Scroll Engine, GPU-accelerated CSS Matrix Transforms, Custom Micro-Ripples'),
-            ('Typography & Editorial', 'Haute Couture Typography (Playfair / Cormorant / Cinzel / Bespoke Serifs)'),
-            ('Edge & Performance', 'Cloudflare Edge / Vercel Global Edge Network with Sub-250ms TTFB Globally'),
-            ('SEO & Social OpenGraph', '100/100 Structured JSON-LD Schema, Dynamic High-Res OpenGraph Preview Cards'),
-            ('Inquiry & CRM Gateway', 'Encrypted Client Brief Dispatch with Email / WhatsApp / Direct API Hook'),
-        ],
         'deliverables': [
-            ('Bespoke Brand Digital Identity', 'High-fashion UI design system, custom iconography, luxury dark/light palette curation.'),
-            ('Responsive Multi-Screen Flagship', 'Pixel-perfect fluid layouts across UltraWide 4K monitors, MacBook Retina, and mobile.'),
-            ('Interactive Service Showcase', 'High-impact grid showcase presenting services, case studies, and brand narrative.'),
-            ('Encrypted Brief & Inquiries', 'Custom inquiry modal with NDA verification, corporate email dispatch, and instant lead capture.'),
-            ('Sub-Second Performance Hardening', 'Asset compression, WebP/AVIF vector pipelines, 100/100 Lighthouse certification.'),
-            ('Production Edge Deployment', 'DNS configuration, SSL certificate issuance, automated CI/CD pipeline setup.'),
+            ('Модерен фирмен сайт (до 5 страници)', 'Начало, За нас, Услуги/Цени, Галерия/Портфолио и Контакти.'),
+            ('Перфектен изглед на всички телефони', 'Над 80% от хората влизат от телефон. Вашият сайт ще изглежда безупречно на iPhone и Android.'),
+            ('Светкавично зареждане (под 1 сек)', 'Клиентите не обичат да чакат. Бързият сайт задържа хората и увеличава поръчките.'),
+            ('Директна връзка по Телефон и WhatsApp/Viber', 'Бутони с 1 клик за незабавно обаждане или съобщение от сайта.'),
+            ('Форма за запитвания и оферти', 'Клиентите ви пишат директно от сайта, а съобщенията пристигат веднага на вашия имейл.'),
+            ('Качване и индексиране в Google', 'Регистрация в Google Search Console и Google Maps за намиране от местни клиенти.'),
+            ('Служебен имейл и безплатен хостинг', 'Настройка на фирмени пощи (напр. office@vashatafirma.com).'),
+        ],
+        'comparison': [
+            ('Скорост на зареждане', 'Бавно (по 4–8 секунди заради тежки плъгини)', 'Светкавично (под 0.8 секунди)'),
+            ('Поддръжка и сигурност', 'Постоянно се чупи при ъпдейти на WordPress', 'Здрав код без вируси и без нужда от плъгини'),
+            ('Собственост на сайта', 'Често ви обвързват с месечни такси и хостинги', '100% Ваша собственост завинаги'),
+            ('Удобство за телефон', 'Често разместени текстове и счупени бутони', 'Перфектна мобилна адаптация'),
         ],
         'phases': [
-            ('Phase 1: Architecture & UI', '5 Days', 'Design system definition, typography pairing, interactive Figma prototype sign-off.'),
-            ('Phase 2: Code & Interaction', '10 Days', 'Hand-coded frontend implementation, smooth physics integration, responsive QA.'),
-            ('Phase 3: Hardening & Deploy', '6 Days', 'Lighthouse 100/100 optimization, edge routing, DNS switchover, handover documentation.'),
+            ('Етап 1: Дизайн и структура', '2 дни', 'Уточняваме текстовете, цветовете и логото. Показваме ви как ще изглежда.'),
+            ('Етап 2: Програмиране и тестове', '4 дни', 'Изграждаме сайта, настройваме формите за контакт и скоростта.'),
+            ('Етап 3: Пускане на живо', '1–2 дни', 'Пускаме сайта на вашия домейн, свързваме пощите и ви показваме как се ползва.'),
         ]
     },
     {
-        'filename': 'PROPOSAL_TIER_2_SPATIAL_3D.pdf',
-        'eyebrow': 'COMMERCIAL PROPOSAL // TIER II (FEATURED)',
-        'title': '3D SPATIAL WEB & LIVING PBR SHADER REALITY',
-        'subtitle': 'Real-Time WebGL / WebGPU Pipelines • 4D Molten Gold & Obsidian • Interactive Product Spatialization',
-        'sector': 'Haute Horlogerie, Fine High Jewelry, Luxury Supercars, High-Tech Showcases',
-        'timeline': '30 – 45 Business Days',
-        'investment_short': '€14,500 EUR Fixed',
-        'sla_short': '12 Months Dedicated SLA Included',
-        'total_investment': '€14,500 EUR',
-        'total_bgn': 'Equivalent: 28,360 BGN (Excl. VAT)',
-        'payment_terms': '• 35% Initiation Advance<br/>• 35% Interactive Shader Alpha<br/>• 30% Final Edge Deployment',
-        'exec_summary': (
-            'Tier II represents the pinnacle of modern web innovation: an interactive 3D spatial world executed entirely in-browser '
-            'without external plugins. We deploy real-time WebGL and WebGPU shader engines featuring living molten metals, '
-            'anisotropic gold foil, deep obsidian lacquer, physical glass caustics, and full 360° product configurators. '
-            'Designed for luxury houses and technology pioneers seeking an unforgettable digital centerpiece.'
+        'filename': 'PROPOSAL_TIER_2_BUSINESS_PRO.pdf',
+        'eyebrow': 'ОФЕРТА ЗА ИЗРАБОТКА НА УЕБСАЙТ // ВАРИАНТ 02 (ПРЕМИУМ БИЗНЕС)',
+        'title': 'ПАКЕТ "ПРЕМИУМ БИЗНЕС & АВТОРСКИ БРАНД"',
+        'subtitle': 'Цялостен корпоративен уебсайт с уникален авторски дизайн, пълно Google SEO и панел за управление',
+        'target': 'Утвърдени фирми, клиники, хотели, агенции за имоти, архитектурни бюра, производствени компании',
+        'timeline': '14 – 20 работни дни',
+        'price_eur': '€1,850 EUR',
+        'price_bgn': '3,620 лв.',
+        'sla': '6 месеца пълна техническа грижа',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=EUR&amount=1850&item_name=Aeterna+Web+Development+Package+2+Business+Pro',
+        'what_you_get_intro': (
+            'Пакет "Бизнес Про" превръща Вашия уебсайт в най-силния Ви търговски представител. '
+            'Създаден е специално за фирми, които искат да изглеждат солидно, престижно и да вдъхват доверие на заможни клиенти.'
         ),
-        'stack': [
-            ('3D Graphics Substrate', 'WebGL 2.0 / WebGPU Pipeline with Custom GLSL Shaders & Raymarching'),
-            ('Physical Material Shaders', 'Conductor Fresnel 24K Gold, Obsidian Piano Lacquer, Clearcoat Glass Caustics'),
-            ('Kinetic Physics & Audio', 'Spring Damping Physics, Spatial 3D Audio synthesis, Micro-Haptic Visual Feedback'),
-            ('Frame Budget & Optimization', 'Strict 60-120 FPS frame timing, dynamic resolution scaling, zero thermal throttling'),
-            ('Asset Compression Pipeline', 'Draco Mesh Geometry & KTX2 Texture compression for sub-second 3D model streaming'),
-            ('CMS & Asset Management', 'Headless CMS for effortless updates to 3D showcases, case studies, and media assets'),
-        ],
         'deliverables': [
-            ('Full-Bleed 3D Living Background', 'Procedural GPU fluid vortex, molten gold tendrils, floating mirror spheres with drop shadows.'),
-            ('Interactive 3D Product Atelier', 'Real-time 360° rotation, parts disassembly/explosion view, micron-level metal reflections.'),
-            ('Cinematic Full-Page Transitions', 'Seamless spatial transitions between sections without traditional page reloads.'),
-            ('Curated Case Study Showcase', 'Continuous autoplay 4K video cards, high-contrast typography, metrics HUD overlays.'),
-            ('Bespoke Soundscape Integration', 'Subtle, ultra-luxury interactive audio feedback designed to accompany touch & hover.'),
-            ('Full Device Parity Guarantee', 'Optimized fallback for low-power mobile GPUs ensuring zero stutter across all devices.'),
+            ('Цялостен корпоративен сайт (до 10-12 страници)', 'Всички нужни секции за детайлно представяне на услуги, проекти, екип и сертификати.'),
+            ('100% Уникален авторски дизайн', 'Без безплатни шаблони. Дизайнът се рисува по поръчка за Вашата фирмена идентичност.'),
+            ('Лесен контролен панел за вас', 'Можете сами с 2 клика да сменяте снимки, цени, текстове или да качвате нови статии.'),
+            ('Пълна SEO оптимизация за Google', 'Структурирани данни, за да излизате напред в Google при търсене на вашите услуги.'),
+            ('Интерактивни анимации и плавен скрол', 'Сайтът се движи плавно и изглежда модерно като скъп международен бранд.'),
+            ('Калкулатор за запитвания или филтри', 'Възможност за изчисляване на цени или филтриране на проекти и продукти.'),
+            ('Интеграция с Google Analytics и реклами', 'Виждате точно колко хора влизат и откъде идват.'),
+        ],
+        'comparison': [
+            ('Визия и усещане', 'Шаблонно, изглеждащо като още 1000 други сайта', 'Премиум авторски стил, отличаващ ви веднага'),
+            ('Класиране в Google', 'Основно базови заглавия без SEO структура', 'Пълна Google оптимизация за реални резултати'),
+            ('Управление на съдържание', 'Сложно, изискващо постоянно плащане на дизайнер', 'Интуитивно и лесно за 1 минута от телефона'),
+            ('Сигурност и защита', 'Уязвим на хакване и спам във формите', 'Защитени форми със спам филтри и криптиране'),
         ],
         'phases': [
-            ('Phase 1: 3D Art & Shaders', '12 Days', '3D model topology optimization, custom GLSL shader synthesis, material look-dev.'),
-            ('Phase 2: Spatial Integration', '18 Days', 'Interactive camera controls, Lenis scroll braiding, product configurator logic.'),
-            ('Phase 3: FPS Optimization', '12 Days', 'GPU draw-call batching, multi-browser stress testing, edge deployment & training.'),
+            ('Етап 1: Стратегия и прототип', '4 дни', 'Анализ на конкурентите ви, изготвяне на визуална концепция и одобрение.'),
+            ('Етап 2: Програмиране и анимации', '10 дни', 'Пълно кодиране на сайта, панел за редакция, SEO оптимизация.'),
+            ('Етап 3: Тестване и пускане', '3–4 дни', 'Обучение за вас, качване на реалния домейн и активиране на анализите.'),
         ]
     },
     {
-        'filename': 'PROPOSAL_TIER_3_SOVEREIGN_ENTERPRISE.pdf',
-        'eyebrow': 'COMMERCIAL PROPOSAL // TIER III',
-        'title': 'SOVEREIGN ENTERPRISE HUD & HIGH-TECH TERMINAL',
-        'subtitle': 'Full-Stack Sovereign Web Platform • Real-Time WebSockets • Post-Quantum Cryptography & High-Throughput Engine',
-        'sector': 'Private Wealth Terminals, Biotech & Clinical Platforms, Decentralized Networks, Institutional Portals',
-        'timeline': '60 – 90 Business Days',
-        'investment_short': '€38,000 EUR Fixed',
-        'sla_short': '24 Months Enterprise SLA Included',
-        'total_investment': '€38,000 EUR',
-        'total_bgn': 'Equivalent: 74,320 BGN (Excl. VAT)',
-        'payment_terms': '• 30% Inception & Architecture<br/>• 30% Functional Core Alpha<br/>• 20% Beta & Security Audit<br/>• 20% Production Go-Live',
-        'exec_summary': (
-            'Tier III is a sovereign mission-critical software portal engineered to enterprise defense-grade standards. '
-            'Combining high-frequency WebSockets telemetry, dark obsidian HUD interface paradigms, cryptographic zero-knowledge '
-            'authentication, and high-performance Rust/WASM or Go microservices. Tailored for family offices, private asset management, '
-            'biomedical research institutions, and decentralized networks requiring absolute data sovereignty.'
+        'filename': 'PROPOSAL_TIER_3_SPATIAL_3D.pdf',
+        'eyebrow': 'ОФЕРТА ЗА ИЗРАБОТКА НА УЕБСАЙТ // ВАРИАНТ 03 (3D СПАТИАЛ & ЛУКС)',
+        'title': 'ПАКЕТ "3D ИНТЕРАКТИВЕН СПАТИАЛ УЕБ & КИНО ЕФЕКТИ"',
+        'subtitle': '3D интерактивност в реално време, живи златни и обсидианови шейдъри, кино фоново видео и пространствен дизайн',
+        'target': 'Луксозни часовници, скъпа бижутерия, имоти ново строителство, суперколи, иновативни брандове',
+        'timeline': '25 – 35 работни дни',
+        'price_eur': '€3,900 EUR',
+        'price_bgn': '7,630 лв.',
+        'sla': '12 месеца персонален консиерж и поддръжка',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=EUR&amount=3900&item_name=Aeterna+Web+Development+Package+3+Spatial+3D',
+        'what_you_get_intro': (
+            'Това е висшата лига в уеб технологиите. Вашият сайт няма да прилича на обикновена интернет страница, '
+            'а на дигитално произведение на изкуството. Клиентите могат да въртят продуктите ви в 3D, да виждат метални отражения '
+            'и да изживеят бранда ви на нивото на Rolex, Apple или Ferrari.'
         ),
-        'stack': [
-            ('High-Speed Substrate', 'Rust Backend Engine with Actix-Web / Axum, WASM / WebGPU Frontend Acceleration'),
-            ('Real-Time Data Pipeline', 'Sub-millisecond WebSocket Telemetry, Redis In-Memory Ring Buffers, Zero-Copy WAL'),
-            ('Security & Cryptography', 'Post-Quantum Cryptography (ML-KEM / Dilithium), Mutual TLS, Hardware Key / Biometrics'),
-            ('Database & Persistence', 'TimescaleDB / RocksDB for microsecond historical time-series telemetry caching'),
-            ('Resilience & Sovereignty', 'Zero Third-Party Cloud Lock-In, Docker/Kubernetes or Bare-Metal Dedicated Deployment'),
-            ('Compliance & Hardening', 'SOC-2 Type II, GDPR, HIPAA-compliant encryption at rest and in transit'),
-        ],
         'deliverables': [
-            ('Sovereign Multi-Node HUD', 'Dark obsidian command portal with live streaming telemetry, interactive charts, and node health.'),
-            ('Biometric / Cryptographic Auth', 'Hardware key (FIDO2 / WebAuthn), Knox-grade security, enterprise role-based access control (RBAC).'),
-            ('Real-Time Data Visualizer', 'Dynamic WebGL/Canvas2D charts rendering 100,000+ data points at 60 FPS without UI freezing.'),
-            ('Automated Reporting Engine', 'Instant server-side vector PDF generation for executive statements, audit logs, and compliance.'),
-            ('Full Penetration & Security Audit', 'External vulnerability assessment, zero-day threat analysis, code freeze certification.'),
-            ('Institutional White-Glove SLA', '24/7 critical incident response, redundant failover management, dedicated engineer hotline.'),
+            ('3D Пространствен енджин в браузъра', 'Вграден 3D модел, който се върти с мишката или пръст на телефона без инсталация.'),
+            ('Жив фон с течни златни шейдъри', 'Специални визуални ефекти с течно злато, отражения и студийно осветление.'),
+            ('Фоново видео с кино качество (Loop)', 'Безшевно видео с висока резолюция, зареждащо се мигновено без накъсване.'),
+            ('Експлозивен изглед на детайли', 'Възможност продуктът да се разглобява в 3D пространството за показване на частите.'),
+            ('Гарантирани 60–120 кадъра в секунда (FPS)', 'Изключително плавно движение дори на стандартни телефони.'),
+            ('Интерактивен дискретен звук', 'Фини звукови ефекти при преминаване и интеракция за луксозно усещане.'),
+            ('12 месеца пълен VIP инженеринг', 'Ние се грижим за всичко technical по сайта цяла година без допълнителни разходи.'),
+        ],
+        'comparison': [
+            ('Въздействие върху клиента', 'Обикновени статични снимки', 'Незабравимо 3D преживяване, което спира дъха'),
+            ('Технологично ниво', 'Стари стандартни CSS таблици', 'Авангарден WebGL / 3D енджин от най-ново поколение'),
+            ('Усещане за лукс', 'Стандартно и евтино', 'Абсолютен хай-енд лукс, вдъхващ усещане за милионен бранд'),
+            ('Конверсия при скъпи стоки', 'Трудно се доказва високата цена', 'Оправдава високите цени на вашите продукти моментално'),
         ],
         'phases': [
-            ('Phase 1: Security & Architecture', '20 Days', 'System specification, cryptographic threat modeling, database schema & API contracts.'),
-            ('Phase 2: Core Engine & Telemetry', '35 Days', 'High-throughput Rust/WebSocket service, WebGL dashboard rendering, auth layer.'),
-            ('Phase 3: Hardening, Audit & Go-Live', '25 Days', 'Security penetration testing, failover drill, institutional handover & staff training.'),
+            ('Етап 1: 3D Моделиране и текстури', '8 дни', 'Подготовка на 3D моделите, материалите от злато, стомана, стъкло.'),
+            ('Етап 2: Интеграция в уеб енджина', '14 дни', 'Свързване на 3D интеракцията, видео фона, скрола и интерфейса.'),
+            ('Етап 3: Оптимизация за телефони', '6–8 дни', 'Тестове на всякакви мобилни устройства за супер плавност.'),
+        ]
+    },
+    {
+        'filename': 'PROPOSAL_TIER_4_ENTERPRISE_ECOMMERCE.pdf',
+        'eyebrow': 'ОФЕРТА ЗА ИЗРАБОТКА НА УЕБСАЙТ // ВАРИАНТ 04 (ПЛАТФОРМА & Е-ТЪРГОВИЯ)',
+        'title': 'ПАКЕТ "СПЕЦИАЛИЗИРАНА ПЛАТФОРМА, ОНЛАЙН МАГАЗИН ИЛИ ПОРТАЛ"',
+        'subtitle': 'Автоматизиран онлайн магазин или клиентски портал с плащания, автоматични фактури и пълна независимост',
+        'target': 'Е-търговци, платформи за резервации, клиники с досиета, B2B портали, софтуерни платформи',
+        'timeline': '30 – 45 работни дни',
+        'price_eur': '€7,800 EUR',
+        'price_bgn': '15,250 лв.',
+        'sla': '24 месеца пълна денонощна гаранция и поддръжка',
+        'paypal_link': 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=EUR&amount=7800&item_name=Aeterna+Web+Development+Package+4+Enterprise+Platform',
+        'what_you_get_intro': (
+            'Това не е обикновен сайт, а цялостна машина за бизнес и автоматизация. '
+            'Включва пълен онлайн магазин или клиентски портал с автоматично приемане на плащания (карти, PayPal, EasyPay), '
+            'мигновено издаване на фактури, товарителници за куриери и интеграция със счетоводство.'
+        ),
+        'deliverables': [
+            ('Пълна платформа за продажби и поръчки', 'Неограничен брой продукти, филтри по размери/цветове/цени, количка и чекаут.'),
+            ('Всички видове плащания в България и чужбина', 'Директни картови плащания (myPOS, Stripe, Борика), PayPal, Apple Pay, наложен платеж.'),
+            ('Автоматично издаване на фактури', 'След всяка поръчка клиентът получава готова валидна фактура по имейл без ваша намеса.'),
+            ('Интеграция със Спиди и Еконт', 'Генериране на товарителници с 1 клик, изчисляване на точна доставка до адрес или офис.'),
+            ('Клиентски профили и история на поръчките', 'Потребителите виждат своите покупки, фактури и статус на доставката.'),
+            ('100% Без месечни комисионни към платформи', 'Спестявате хиляди левове годишно от такси, които Shopify или WooCommerce прибират.'),
+            ('24 Месеца денонощен технически съпорт', 'Постоянен мониторинг срещу сривове, ежедневни резервни копия и бърза реакция.'),
+        ],
+        'comparison': [
+            ('Комисионни от продажби', 'Плащате по 2–3% от всеки оборот на чужди платформи', '0% комисионна — всички пари отиват директно при вас'),
+            ('Скорост при хиляди продукти', 'Забавяне, грешки в базата данни и бъгове', 'Светкавична скорост, издържаща десетки хиляди клиенти'),
+            ('Фактуриране и куриери', 'Ръчно писане на фактури с часове всеки ден', 'Напълно автоматизирано за 0 секунди'),
+            ('Контрол над бизнеса', 'Ако платформата реши, може да ви блокира профила', 'Пълен суверенитет и контрол над вашите пари и данни'),
+        ],
+        'phases': [
+            ('Етап 1: Архитектура на базата и поръчките', '8 дни', 'Проектиране на каталога, плащанията, доставките и данъчните изисквания.'),
+            ('Етап 2: Програмиране и интеграция на плащания', '18 дни', 'Свързване на банкови терминали, PayPal, автоматични фактури, Спиди/Еконт.'),
+            ('Етап 3: Тестове с реални поръчки и пускане', '8–10 дни', 'Тестови плащания, проверка на сигурността, обучение на персонала ви.'),
         ]
     }
 ]
@@ -468,16 +405,16 @@ def main():
     target_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "proposals")
     os.makedirs(target_dir, exist_ok=True)
     print("=" * 80)
-    print("🔱 GENERATING AETERNA HAUTE COMMERCIAL PDF PROPOSALS")
+    print("🔱 GENERATING 4 AETERNA COMMERCIAL PROPOSALS (HUMAN-READABLE, CALIBRATED PRICES)")
     print(f"Destination: {os.path.abspath(target_dir)}")
     print("=" * 80)
 
-    for p in PROPOSALS:
+    for p in PROPOSALS_V2:
         out_file = os.path.join(target_dir, p['filename'])
         create_proposal_pdf(out_file, p)
 
     print("=" * 80)
-    print("[✓] ALL 3 PROPOSALS GENERATED SUCCESSFULLY")
+    print("[✓] ALL 4 PROPOSALS SUCCESSFULLY GENERATED WITH PAYPAL INVOICE LINKS")
     print("=" * 80)
 
 
