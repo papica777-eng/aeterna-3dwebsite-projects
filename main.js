@@ -663,13 +663,14 @@
   });
 
   // ==========================================================================
-  // 8b. PROPOSAL MODALS (TIER 01, TIER 02, TIER 03)
+  // 8b. PROPOSAL MODALS (TIER 01 - 04 & BESPOKE INVOICE)
   // ==========================================================================
   const proposalModals = {
     tier1: document.getElementById('modalProposalTier1'),
     tier2: document.getElementById('modalProposalTier2'),
     tier3: document.getElementById('modalProposalTier3'),
     tier4: document.getElementById('modalProposalTier4'),
+    invoice: document.getElementById('modalBespokeInvoice'),
   };
 
   function openProposalModal(tierKey) {
@@ -697,7 +698,7 @@
     });
   });
 
-  document.querySelectorAll('.proposal-modal .modal-close-btn').forEach((btn) => {
+  document.querySelectorAll('.proposal-modal .modal-close-btn, .modal-close-btn-inline').forEach((btn) => {
     btn.addEventListener('click', closeAllProposalModals);
   });
 
@@ -706,6 +707,192 @@
       if (e.target === modal) closeAllProposalModals();
     });
   });
+
+  // ==========================================================================
+  // 8c. INTERACTIVE SCOPE CONFIGURATOR & BRUTAL INVOICE GENERATOR
+  // ==========================================================================
+  const tierPills = document.querySelectorAll('.cfg-tier-pill');
+  const addonChecks = document.querySelectorAll('.cfg-addon-check');
+  const maintRadios = document.querySelectorAll('input[name="maintPlan"]');
+  const cfgBreakdownText = document.getElementById('cfgBreakdownText');
+  const cfgTotalDisplay = document.getElementById('cfgTotalDisplay');
+  const btnTriggerCustomInvoice = document.getElementById('btnTriggerCustomInvoice');
+
+  let currentTier = {
+    id: 'tier1',
+    title: 'Express Business Presence',
+    price: 1500,
+  };
+
+  function recalculateConfigurator() {
+    let total = currentTier.price;
+    let checkedAddons = [];
+
+    addonChecks.forEach((chk) => {
+      const card = chk.closest('.addon-card');
+      if (chk.checked) {
+        if (card) card.classList.add('selected');
+        const price = parseInt(chk.getAttribute('data-price'), 10) || 0;
+        const name = chk.getAttribute('data-name') || '';
+        total += price;
+        checkedAddons.push({ name, price });
+      } else {
+        if (card) card.classList.remove('selected');
+      }
+    });
+
+    if (cfgTotalDisplay) {
+      cfgTotalDisplay.textContent = total.toLocaleString('en-US');
+    }
+
+    if (cfgBreakdownText) {
+      const addonCount = checkedAddons.length;
+      const addonSum = checkedAddons.reduce((acc, a) => acc + a.price, 0);
+      cfgBreakdownText.textContent = `${currentTier.title} ($${currentTier.price.toLocaleString('en-US')}) + ${addonCount} Selected Extras (+$${addonSum.toLocaleString('en-US')})`;
+    }
+
+    return { total, checkedAddons };
+  }
+
+  // Tier pill click handlers
+  tierPills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      tierPills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentTier.id = pill.getAttribute('data-tier-id') || 'tier1';
+      currentTier.title = pill.getAttribute('data-tier-title') || 'Express Business Presence';
+      currentTier.price = parseInt(pill.getAttribute('data-base-price'), 10) || 1500;
+      recalculateConfigurator();
+    });
+  });
+
+  // Addon checkbox change handlers
+  addonChecks.forEach((chk) => {
+    chk.addEventListener('change', recalculateConfigurator);
+  });
+
+  // Maintenance radio change handlers
+  maintRadios.forEach((radio) => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.maint-option-label').forEach((lbl) => lbl.classList.remove('selected'));
+      const parentLabel = radio.closest('.maint-option-label');
+      if (parentLabel) parentLabel.classList.add('selected');
+    });
+  });
+
+  // Initial calculation on page load
+  recalculateConfigurator();
+
+  // Generate & Render Brutally Beautiful Invoice
+  if (btnTriggerCustomInvoice) {
+    btnTriggerCustomInvoice.addEventListener('click', () => {
+      const { total, checkedAddons } = recalculateConfigurator();
+
+      // Dynamic Invoice Details
+      const invRand = Math.floor(1000 + Math.random() * 9000);
+      const invNum = `INV-2026-${invRand}`;
+      const now = new Date();
+      const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+
+      // Elements inside invoice modal
+      const invRenderNumber = document.getElementById('invRenderNumber');
+      const invRenderDate = document.getElementById('invRenderDate');
+      const invItemsTableBody = document.getElementById('invItemsTableBody');
+      const invRenderSubtotal = document.getElementById('invRenderSubtotal');
+      const invRenderGrandTotal = document.getElementById('invRenderGrandTotal');
+      const invRenderMaintPlan = document.getElementById('invRenderMaintPlan');
+      const invDynamicPayPalLink = document.getElementById('invDynamicPayPalLink');
+      const invPayBtnAmount = document.getElementById('invPayBtnAmount');
+
+      if (invRenderNumber) invRenderNumber.textContent = invNum;
+      if (invRenderDate) invRenderDate.textContent = `Date: ${dateStr}`;
+
+      // Populate line items table
+      if (invItemsTableBody) {
+        invItemsTableBody.innerHTML = '';
+
+        // Row 1: Base Tier
+        const trBase = document.createElement('tr');
+        trBase.innerHTML = `
+          <td>
+            <strong class="inv-item-name">${currentTier.title}</strong>
+            <span class="inv-item-desc">Core architectural layout, mobile responsive UI/UX, sub-second latency, contact endpoints & Google indexing.</span>
+          </td>
+          <td><span style="font-family: var(--font-mono); font-size: 11px; color: var(--gold-light);">BASE ARCHITECTURE</span></td>
+          <td style="text-align: right;">$${currentTier.price.toLocaleString('en-US')}.00</td>
+        `;
+        invItemsTableBody.appendChild(trBase);
+
+        // Checked Add-on rows
+        checkedAddons.forEach((addon) => {
+          const trAddon = document.createElement('tr');
+          trAddon.innerHTML = `
+            <td>
+              <strong class="inv-item-name">${addon.name}</strong>
+              <span class="inv-item-desc">Bespoke technical add-on & service module integrated into client platform.</span>
+            </td>
+            <td><span style="font-family: var(--font-mono); font-size: 11px; color: #70baff;">ADD-ON MODULE</span></td>
+            <td style="text-align: right;">+$${addon.price.toLocaleString('en-US')}.00</td>
+          `;
+          invItemsTableBody.appendChild(trAddon);
+        });
+      }
+
+      // Totals
+      const totalFormatted = `$${total.toLocaleString('en-US')}.00`;
+      if (invRenderSubtotal) invRenderSubtotal.textContent = totalFormatted;
+      if (invRenderGrandTotal) invRenderGrandTotal.textContent = `${totalFormatted} USD`;
+      if (invPayBtnAmount) invPayBtnAmount.textContent = `${totalFormatted} USD`;
+
+      // Maintenance description
+      const selectedMaint = document.querySelector('input[name="maintPlan"]:checked')?.value;
+      if (invRenderMaintPlan) {
+        if (selectedMaint === 'seo') {
+          invRenderMaintPlan.textContent = '$500 / month (Enterprise Care + Active Monthly Google SEO & Optimization)';
+        } else {
+          invRenderMaintPlan.textContent = '$200 / month (Standard Cloud Maintenance & Security Updates)';
+        }
+      }
+
+      // PayPal Instant Link configuration
+      const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=papica777@gmail.com&currency_code=USD&amount=${total}&item_name=${encodeURIComponent(`Aeterna Invoice ${invNum} - ${currentTier.title}`)}`;
+      if (invDynamicPayPalLink) {
+        invDynamicPayPalLink.href = paypalUrl;
+      }
+
+      // Open the invoice modal!
+      openProposalModal('invoice');
+    });
+  }
+
+  // Invoice Print Action
+  const btnInvoicePrint = document.getElementById('btnInvoicePrint');
+  if (btnInvoicePrint) {
+    btnInvoicePrint.addEventListener('click', () => {
+      window.print();
+    });
+  }
+
+  // Invoice Copy Link Action
+  const btnInvoiceCopyLink = document.getElementById('btnInvoiceCopyLink');
+  if (btnInvoiceCopyLink) {
+    btnInvoiceCopyLink.addEventListener('click', () => {
+      const link = document.getElementById('invDynamicPayPalLink')?.href;
+      if (link) {
+        navigator.clipboard.writeText(link).then(() => {
+          const originalText = btnInvoiceCopyLink.innerHTML;
+          btnInvoiceCopyLink.innerHTML = '<span>✓ LINK COPIED TO CLIPBOARD!</span>';
+          btnInvoiceCopyLink.style.borderColor = '#16833b';
+          btnInvoiceCopyLink.style.color = '#38e370';
+          setTimeout(() => {
+            btnInvoiceCopyLink.innerHTML = originalText;
+            btnInvoiceCopyLink.style.borderColor = '';
+            btnInvoiceCopyLink.style.color = '';
+          }, 2500);
+        });
+      }
+    });
+  }
 
   // "INITIATE THIS TIER WITH NDA" button inside proposal modals
   document.querySelectorAll('.initiate-tier-btn').forEach((btn) => {

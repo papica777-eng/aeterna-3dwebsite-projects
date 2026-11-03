@@ -2003,6 +2003,834 @@ body.vortex-mode .vortex-sub {
   }
 }
 
+/* ==========================================================================
+   INTERACTIVE SCOPE & INVOICE CONFIGURATOR
+   ========================================================================== */
+.configurator-section {
+  margin-top: 56px;
+  background: linear-gradient(180deg, rgba(17, 20, 27, 0.85) 0%, rgba(10, 11, 14, 0.95) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 18px;
+  padding: 44px 40px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 50px rgba(212, 175, 55, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
 
+.config-head {
+  text-align: center;
+  max-width: 760px;
+  margin: 0 auto 36px;
+}
 
+.config-title {
+  font-family: var(--font-serif);
+  font-size: 32px;
+  color: var(--text-pure);
+  margin: 10px 0 12px;
+  letter-spacing: -0.5px;
+}
 
+.config-lead {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+/* Tier Selection Tabs/Pills */
+.config-tier-selector {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 32px;
+}
+
+.cfg-tier-pill {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 16px 14px;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.cfg-tier-pill:hover {
+  border-color: rgba(212, 175, 55, 0.5);
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.cfg-tier-pill.active {
+  background: rgba(212, 175, 55, 0.12);
+  border-color: var(--gold-primary);
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.25);
+}
+
+.cfg-tier-tag {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.cfg-tier-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-pure);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.cfg-tier-cost {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--gold-primary);
+}
+
+/* Add-ons & Extras Grid */
+.addons-catalog-box {
+  margin-bottom: 32px;
+}
+
+.config-section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.config-section-label::after {
+  content: '';
+  flex-grow: 1;
+  height: 1px;
+  background: rgba(212, 175, 55, 0.25);
+}
+
+.addons-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.addon-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.addon-card:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(212, 175, 55, 0.35);
+}
+
+.addon-card.selected {
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.7);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.addon-card input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold-primary);
+  cursor: pointer;
+  margin-top: 2px;
+}
+
+.addon-info {
+  flex-grow: 1;
+}
+
+.addon-name {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text-pure);
+  margin-bottom: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.addon-price-tag {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.addon-desc {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Post-Launch Care Selection */
+.maintenance-tier-box {
+  background: rgba(0, 48, 135, 0.12);
+  border: 1px solid rgba(0, 112, 186, 0.35);
+  border-radius: 10px;
+  padding: 20px 24px;
+  margin-bottom: 32px;
+}
+
+.maint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.maint-title {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #70baff;
+  letter-spacing: 1px;
+}
+
+.maint-badge-free {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #060708;
+  background: linear-gradient(90deg, #d4af37, #f7e29b);
+  padding: 3px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.8px;
+}
+
+.maint-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.maint-option-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.maint-option-label:hover {
+  border-color: rgba(0, 112, 186, 0.6);
+}
+
+.maint-option-label.selected {
+  border-color: #0070ba;
+  background: rgba(0, 48, 135, 0.35);
+}
+
+.maint-option-label input[type="radio"] {
+  accent-color: #0070ba;
+  margin-top: 3px;
+}
+
+.maint-opt-text strong {
+  display: block;
+  font-size: 13px;
+  color: var(--text-pure);
+  margin-bottom: 2px;
+}
+
+.maint-opt-text span {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.4;
+  display: block;
+}
+
+/* Dynamic Live Summary Bar */
+.config-summary-bar {
+  background: rgba(10, 12, 16, 0.95);
+  border: 1px solid var(--gold-primary);
+  border-radius: 12px;
+  padding: 24px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(212, 175, 55, 0.15);
+}
+
+.sum-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sum-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.sum-breakdown {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.sum-total-box {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.sum-currency {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  color: var(--gold-primary);
+}
+
+.sum-amount {
+  font-family: var(--font-serif);
+  font-size: 44px;
+  font-weight: 700;
+  color: var(--text-pure);
+  line-height: 1;
+}
+
+.sum-right {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.btn-generate-invoice {
+  background: linear-gradient(135deg, #d4af37 0%, #aa820a 100%);
+  color: #060708 !important;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 16px 32px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 20px rgba(212, 175, 55, 0.4);
+}
+
+.btn-generate-invoice:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(212, 175, 55, 0.6);
+  background: linear-gradient(135deg, #f7e29b 0%, #d4af37 100%);
+}
+
+.paypal-trust-badges {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.paypal-trust-text {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1px;
+  color: var(--text-dim);
+}
+
+.payment-icons-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.payment-icon-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+}
+
+.payment-icon-paypal {
+  background: #003087;
+  color: #0070ba;
+  font-weight: 900;
+}
+
+.payment-icon-paypal span:first-child { color: #0079C1; }
+.payment-icon-paypal span:last-child { color: #00457C; }
+
+/* ==========================================================================
+   BRUTALLY BEAUTIFUL OFFICIAL INVOICE MODAL
+   ========================================================================== */
+.invoice-modal-dialog {
+  max-width: 900px;
+  padding: 0;
+  background: #090a0d;
+  border: 1px solid var(--gold-primary);
+  border-radius: 12px;
+  box-shadow: 0 40px 120px rgba(0, 0, 0, 0.98), 0 0 80px rgba(212, 175, 55, 0.25);
+  overflow: hidden;
+  position: relative;
+}
+
+.invoice-paper {
+  padding: 48px 52px;
+  position: relative;
+  background: radial-gradient(circle at top right, rgba(212, 175, 55, 0.04) 0%, rgba(9, 10, 13, 1) 70%);
+}
+
+.invoice-paper::before {
+  content: '▲ AETERNA';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-30deg);
+  font-family: var(--font-serif);
+  font-size: 110px;
+  font-weight: 900;
+  color: rgba(212, 175, 55, 0.025);
+  letter-spacing: 20px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+/* Invoice Header */
+.inv-top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.inv-brand-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.inv-studio-logo {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  color: var(--text-pure);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.inv-studio-logo .inv-delta {
+  color: var(--gold-primary);
+}
+
+.inv-studio-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+  text-transform: uppercase;
+}
+
+.inv-corp-data {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.inv-meta-box {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.inv-badge-official {
+  align-self: flex-end;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #060708;
+  background: linear-gradient(90deg, #d4af37, #f7e29b);
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 6px;
+}
+
+.inv-number {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-pure);
+  letter-spacing: 1.5px;
+}
+
+.inv-date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.inv-status {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #70baff;
+  letter-spacing: 0.8px;
+}
+
+/* Bill To & Recipient Details */
+.inv-client-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.inv-billed-to-label {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.inv-billed-to-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-pure);
+}
+
+.inv-billed-to-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Itemized Table */
+.inv-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 24px;
+}
+
+.inv-table th {
+  background: rgba(212, 175, 55, 0.08);
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 1.2px;
+  color: var(--gold-light);
+  text-transform: uppercase;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.inv-table th:last-child {
+  text-align: right;
+}
+
+.inv-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.inv-table td:last-child {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-pure);
+}
+
+.inv-item-name {
+  font-weight: 600;
+  color: var(--text-pure);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.inv-item-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+/* Calculations & Grand Total */
+.inv-totals-box {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 28px;
+}
+
+.inv-totals-table {
+  width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inv-tot-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.inv-tot-row.grand-total {
+  border-top: 1px solid rgba(212, 175, 55, 0.4);
+  padding-top: 10px;
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-pure);
+  align-items: baseline;
+}
+
+.inv-tot-row.grand-total .inv-tot-val {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  color: var(--gold-primary);
+}
+
+/* Legal Covenant Box */
+.inv-covenant-box {
+  background: rgba(212, 175, 55, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 28px;
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.inv-covenant-title {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.inv-covenant-list {
+  margin: 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* Direct PayPal Payment Block in Invoice */
+.inv-payment-cta-box {
+  background: linear-gradient(180deg, rgba(0, 48, 135, 0.2) 0%, rgba(0, 30, 85, 0.3) 100%);
+  border: 1px solid rgba(0, 112, 186, 0.6);
+  border-radius: 10px;
+  padding: 22px 24px;
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.inv-pay-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: #70baff;
+  letter-spacing: 1.2px;
+  margin-bottom: 6px;
+}
+
+.inv-pay-sub {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 16px;
+}
+
+.btn-paypal-supreme {
+  background: linear-gradient(90deg, #003087 0%, #0070ba 100%);
+  border: 1px solid #3399ff;
+  color: #ffffff !important;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 16px 36px;
+  border-radius: 8px;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  box-shadow: 0 6px 25px rgba(0, 112, 186, 0.5);
+  transition: all 0.25s ease;
+  width: 100%;
+  max-width: 520px;
+}
+
+.btn-paypal-supreme:hover {
+  background: linear-gradient(90deg, #002266 0%, #005599 100%);
+  box-shadow: 0 8px 35px rgba(0, 112, 186, 0.7);
+  transform: translateY(-2px);
+}
+
+.inv-actions-row {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btn-inv-tool {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--text-pure);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-inv-tool:hover {
+  background: rgba(212, 175, 55, 0.15);
+  border-color: var(--gold-primary);
+  color: #ffffff;
+}
+
+/* Print Stylesheet for Physical / PDF Export */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #modalBespokeInvoice, #modalBespokeInvoice * {
+    visibility: visible;
+  }
+  #modalBespokeInvoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+  .invoice-paper {
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 20px;
+  }
+  .inv-top-bar, .inv-client-box, .inv-table th, .inv-table td, .inv-covenant-box {
+    color: #000000 !important;
+    border-color: #cccccc !important;
+    background: transparent !important;
+  }
+  .inv-number, .inv-studio-logo, .inv-item-name, .inv-tot-row.grand-total, .sum-amount {
+    color: #000000 !important;
+  }
+  .inv-payment-cta-box, .inv-actions-row, .modal-close-btn {
+    display: none !important;
+  }
+}
+
+/* Responsive Configurator */
+@media (max-width: 1024px) {
+  .config-tier-selector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .addons-grid {
+    grid-template-columns: 1fr;
+  }
+  .maint-options-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .configurator-section {
+    padding: 28px 20px;
+  }
+  .config-tier-selector {
+    grid-template-columns: 1fr;
+  }
+  .config-summary-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .sum-right {
+    width: 100%;
+    align-items: stretch;
+  }
+  .btn-generate-invoice {
+    width: 100%;
+    justify-content: center;
+  }
+  .invoice-paper {
+    padding: 28px 20px;
+  }
+  .inv-top-bar {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .inv-meta-box {
+    text-align: left;
+  }
+  .inv-badge-official {
+    align-self: flex-start;
+  }
+  .inv-totals-table {
+    width: 100%;
+  }
+}
