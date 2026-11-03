@@ -745,20 +745,47 @@
     price: 1500,
   };
 
+  const addonCard3dViewer = document.getElementById('addonCard3dViewer');
+  const addonCheck3dViewer = document.getElementById('addonCheck3dViewer');
+  const addonTag3dViewer = document.getElementById('addonTag3dViewer');
+
+  function sync3dAddonAvailability() {
+    const is3dIncludedInTier = (currentTier.id === 'tier3' || currentTier.id === 'tier4');
+    if (addonCheck3dViewer && addonCard3dViewer && addonTag3dViewer) {
+      if (is3dIncludedInTier) {
+        addonCheck3dViewer.checked = false;
+        addonCheck3dViewer.disabled = true;
+        addonCard3dViewer.classList.remove('selected');
+        addonCard3dViewer.classList.add('included-in-tier');
+        addonTag3dViewer.textContent = '✓ INCLUDED IN TIER ($0)';
+        addonTag3dViewer.style.color = '#38e370';
+      } else {
+        addonCheck3dViewer.disabled = false;
+        addonCard3dViewer.classList.remove('included-in-tier');
+        addonTag3dViewer.textContent = '+$800';
+        addonTag3dViewer.style.color = '';
+      }
+    }
+  }
+
   function recalculateConfigurator() {
+    sync3dAddonAvailability();
+
     let totalScope = currentTier.price;
     let checkedAddons = [];
 
     addonChecks.forEach((chk) => {
       const card = chk.closest('.addon-card');
-      if (chk.checked) {
+      if (chk.checked && !chk.disabled) {
         if (card) card.classList.add('selected');
         const price = parseInt(chk.getAttribute('data-price'), 10) || 0;
         const name = chk.getAttribute('data-name') || '';
         totalScope += price;
         checkedAddons.push({ name, price });
       } else {
-        if (card) card.classList.remove('selected');
+        if (card && !card.classList.contains('included-in-tier')) {
+          card.classList.remove('selected');
+        }
       }
     });
 
@@ -913,27 +940,65 @@
         });
       }
 
-      // Calculations in totals table
+      // Calculations in totals table with Dynamic VAT Logic
       if (invRenderTotalScope) invRenderTotalScope.textContent = `$${totalScope.toLocaleString('en-US')}.00`;
       
-      if (isDeposit) {
-        if (invRenderScheduleLabel) invRenderScheduleLabel.textContent = 'Settlement Schedule (50% Upfront Production Deposit):';
-        if (invRenderScheduleAmount) invRenderScheduleAmount.textContent = `$${payableNow.toLocaleString('en-US')}.00`;
-        if (invRowBalanceDue) invRowBalanceDue.style.display = 'flex';
-        if (invRenderBalanceDue) invRenderBalanceDue.textContent = `$${balanceDue.toLocaleString('en-US')}.00 (Due upon final delivery)`;
-        if (invRenderGrandLabel) invRenderGrandLabel.textContent = 'AMOUNT DUE TODAY (50% DEPOSIT):';
-        if (invRenderGrandTotal) invRenderGrandTotal.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
+      const cleanVat = (clientVat || '').toUpperCase().trim();
+      const cleanAddr = (clientAddress || '').toUpperCase();
+      const isBulgarianTax = cleanVat.startsWith('BG') || /^\d{9,10}$/.test(cleanVat) || cleanAddr.includes('BULGARIA') || cleanAddr.includes('БЪЛГАРИЯ');
+
+      let vatRate = 0.0;
+      let vatAmount = 0;
+      let grossScope = totalScope;
+
+      const invRenderVatLabel = document.getElementById('invRenderVatLabel');
+      const invRenderVatAmount = document.getElementById('invRenderVatAmount');
+
+      if (isBulgarianTax) {
+        vatRate = 0.20;
+        vatAmount = Math.round(totalScope * 0.20);
+        grossScope = totalScope + vatAmount;
+        if (invRenderVatLabel) invRenderVatLabel.textContent = 'VAT (20% Bulgarian Commercial Tax - чл. 86 ЗДДС):';
+        if (invRenderVatAmount) invRenderVatAmount.textContent = `+$${vatAmount.toLocaleString('en-US')}.00 (20%)`;
       } else {
-        const discountAmt = totalScope - payableNow;
+        vatRate = 0.0;
+        vatAmount = 0;
+        grossScope = totalScope;
+        if (invRenderVatLabel) invRenderVatLabel.textContent = 'Tax / VAT (B2B Cross-Border Reverse Charge - Art. 196 EU VAT Directive):';
+        if (invRenderVatAmount) invRenderVatAmount.textContent = '$0.00 (0%)';
+      }
+
+      let finalPayable = grossScope;
+      let finalBalanceDue = 0;
+
+      if (isDeposit) {
+        finalPayable = Math.round(grossScope * 0.5);
+        finalBalanceDue = grossScope - finalPayable;
+        if (invRenderScheduleLabel) invRenderScheduleLabel.textContent = 'Settlement Schedule (50% Upfront Production Deposit):';
+        if (invRenderScheduleAmount) invRenderScheduleAmount.textContent = `$${finalPayable.toLocaleString('en-US')}.00`;
+        if (invRowBalanceDue) invRowBalanceDue.style.display = 'flex';
+        if (invRenderBalanceDue) invRenderBalanceDue.textContent = `$${finalBalanceDue.toLocaleString('en-US')}.00 (Due upon final delivery)`;
+        if (invRenderGrandLabel) invRenderGrandLabel.textContent = 'AMOUNT DUE TODAY (50% DEPOSIT):';
+        if (invRenderGrandTotal) invRenderGrandTotal.textContent = `$${finalPayable.toLocaleString('en-US')}.00 USD`;
+      } else {
+        const discountAmt = Math.round(totalScope * 0.05);
+        finalPayable = grossScope - discountAmt;
+        finalBalanceDue = 0;
         if (invRenderScheduleLabel) invRenderScheduleLabel.textContent = 'Prepayment Incentive (5% Immediate Cash Discount):';
         if (invRenderScheduleAmount) invRenderScheduleAmount.textContent = `-$${discountAmt.toLocaleString('en-US')}.00`;
         if (invRowBalanceDue) invRowBalanceDue.style.display = 'none';
         if (invRenderGrandLabel) invRenderGrandLabel.textContent = 'AMOUNT DUE TODAY (FULL SETTLEMENT):';
-        if (invRenderGrandTotal) invRenderGrandTotal.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
+        if (invRenderGrandTotal) invRenderGrandTotal.textContent = `$${finalPayable.toLocaleString('en-US')}.00 USD`;
       }
 
-      if (invStripeBtnAmount) invStripeBtnAmount.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
-      if (invPayBtnAmount) invPayBtnAmount.textContent = `$${payableNow.toLocaleString('en-US')}.00 USD`;
+      if (invStripeBtnAmount) invStripeBtnAmount.textContent = `$${finalPayable.toLocaleString('en-US')}.00 USD`;
+      if (invPayBtnAmount) invPayBtnAmount.textContent = `$${finalPayable.toLocaleString('en-US')}.00 USD`;
+
+      // Bank Wire reference update
+      const invRenderWireRef = document.getElementById('invRenderWireRef');
+      if (invRenderWireRef) {
+        invRenderWireRef.textContent = `${invNum} / ${(clientCompany || 'Corporate Commission')}`;
+      }
 
       // Maintenance description
       const selectedMaint = document.querySelector('input[name="maintPlan"]:checked')?.value;
@@ -947,16 +1012,43 @@
 
       // Dual Gateways checkout URLs
       const tierMap = STRIPE_LINKS[currentTier.id] || STRIPE_LINKS.tier1;
-      const stripeUrl = isDeposit ? tierMap.deposit : tierMap.full;
+      const hasCustomAddons = checkedAddons.length > 0 || isBulgarianTax;
+      const stripeUrl = hasCustomAddons
+        ? 'https://buy.stripe.com/28E14h0bacau7Aw1SffAc0a'
+        : (isDeposit ? tierMap.deposit : tierMap.full);
+
       if (invDynamicStripeLink) {
         invDynamicStripeLink.href = stripeUrl;
       }
 
       const scheduleLabel = isDeposit ? '50% Production Deposit' : 'Full Settlement';
-      const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=${payableNow}&item_name=${encodeURIComponent(`Aeterna Invoice ${invNum} - ${currentTier.title} (${scheduleLabel})`)}`;
+      const paypalUrl = `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=USD&amount=${finalPayable}&item_name=${encodeURIComponent(`Aeterna Invoice ${invNum} - ${currentTier.title} (${scheduleLabel})`)}&no_shipping=1&no_note=0`;
       if (invDynamicPayPalLink) {
         invDynamicPayPalLink.href = paypalUrl;
       }
+
+      // Background Lead Capture Dispatch (Instant Hot Lead Notification)
+      try {
+        fetch('https://formspree.io/f/mqaeveze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify({
+            event: 'Invoice Generated',
+            invoiceNumber: invNum,
+            tier: currentTier.title,
+            basePrice: currentTier.price,
+            totalScope,
+            payableToday: finalPayable,
+            isDeposit,
+            clientCompany: clientCompany || 'Undisclosed',
+            clientVat: clientVat || 'N/A',
+            clientContact: clientContact || 'N/A',
+            clientAddress: clientAddress || 'N/A',
+            addons: checkedAddons.map(a => `${a.name} (+$${a.price})`).join('; ') || 'None',
+            timestamp: new Date().toISOString()
+          })
+        }).catch(() => {});
+      } catch (_) {}
 
       // Open the invoice modal!
       openProposalModal('invoice');
@@ -991,6 +1083,215 @@
       }
     });
   }
+
+  // Copy Bank Wire Details Action
+  const btnCopyWireDetails = document.getElementById('btnCopyWireDetails');
+  if (btnCopyWireDetails) {
+    btnCopyWireDetails.addEventListener('click', () => {
+      const wireRef = document.getElementById('invRenderWireRef')?.textContent || 'INV-2026-COMMISSION';
+      const wirePayload = 
+`AETERNA TECHNOLOGIES EOOD // OFFICIAL B2B BANK WIRE DETAILS
+------------------------------------------------------------------
+Beneficiary:         Dimitar Stavrev Prodromov / AETERNA Technologies EOOD
+Corporate UIC / VAT: BG101327948
+Depository Bank:     iCard AD (EU Regulated Financial Institution)
+IBAN (EUR/USD/BGN):  BG22INTF40012011857631
+BIC / SWIFT Code:    INTFBGSF
+Payment Reference:   ${wireRef}
+Bank Jurisdiction:   Sofia / Pomorie, European Union
+------------------------------------------------------------------
+Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
+
+      navigator.clipboard.writeText(wirePayload).then(() => {
+        const originalText = btnCopyWireDetails.innerHTML;
+        btnCopyWireDetails.innerHTML = '<span>✓ OFFICIAL IBAN &amp; WIRE DETAILS COPIED!</span>';
+        btnCopyWireDetails.style.borderColor = '#38e370';
+        btnCopyWireDetails.style.color = '#38e370';
+        setTimeout(() => {
+          btnCopyWireDetails.innerHTML = originalText;
+          btnCopyWireDetails.style.borderColor = '';
+          btnCopyWireDetails.style.color = '';
+        }, 3000);
+      });
+    });
+  }
+
+  // Share Configured Quote Link (Deep Linking for Partners & Accountants)
+  const btnShareQuoteLink = document.getElementById('btnShareQuoteLink');
+  if (btnShareQuoteLink) {
+    btnShareQuoteLink.addEventListener('click', () => {
+      const isDeposit = document.querySelector('input[name="paymentSchedule"]:checked')?.value === 'deposit';
+      const checkedAddonNames = [];
+      document.querySelectorAll('.cfg-addon-check:checked').forEach((c) => {
+        const p = c.getAttribute('data-price');
+        if (p) checkedAddonNames.push(p);
+      });
+
+      const comp = encodeURIComponent(document.getElementById('cfgClientCompany')?.value.trim() || '');
+      const tax = encodeURIComponent(document.getElementById('cfgClientVat')?.value.trim() || '');
+
+      const params = new URLSearchParams();
+      params.set('tier', currentTier.id);
+      params.set('sched', isDeposit ? 'deposit' : 'full');
+      if (checkedAddonNames.length) params.set('addons', checkedAddonNames.join(','));
+      if (comp) params.set('comp', comp);
+      if (tax) params.set('tax', tax);
+
+      const shareableUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}#quoteConfigurator`;
+
+      navigator.clipboard.writeText(shareableUrl).then(() => {
+        const originalText = btnShareQuoteLink.innerHTML;
+        btnShareQuoteLink.innerHTML = '<span>✓ SHAREABLE QUOTE LINK COPIED!</span>';
+        btnShareQuoteLink.style.borderColor = '#70baff';
+        btnShareQuoteLink.style.color = '#70baff';
+        setTimeout(() => {
+          btnShareQuoteLink.innerHTML = originalText;
+          btnShareQuoteLink.style.borderColor = '';
+          btnShareQuoteLink.style.color = '';
+        }, 3000);
+      });
+    });
+  }
+
+  // Deep-Linking: Hydrate Configurator from URL on page load
+  function hydrateFromUrlParams() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (!urlParams.toString()) return;
+
+      const tierParam = urlParams.get('tier');
+      if (tierParam) {
+        const targetPill = document.querySelector(`.cfg-tier-pill[data-tier-id="${tierParam}"]`);
+        if (targetPill) targetPill.click();
+      }
+
+      const schedParam = urlParams.get('sched');
+      if (schedParam) {
+        const targetRadio = document.querySelector(`input[name="paymentSchedule"][value="${schedParam}"]`);
+        if (targetRadio) {
+          targetRadio.checked = true;
+          targetRadio.dispatchEvent(new Event('change'));
+        }
+      }
+
+      const compParam = urlParams.get('comp');
+      if (compParam) {
+        const compInput = document.getElementById('cfgClientCompany');
+        if (compInput) compInput.value = decodeURIComponent(compParam);
+      }
+
+      const taxParam = urlParams.get('tax');
+      if (taxParam) {
+        const taxInput = document.getElementById('cfgClientVat');
+        if (taxInput) taxInput.value = decodeURIComponent(taxParam);
+      }
+
+      recalculateConfigurator();
+    } catch (_) {}
+  }
+  setTimeout(hydrateFromUrlParams, 200);
+
+  // ==========================================================================
+  // LEGAL & COMPLIANCE MODAL ENGINE
+  // ==========================================================================
+  const modalLegal = document.getElementById('modalLegalCompliance');
+  const legalModalTitle = document.getElementById('legalModalTitle');
+  const legalModalContent = document.getElementById('legalModalContent');
+  const legalTabs = document.querySelectorAll('.btn-legal-tab');
+
+  const LEGAL_DOCS = {
+    terms: {
+      title: 'Terms of Service & Engagement Governance',
+      html: `
+        <h4>1. CORPORATE IDENTIFICATION & JURISDICTION</h4>
+        <p>This digital service covenant is executed by and between the client ("Client") and <strong>AETERNA Technologies EOOD</strong>, Unified Identification Code (UIC / VAT): <strong>BG101327948</strong>, registered with headquarters in Pomorie, Republic of Bulgaria, European Union ("Studio", "Architect").</p>
+
+        <h4>2. DELIVERABLES & TECHNICAL BENCHMARKS</h4>
+        <p>The Studio delivers bespoke web architecture, 3D WebGL spatial engines, and high-conversion commercial flagships in accordance with the selected commercial tier (Tier 01 Express to Tier 04 Enterprise). All systems are engineered to achieve &lt; 0.8s load latency and 90–100 Google Core Web Vitals performance benchmarks.</p>
+
+        <h4>3. 100% UNRESTRICTED CODE & ASSET OWNERSHIP</h4>
+        <p>Upon clearance of the final milestone settlement, 100% of the custom source code, Git repositories, 3D assets, layouts, and domain configurations are transferred unconditionally to the Client. The Client incurs 0% ongoing platform cuts or proprietary licensing royalties.</p>
+
+        <h4>4. 90-DAY COMPLIMENTARY TECHNICAL WARRANTY</h4>
+        <p>Every commercial package includes ninety (90) days of comprehensive post-launch technical support, cloud backup verification, and bug fixes at zero additional cost ($0). Month-to-month care plans starting Month 4 are optional and cancelable at any time.</p>
+      `
+    },
+    privacy: {
+      title: 'Privacy Policy & GDPR Compliance (Regulation EU 2016/679)',
+      html: `
+        <h4>1. DATA CONTROLLER & COMMITMENT</h4>
+        <p>AETERNA Technologies EOOD operates as the Data Controller in strict accordance with the General Data Protection Regulation (GDPR) and the Bulgarian Personal Data Protection Act. Inquiries may be addressed directly to <strong>billing@aeterna.website</strong>.</p>
+
+        <h4>2. SCOPE OF COLLECTED DATA</h4>
+        <p>We collect solely the corporate and contact data strictly necessary to execute commercial pro-forma invoices, mutual Non-Disclosure Agreements, and custom architecture commissions (e.g. Legal Entity Name, Corporate Tax/VAT Number, Signatory Name, and Billing Email).</p>
+
+        <h4>3. ZERO DATA COMMERCIALIZATION</h4>
+        <p>The Studio never sells, rents, or commercializes client data to advertising networks or external data brokers. All communications are encrypted via 256-bit TLS encryption.</p>
+
+        <h4>4. RIGHTS OF DATA SUBJECTS</h4>
+        <p>Clients possess the unqualified right to access, rectify, export, or request the immediate erasure of their personal data from our operational repositories at any time.</p>
+      `
+    },
+    refund: {
+      title: 'Refund, Milestone Settlement & Digital Delivery Policy',
+      html: `
+        <h4>1. MILESTONE PRODUCTION DEPOSIT</h4>
+        <p>Due to the bespoke nature of custom architectural design and dedicated studio reservation (maximum 4 client allocations per quarter), the 50% milestone production deposit becomes non-refundable once discovery and custom software compilation commence.</p>
+
+        <h4>2. CLIENT CALIBRATION & REVISION PHASES</h4>
+        <p>Prior to final handover, the Client reviews the live flagship on a private staging server and is entitled to up to three (3) iterative rounds of microscopic design, copy, and performance calibration.</p>
+
+        <h4>3. DIGITAL DELIVERY FULFILLMENT</h4>
+        <p>Final delivery is fulfilled digitally via encrypted Git repository transfer, direct DNS / production server deployment, and turnkey credential handover. Automated official tax invoices are issued immediately upon transaction clearance.</p>
+
+        <h4>4. B2B DISPUTE RESOLUTION</h4>
+        <p>In the event of an operational dispute, both parties commit to thirty (30) days of good-faith executive mediation directly with the Managing Director prior to initiating formal arbitration.</p>
+      `
+    },
+    nda: {
+      title: 'Mutual Non-Disclosure Agreement (NDA) Covenant',
+      html: `
+        <h4>1. CONFIDENTIALITY PLEDGE</h4>
+        <p>Both parties acknowledge that in the course of discussing and executing the digital flagship, proprietary commercial insights, unreleased products, financial projections, and custom codebase will be exchanged ("Confidential Information").</p>
+
+        <h4>2. STANDARD OF CARE</h4>
+        <p>The Receiving Party shall safeguard all Confidential Information with the same degree of care it exercises for its own confidential assets, but in no event less than reasonable institutional care.</p>
+
+        <h4>3. TERM OF PROTECTION</h4>
+        <p>This confidentiality covenant remains binding for a period of three (3) full years following the date of initial disclosure or formal invoice generation.</p>
+
+        <h4>4. EXECUTED BY ARCHITECT</h4>
+        <p>Executed by Dimitar Stavrev Prodromov under EU Horizon Europe PIC: 865986222 and AETERNA Sovereign Cryptographic Mandate.</p>
+      `
+    }
+  };
+
+  function renderLegalDoc(docKey) {
+    const doc = LEGAL_DOCS[docKey] || LEGAL_DOCS.terms;
+    if (legalModalTitle) legalModalTitle.textContent = doc.title;
+    if (legalModalContent) legalModalContent.innerHTML = doc.html;
+    legalTabs.forEach(t => {
+      t.classList.toggle('active', t.getAttribute('data-doc') === docKey);
+    });
+  }
+
+  legalTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const docKey = tab.getAttribute('data-doc');
+      renderLegalDoc(docKey);
+    });
+  });
+
+  document.querySelectorAll('.trigger-legal-modal').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const docKey = btn.getAttribute('data-legal') || 'terms';
+      renderLegalDoc(docKey);
+      if (modalLegal) {
+        modalLegal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+    });
+  });
 
   // ==========================================================================
   // 8d. THREE.JS LUXURY 3D INTERACTIVE SANDBOX ENGINE
