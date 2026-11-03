@@ -2115,4 +2115,134 @@ Official Invoicing:  billing@aeterna.website • Tel: +359 884 638 640`;
     });
   }
 
+  // ==========================================================================
+  // 9. FLAGSHIP PORTFOLIO FILTER & INTERACTIVE LIVE BROWSER PREVIEW
+  // ==========================================================================
+  const filterTabs = document.querySelectorAll('.btn-filter-tab');
+  const portfolioCards = document.querySelectorAll('.portfolio-card');
+
+  function setPortfolioFilter(category) {
+    filterTabs.forEach((tab) => {
+      tab.classList.toggle('active', tab.getAttribute('data-filter') === category);
+    });
+    portfolioCards.forEach((card) => {
+      const cardCat = card.getAttribute('data-category');
+      if (category === 'all' || cardCat === category) {
+        card.classList.remove('is-hidden');
+      } else {
+        card.classList.add('is-hidden');
+      }
+    });
+  }
+
+  filterTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const category = tab.getAttribute('data-filter') || 'live';
+      setPortfolioFilter(category);
+    });
+  });
+
+  // Default to Live Production Platforms on initial load
+  setPortfolioFilter('live');
+
+  // Direct Tier Order Triggers from Portfolio Cards
+  document.querySelectorAll('.btn-trigger-tier-order').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const tierId = btn.getAttribute('data-select-tier') || 'tier4';
+      const targetPill = document.querySelector(`.cfg-tier-pill[data-tier-id="${tierId}"]`);
+      if (targetPill) targetPill.click();
+      const cfgElem = document.getElementById('quoteConfigurator');
+      if (cfgElem) {
+        cfgElem.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Interactive Live Browser Preview Modal Engine
+  const modalLiveBrowserPreview = document.getElementById('modalLiveBrowserPreview');
+  const lblLivePreviewUrl = document.getElementById('lblLivePreviewUrl');
+  const btnLiveExternalLink = document.getElementById('btnLiveExternalLink');
+  const iframeLivePreview = document.getElementById('iframeLivePreview');
+  const browserSpinner = document.getElementById('browserSpinner');
+  const btnViewDesktop = document.getElementById('btnViewDesktop');
+  const btnViewMobile = document.getElementById('btnViewMobile');
+  const browserViewportWrapper = document.getElementById('browserViewportWrapper');
+  const btnAdoptLiveDesign = document.getElementById('btnAdoptLiveDesign');
+  const btnCloseBrowserPreview = document.getElementById('btnCloseBrowserPreview');
+
+  let currentPreviewUrl = 'https://anchialo.com';
+
+  function openLiveBrowserPreview(url, title) {
+    if (!modalLiveBrowserPreview || !iframeLivePreview) return;
+    currentPreviewUrl = url;
+    if (lblLivePreviewUrl) lblLivePreviewUrl.textContent = url;
+    if (btnLiveExternalLink) btnLiveExternalLink.href = url;
+
+    if (browserSpinner) browserSpinner.classList.add('active');
+    iframeLivePreview.src = url;
+
+    iframeLivePreview.onload = () => {
+      if (browserSpinner) browserSpinner.classList.remove('active');
+    };
+
+    modalLiveBrowserPreview.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLiveBrowserPreview() {
+    if (!modalLiveBrowserPreview) return;
+    modalLiveBrowserPreview.classList.remove('active');
+    document.body.style.overflow = '';
+    if (iframeLivePreview) iframeLivePreview.src = 'about:blank';
+  }
+
+  document.querySelectorAll('.btn-case-preview-trigger, .btn-card-preview-live').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const url = btn.getAttribute('data-preview-url') || 'https://anchialo.com';
+      const title = btn.getAttribute('data-preview-title') || 'Live Platform Preview';
+      openLiveBrowserPreview(url, title);
+    });
+  });
+
+  if (btnViewDesktop && browserViewportWrapper) {
+    btnViewDesktop.addEventListener('click', () => {
+      btnViewDesktop.classList.add('active');
+      if (btnViewMobile) btnViewMobile.classList.remove('active');
+      browserViewportWrapper.classList.remove('is-mobile');
+    });
+  }
+
+  if (btnViewMobile && browserViewportWrapper) {
+    btnViewMobile.addEventListener('click', () => {
+      btnViewMobile.classList.add('active');
+      if (btnViewDesktop) btnViewDesktop.classList.remove('active');
+      browserViewportWrapper.classList.add('is-mobile');
+    });
+  }
+
+  if (btnCloseBrowserPreview) {
+    btnCloseBrowserPreview.addEventListener('click', closeLiveBrowserPreview);
+  }
+
+  if (modalLiveBrowserPreview) {
+    modalLiveBrowserPreview.addEventListener('click', (e) => {
+      if (e.target === modalLiveBrowserPreview) closeLiveBrowserPreview();
+    });
+  }
+
+  if (btnAdoptLiveDesign) {
+    btnAdoptLiveDesign.addEventListener('click', () => {
+      closeLiveBrowserPreview();
+      const targetPill = document.querySelector('.cfg-tier-pill[data-tier-id="tier4"]');
+      if (targetPill) targetPill.click();
+      const cfgElem = document.getElementById('quoteConfigurator');
+      if (cfgElem) {
+        cfgElem.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  }
+
 })();
