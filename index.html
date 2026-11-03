@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AETERNA // Haute 3D Spatial Web Architecture &amp; Living Liquid Engine</title>
+  <meta name="description" content="We engineer high-caliber digital products, bespoke 3D spatial web architecture, and organic liquid experiences for visionary brands.">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="AETERNA // Haute 3D Spatial Web Architecture">
+  <meta property="og:description" content="Bespoke Web Architecture, High-End UI/UX, and Haute Digital Strategy.">
+  <meta property="og:type" content="website">
+
+  <!-- Typography: Cormorant Garamond / Cinzel (Luxury Serif) & Plus Jakarta Sans (Clean Modern Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- ==================== LUXURY HEADER NAVIGATION ==================== -->
+  <header class="site-header" id="siteHeader">
+    <div class="header-container">
+      
+      <!-- Brand Logo -->
+      <a href="#hero" class="brand-logo" aria-label="AETERNA DIGITAL Home">
+        <span class="logo-mark">&#9650;</span>
+        <span class="logo-text">AETERNA DIGITAL</span>
+      </a>
+
+      <!-- Center Navigation Links -->
+      <nav class="nav-links" id="navLinks">
+        <a href="#services" class="nav-item">Services</a>
+        <a href="#portfolio" class="nav-item">Portfolio</a>
+        <a href="#philosophy" class="nav-item">About</a>
+        <a href="#insights" class="nav-item">Insights</a>
+      </nav>
+
+      <!-- Right Action Pill Button -->
+      <div class="header-actions">
+        <button class="btn-inquire-pill trigger-inquire-modal">
+          <span>INQUIRE NOW</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ==================== MAIN HERO SECTION ==================== -->
+  <section class="hero-section" id="hero">
+    
+    <!-- Architectural Grid Background Layer -->
+    <div class="hero-grid-overlay" aria-hidden="true"></div>
+    <div class="hero-particles" id="heroParticles" aria-hidden="true"></div>
+
+    <div class="hero-container">
+      
+      <!-- Left Column: Prestigious Typography & CTA -->
+      <div class="hero-left">
+        <h1 class="hero-headline">
+          <span class="headline-row">CRAFTING</span>
+          <span class="headline-row">LUXURY DIGITAL</span>
+          <span class="headline-row">EXPERIENCES</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          We engineer high-caliber digital products and bespoke web architecture for visionary brands.
+        </p>
+
+        <div class="hero-cta-group">
+          <button class="btn btn-gold trigger-inquire-modal">START A PROJECT</button>
+          <a href="#services" class="btn btn-outline">DISCOVER MORE</a>
+        </div>
+      </div>
+
+      <!-- Right Column: Organic 3D Living Liquid Gold Sculpture Bleeding Directly into Void -->
+      <div class="hero-right" id="heroRightWrap">
+        <div class="sculpture-liquid-stage" id="sculptureCard">
+          
+          <!-- Volumetric Golden Caustics & Liquid Water Ripples Backdrop -->
+          <canvas id="liquidCausticsCanvas" class="liquid-caustics-canvas"></canvas>
+
+          <!-- The 120-Frame Double-Buffered Living 3D Scrubber Canvas with Feathered Liquid Mask -->
+          <canvas id="heroCanvas" class="hero-liquid-canvas" width="1280" height="720"></canvas>
+
+          <!-- Interactive Water Ripple & Liquid Refraction WebGL Shader Layer -->
+          <canvas id="heroGlCanvas" class="hero-water-ripple-canvas"></canvas>
+
+          <!-- Golden Fluid Aurora Spilling Across Screen Void -->
+          <div class="liquid-gold-spill" id="liquidGoldSpill" aria-hidden="true"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Bottom Center: Scroll To Explore Indicator -->
+    <div class="hero-scroll-indicator">
+      <span class="scroll-text">SCROLL TO EXPLORE</span>
+      <div class="scroll-mouse-icon">
+        <svg viewBox="0 0 24 38" width="18" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="2" width="20" height="34" rx="10"/>
+          <line x1="12" y1="8" x2="12" y2="15" stroke-linecap="round" class="mouse-wheel-anim"/>
+        </svg>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ==================== SERVICES SECTION ==================== -->
+  <section class="services-section" id="services">
+    <div class="services-container">
+      
+      <div class="services-header">
+        <h2 class="services-title">SERVICES</h2>
+      </div>
+
+      <!-- The Exact 2x3 Architectural Glass Card Grid -->
+      <div class="services-glass-box">
+        
+        <!-- Row 1, Column 1: Premium Web Architecture -->
+        <div class="service-cell">
+          <div class="service-icon-box">
+            <!-- Code Editor Window Icon [ < / > ] -->
+            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="6" y="8" width="36" height="32" rx="4"/>
+              <circle cx="12" cy="14" r="1.5" fill="currentColor"/>
+              <circle cx="17" cy="14" r="1.5" fill="currentColor"/>
+              <circle cx="22" cy="14" r="1.5" fill="currentColor"/>
+              <path d="M18 24l-4 4 4 4M30 24l4 4-4 4M26 21l-4 14" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="service-heading">Premium Web Architecture</h3>
+          <p class="service-desc">Robust, elegant development</p>
+        </div>
+
+        <!-- Row 1, Column 2: High-End UI/UX -->
+        <div class="service-cell">
+          <div class="service-icon-box">
+            <!-- Vector Bezier Pen Tool Icon -->
+            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M24 10l-6 12 6 6 6-6-6-12z" stroke-linejoin="round"/>
+              <circle cx="24" cy="22" r="1.5" fill="currentColor"/>
+              <path d="M10 32c4-10 10-14 14-14s10 4 14 14" stroke-linecap="round"/>
+              <rect x="8" y="30" width="4" height="4"/>
+              <rect x="36" y="30" width="4" height="4"/>
+              <path d="M12 32h24" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <h3 class="service-heading">High-End UI/UX</h3>
+          <p class="service-desc">Imaginative, bespoke interfaces</p>
+        </div>
+
+        <!-- Row 1, Column 3: Strategic Branding -->
+        <div class="service-cell">
+          <div class="service-icon-box">
+            <!-- 4-Point Celestial Star with Circle Icon -->
+            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="24" cy="24" r="15"/>
+              <path d="M24 12v24M12 24h24" stroke-linecap="round"/>
+              <path d="M24 18c0 3-3 6-6 6 3 0 6 3 6 6 0-3 3-6 6-6-3 0-6-3-6-6z" fill="currentColor"/>
+              <ellipse cx="24" cy="24" rx="18" ry="7" transform="rotate(-25 24 24)"/>
+            </svg>
+          </div>
+          <h3 class="service-heading">Strategic Branding</h3>
+          <p class="service-desc">High-level identity and story-driven branding</p>
+        </div>
+
+        <!-- Row 2, Column 1: Bespoke CMS & Platforms -->
+        <div class="service-cell">
+          <div class="service-icon-box">
+            <!-- Document Page Icon with Folded Corner -->
+            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
+              <path d="M14 6h14l10 10v26H14V6z" stroke-linejoin="round"/>
+              <path d="M28 6v10h10M20 22h14M20 28h14M20 34h8" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="service-heading">Custom CMS &amp; Platforms</h3>
+          <p class="service-desc">Tailored, scalable backend solutions</p>
+        </div>
+
+        <!-- Row 2, Column 2: Performance & SEO -->
+        <div class="service-cell">
+          <div class="service-icon-box">
+            <!-- Monitor with Ascending Chart Line -->
+            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
+              <rect x="6" y="8" width="36" height="24" rx="3"/>
+              <path d="M24 32v8M16 40h16M12 24l7-7 6 6 11-10M32 13h4v4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="service-heading">Performance &amp; SEO</h3>
+          <p class="service-desc">Sub-second load times &amp; conversion dominance</p>
+        </div>
+
+        <!-- Row 2, Column 3: Conversion Strategy -->
+        <div class="service-cell">
+          <div class="service-icon-box">
+            <!-- Target Dartboard with Arrow -->
+            <svg viewBox="0 0 48 48" class="service-icon" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="24" cy="24" r="16"/>
+              <circle cx="24" cy="24" r="10"/>
+              <circle cx="24" cy="24" r="4" fill="currentColor"/>
+              <path d="M36 12l-10 10M36 12h-6M36 12v6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="service-heading">Conversion Strategy</h3>
+          <p class="service-desc">Data-backed digital acquisition &amp; ROI</p>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== OUR PHILOSOPHY SECTION ==================== -->
+  <section class="philosophy-section" id="philosophy">
+    <div class="philosophy-container">
+      
+      <div class="philosophy-banner-card">
+        <img 
+          src="./assets/philosophy_clean_bg.jpg" 
+          alt="Our Philosophy - Golden Lightning Energy" 
+          class="philosophy-bg-image"
+        >
+        <div class="philosophy-content-overlay">
+          <span class="gold-eyebrow">OUR PHILOSOPHY</span>
+          <h2 class="philosophy-title">Where Engineering Precision<br>Meets Haute Aesthetics</h2>
+          <p class="philosophy-lead">
+            We reject off-the-shelf templates and bloated frameworks. Every line of code, interaction vector, and 3D shader is custom-engineered to create enduring digital distinction.
+          </p>
+          <button class="btn btn-gold trigger-inquire-modal">DISCOVER OUR PRINCIPLES</button>
+        </div>
+      </div>
+
+      <!-- 3 Pillars Grid -->
+      <div class="pillars-grid">
+        <div class="pillar-card">
+          <span class="pillar-num">01</span>
+          <h4 class="pillar-title">Sub-Second Edge Execution</h4>
+          <p class="pillar-desc">
+            Optimized for 100/100 Lighthouse performance, instant hydration, and silky 60-120 FPS render pipelines.
+          </p>
+        </div>
+        <div class="pillar-card">
+          <span class="pillar-num">02</span>
+          <h4 class="pillar-title">Architectural Distinction</h4>
+          <p class="pillar-desc">
+            Bespoke visual narratives, fluid physics, and tactile micro-interactions that elevate brand prestige.
+          </p>
+        </div>
+        <div class="pillar-card">
+          <span class="pillar-num">03</span>
+          <h4 class="pillar-title">Enterprise Security</h4>
+          <p class="pillar-desc">
+            Hardened deployments, zero third-party vulnerability bloat, and complete IP sovereignty.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== SELECTED PORTFOLIO / CASE STUDIES ==================== -->
+  <section class="portfolio-section" id="portfolio">
+    <div class="portfolio-container">
+      
+      <div class="portfolio-header">
+        <span class="gold-eyebrow">SELECTED COMMISSIONS</span>
+        <h2 class="portfolio-title">Flagship Case Studies</h2>
+      </div>
+
+      <div class="portfolio-grid">
+        
+        <!-- Case 1: Haute Horlogerie 3D Spatial Atelier -->
+        <article class="portfolio-card">
+          <div class="card-video-box">
+            <div class="card-backlight" style="--glow-color: rgba(224, 36, 195, 0.45);"></div>
+            <video class="portfolio-video" muted playsinline loop preload="metadata" poster="./assets/thumb_ab0a7bbd.jpg" src="./assets/gemini_generated_video_ab0a7bbd.mp4"></video>
+            <div class="card-scrub-bar"><div class="card-scrub-fill"></div></div>
+          </div>
+          <div class="case-meta">
+            <span class="case-tag">HAUTE HORLOGERIE &bull; 3D SPATIAL</span>
+            <span class="case-year">2026</span>
+          </div>
+          <h3 class="case-title">Aura Monaco // Tourbillon Spatial Atelier</h3>
+          <p class="case-desc">
+            A real-time WebGL flagship where collectors disassemble custom luxury watch movements in full 3D with micron-level metallic reflections.
+          </p>
+          <div class="case-stats">
+            <div class="stat-unit">
+              <span class="stat-num">&euro;3.4M</span>
+              <span class="stat-label">Direct Allocations</span>
+            </div>
+            <div class="stat-unit">
+              <span class="stat-num">100/100</span>
+              <span class="stat-label">Lighthouse Score</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Case 2: Private Wealth Sovereign Terminal -->
+        <article class="portfolio-card">
+          <div class="card-video-box">
+            <div class="card-backlight" style="--glow-color: rgba(0, 229, 255, 0.45);"></div>
+            <video class="portfolio-video" muted playsinline loop preload="metadata" poster="./assets/thumb_213d9b23.jpg" src="./assets/gemini_generated_video_213d9b23.mp4"></video>
+            <div class="card-scrub-bar"><div class="card-scrub-fill"></div></div>
+          </div>
+          <div class="case-meta">
+            <span class="case-tag">PRIVATE WEALTH &bull; TOPOLOGY</span>
+            <span class="case-year">2026</span>
+          </div>
+          <h3 class="case-title">Vance &amp; Sterling // Global Asset Terminal</h3>
+          <p class="case-desc">
+            Dark obsidian private banking portal with interactive financial topography, biometric authentication, and sub-second edge distribution.
+          </p>
+          <div class="case-stats">
+            <div class="stat-unit">
+              <span class="stat-num">+210%</span>
+              <span class="stat-label">HNW Inbound Leads</span>
+            </div>
+            <div class="stat-unit">
+              <span class="stat-num">0.24s</span>
+              <span class="stat-label">Global Load Latency</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- Case 3: Haute Jewelry 4D Living Gold -->
+        <article class="portfolio-card">
+          <div class="card-video-box">
+            <div class="card-backlight" style="--glow-color: rgba(212, 175, 55, 0.45);"></div>
+            <video class="portfolio-video" muted playsinline loop preload="metadata" poster="./assets/hero_loop_frame0.jpg" src="./assets/hero_sculpture_loop.mp4"></video>
+            <div class="card-scrub-bar"><div class="card-scrub-fill"></div></div>
+          </div>
+          <div class="case-meta">
+            <span class="case-tag">FINE JEWELRY &bull; 4D LIQUID GOLD</span>
+            <span class="case-year">2026</span>
+          </div>
+          <h3 class="case-title">Kallos Atelier // Haute Jewelry Experience</h3>
+          <p class="case-desc">
+            Interactive multi-sensory boutique pairing 4K procedural diamond refractive shaders with frictionless private client conciergerie.
+          </p>
+          <div class="case-stats">
+            <div class="stat-unit">
+              <span class="stat-num">+240%</span>
+              <span class="stat-label">Pre-Order Velocity</span>
+            </div>
+            <div class="stat-unit">
+              <span class="stat-num">4.2min</span>
+              <span class="stat-label">Avg. Engagement</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== CALL TO ACTION / VORTEX SECTION ==================== -->
+  <section class="vortex-section" id="insights">
+    <div class="vortex-container">
+      
+      <div class="vortex-card">
+        <img 
+          src="./assets/media_1793701046411_a948a464.jpg" 
+          alt="Molten Gold Vortex" 
+          class="vortex-bg-image"
+        >
+        <div class="vortex-overlay">
+          <h2 class="vortex-headline">
+            LET'S BUILD<br>
+            SOMETHING<br>
+            <span>EXTRAORDINARY</span>
+          </h2>
+          <p class="vortex-sub">
+            We partner with visionary founders, institutions, and luxury houses worldwide to engineer transformative digital realities.
+          </p>
+          <div class="vortex-actions">
+            <button class="btn btn-gold trigger-inquire-modal">START A PROJECT</button>
+            <a href="mailto:inquire@apexdigital.com?subject=Strategic%20Project%20Commission" class="btn btn-outline">
+              CORPORATE INQUIRY
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ==================== SITE FOOTER ==================== -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      
+      <div class="footer-brand-col">
+        <div class="footer-logo">
+          <span class="logo-mark">&#9650;</span>
+          <span class="logo-text">AETERNA DIGITAL</span>
+        </div>
+        <p class="footer-tagline">
+          Haute 3D spatial architecture &amp; high-caliber web engineering.
+        </p>
+        <div class="footer-hq-badge">
+          <span>POMORIE HQ &bull; GLOBAL CLIENT NETWORK</span>
+        </div>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="footer-heading">NAVIGATION</span>
+        <a href="#services">Services</a>
+        <a href="#portfolio">Portfolio</a>
+        <a href="#philosophy">About</a>
+        <a href="#insights">Insights</a>
+      </div>
+
+      <div class="footer-links-col">
+        <span class="footer-heading">ENGAGEMENT</span>
+        <a href="javascript:void(0)" class="trigger-inquire-modal">Initiate Brief</a>
+        <a href="mailto:inquire@apexdigital.com">Corporate Mail</a>
+        <a href="https://wa.me/359888888888" target="_blank" rel="noopener">Executive WhatsApp</a>
+        <a href="javascript:void(0)" class="trigger-inquire-modal">NDA Agreement</a>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom-bar">
+      <div class="footer-bottom-container">
+        <span>&copy; 2026 AETERNA DIGITAL // DIMITAR PRODROMOV. ALL RIGHTS RESERVED.</span>
+        <a href="#hero" class="back-to-top">BACK TO TOP &uarr;</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== EXECUTIVE PROJECT BRIEF MODAL ==================== -->
+  <div class="modal-overlay" id="inquireModal">
+    <div class="modal-dialog">
+      <button class="modal-close-btn" id="closeModalBtn" aria-label="Close Modal">&times;</button>
+
+      <div class="modal-head">
+        <span class="gold-eyebrow">[ EXECUTIVE BRIEF ]</span>
+        <h3 class="modal-title">Initiate Strategic Commission</h3>
+        <p class="modal-subtitle">
+          Submit your requirements. Every inquiry is reviewed directly by studio leadership. Mutual Non-Disclosure Agreements (NDA) are executed prior to discovery sessions.
+        </p>
+      </div>
+
+      <form id="inquiryForm">
+        <div class="form-group">
+          <label class="form-label">Project Scope:</label>
+          <div class="pills-grid">
+            <span class="pill pill-service selected">Premium Web Architecture</span>
+            <span class="pill pill-service">High-End UI/UX</span>
+            <span class="pill pill-service">Strategic Branding</span>
+            <span class="pill pill-service">Custom CMS &amp; Platforms</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Investment Scope:</label>
+          <div class="pills-grid">
+            <span class="pill pill-budget selected">&euro;3,000 &ndash; &euro;7,500</span>
+            <span class="pill pill-budget">&euro;7,500 &ndash; &euro;15,000</span>
+            <span class="pill pill-budget">&euro;15,000+ (Flagship)</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="clientName">Full Name &amp; Title</label>
+            <input type="text" id="clientName" class="form-input" placeholder="e.g. Julian Vance, Managing Director" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="clientCompany">Company / Brand</label>
+            <input type="text" id="clientCompany" class="form-input" placeholder="e.g. Vance &amp; Sterling Capital" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="clientEmail">Corporate Email</label>
+            <input type="email" id="clientEmail" class="form-input" placeholder="e.g. j.vance@vanceholding.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="clientTimeline">Target Timeline</label>
+            <select id="clientTimeline" class="form-input">
+              <option value="Immediate">Immediate (Next 30 Days)</option>
+              <option value="60-90 Days" selected>Standard (60 &ndash; 90 Days)</option>
+              <option value="Quarterly">Q1/Q2 Strategic Horizon</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="clientBrief">Commercial Objectives &amp; Vision</label>
+          <textarea id="clientBrief" class="form-textarea" placeholder="Outline your objectives, target audience, and key deliverables..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="checkbox-container">
+            <input type="checkbox" id="ndaCheck" checked>
+            <span>Execute mutual Non-Disclosure Agreement (NDA) prior to discovery call.</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn btn-gold modal-submit-btn">
+          SUBMIT BRIEF &amp; SCHEDULE CONSULTATION
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- CDN Dependencies: Lenis Smooth Scroll -->
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.18/dist/lenis.min.js"></script>
+
+  <!-- Interactive Parallax & Modal Engine -->
+  <script src="./main.js"></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+[package]
+name = "aeterna_video_canvas_synth"
+version = "3.0.0"
+edition = "2021"
+authors = ["Dimitar Prodromov <id:101327948>"]
+description = "AETERNA High-Speed Video Canvas Synthesizer - 120-Frame WebP Scrubber Pipeline"
+
+[[bin]]
+name = "aeterna_video_canvas_synth"
+path = "src/main.rs"
+
+[dependencies]
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "webp", "bmp"] }
+rayon = "1.12"
+base64 = "0.22"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"

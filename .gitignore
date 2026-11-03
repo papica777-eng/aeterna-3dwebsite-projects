@@ -1,0 +1,15 @@
+# Rust target build artifacts
+target/
+**/target/
+Cargo.lock
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.log
+
+# Editor directories
+.vscode/
+.idea/
