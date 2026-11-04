@@ -697,7 +697,8 @@
     if (c.includes('sam')) return './assets/images/coaches/sam.jpg';
     if (c.includes('kahow')) return './assets/images/coaches/muaythai-kahow.jpg';
     if (c.includes('lee')) return './assets/images/coaches/lee.jpg';
-    if (c.includes('mee') || c.includes('sotir')) return './assets/images/coaches/muaythai-kahow.jpg';
+    if (c.includes('sotir')) return './assets/images/coaches/sotir.jpg';
+    if (c.includes('mee')) return './assets/images/coaches/muaythai-kahow.jpg';
     if (c.includes('ben') || c.includes('youth') || c.includes('kids')) return './assets/images/coaches/ben.jpg';
     return './assets/images/coaches/lee.jpg';
   }
