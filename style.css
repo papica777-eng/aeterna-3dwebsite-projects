@@ -6120,3 +6120,141 @@ section {
 .readout-item .r-val.green {
   color: #34d399;
 }
+
+/* ==========================================================================
+   AETERNA ULTRA-COMPACT 8K LUXURY HUD & EDITIONS TIGHTENING
+   ========================================================================== */
+.edition-quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.btn-outline-stripe {
+  background: rgba(99, 91, 255, 0.12);
+  border: 1px solid rgba(99, 91, 255, 0.4);
+  color: #c7d2fe;
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  padding: 7px 10px;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-outline-stripe:hover {
+  background: #635bff;
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(99, 91, 255, 0.4);
+}
+
+.edition-mini-deposit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  color: #9ca3af;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.edition-mini-deposit a {
+  color: #f5d77f;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px dotted rgba(212, 175, 55, 0.5);
+}
+
+.edition-mini-deposit a:hover {
+  color: #ffffff;
+  border-bottom-color: #ffffff;
+}
+
+/* ==========================================================================
+   ZERO-ENTROPY VERTICAL COMPACT HUD ENGINE (ELIMINATE INFINITE SCROLL)
+   ========================================================================== */
+.hero-section {
+  padding: 100px 0 24px !important;
+  min-height: auto !important;
+}
+
+.services-section {
+  padding: 24px 0 36px !important;
+}
+
+.portfolio-section {
+  padding: 28px 0 36px !important;
+}
+
+.process-section {
+  padding: 32px 24px !important;
+}
+
+.editions-section {
+  padding: 36px 0 40px !important;
+}
+
+.about-section {
+  padding: 36px 24px !important;
+}
+
+.vortex-section, body.vortex-mode .vortex-section {
+  padding: 36px 0 44px !important;
+}
+
+.site-footer {
+  padding: 36px 0 20px !important;
+}
+
+.editions-header, .process-header, .testimonials-header, .portfolio-header, .atelier-hud-header {
+  margin-bottom: 24px !important;
+}
+
+.edition-card {
+  padding: 24px 20px 18px !important;
+}
+
+.edition-features {
+  margin: 0 0 16px !important;
+  gap: 7px !important;
+}
+
+.edition-bgn-equiv {
+  margin-bottom: 14px !important;
+  padding-bottom: 10px !important;
+}
+
+.testimonials-grid {
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 16px !important;
+}
+
+.testi-card-lead {
+  grid-column: 1 / -1 !important;
+  padding: 18px 22px !important;
+}
+
+.testi-card {
+  padding: 16px 18px !important;
+}
+
+.testi-quote {
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  margin-bottom: 10px !important;
+}
+
+.testi-lead-badge {
+  margin-bottom: 10px !important;
+  font-size: 10px !important;
+}
