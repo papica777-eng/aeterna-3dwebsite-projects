@@ -68,20 +68,6 @@
   <!-- AETERNA Liquid Vortex: native-resolution GPU background (3D Sovereign Studio engine) -->
   <canvas id="aeternaVortexBg" class="aeterna-vortex-bg" aria-hidden="true"></canvas>
 
-  <!-- ==================== AETERNA 8K CORNER HUD BRACKETS ==================== -->
-  <aside class="corner-hud-overlay" aria-hidden="true">
-    <div class="hud-corner top-left">
-      <span class="hud-corner-dot"></span>
-      <span class="hud-corner-mono">AETERNA // SOVEREIGN ATELIER [BG-POMORIE HQ]</span>
-    </div>
-    <div class="hud-corner top-right">
-      <span class="hud-corner-mono">LIVE: <strong id="hudLiveFps">120.0 FPS</strong> &bull; &lt; 0.4s ANYCAST &bull; WEBGL2</span>
-    </div>
-    <div class="hud-corner bottom-left">
-      <span class="hud-corner-mono">&#9672; EU HORIZON ID: 101403556 &bull; 100% IP COVENANT</span>
-    </div>
-  </aside>
-
   <!-- ==================== LUXURY HEADER NAVIGATION ==================== -->
   <header class="site-header" id="siteHeader">
     <div class="header-container">
@@ -403,24 +389,7 @@
         </div>
       </div>
 
-      <!-- CAD Discovery Dock (MacOS-Style Horizontal Carousel Controls) -->
-      <div class="dock-navigation-bar">
-        <button type="button" class="btn-dock-nav" id="dockPrevBtn" aria-label="Previous Workstation">
-          <span>&#9664; PREV</span>
-        </button>
-        <div class="dock-indicator-pills">
-          <button type="button" class="dock-pill active" data-index="0">01 ANCHIALO</button>
-          <button type="button" class="dock-pill" data-index="1">02 CPT MMA</button>
-          <button type="button" class="dock-pill" data-index="2">03 IMMERSION</button>
-          <button type="button" class="dock-pill" data-index="3">04 PAINTERS</button>
-        </div>
-        <button type="button" class="btn-dock-nav" id="dockNextBtn" aria-label="Next Workstation">
-          <span>NEXT &#9654;</span>
-        </button>
-      </div>
-
-      <div class="portfolio-dock-viewport" id="portfolioDockViewport">
-        <div class="portfolio-dock-track" id="portfolioDockTrack">
+      <div class="portfolio-grid">
         
         <!-- ==================== LIVE PLATFORM 1: ANCHIALO.COM ==================== -->
         <article class="portfolio-card" data-category="live">
@@ -865,7 +834,6 @@
           </div>
         </article>
 
-        </div>
       </div>
 
       <!-- ==================== EXECUTIVE CLIENT TESTIMONIALS ==================== -->
@@ -2752,26 +2720,12 @@
       }
     }
 
-    function enforce8KCanvasSupersampling() {
-      var canvases = document.querySelectorAll("canvas");
-      var targetRatio = Math.min((window.devicePixelRatio || 1) * 1.5, 3.0);
-      for (var i = 0; i < canvases.length; i++) {
-        var c = canvases[i];
-        c.style.imageRendering = "high-quality";
-      }
-      if (window.renderer && typeof window.renderer.setPixelRatio === "function") {
-        window.renderer.setPixelRatio(targetRatio);
-      }
-    }
-
     if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", function() {
         upgradeEmojisToPrecisionTypography();
-        enforce8KCanvasSupersampling();
       });
     } else {
       upgradeEmojisToPrecisionTypography();
-      enforce8KCanvasSupersampling();
     }
   })();
 
@@ -2879,142 +2833,6 @@
       initAtelierTabs();
     }
   })();
-
-  // ================== CAD DISCOVERY DOCK (MACOS CAROUSEL) ENGINE ==================
-  (function() {
-    function initCadDock() {
-      var viewport = document.getElementById("portfolioDockViewport");
-      var prevBtn = document.getElementById("dockPrevBtn");
-      var nextBtn = document.getElementById("dockNextBtn");
-      var pills = document.querySelectorAll(".dock-pill");
-      var cards = document.querySelectorAll("#portfolioDockTrack .portfolio-card");
-      if (!viewport || !cards.length) return;
-
-      function updateActivePill() {
-        var scrollLeft = viewport.scrollLeft;
-        var cardWidth = cards[0].offsetWidth + 32;
-        var currentIndex = Math.round(scrollLeft / cardWidth);
-        pills.forEach(function(pill, idx) {
-          if (idx === currentIndex) {
-            pill.classList.add("active");
-          } else {
-            pill.classList.remove("active");
-          }
-        });
-      }
-
-      function scrollToCard(index) {
-        if (index < 0) index = 0;
-        if (index >= cards.length) index = cards.length - 1;
-        var cardWidth = cards[0].offsetWidth + 32;
-        viewport.scrollTo({
-          left: index * cardWidth,
-          behavior: "smooth"
-        });
-      }
-
-      if (prevBtn) {
-        prevBtn.addEventListener("click", function() {
-          var cardWidth = cards[0].offsetWidth + 32;
-          var currentIndex = Math.round(viewport.scrollLeft / cardWidth);
-          scrollToCard(currentIndex - 1);
-        });
-      }
-
-      if (nextBtn) {
-        nextBtn.addEventListener("click", function() {
-          var cardWidth = cards[0].offsetWidth + 32;
-          var currentIndex = Math.round(viewport.scrollLeft / cardWidth);
-          scrollToCard(currentIndex + 1);
-        });
-      }
-
-      pills.forEach(function(pill) {
-        pill.addEventListener("click", function() {
-          var idx = parseInt(pill.getAttribute("data-index"), 10);
-          scrollToCard(idx);
-        });
-      });
-
-      viewport.addEventListener("scroll", function() {
-        requestAnimationFrame(updateActivePill);
-      }, { passive: true });
-
-      // Live FPS display in corner HUD
-      var fpsEl = document.getElementById("hudLiveFps");
-      if (fpsEl) {
-        var lastTime = performance.now();
-        var frameCount = 0;
-        function updateFps() {
-          frameCount++;
-          var now = performance.now();
-          if (now - lastTime >= 1000) {
-            var fps = Math.round((frameCount * 1000) / (now - lastTime));
-            fpsEl.textContent = (fps >= 55 ? "120.0" : fps.toFixed(1)) + " FPS";
-            frameCount = 0;
-            lastTime = now;
-          }
-          requestAnimationFrame(updateFps);
-        }
-        requestAnimationFrame(updateFps);
-      }
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initCadDock);
-    } else {
-      initCadDock();
-    }
-  })();
-
-  // ================== AETERNA 8K CHAMELEON ASCENT ENGINE ==================
-  (function() {
-    function initChameleonAscent() {
-      if (window.innerWidth <= 1024) return;
-      var container = document.getElementById("chameleon-container");
-      var video = document.getElementById("chameleon-video");
-      var logo = document.querySelector(".brand-logo");
-      if (!container || !video || !logo) return;
-
-      var hasTriggered = false;
-      function triggerAscent() {
-        if (hasTriggered) return;
-        hasTriggered = true;
-        video.currentTime = 0;
-        var playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.then(function() {
-            container.classList.add("active-ascent");
-            var logoRect = logo.getBoundingClientRect();
-            var targetTop = Math.max(logoRect.top + 6, 16);
-            var distanceY = window.innerHeight - targetTop;
-            container.style.transform = "translate3d(0, -" + distanceY + "px, 0)";
-          }).catch(function() {
-            // Browser autoplay restricted fallback
-          });
-        }
-      }
-
-      setTimeout(triggerAscent, 1200);
-
-      window.addEventListener("scroll", function() {
-        if (!hasTriggered) triggerAscent();
-      }, { once: true, passive: true });
-    }
-
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initChameleonAscent);
-    } else {
-      initChameleonAscent();
-    }
-  })();
   </script>
-
-  <!-- ==================== AETERNA 8K CHAMELEON ASCENT STAGE ==================== -->
-  <div id="chameleon-container" aria-hidden="true">
-    <video id="chameleon-video" muted playsinline preload="auto">
-      <source src="./assets/chameleon_ascent.mp4" type="video/mp4">
-    </video>
-  </div>
 </body>
 </html>

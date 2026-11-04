@@ -299,8 +299,8 @@ void main(){
     const U = {};
     ['uRes', 'uTime', 'uMouse', 'uCenter', 'uZoom'].forEach((n) => { U[n] = gl.getUniformLocation(prog, n); });
 
-    // ZERO BLUR: Locked full crisp native resolution (capped at 2.0 for Retina/4K)
-    const maxDpr = opts.maxDpr || 2;
+    // ULTRA-FAST PBR: Locked full crisp native resolution (capped at 1.25 for buttery 120 FPS zero-lag)
+    const maxDpr = opts.maxDpr || 1.25;
     const scale = Math.min(global.devicePixelRatio || 1, maxDpr);
 
     const state = {

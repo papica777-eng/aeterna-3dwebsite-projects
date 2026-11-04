@@ -564,7 +564,7 @@
       vortex = AeternaLiquidVortex.mount(vCanvas, {
         center: fixedCenter,
         zoom: fixedZoom,
-        maxDpr: 2,
+        maxDpr: 1.25,
       });
     } catch (err) {
       console.error(err);
