@@ -23,9 +23,9 @@
             { time: "12:00", display: "12:00 PM", title: "Lunchtime No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew" },
             { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
             { time: "17:00", display: "5:00 PM", title: "Youth BJJ Champions (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Beginners)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Dave Marinakis" },
+            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Beginners)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
             { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing Fundamentals", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:15", display: "7:15 PM", title: "Advanced BJJ & Positional Sparring", disc: "bjj", badge: "Advanced BJJ", coach: "Coach Dave Marinakis & Sam Chew" },
+            { time: "19:15", display: "7:15 PM", title: "Advanced BJJ & Positional Sparring", disc: "bjj", badge: "Advanced BJJ", coach: "Coach Lee Ting & Sam Chew" },
             { time: "19:15", display: "7:15 PM", title: "Muay Thai Padwork & Clinch Lab", disc: "muaythai", badge: "Padwork & Clinch", coach: "Coach Kahow Lee" }
           ]
         },
@@ -33,13 +33,13 @@
           day: "Tuesday",
           dayIndex: 2,
           slots: [
-            { time: "06:00", display: "6:00 AM", title: "Morning BJJ Gi (All Levels)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Dave Marinakis" },
+            { time: "06:00", display: "6:00 AM", title: "Morning BJJ Gi (All Levels)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
             { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Dutch Drills", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
             { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
             { time: "17:00", display: "5:00 PM", title: "Youth BJJ & Anti-Bully Shield (8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Guard Passing)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Dave Marinakis" },
+            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Guard Passing)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
             { time: "18:00", display: "6:00 PM", title: "Muay Thai Dutch Drills & Combos", disc: "muaythai", badge: "Muay Thai", coach: "Coach Kahow Lee" },
-            { time: "19:15", display: "7:15 PM", title: "Competition BJJ Team Training", disc: "bjj", badge: "Competition BJJ", coach: "Coach Dave Marinakis" },
+            { time: "19:15", display: "7:15 PM", title: "Competition BJJ Team Training", disc: "bjj", badge: "Competition BJJ", coach: "Coach Lee Ting" },
             { time: "19:15", display: "7:15 PM", title: "Muay Thai Sparring & Fight Strategy", disc: "muaythai", badge: "MT Sparring", coach: "Coach Mee Jaemmanee" }
           ]
         },
@@ -51,9 +51,9 @@
             { time: "12:00", display: "12:00 PM", title: "Midday No-Gi Grappling", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew" },
             { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai (Ages 4–7)", disc: "kids", badge: "Kids Striking", coach: "Coach Benjamin Tran" },
             { time: "17:00", display: "5:00 PM", title: "Youth Muay Thai (Ages 8–14)", disc: "kids", badge: "Youth Striking", coach: "Coach Kahow Lee" },
-            { time: "18:00", display: "6:00 PM", title: "No-Gi BJJ Fundamentals", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Dave Marinakis" },
+            { time: "18:00", display: "6:00 PM", title: "No-Gi BJJ Fundamentals", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Lee Ting" },
             { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing Fundamentals", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:15", display: "7:15 PM", title: "Advanced No-Gi & Leg Lock Systems", disc: "bjj", badge: "Advanced No-Gi", coach: "Coach Dave Marinakis & Sam Chew" },
+            { time: "19:15", display: "7:15 PM", title: "Advanced No-Gi & Leg Lock Systems", disc: "bjj", badge: "Advanced No-Gi", coach: "Coach Lee Ting & Sam Chew" },
             { time: "19:15", display: "7:15 PM", title: "Muay Thai Clinch & Body Weapons", disc: "muaythai", badge: "Muay Thai", coach: "Coach Kahow Lee" }
           ]
         },
@@ -61,13 +61,13 @@
           day: "Thursday",
           dayIndex: 4,
           slots: [
-            { time: "06:00", display: "6:00 AM", title: "Morning BJJ Gi", disc: "bjj", badge: "BJJ Gi", coach: "Coach Dave Marinakis" },
+            { time: "06:00", display: "6:00 AM", title: "Morning BJJ Gi", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
             { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
             { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
             { time: "17:00", display: "5:00 PM", title: "Youth BJJ Takedowns (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Closed Guard)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Dave Marinakis" },
+            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Closed Guard)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
             { time: "18:00", display: "6:00 PM", title: "Muay Thai Power Pad Rounds", disc: "muaythai", badge: "Muay Thai", coach: "Coach Kahow Lee" },
-            { time: "19:15", display: "7:15 PM", title: "Advanced BJJ Gi & Takedowns", disc: "bjj", badge: "Advanced BJJ", coach: "Coach Dave Marinakis" },
+            { time: "19:15", display: "7:15 PM", title: "Advanced BJJ Gi & Takedowns", disc: "bjj", badge: "Advanced BJJ", coach: "Coach Lee Ting" },
             { time: "19:15", display: "7:15 PM", title: "Muay Thai Sparring & Defense", disc: "muaythai", badge: "MT Sparring", coach: "Coach Mee Jaemmanee" }
           ]
         },
@@ -84,7 +84,7 @@
           slots: [
             { time: "09:00", display: "9:00 AM", title: "Kids BJJ (8-14) Youth Champions", disc: "kids", badge: "Kids 8–14", coach: "Coach Benjamin Tran" },
             { time: "10:00", display: "10:00 AM", title: "Muay Thai Weekend Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "11:30", display: "11:30 AM", title: "BJJ Gi & No-Gi Masterclass", disc: "bjj", badge: "BJJ All Levels", coach: "Coach Dave Marinakis & Sam Chew" }
+            { time: "11:30", display: "11:30 AM", title: "BJJ Gi & No-Gi Masterclass", disc: "bjj", badge: "BJJ All Levels", coach: "Coach Lee Ting & Sam Chew" }
           ]
         }
       ]
@@ -97,13 +97,13 @@
           dayIndex: 1,
           slots: [
             { time: "06:30", display: "6:30 AM", title: "Morning BJJ Gi (Technique & Rolling)", disc: "bjj", badge: "BJJ Gi", coach: "Coach James Fitzgerald" },
-            { time: "10:15", display: "10:15 AM", title: "BJJ Pro Training", disc: "bjj", badge: "Pro BJJ", coach: "Coach Dave Marinakis & Nikki Lloyd-Griffiths" },
+            { time: "10:15", display: "10:15 AM", title: "BJJ Pro Training", disc: "bjj", badge: "Pro BJJ", coach: "Coach Lee Ting & Nikki Lloyd-Griffiths" },
             { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
             { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
             { time: "17:00", display: "5:00 PM", title: "Youth BJJ (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
             { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing All-Levels", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
             { time: "19:00", display: "7:00 PM", title: "MMA Cage Control & Wall Wrestling", disc: "mma", badge: "MMA Cage Control", coach: "Coach James Fitzgerald & Sotir Kichukov" },
-            { time: "20:00", display: "8:00 PM", title: "BJJ Gi (Guard Passing & Submissions)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Dave Marinakis & James Fitzgerald" }
+            { time: "20:00", display: "8:00 PM", title: "BJJ Gi (Guard Passing & Submissions)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & James Fitzgerald" }
           ]
         },
         {
@@ -113,7 +113,7 @@
             { time: "06:30", display: "6:30 AM", title: "Morning Muay Thai & Core Blast", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
             { time: "12:00", display: "12:00 PM", title: "Midday BJJ Gi Mechanics", disc: "bjj", badge: "BJJ Gi", coach: "Coach Sam Chew" },
             { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai (Ages 4–14)", disc: "kids", badge: "Kids Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "17:30", display: "5:30 PM", title: "Competition BJJ Grappling", disc: "bjj", badge: "Competition BJJ", coach: "Coach Dave Marinakis" },
+            { time: "17:30", display: "5:30 PM", title: "Competition BJJ Grappling", disc: "bjj", badge: "Competition BJJ", coach: "Coach Lee Ting" },
             { time: "18:30", display: "6:30 PM", title: "Sotir Kichukov Pro Striking & MMA Transitions", disc: "mma", badge: "MMA Striking", coach: "Coach Sotir Kichukov" },
             { time: "19:30", display: "7:30 PM", title: "Fundamentals BJJ (Beginners Stream)", disc: "bjj", badge: "Fundamentals BJJ", coach: "Coach Sam Chew & James Fitzgerald" },
             { time: "20:15", display: "8:15 PM", title: "Muay Thai Heavy Pad Rounds", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" }
@@ -128,7 +128,7 @@
             { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
             { time: "17:00", display: "5:00 PM", title: "Youth BJJ Champions (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
             { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing All-Levels", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:00", display: "7:00 PM", title: "No-Gi BJJ & Leg Lock Systems", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Nikki Lloyd-Griffiths & Dave Marinakis" },
+            { time: "19:00", display: "7:00 PM", title: "No-Gi BJJ & Leg Lock Systems", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Nikki Lloyd-Griffiths & Lee Ting" },
             { time: "20:00", display: "8:00 PM", title: "Wrestling / ADCC Grappling", disc: "bjj", badge: "Wrestling / ADCC", coach: "Coach James Fitzgerald & Nikki Lloyd-Griffiths" }
           ]
         },
@@ -452,11 +452,11 @@
 
         setTimeout(() => {
           const lower = q.toLowerCase();
-          let reply = "That's a fantastic question! Head Coaches Dave, Mee, Sam, and the team are on the mats daily. The best way to experience Immersion is to come in for a 100% Free Trial Class.";
+          let reply = "That's a fantastic question! Head Coaches Lee Ting, Mee, Sam, and the team are on the mats daily. The best way to experience Immersion is to come in for a 100% Free Trial Class.";
           if (lower.includes('price') || lower.includes('cost') || lower.includes('fee')) {
             reply = "We offer flexible weekly memberships with no lock-ins, zero joining fees, and easy pause options whenever you travel!";
           } else if (lower.includes('bjj') || lower.includes('jiu jitsu') || lower.includes('belt')) {
-            reply = "Head Coach Dave Marinakis is an ADCC World Competitor and 3rd Degree Black Belt. We have 5+ Black Belts on the mats and separate beginner/advanced streams.";
+            reply = "Head Coach Lee Ting is a Pan-Pacific Champion and 3rd Degree Black Belt. We have 5+ Black Belts on the mats and separate beginner/advanced streams.";
           } else if (lower.includes('muay thai') || lower.includes('kickboxing') || lower.includes('striking')) {
             reply = "Coach Mee runs authentic Muay Thai striking — punches, kicks, knees, elbows and clinch. It's safe, thrilling, and burns 800+ calories!";
           } else if (lower.includes('where') || lower.includes('location') || lower.includes('address')) {
@@ -479,7 +479,7 @@
       white: {
         name: "White Belt: Foundations & Survival",
         duration: "12–18 Months (4 Stripes)",
-        desc: "The most important belt in Jiu-Jitsu. Under Dave Marinakis and Sam, you learn how to protect yourself, remain calm under pressure, master guard retention, and execute fundamental escapes and sweeps.",
+        desc: "The most important belt in Jiu-Jitsu. Under Lee Ting and Sam, you learn how to protect yourself, remain calm under pressure, master guard retention, and execute fundamental escapes and sweeps.",
         focus: "Positional survival, breathing control, foundational sweeps, closed guard, and basic collar/arm submissions.",
         safety: "Zero live free sparring until fundamental positioning and tap etiquette are fully mastered. 100% controlled drill environment.",
         grading: "Earn stripes based on consistent class attendance, technique retention, and ego-free mat etiquette."
@@ -511,10 +511,10 @@
       black: {
         name: "Black Belt: Mastery, Lineage & Lifetime Evolution",
         duration: "10+ Years of Dedication",
-        desc: "Certified under Head Coach Dave Marinakis (3rd Degree Black Belt). Black belt is not the finish line — it is the true beginning of selfless teaching, lineage preservation, and effortless mastery.",
+        desc: "Certified under Head Coach Lee Ting (3rd Degree Black Belt). Black belt is not the finish line — it is the true beginning of selfless teaching, lineage preservation, and effortless mastery.",
         focus: "Timing, invisible Jiu-Jitsu leverage, pedagogy, mental calmness, and lifelong personal resilience.",
         safety: "Highest echelon of body awareness and protection.",
-        grading: "Conferred exclusively by Head Coach Dave Marinakis following years of continuous contribution to the Immersion community."
+        grading: "Conferred exclusively by Head Coach Lee Ting following years of continuous contribution to the Immersion community."
       }
     };
 
@@ -656,7 +656,7 @@
       },
       'youth-confidence': {
         title: "Youth Champions (8–14): Self-Esteem & Physical Strength",
-        timeline: "Month 1: Guard posture & basic escapes → Month 2: Thai striking stance & coordination → Month 3: Earn first official stripe under Dave & Shah."
+        timeline: "Month 1: Guard posture & basic escapes → Month 2: Thai striking stance & coordination → Month 3: Earn first official stripe under Lee Ting & Shah."
       },
       'youth-energy': {
         title: "Youth Champions (8–14): Screen Detox & Athletic Grit",
@@ -709,8 +709,8 @@
     if (c.includes('lee')) return './assets/images/coaches/lee.jpg';
     if (c.includes('mee') || c.includes('sotir')) return './assets/images/coaches/muaythai-kahow.jpg';
     if (c.includes('ben') || c.includes('shah') || c.includes('kai-ser') || c.includes('mateja') || c.includes('youth') || c.includes('kids')) return './assets/images/coaches/ben.jpg';
-    if (c.includes('dave')) return './assets/images/coaches/dave.jpg';
-    return './assets/images/coaches/dave.jpg';
+    if (c.includes('Lee Ting')) return './assets/images/coaches/lee.jpg';
+    return './assets/images/coaches/lee.jpg';
   }
 
   function switchLocation(loc) {
@@ -1005,6 +1005,114 @@
         });
       }
     });
+
+    // 7. World-Class 3D Perspective Tilt & Specular Glare on Interactive Cards
+    if (window.matchMedia('(pointer: fine)').matches) {
+      const tiltNodes = document.querySelectorAll('.coach-card-mono, .coach-spotlight-photo, .calc-output-card, .map-card-wrapper');
+      tiltNodes.forEach(card => {
+        card.addEventListener('pointermove', (e) => {
+          const r = card.getBoundingClientRect();
+          const x = e.clientX - r.left;
+          const y = e.clientY - r.top;
+          card.style.setProperty('--mx', x + 'px');
+          card.style.setProperty('--my', y + 'px');
+          const rx = ((y / r.height) - 0.5) * -6.0;
+          const ry = ((x / r.width) - 0.5) * 6.0;
+          card.style.transform = `perspective(1000px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg) translateY(-3px)`;
+        }, { passive: true });
+        card.addEventListener('pointerleave', () => {
+          card.style.transform = '';
+        }, { passive: true });
+      });
+    }
+
+    // 8. Deterministic 60FPS Kinetic Combat Atmosphere Canvas (Crimson & Gold Energy Ribbon + Embers)
+    if (!document.getElementById('immersion-kinetic-canvas')) {
+      const kCanvas = document.createElement('canvas');
+      kCanvas.id = 'immersion-kinetic-canvas';
+      kCanvas.setAttribute('aria-hidden', 'true');
+      document.body.prepend(kCanvas);
+      const kCtx = kCanvas.getContext('2d');
+      if (kCtx) {
+        let kw = window.innerWidth, kh = window.innerHeight;
+        let kdpr = Math.min(window.devicePixelRatio || 1, 2);
+        const resizeKinetic = () => {
+          kw = window.innerWidth;
+          kh = window.innerHeight;
+          kdpr = Math.min(window.devicePixelRatio || 1, 2);
+          kCanvas.width = Math.round(kw * kdpr);
+          kCanvas.height = Math.round(kh * kdpr);
+        };
+        resizeKinetic();
+        window.addEventListener('resize', resizeKinetic, { passive: true });
+
+        let scrollPos = window.scrollY || 0;
+        let ptrX = kw * 0.7, ptrY = kh * 0.35;
+        window.addEventListener('scroll', () => { scrollPos = window.scrollY || 0; }, { passive: true });
+        window.addEventListener('pointermove', (e) => { ptrX = e.clientX; ptrY = e.clientY; }, { passive: true });
+
+        // Deterministic golden-ratio ember lattice (zero Math.random)
+        const EMBER_COUNT = 28;
+        const embers = [];
+        for (let i = 0; i < EMBER_COUNT; i++) {
+          const phi = (i * 0.61803398875) % 1;
+          const psi = ((i * 1.32471795724) + 0.23) % 1;
+          embers.push({
+            u: phi,
+            v: psi,
+            r: 1.1 + (i % 4) * 0.65,
+            speed: 0.14 + (i % 5) * 0.05,
+            phase: i * 1.71,
+            isGold: (i % 3 === 0)
+          });
+        }
+
+        const renderKinetic = (now) => {
+          requestAnimationFrame(renderKinetic);
+          if (document.hidden) return;
+          const t = now * 0.001;
+          kCtx.clearRect(0, 0, kCanvas.width, kCanvas.height);
+          kCtx.save();
+          kCtx.scale(kdpr, kdpr);
+
+          // Subtle flowing Crimson & Championship Gold kinetic wave along right-center spine
+          const scrollPhase = scrollPos * 0.0022;
+          kCtx.beginPath();
+          for (let y = 0; y <= kh; y += 32) {
+            const ny = y / Math.max(1, kh);
+            const waveX = kw * 0.76 + Math.sin(ny * 4.2 + t * 0.85 - scrollPhase) * (kw * 0.11) + ((ptrX - kw * 0.5) * 0.04);
+            if (y === 0) kCtx.moveTo(waveX, y);
+            else kCtx.lineTo(waveX, y);
+          }
+          const ribbonGrad = kCtx.createLinearGradient(0, 0, 0, kh);
+          ribbonGrad.addColorStop(0, 'rgba(225, 29, 72, 0.0)');
+          ribbonGrad.addColorStop(0.35, 'rgba(225, 29, 72, 0.065)');
+          ribbonGrad.addColorStop(0.65, 'rgba(245, 158, 11, 0.055)');
+          ribbonGrad.addColorStop(1, 'rgba(225, 29, 72, 0.0)');
+          kCtx.strokeStyle = ribbonGrad;
+          kCtx.lineWidth = 48;
+          kCtx.lineCap = 'round';
+          kCtx.stroke();
+
+          // Deterministic rising combat embers
+          for (let i = 0; i < EMBER_COUNT; i++) {
+            const e = embers[i];
+            const ex = ((e.u * kw + Math.sin(t * 0.7 + e.phase) * 28) % kw + kw) % kw;
+            const ey = ((e.v * kh - (t * 22 * e.speed) - scrollPos * 0.18) % kh + kh) % kh;
+            const alpha = 0.18 + 0.16 * Math.sin(t * 2.1 + e.phase);
+            kCtx.fillStyle = e.isGold
+              ? `rgba(245, 158, 11, ${alpha.toFixed(3)})`
+              : `rgba(225, 29, 72, ${alpha.toFixed(3)})`;
+            kCtx.beginPath();
+            kCtx.arc(ex, ey, e.r, 0, Math.PI * 2);
+            kCtx.fill();
+          }
+
+          kCtx.restore();
+        };
+        requestAnimationFrame(renderKinetic);
+      }
+    }
   });
 
 })();

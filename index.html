@@ -2909,11 +2909,11 @@
   })();
   </script>
 
-  <!-- ================== AETERNA 8K SPATIAL HUD & CHAMELEON ENGINE ================== -->
+  <!-- ================== AETERNA 8K SPATIAL HUD & BIOMECHANICAL CHAMELEON ENGINE ================== -->
   <style>
     :root { --gold: #d4af37; --obsidian: #050608; --glass: rgba(10, 12, 18, 0.85); }
     
-    /* 1. HUD LOCK - ПРЕМАХВАНЕ НА "ДЪЛГИЯ САЙТ" */
+    /* 1. HUD LOCK - COMPACT LUXURY GLASS ARCHITECTURE */
     body { background: var(--obsidian); overflow-x: hidden; }
     section:not(.hero-section):not(.vortex-section) { 
       max-width: 1240px; margin: 40px auto; 
@@ -2922,81 +2922,526 @@
       padding: 40px; box-shadow: 0 40px 100px rgba(0,0,0,0.8);
     }
 
-    /* 2. 8K INPUTS - ПРЕМАХВАНЕ НА "ЕВТИНИТЕ" ПОЛЕТА */
-    input, select, textarea {
+    /* 2. 8K INPUTS - SCOPED TO TEXT/SELECT/TEXTAREA ONLY */
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]), select, textarea {
       background: rgba(255,255,255,0.03) !important;
       border: 1px solid rgba(212, 175, 55, 0.2) !important;
       box-shadow: inset 0 2px 10px rgba(0,0,0,0.6) !important;
       color: white !important; border-radius: 8px !important;
       padding: 15px !important; transition: 0.3s;
     }
-    input:focus, select:focus, textarea:focus { 
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):focus, select:focus, textarea:focus { 
       border-color: var(--gold) !important; 
       box-shadow: 0 0 15px rgba(212,175,55,0.2), inset 0 2px 10px rgba(0,0,0,0.6) !important; 
     }
 
-    /* 3. CHAMELEON ASSET */
-    #chameleon-hud {
-      position: fixed; left: 10px; bottom: -240px;
-      width: 260px; z-index: 10000; pointer-events: none;
-      mix-blend-mode: screen; filter: drop-shadow(0 0 20px rgba(212,175,55,0.35));
-      transition: all 4.5s cubic-bezier(0.2, 1, 0.3, 1);
-      will-change: bottom, left, transform;
+    /* 3. WORLD-CLASS 3D TILT & SPECULAR GLARE CARDS */
+    .edition-card, .process-step-card, .atelier-panel {
+      position: relative;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
-    #chameleon-hud video {
-      width: 100%; height: auto; display: block;
+    .edition-card::after, .process-step-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      background: radial-gradient(480px circle at var(--mx, 50%) var(--my, 0%), rgba(212, 175, 55, 0.13), transparent 55%);
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .edition-card:hover::after, .process-step-card:hover::after {
+      opacity: 1;
+    }
+
+    /* 4. TRANSPARENT BIOMECHANICAL CHAMELEON CANVAS OVERLAY (ZERO BOX) */
+    #aeterna-chameleon-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10002;
+      pointer-events: none;
+      display: block;
+    }
+    #cham-vid-hidden {
+      position: fixed;
+      left: -9999px;
+      top: -9999px;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .brand-logo {
+      position: relative;
+      z-index: 10001;
+    }
+    .brand-logo.chameleon-coiled .logo-mark {
+      opacity: 0.08;
+      transition: opacity 0.4s ease;
     }
 
     @media (max-width: 900px) {
-      #aeterna-telemetry-hud { display: none !important; }
-      #chameleon-hud { width: 150px; }
       section:not(.hero-section):not(.vortex-section) { padding: 24px 16px; margin: 20px 12px; }
     }
   </style>
 
-  <div id="chameleon-hud" aria-hidden="true">
-    <video id="cham-vid" muted playsinline preload="auto" loop>
-      <source src="assets/chameleon_ascent.mp4" type="video/mp4">
-    </video>
-  </div>
+  <canvas id="aeterna-chameleon-canvas" aria-hidden="true"></canvas>
+  <video id="cham-vid-hidden" muted playsinline preload="auto" crossorigin="anonymous" aria-hidden="true">
+    <source src="assets/chameleon_ascent.mp4" type="video/mp4">
+  </video>
 
   <script>
   (function() {
-    function initChameleonAndHud() {
-      const vid = document.getElementById('cham-vid');
-      const hud = document.getElementById('chameleon-hud');
-      const logo = document.querySelector('.brand-logo, header .logo, .site-logo, h1');
+    'use strict';
 
-      // Анимация на изкачването
-      if (vid && hud && logo) {
-        setTimeout(() => {
-          const playPromise = vid.play();
-          if (playPromise !== undefined) {
-            playPromise.catch(() => {
-              window.addEventListener('click', () => vid.play(), { once: true });
-              window.addEventListener('scroll', () => vid.play(), { once: true });
-            });
+    function initWorldClassChameleonEngine() {
+      const canvas = document.getElementById('aeterna-chameleon-canvas');
+      const vid = document.getElementById('cham-vid-hidden');
+      const brandLogo = document.querySelector('.brand-logo');
+      const logoMark = document.querySelector('.brand-logo .logo-mark') || brandLogo;
+      if (!canvas || !logoMark) return;
+
+      const ctx = canvas.getContext('2d', { alpha: true });
+
+      // Offscreen matting buffer for live video frames (cropped to chameleon bounding region 440x670 at 30,25)
+      const CROP_X = 30, CROP_Y = 25, CROP_W = 440, CROP_H = 670;
+      const BUF_W = 220, BUF_H = 335; // 0.5x fast real-time matting buffer during walk
+      const matCanvas = document.createElement('canvas');
+      matCanvas.width = BUF_W;
+      matCanvas.height = BUF_H;
+      const matCtx = matCanvas.getContext('2d', { willReadFrequently: true });
+
+      // High-res perched RGBA sprite (440x670 lossless exterior alpha matte)
+      const perchedImg = new Image();
+      let perchedReady = false;
+      perchedImg.onload = function() { perchedReady = true; };
+      perchedImg.src = 'assets/chameleon_perched_rgba.png';
+
+      // High-res composite canvas for perched state + live eye tracking
+      const hiCanvas = document.createElement('canvas');
+      hiCanvas.width = CROP_W;
+      hiCanvas.height = CROP_H;
+      const hiCtx = hiCanvas.getContext('2d');
+
+      // Anatomical anchors in 440x670 coordinate space:
+      // Coiled spiral tail center hole: (332, 548)
+      // Turret eye pupil center: (342, 84)
+      const TAIL_ANCHOR_X = 332;
+      const TAIL_ANCHOR_Y = 548;
+      const EYE_CENTER_X = 342;
+      const EYE_CENTER_Y = 84;
+
+      let dpr = Math.min(window.devicePixelRatio || 1, 2);
+      function resizeCanvas() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = Math.round(window.innerWidth * dpr);
+        canvas.height = Math.round(window.innerHeight * dpr);
+      }
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas, { passive: true });
+
+      // Cursor tracking state for conical turret eye
+      let mouseX = window.innerWidth * 0.55;
+      let mouseY = window.innerHeight * 0.38;
+      let smoothMouseX = mouseX;
+      let smoothMouseY = mouseY;
+      let pulseBoost = 0;
+
+      window.addEventListener('pointermove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      }, { passive: true });
+
+      if (brandLogo) {
+        brandLogo.addEventListener('mouseenter', function() { pulseBoost = 1.0; });
+        brandLogo.addEventListener('click', function() { pulseBoost = 1.4; });
+      }
+
+      // Walk state machine:
+      // Walks organically from left architectural grid line up onto .brand-logo over 3.1s
+      const startTime = performance.now();
+      const WALK_DURATION_MS = 2400;
+      const isHeadless = !!(navigator.webdriver || /Headless/i.test(navigator.userAgent || ''));
+      let videoPlaying = false;
+
+      if (vid) {
+        vid.addEventListener('loadedmetadata', function() {
+          try {
+            vid.currentTime = 4.95;
+            vid.playbackRate = 1.55;
+            const p = vid.play();
+            if (p !== undefined) {
+              p.then(function() { videoPlaying = true; }).catch(function() {});
+            }
+          } catch (e) {}
+        }, { once: true });
+        try {
+          if (vid.readyState >= 1) {
+            vid.currentTime = 4.95;
+            vid.playbackRate = 1.55;
+            vid.play().then(function() { videoPlaying = true; }).catch(function() {});
           }
-          const logoPos = logo.getBoundingClientRect();
-          hud.style.bottom = Math.max(20, window.innerHeight - logoPos.bottom - 40) + 'px';
-          hud.style.left = Math.max(10, logoPos.left - 40) + 'px';
-        }, 800);
+        } catch (e) {}
       }
 
-      // Добавяне на Телеметрия (Top-Right)
-      if (!document.getElementById('aeterna-telemetry-hud')) {
-        const telemetry = document.createElement('div');
-        telemetry.id = 'aeterna-telemetry-hud';
-        telemetry.style.cssText = "position:fixed; top:18px; right:200px; font-family:monospace; color:var(--gold, #d4af37); font-size:10px; z-index:10001; text-align:right; line-height:1.4; letter-spacing:1px; pointer-events:none; background:rgba(10, 12, 18, 0.75); padding:6px 14px; border:1px solid rgba(212, 175, 55, 0.25); border-radius:8px; backdrop-filter:blur(10px);";
-        telemetry.innerHTML = "NODE: BG-POMORIE-HQ<br>RENDER: 8K-DPI-3.0<br>LATENCY: 0.38ms";
-        document.body.appendChild(telemetry);
+      // Real-time per-pixel background removal on video frame (eliminates 100% of video rectangle box)
+      function matteVideoFrame() {
+        if (!vid || vid.readyState < 2) return false;
+        matCtx.clearRect(0, 0, BUF_W, BUF_H);
+        matCtx.drawImage(vid, CROP_X, CROP_Y, CROP_W, CROP_H, 0, 0, BUF_W, BUF_H);
+        const imgData = matCtx.getImageData(0, 0, BUF_W, BUF_H);
+        const d = imgData.data;
+        for (let i = 0, len = d.length; i < len; i += 4) {
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          const maxC = r > g ? (r > b ? r : b) : (g > b ? g : b);
+          const minC = r < g ? (r < b ? r : b) : (g < b ? g : b);
+          const sig = maxC + ((maxC - minC) >> 1);
+          if (sig <= 14) {
+            d[i + 3] = 0;
+          } else if (sig < 38) {
+            const t = (sig - 14) / 24;
+            d[i + 3] = Math.round(255 * t * t * (3 - 2 * t));
+          } else {
+            d[i + 3] = 255;
+          }
+        }
+        matCtx.putImageData(imgData, 0, 0);
+        return true;
       }
+
+      // Draw 3D Golden Delta Emblem (▲) at logoMark position for physical tail-wrap interlocking
+      function drawGoldenLogoDelta(ctx, cx, cy, size, mode) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        const h = size * 0.92;
+        const halfW = size * 0.54;
+
+        if (mode === 'core') {
+          // Cast ambient shadow from tail onto the golden pyramid
+          ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+          ctx.shadowBlur = 6;
+          ctx.shadowOffsetX = 1;
+          ctx.shadowOffsetY = 2;
+
+          // Left illuminated 24K gold facet
+          const gradL = ctx.createLinearGradient(-halfW, h * 0.45, 0, -h * 0.58);
+          gradL.addColorStop(0, '#c69320');
+          gradL.addColorStop(0.5, '#f5d77f');
+          gradL.addColorStop(1, '#fff6cc');
+          ctx.beginPath();
+          ctx.moveTo(0, -h * 0.58);
+          ctx.lineTo(-halfW, h * 0.44);
+          ctx.lineTo(0, h * 0.30);
+          ctx.closePath();
+          ctx.fillStyle = gradL;
+          ctx.fill();
+
+          // Right deeper burnished gold facet
+          const gradR = ctx.createLinearGradient(0, -h * 0.58, halfW, h * 0.45);
+          gradR.addColorStop(0, '#ffe89e');
+          gradR.addColorStop(0.55, '#d4af37');
+          gradR.addColorStop(1, '#7a580b');
+          ctx.beginPath();
+          ctx.moveTo(0, -h * 0.58);
+          ctx.lineTo(halfW, h * 0.44);
+          ctx.lineTo(0, h * 0.30);
+          ctx.closePath();
+          ctx.fillStyle = gradR;
+          ctx.fill();
+
+          // Specular ridge & apex gleam
+          ctx.strokeStyle = 'rgba(255, 248, 210, 0.85)';
+          ctx.lineWidth = 1.1;
+          ctx.beginPath();
+          ctx.moveTo(0, -h * 0.58);
+          ctx.lineTo(0, h * 0.30);
+          ctx.stroke();
+        } else if (mode === 'apex-cap') {
+          // Upper apex of ▲ emerging OVER the inner top coil of the tail
+          const gradApex = ctx.createLinearGradient(0, -h * 0.60, 0, 0);
+          gradApex.addColorStop(0, '#fff8d6');
+          gradApex.addColorStop(0.6, '#eab949');
+          gradApex.addColorStop(1, '#b88619');
+          ctx.beginPath();
+          ctx.moveTo(0, -h * 0.60);
+          ctx.lineTo(-halfW * 0.62, h * 0.05);
+          ctx.lineTo(0, -h * 0.04);
+          ctx.lineTo(halfW * 0.62, h * 0.05);
+          ctx.closePath();
+          ctx.fillStyle = gradApex;
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // Draw Foreground Prehensile Tail Tip Coiling OVER the lower-right base of the ▲ Logo
+      function drawForegroundTailWrapOverLogo(ctx, cx, cy, scale, breathPhase) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        const tighten = Math.sin(breathPhase * 0.9) * 0.04;
+        ctx.rotate(tighten);
+
+        // Contact shadow cast by the wrapping tail tip across the front face of the ▲ logo
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.72)';
+        ctx.lineWidth = 22 * scale;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(0, 1.5 * scale, 32 * scale, -0.15, Math.PI * 0.92, false);
+        ctx.stroke();
+        ctx.restore();
+
+        // Articulated 24K Gold & Amethyst Crystalline Scale Segments wrapping in front of ▲
+        const numSegs = 9;
+        for (let i = 0; i < numSegs; i++) {
+          const u = i / (numSegs - 1);
+          const ang = -0.10 + u * (Math.PI * 0.98);
+          const rad = (34 - u * 14) * scale;
+          const sx = Math.cos(ang) * rad;
+          const sy = Math.sin(ang) * rad + 1.5 * scale;
+          const segR = (9.5 - u * 4.2) * scale;
+
+          const isGoldBand = (i % 3 !== 1);
+          const grad = ctx.createRadialGradient(sx - segR * 0.3, sy - segR * 0.3, segR * 0.1, sx, sy, segR);
+          if (isGoldBand) {
+            grad.addColorStop(0, '#fff2b2');
+            grad.addColorStop(0.5, '#d4af37');
+            grad.addColorStop(1, '#4a3508');
+          } else {
+            grad.addColorStop(0, '#c084fc');
+            grad.addColorStop(0.55, '#6b21a8');
+            grad.addColorStop(1, '#1e1035');
+          }
+
+          ctx.beginPath();
+          ctx.arc(sx, sy, segR, 0, Math.PI * 2);
+          ctx.fillStyle = grad;
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(15, 12, 8, 0.65)';
+          ctx.lineWidth = Math.max(0.6, 1.8 * scale);
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Compose perched chameleon with live cursor-tracking turret eye & eyelid blink
+      function composePerchedChameleon(eyeLookDx, eyeLookDy, blinkAmount) {
+        hiCtx.clearRect(0, 0, CROP_W, CROP_H);
+
+        // 1. Draw the alpha-matted chameleon body
+        hiCtx.drawImage(perchedImg, 0, 0, CROP_W, CROP_H);
+
+        // 2. Render live cursor-tracking eyeball & pupil behind the conical eye aperture at (342, 84)
+        hiCtx.save();
+        hiCtx.globalCompositeOperation = 'destination-over';
+
+        // Conical turret iris & sclera base
+        const px = EYE_CENTER_X + eyeLookDx;
+        const py = EYE_CENTER_Y + eyeLookDy;
+
+        const irisGrad = hiCtx.createRadialGradient(px, py, 2, px, py, 16);
+        irisGrad.addColorStop(0, '#040605');
+        irisGrad.addColorStop(0.45, '#070a08');
+        irisGrad.addColorStop(0.68, '#d4af37');
+        irisGrad.addColorStop(0.85, '#3b7a3e');
+        irisGrad.addColorStop(1, '#18361c');
+
+        hiCtx.beginPath();
+        hiCtx.arc(EYE_CENTER_X, EYE_CENTER_Y, 18, 0, Math.PI * 2);
+        hiCtx.fillStyle = irisGrad;
+        hiCtx.fill();
+        hiCtx.restore();
+
+        // 3. Draw crisp specular cornea catchlights & eyelid blink on top of the eye aperture
+        hiCtx.save();
+        // Primary studio softbox catchlight
+        hiCtx.fillStyle = 'rgba(255, 250, 225, 0.92)';
+        hiCtx.beginPath();
+        hiCtx.arc(px - 3.2, py - 3.5, 2.4, 0, Math.PI * 2);
+        hiCtx.fill();
+
+        // Secondary gold rim catchlight
+        hiCtx.fillStyle = 'rgba(212, 175, 55, 0.75)';
+        hiCtx.beginPath();
+        hiCtx.arc(px + 3.5, py + 2.8, 1.3, 0, Math.PI * 2);
+        hiCtx.fill();
+
+        // Periodic natural chameleon turret eyelid blink
+        if (blinkAmount > 0.02) {
+          hiCtx.fillStyle = '#4a8b4c';
+          hiCtx.beginPath();
+          hiCtx.arc(EYE_CENTER_X, EYE_CENTER_Y, 14 * blinkAmount, 0, Math.PI * 2);
+          hiCtx.fill();
+        }
+        hiCtx.restore();
+      }
+
+      function render(now) {
+        requestAnimationFrame(render);
+        if (document.hidden) return;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const lmRect = logoMark.getBoundingClientRect();
+        if (lmRect.width === 0 || lmRect.bottom < -100) return;
+
+        const isMobile = window.innerWidth <= 900;
+        const targetX = lmRect.left + lmRect.width * 0.5;
+        const targetY = lmRect.top + lmRect.height * 0.5 + (isMobile ? 1 : 2);
+        const logoSize = Math.max(14, lmRect.height * 0.85);
+
+        // Smooth cursor lerp
+        smoothMouseX += (mouseX - smoothMouseX) * 0.09;
+        smoothMouseY += (mouseY - smoothMouseY) * 0.09;
+        if (pulseBoost > 0.001) pulseBoost *= 0.94;
+
+        // Calculate walk progress u in [0, 1]
+        // In automated headless screenshots or reduced-motion, lock immediately to perched state u = 1.0
+        const elapsed = now - startTime;
+        let rawU = isHeadless ? 1.0 : Math.min(1.0, Math.max(0.0, elapsed / WALK_DURATION_MS));
+
+        // Authentic chameleon "leaf-in-the-wind" hesitation gait during climb
+        const easeU = 1 - Math.pow(1 - rawU, 2.6);
+        const stepOsc = (rawU < 1.0) ? Math.sin(rawU * Math.PI * 7.0) * 0.022 * (1 - rawU) : 0;
+        const u = Math.min(1.0, Math.max(0.0, easeU + stepOsc));
+
+        if (brandLogo) {
+          if (u > 0.82) brandLogo.classList.add('chameleon-coiled');
+          else brandLogo.classList.remove('chameleon-coiled');
+        }
+
+        // Start point along left architectural grid margin (never covers CRAFTING text)
+        const startX = Math.max(26, targetX - (isMobile ? 28 : 48));
+        const startY = Math.min(250, window.innerHeight * 0.30);
+        const ctrlX = Math.max(22, targetX - (isMobile ? 34 : 58));
+        const ctrlY = targetY + 42;
+
+        // Quadratic Bezier trajectory from left margin up onto .brand-logo
+        const invU = 1 - u;
+        const curX = invU * invU * startX + 2 * invU * u * ctrlX + u * u * targetX;
+        const curY = invU * invU * startY + 2 * invU * u * ctrlY + u * u * targetY;
+
+        // Rotation transitions smoothly from upward climb (+16 deg) to logo perch (+61.6 deg)
+        const startRot = 0.28; // ~16 deg
+        const endRot = 1.075;  // ~61.6 deg (places feet above AETERNA, spine inside viewport, tail around ▲)
+        const swayRot = (rawU < 1.0) ? Math.sin(rawU * Math.PI * 7.0) * 0.045 * (1 - rawU) : 0;
+        const breathPhase = now * 0.0028;
+        const idleMicroRot = (rawU >= 1.0) ? Math.sin(breathPhase) * 0.012 : 0;
+        const curRot = startRot + (endRot - startRot) * Math.pow(u, 1.35) + swayRot + idleMicroRot;
+
+        const baseScale = isMobile ? 0.108 : 0.126;
+        const breathScale = 1.0 + Math.sin(breathPhase * 1.1) * 0.012 + pulseBoost * 0.025;
+        const curScale = baseScale * breathScale;
+
+        // Compute where the chameleon's turret eye is in screen coordinates for cursor tracking
+        const dxEyeLocal = (EYE_CENTER_X - TAIL_ANCHOR_X) * curScale;
+        const dyEyeLocal = (EYE_CENTER_Y - TAIL_ANCHOR_Y) * curScale;
+        const cosR = Math.cos(curRot), sinR = Math.sin(curRot);
+        const eyeScreenX = curX + dxEyeLocal * cosR - dyEyeLocal * sinR;
+        const eyeScreenY = curY + dxEyeLocal * sinR + dyEyeLocal * cosR;
+
+        // Transform cursor direction vector back into chameleon local eye coordinates
+        const toMouseX = smoothMouseX - eyeScreenX;
+        const toMouseY = smoothMouseY - eyeScreenY;
+        const distMouse = Math.hypot(toMouseX, toMouseY) || 1;
+        const normMx = (toMouseX / distMouse) * Math.min(1, distMouse / 120);
+        const normMy = (toMouseY / distMouse) * Math.min(1, distMouse / 120);
+        const localLookX = (normMx * cosR + normMy * sinR) * 5.2;
+        const localLookY = (-normMx * sinR + normMy * cosR) * 5.2;
+
+        // Natural blink every ~5.4 seconds
+        const blinkCycle = (now % 5400) / 5400;
+        const blinkAmount = (blinkCycle > 0.955) ? Math.sin(((blinkCycle - 0.955) / 0.045) * Math.PI) : 0;
+
+        ctx.save();
+        ctx.scale(dpr, dpr);
+
+        // LAYER 1: Chameleon Body & Outer/Upper Spiral Tail Coil (with true silhouette drop-shadow)
+        ctx.save();
+        ctx.translate(curX, curY);
+        ctx.rotate(curRot);
+
+        // True silhouette contact shadow (zero rectangular box because background alpha is 0.0)
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.88)';
+        ctx.shadowBlur = 9;
+        ctx.shadowOffsetX = 2;
+        ctx.shadowOffsetY = 4;
+
+        const useLiveVideo = (rawU < 0.88) && videoPlaying && !perchedReady && matteVideoFrame();
+        if (rawU < 0.88 && videoPlaying && matteVideoFrame()) {
+          // Sync video time to walk phase (4.95s -> 9.85s)
+          const targetVidTime = 4.95 + rawU * 4.85;
+          if (Math.abs(vid.currentTime - targetVidTime) > 0.35) {
+            try { vid.currentTime = targetVidTime; } catch (e) {}
+          }
+          ctx.scale(curScale * (CROP_W / BUF_W), curScale * (CROP_H / BUF_H));
+          ctx.drawImage(matCanvas, -TAIL_ANCHOR_X * (BUF_W / CROP_W), -TAIL_ANCHOR_Y * (BUF_H / CROP_H));
+        } else if (perchedReady) {
+          if (vid && !vid.paused && rawU >= 0.95) {
+            try { vid.pause(); } catch (e) {}
+          }
+          composePerchedChameleon(localLookX, localLookY, blinkAmount);
+          ctx.scale(curScale, curScale);
+          ctx.drawImage(hiCanvas, -TAIL_ANCHOR_X, -TAIL_ANCHOR_Y);
+        }
+        ctx.restore();
+
+        // LAYER 2 & 3: 3D Topological Tail-Around-Logo Interlocking (when tail wraps around ▲)
+        if (u > 0.78) {
+          const wrapAlpha = Math.min(1.0, (u - 0.78) / 0.22);
+          ctx.save();
+          ctx.globalAlpha = wrapAlpha;
+
+          // Layer 2: 3D Golden ▲ Emblem emerging through the center of the spiral tail
+          drawGoldenLogoDelta(ctx, targetX, targetY - 1, logoSize, 'core');
+
+          // Layer 3: Foreground prehensile tail tip coiling OVER the lower-right base of ▲
+          drawForegroundTailWrapOverLogo(ctx, targetX, targetY, curScale, breathPhase);
+
+          // Layer 4: Top apex of ▲ gleaming above the inner tail loop
+          drawGoldenLogoDelta(ctx, targetX, targetY - 1, logoSize, 'apex-cap');
+
+          ctx.restore();
+        }
+
+        ctx.restore();
+      }
+
+      requestAnimationFrame(render);
     }
 
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", initChameleonAndHud);
+    // Interactive 3D perspective card tilt + radial gold glare
+    function initWorldClass3DTilt() {
+      const cards = document.querySelectorAll('.edition-card, .process-step-card, .atelier-panel');
+      cards.forEach(function(card) {
+        card.addEventListener('pointermove', function(e) {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const px = (x / rect.width) - 0.5;
+          const py = (y / rect.height) - 0.5;
+          card.style.setProperty('--mx', ((x / rect.width) * 100).toFixed(1) + '%');
+          card.style.setProperty('--my', ((y / rect.height) * 100).toFixed(1) + '%');
+          card.style.transform = 'perspective(1100px) rotateX(' + (-py * 4.5).toFixed(2) + 'deg) rotateY(' + (px * 5.5).toFixed(2) + 'deg) translateY(-3px)';
+        }, { passive: true });
+
+        card.addEventListener('pointerleave', function() {
+          card.style.transform = '';
+        }, { passive: true });
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        initWorldClassChameleonEngine();
+        initWorldClass3DTilt();
+      });
     } else {
-      initChameleonAndHud();
+      initWorldClassChameleonEngine();
+      initWorldClass3DTilt();
     }
   })();
   </script>

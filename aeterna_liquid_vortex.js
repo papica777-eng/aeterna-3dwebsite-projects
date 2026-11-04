@@ -220,8 +220,10 @@ void main(){
   vec2 m = (uMouse - 0.5);
   vec2 frag = gl_FragCoord.xy;
   
-  vec2 p = (frag - uRes*uCenter)/uRes.y*2.0/uZoom;
-  float e = 1.3/uRes.y*2.0/uZoom;
+  float normScale = min(uRes.y, uRes.x * 0.68);
+  vec2 p = (frag - uRes*uCenter)/normScale*2.0/uZoom;
+  float e = 1.3/normScale*2.0/uZoom;
+  float heroTextGuard = (uRes.x > 760.0) ? smoothstep(0.20, 0.50, frag.x / uRes.x) : 1.0;
   
   // Autonomous fluid rotation
   float t = uTime * 0.14;
@@ -234,6 +236,7 @@ void main(){
   float aB;
   vec2 pB = rot(0.85)*p;
   vec3 cB = shadeRibbons(pB, t*0.88, 7.3, e*1.2, m, aB);
+  aB *= heroTextGuard;
   col = mix(col, cB*0.45, aB*0.90);
 
   /* Back floating spheres */
@@ -242,6 +245,7 @@ void main(){
   /* Main foreground sculptural ribbons (Obsidian & Gold) */
   float aF;
   vec3 cF = shadeRibbons(p, t, 1.0, e, m, aF);
+  aF *= heroTextGuard;
 
   // Ambient occlusion shadow cast onto underlying layers
   col *= 1.0 - 0.65*smoothstep(0.0, 0.70, aF);
