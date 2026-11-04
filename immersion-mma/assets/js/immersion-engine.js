@@ -19,72 +19,64 @@
           day: "Monday",
           dayIndex: 1,
           slots: [
-            { time: "06:00", display: "6:00 AM", title: "Morning Muay Thai Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "12:00", display: "12:00 PM", title: "Lunchtime No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
-            { time: "17:00", display: "5:00 PM", title: "Youth BJJ Champions (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Beginners)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
-            { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing Fundamentals", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:15", display: "7:15 PM", title: "Advanced BJJ & Positional Sparring", disc: "bjj", badge: "Advanced BJJ", coach: "Coach Lee Ting & Sam Chew" },
-            { time: "19:15", display: "7:15 PM", title: "Muay Thai Padwork & Clinch Lab", disc: "muaythai", badge: "Padwork & Clinch", coach: "Coach Kahow Lee" }
+            { time: "06:00", display: "6:00 AM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "12:00", display: "12:00 PM", title: "No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew & Lee Ting" },
+            { time: "16:15", display: "4:15 PM", title: "Kids Muaythai (Ages 8–14)", disc: "kids", badge: "Kids MT 8–14", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "17:00", display: "5:00 PM", title: "Competition Training (BJJ)", disc: "bjj", badge: "Comp Training", coach: "Coach Lee Ting & Sam Chew" },
+            { time: "18:00", display: "6:00 PM", title: "Brazilian Jiu-Jitsu (Gi)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & Resident Black Belts" },
+            { time: "19:30", display: "7:30 PM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" }
           ]
         },
         {
           day: "Tuesday",
           dayIndex: 2,
           slots: [
-            { time: "06:00", display: "6:00 AM", title: "Morning BJJ Gi (All Levels)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
-            { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Dutch Drills", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
-            { time: "17:00", display: "5:00 PM", title: "Youth BJJ & Anti-Bully Shield (8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Guard Passing)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
-            { time: "18:00", display: "6:00 PM", title: "Muay Thai Dutch Drills & Combos", disc: "muaythai", badge: "Muay Thai", coach: "Coach Kahow Lee" },
-            { time: "19:15", display: "7:15 PM", title: "Competition BJJ Team Training", disc: "bjj", badge: "Competition BJJ", coach: "Coach Lee Ting" },
-            { time: "19:15", display: "7:15 PM", title: "Muay Thai Sparring & Fight Strategy", disc: "muaythai", badge: "MT Sparring", coach: "Coach Mee Jaemmanee" }
+            { time: "06:00", display: "6:00 AM", title: "Brazilian Jiu-Jitsu (Gi)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & Sam Chew" },
+            { time: "12:00", display: "12:00 PM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
+            { time: "16:15", display: "4:15 PM", title: "Kids BJJ (Ages 4–7)", disc: "kids", badge: "Kids BJJ 4–7", coach: "Coach Benjamin Tran" },
+            { time: "17:00", display: "5:00 PM", title: "Kids BJJ (Ages 8–14)", disc: "kids", badge: "Kids BJJ 8–14", coach: "Coach Benjamin Tran & Lee Ting" },
+            { time: "18:00", display: "6:00 PM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "19:30", display: "7:30 PM", title: "Brazilian Jiu-Jitsu (Gi)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & Resident Black Belts" }
           ]
         },
         {
           day: "Wednesday",
           dayIndex: 3,
           slots: [
-            { time: "06:00", display: "6:00 AM", title: "Morning Muay Thai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "12:00", display: "12:00 PM", title: "Midday No-Gi Grappling", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai (Ages 4–7)", disc: "kids", badge: "Kids Striking", coach: "Coach Benjamin Tran" },
-            { time: "17:00", display: "5:00 PM", title: "Youth Muay Thai (Ages 8–14)", disc: "kids", badge: "Youth Striking", coach: "Coach Kahow Lee" },
-            { time: "18:00", display: "6:00 PM", title: "No-Gi BJJ Fundamentals", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Lee Ting" },
-            { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing Fundamentals", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:15", display: "7:15 PM", title: "Advanced No-Gi & Leg Lock Systems", disc: "bjj", badge: "Advanced No-Gi", coach: "Coach Lee Ting & Sam Chew" },
-            { time: "19:15", display: "7:15 PM", title: "Muay Thai Clinch & Body Weapons", disc: "muaythai", badge: "Muay Thai", coach: "Coach Kahow Lee" }
+            { time: "06:00", display: "6:00 AM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "12:00", display: "12:00 PM", title: "No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew & Lee Ting" },
+            { time: "16:15", display: "4:15 PM", title: "Kids Muaythai (Ages 8–14)", disc: "kids", badge: "Kids MT 8–14", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "17:00", display: "5:00 PM", title: "Competition Training (BJJ)", disc: "bjj", badge: "Comp Training", coach: "Coach Lee Ting & Sam Chew" },
+            { time: "18:00", display: "6:00 PM", title: "No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Lee Ting & Nikki Lloyd-Griffiths" },
+            { time: "19:30", display: "7:30 PM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" }
           ]
         },
         {
           day: "Thursday",
           dayIndex: 4,
           slots: [
-            { time: "06:00", display: "6:00 AM", title: "Morning BJJ Gi", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
-            { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
-            { time: "17:00", display: "5:00 PM", title: "Youth BJJ Takedowns (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "BJJ Gi Fundamentals (Closed Guard)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting" },
-            { time: "18:00", display: "6:00 PM", title: "Muay Thai Power Pad Rounds", disc: "muaythai", badge: "Muay Thai", coach: "Coach Kahow Lee" },
-            { time: "19:15", display: "7:15 PM", title: "Advanced BJJ Gi & Takedowns", disc: "bjj", badge: "Advanced BJJ", coach: "Coach Lee Ting" },
-            { time: "19:15", display: "7:15 PM", title: "Muay Thai Sparring & Defense", disc: "muaythai", badge: "MT Sparring", coach: "Coach Mee Jaemmanee" }
+            { time: "06:00", display: "6:00 AM", title: "Brazilian Jiu-Jitsu (Gi)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & Sam Chew" },
+            { time: "12:00", display: "12:00 PM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
+            { time: "16:15", display: "4:15 PM", title: "Kids BJJ (Ages 4–7)", disc: "kids", badge: "Kids BJJ 4–7", coach: "Coach Benjamin Tran" },
+            { time: "17:00", display: "5:00 PM", title: "Kids BJJ (Ages 8–14)", disc: "kids", badge: "Kids BJJ 8–14", coach: "Coach Benjamin Tran & Lee Ting" },
+            { time: "18:00", display: "6:00 PM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "19:30", display: "7:30 PM", title: "Brazilian Jiu-Jitsu (Gi)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & Resident Black Belts" }
           ]
         },
         {
           day: "Friday",
           dayIndex: 5,
           slots: [
-            { time: "17:00", display: "5:00 PM", title: "Immersion Open Mat (Gi & No-Gi)", disc: "bjj", badge: "Open Mat", coach: "All Resident Coaches" }
+            { time: "17:00", display: "5:00 PM", title: "Open Mat (5:00 PM – 7:00 PM · Unstaffed Facility)", disc: "bjj", badge: "Open Mat", coach: "Members Open Mat" }
           ]
         },
         {
           day: "Saturday",
           dayIndex: 6,
           slots: [
-            { time: "09:00", display: "9:00 AM", title: "Kids BJJ (8-14) Youth Champions", disc: "kids", badge: "Kids 8–14", coach: "Coach Benjamin Tran" },
-            { time: "10:00", display: "10:00 AM", title: "Muay Thai Weekend Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "11:30", display: "11:30 AM", title: "BJJ Gi & No-Gi Masterclass", disc: "bjj", badge: "BJJ All Levels", coach: "Coach Lee Ting & Sam Chew" }
+            { time: "09:00", display: "9:00 AM", title: "Kids BJJ (Ages 8–14)", disc: "kids", badge: "Kids 8–14", coach: "Coach Benjamin Tran" },
+            { time: "10:00", display: "10:00 AM", title: "Muaythai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "11:30", display: "11:30 AM", title: "Brazilian Jiu-Jitsu (All Levels)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & Sam Chew" }
           ]
         }
       ]
@@ -96,71 +88,69 @@
           day: "Monday",
           dayIndex: 1,
           slots: [
-            { time: "06:30", display: "6:30 AM", title: "Morning BJJ Gi (Technique & Rolling)", disc: "bjj", badge: "BJJ Gi", coach: "Coach James Fitzgerald" },
+            { time: "06:00", display: "6:00 AM", title: "Morning BJJ", disc: "bjj", badge: "BJJ", coach: "Coach James Fitzgerald & Sam Chew" },
             { time: "10:15", display: "10:15 AM", title: "BJJ Pro Training", disc: "bjj", badge: "Pro BJJ", coach: "Coach Lee Ting & Nikki Lloyd-Griffiths" },
-            { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Conditioning", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
-            { time: "17:00", display: "5:00 PM", title: "Youth BJJ (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing All-Levels", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:00", display: "7:00 PM", title: "MMA Cage Control & Wall Wrestling", disc: "mma", badge: "MMA Cage Control", coach: "Coach James Fitzgerald & Sotir Kichukov" },
-            { time: "20:00", display: "8:00 PM", title: "BJJ Gi (Guard Passing & Submissions)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & James Fitzgerald" }
+            { time: "12:00", display: "12:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "16:15", display: "4:15 PM", title: "Kids BJJ (Ages 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
+            { time: "17:00", display: "5:00 PM", title: "Kids BJJ (Ages 8–14)", disc: "kids", badge: "Kids 8–14", coach: "Coach Benjamin Tran" },
+            { time: "18:00", display: "6:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "19:00", display: "7:00 PM", title: "Brazilian Jiu-Jitsu (Gi)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & James Fitzgerald" }
           ]
         },
         {
           day: "Tuesday",
           dayIndex: 2,
           slots: [
-            { time: "06:30", display: "6:30 AM", title: "Morning Muay Thai & Core Blast", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "12:00", display: "12:00 PM", title: "Midday BJJ Gi Mechanics", disc: "bjj", badge: "BJJ Gi", coach: "Coach Sam Chew" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai (Ages 4–14)", disc: "kids", badge: "Kids Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "17:30", display: "5:30 PM", title: "Competition BJJ Grappling", disc: "bjj", badge: "Competition BJJ", coach: "Coach Lee Ting" },
-            { time: "18:30", display: "6:30 PM", title: "Sotir Kichukov Pro Striking & MMA Transitions", disc: "mma", badge: "MMA Striking", coach: "Coach Sotir Kichukov" },
-            { time: "19:30", display: "7:30 PM", title: "Fundamentals BJJ (Beginners Stream)", disc: "bjj", badge: "Fundamentals BJJ", coach: "Coach Sam Chew & James Fitzgerald" },
-            { time: "20:15", display: "8:15 PM", title: "Muay Thai Heavy Pad Rounds", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" }
+            { time: "06:00", display: "6:00 AM", title: "Morning MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "12:00", display: "12:00 PM", title: "Midday BJJ", disc: "bjj", badge: "BJJ", coach: "Coach Sam Chew & James Fitzgerald" },
+            { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai", disc: "kids", badge: "Kids Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "17:30", display: "5:30 PM", title: "Comp Training BJJ", disc: "bjj", badge: "Comp BJJ", coach: "Coach Lee Ting & Nikki Lloyd-Griffiths" },
+            { time: "19:00", display: "7:00 PM", title: "Fundamentals BJJ", disc: "bjj", badge: "Fundamentals BJJ", coach: "Coach James Fitzgerald & Sam Chew" },
+            { time: "20:00", display: "8:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" }
           ]
         },
         {
           day: "Wednesday",
           dayIndex: 3,
           slots: [
-            { time: "06:30", display: "6:30 AM", title: "Morning BJJ Gi Leverage & Escapes", disc: "bjj", badge: "BJJ Gi", coach: "Coach James Fitzgerald" },
-            { time: "12:00", display: "12:00 PM", title: "Midday Muay Thai Technical Sparring", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Bullyproof (Little Grapplers 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
-            { time: "17:00", display: "5:00 PM", title: "Youth BJJ Champions (Ages 8–14)", disc: "kids", badge: "Youth 8–14", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "Muay Thai Kickboxing All-Levels", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "19:00", display: "7:00 PM", title: "No-Gi BJJ & Leg Lock Systems", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Nikki Lloyd-Griffiths & Lee Ting" },
-            { time: "20:00", display: "8:00 PM", title: "Wrestling / ADCC Grappling", disc: "bjj", badge: "Wrestling / ADCC", coach: "Coach James Fitzgerald & Nikki Lloyd-Griffiths" }
+            { time: "06:00", display: "6:00 AM", title: "Morning BJJ", disc: "bjj", badge: "BJJ", coach: "Coach James Fitzgerald & Sam Chew" },
+            { time: "12:00", display: "12:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "16:15", display: "4:15 PM", title: "Kids BJJ (Ages 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
+            { time: "17:00", display: "5:00 PM", title: "Kids BJJ (Ages 8–14)", disc: "kids", badge: "Kids 8–14", coach: "Coach Benjamin Tran" },
+            { time: "18:00", display: "6:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "19:00", display: "7:00 PM", title: "No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Nikki Lloyd-Griffiths & Lee Ting" },
+            { time: "20:00", display: "8:00 PM", title: "Wrestling / ADCC", disc: "mma", badge: "Wrestling / ADCC", coach: "Coach James Fitzgerald & Nikki Lloyd-Griffiths" }
           ]
         },
         {
           day: "Thursday",
           dayIndex: 4,
           slots: [
-            { time: "06:30", display: "6:30 AM", title: "Morning Muay Thai Kickboxing", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "12:00", display: "12:00 PM", title: "Midday No-Gi BJJ Submission Hunting", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew" },
-            { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai Striking (4–14)", disc: "kids", badge: "Kids Muay Thai", coach: "Coach Mee Jaemmanee" },
-            { time: "17:00", display: "5:00 PM", title: "Advanced Youth BJJ (Competition Track)", disc: "kids", badge: "Advanced Kids", coach: "Coach Benjamin Tran" },
-            { time: "18:00", display: "6:00 PM", title: "Sotir Kichukov MMA Ground Control & Takedowns", disc: "mma", badge: "MMA Ground Control", coach: "Coach Sotir Kichukov & James Fitzgerald" },
-            { time: "19:15", display: "7:15 PM", title: "Fundamentals BJJ Gi", disc: "bjj", badge: "Fundamentals BJJ", coach: "Coach Sam Chew & James Fitzgerald" },
-            { time: "20:15", display: "8:15 PM", title: "Muay Thai Kickboxing Combinations", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" }
+            { time: "06:00", display: "6:00 AM", title: "Morning MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "12:00", display: "12:00 PM", title: "No-Gi BJJ", disc: "bjj", badge: "No-Gi BJJ", coach: "Coach Sam Chew & Nikki Lloyd-Griffiths" },
+            { time: "16:15", display: "4:15 PM", title: "Kids Muay Thai", disc: "kids", badge: "Kids Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" },
+            { time: "17:00", display: "5:00 PM", title: "Advanced Kids BJJ", disc: "kids", badge: "Advanced Kids BJJ", coach: "Coach Benjamin Tran" },
+            { time: "17:30", display: "5:30 PM", title: "Comp Training BJJ", disc: "bjj", badge: "Comp BJJ", coach: "Coach Lee Ting & Nikki Lloyd-Griffiths" },
+            { time: "19:00", display: "7:00 PM", title: "Fundamentals BJJ", disc: "bjj", badge: "Fundamentals BJJ", coach: "Coach James Fitzgerald & Sam Chew" },
+            { time: "20:00", display: "8:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" }
           ]
         },
         {
           day: "Friday",
           dayIndex: 5,
           slots: [
-            { time: "18:00", display: "6:00 PM", title: "Intermediate MMA (Invite Only)", disc: "mma", badge: "Intermediate MMA", coach: "Coach James Fitzgerald & Sotir Kichukov" }
+            { time: "18:00", display: "6:00 PM", title: "Intermediate MMA (Invite Only)", disc: "mma", badge: "Intermediate MMA", coach: "Coach Sotir Kichukov & James Fitzgerald" }
           ]
         },
         {
           day: "Saturday",
           dayIndex: 6,
           slots: [
-            { time: "09:00", display: "9:00 AM", title: "Kids BJJ Little Champions (Ages 4–7)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
-            { time: "09:30", display: "9:30 AM", title: "Kids BJJ Junior Champions (Ages 8–14)", disc: "kids", badge: "Junior 8–14", coach: "Coach Benjamin Tran" },
-            { time: "10:30", display: "10:30 AM", title: "BJJ Gi All-Levels Technical Masterclass", disc: "bjj", badge: "BJJ Gi", coach: "Coach James Fitzgerald & Sam Chew" },
-            { time: "11:45", display: "11:45 AM", title: "Sotir Kichukov MMA Striking Clinic", disc: "mma", badge: "MMA Striking", coach: "Coach Sotir Kichukov" },
-            { time: "12:45", display: "12:45 PM", title: "Muay Thai Kickboxing & Clinch Lab", disc: "muaythai", badge: "Muay Thai", coach: "Coach Mee Jaemmanee" }
+            { time: "09:00", display: "9:00 AM", title: "Kids BJJ (Ages 4–7 · 30 min)", disc: "kids", badge: "Kids 4–7", coach: "Coach Benjamin Tran" },
+            { time: "09:30", display: "9:30 AM", title: "Kids BJJ (Ages 8–14 · 45 min)", disc: "kids", badge: "Kids 8–14", coach: "Coach Benjamin Tran" },
+            { time: "10:15", display: "10:15 AM", title: "Brazilian Jiu-Jitsu (All Levels)", disc: "bjj", badge: "BJJ Gi", coach: "Coach Lee Ting & James Fitzgerald" },
+            { time: "12:00", display: "12:00 PM", title: "MT Kickboxing", disc: "muaythai", badge: "MT Kickboxing", coach: "Coach Mee Jaemmanee & Sotir Kichukov" },
+            { time: "13:00", display: "1:00 PM", title: "Kids Muay Thai", disc: "kids", badge: "Kids Muay Thai", coach: "Coach Mee Jaemmanee & Kahow Lee" }
           ]
         }
       ]
@@ -332,13 +322,13 @@
     if (document.getElementById('ben-launcher')) return;
 
     const chatHTML = `
-      <div class="ben-chat-launcher" id="ben-launcher" role="button" aria-label="Open Ben Immersion Concierge Chat">
+      <div class="ben-chat-launcher" id="ben-launcher" role="button" aria-label="Open Donny Immersion Concierge Chat">
         <div class="launcher-avatar-wrap">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
           <span class="launcher-online-dot"></span>
         </div>
         <div class="launcher-text-wrap">
-          <span class="launcher-title">Ben · Front Desk</span>
+          <span class="launcher-title">Donny · Front Desk</span>
           <span class="launcher-subtitle">● Online · Click to ask</span>
         </div>
       </div>
@@ -350,7 +340,7 @@
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
             </div>
             <div>
-              <h4 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #fff; line-height: 1.1;">Ben (Front Desk Concierge)</h4>
+              <h4 style="font-family: var(--font-display); font-size: 0.9375rem; font-weight: 800; color: #fff; line-height: 1.1;">Donny Harris (Front of House)</h4>
               <span style="font-size: 0.72rem; color: var(--emerald); font-weight: 700;">● Active · Glen Waverley &amp; Ringwood</span>
             </div>
           </div>
@@ -359,7 +349,7 @@
 
         <div class="chat-messages-container" id="chat-messages-container">
           <div class="chat-msg chat-msg-ben">
-            G'day! I'm Ben from the Immersion front desk. Whether you're curious about BJJ belts, Muay Thai conditioning, or our Kids bully-proof classes, I'm here to help. Pick a topic below or type anything!
+            G'day! I'm Donny from the Immersion front desk. Whether you're curious about BJJ belts, Muay Thai conditioning, or our Kids bully-proof classes, I'm here to help. Pick a topic below or type anything!
           </div>
 
           <div class="chat-chips-row" id="chat-chips-row">
@@ -379,7 +369,7 @@
         </div>
 
         <form class="chat-input-bar" id="chat-form">
-          <input type="text" id="chat-user-input" class="chat-input-box" placeholder="Ask Ben anything about training..." autocomplete="off">
+          <input type="text" id="chat-user-input" class="chat-input-box" placeholder="Ask Donny anything about training..." autocomplete="off">
           <button type="submit" class="chat-send-btn" aria-label="Send">Send</button>
         </form>
       </div>
@@ -656,7 +646,7 @@
       },
       'youth-confidence': {
         title: "Youth Champions (8–14): Self-Esteem & Physical Strength",
-        timeline: "Month 1: Guard posture & basic escapes → Month 2: Thai striking stance & coordination → Month 3: Earn first official stripe under Lee Ting & Shah."
+        timeline: "Month 1: Guard posture & basic escapes → Month 2: Thai striking stance & coordination → Month 3: Earn first official stripe under Lee Ting & Benjamin Tran."
       },
       'youth-energy': {
         title: "Youth Champions (8–14): Screen Detox & Athletic Grit",
@@ -708,8 +698,7 @@
     if (c.includes('kahow')) return './assets/images/coaches/muaythai-kahow.jpg';
     if (c.includes('lee')) return './assets/images/coaches/lee.jpg';
     if (c.includes('mee') || c.includes('sotir')) return './assets/images/coaches/muaythai-kahow.jpg';
-    if (c.includes('ben') || c.includes('shah') || c.includes('kai-ser') || c.includes('mateja') || c.includes('youth') || c.includes('kids')) return './assets/images/coaches/ben.jpg';
-    if (c.includes('Lee Ting')) return './assets/images/coaches/lee.jpg';
+    if (c.includes('ben') || c.includes('youth') || c.includes('kids')) return './assets/images/coaches/ben.jpg';
     return './assets/images/coaches/lee.jpg';
   }
 
