@@ -8911,14 +8911,14 @@ Please provide a quote including full preparation, 3-coat Dulux Weathershield sy
         </div>
       </div>
       <div class="pog-footer-cta-group">
+        <a id="pogStripeDepositLink" class="pog-cta-pay" href="https://buy.stripe.com/eVq14h0ba7Ue2gccwTfAc0b" target="_blank" rel="noopener">
+          <i class="fa-solid fa-credit-card"></i> Stripe 50% Deposit ($750 AUD)
+        </a>
+        <a id="pogStripeFullLink" class="pog-cta-mail" style="border-color:rgba(251,146,60,0.45); color:#fed7aa !important;" href="https://buy.stripe.com/dRm6oB2ji8Yig727czfAc0c" target="_blank" rel="noopener">
+          <i class="fa-solid fa-bolt"></i> Pay 100% Full ($1,500 AUD)
+        </a>
         <a id="pogWhatsappAcceptLink" class="pog-cta-wa" href="#" target="_blank" rel="noopener">
           <i class="fa-brands fa-whatsapp"></i> Accept via WhatsApp
-        </a>
-        <a id="pogPaypalDepositLink" class="pog-cta-pay" href="#" target="_blank" rel="noopener">
-          <i class="fa-solid fa-lock"></i> Pay 50% Deposit ($750 AUD)
-        </a>
-        <a id="pogEmailAcceptLink" class="pog-cta-mail" href="#">
-          <i class="fa-solid fa-envelope"></i> Email Confirmation
         </a>
       </div>
     </div>
@@ -8928,25 +8928,32 @@ Please provide a quote including full preparation, 3-coat Dulux Weathershield sy
 
 <script>
 (function() {
-  // Deterministic Zero-Float Integer AUD Pricing Matrix
+  // Deterministic Zero-Float Integer AUD Pricing Matrix + Live Verified Stripe AUD Payment Links
+  const POG_STRIPE_CUSTOM_AUD = 'https://buy.stripe.com/5kQ8wJ0ba0rM084aoLfAc0h';
   const POG_EDITIONS = {
     ed1: {
       code: 'ed1',
       label: '01 · Essential Foundation (Base Website)',
       totalAud: 1500,
-      melbAud: 3200
+      melbAud: 3200,
+      stripeDep: 'https://buy.stripe.com/eVq14h0ba7Ue2gccwTfAc0b',
+      stripeFull: 'https://buy.stripe.com/dRm6oB2ji8Yig727czfAc0c'
     },
     ed2: {
       code: 'ed2',
       label: '02 · Growth & Dulux Colour Studio Edition',
       totalAud: 2650,
-      melbAud: 6800
+      melbAud: 6800,
+      stripeDep: 'https://buy.stripe.com/28E00d5vugqKcUQ1SffAc0d',
+      stripeFull: 'https://buy.stripe.com/cNi28l6zygqK7AwfJ5fAc0e'
     },
     ed3: {
       code: 'ed3',
       label: '03 · Sovereign Turnkey Flagship (All-Inclusive)',
       totalAud: 3890,
-      melbAud: 14500
+      melbAud: 14500,
+      stripeDep: 'https://buy.stripe.com/3cI3cpbTS0rM7Aw2WjfAc0f',
+      stripeFull: 'https://buy.stripe.com/eVq9AN8HG5M64ok68vfAc0g'
     }
   };
 
@@ -9057,8 +9064,8 @@ Please provide a quote including full preparation, 3-coat Dulux Weathershield sy
     const depEl = document.getElementById('pogDepositAud');
     const savEl = document.getElementById('pogSavingsAud');
     const waEl = document.getElementById('pogWhatsappAcceptLink');
-    const ppEl = document.getElementById('pogPaypalDepositLink');
-    const emEl = document.getElementById('pogEmailAcceptLink');
+    const stDepEl = document.getElementById('pogStripeDepositLink');
+    const stFullEl = document.getElementById('pogStripeFullLink');
 
     if (lblEl) lblEl.textContent = label;
     if (totEl) totEl.textContent = fmtAud(totalAud);
@@ -9070,12 +9077,13 @@ Please provide a quote including full preparation, 3-coat Dulux Weathershield sy
     if (waEl) {
       waEl.href = 'https://wa.me/359884638640?text=' + encodeURIComponent(msgPlain);
     }
-    if (ppEl) {
-      ppEl.innerHTML = '<i class="fa-solid fa-lock"></i> Pay 50% Deposit ($' + depositAud.toLocaleString('en-AU') + ' AUD)';
-      ppEl.href = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=AUD&amount=' + depositAud + '&item_name=' + encodeURIComponent('Painters of Geelong - ' + label + ' (50% Deposit)');
+    if (stDepEl) {
+      stDepEl.innerHTML = '<i class="fa-solid fa-credit-card"></i> Stripe 50% Deposit ($' + depositAud.toLocaleString('en-AU') + ' AUD)';
+      stDepEl.href = (state.mode === 'edition' && POG_EDITIONS[state.editionKey]) ? POG_EDITIONS[state.editionKey].stripeDep : POG_STRIPE_CUSTOM_AUD;
     }
-    if (emEl) {
-      emEl.href = 'mailto:dimitar@aeterna.website?subject=' + encodeURIComponent('Painters of Geelong — Website Offer Acceptance (' + fmtAud(totalAud) + ')') + '&body=' + encodeURIComponent(msgPlain);
+    if (stFullEl) {
+      stFullEl.innerHTML = '<i class="fa-solid fa-bolt"></i> Pay 100% Full (' + fmtAud(totalAud) + ')';
+      stFullEl.href = (state.mode === 'edition' && POG_EDITIONS[state.editionKey]) ? POG_EDITIONS[state.editionKey].stripeFull : POG_STRIPE_CUSTOM_AUD;
     }
   }
 
