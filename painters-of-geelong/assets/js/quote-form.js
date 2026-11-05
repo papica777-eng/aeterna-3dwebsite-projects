@@ -293,8 +293,8 @@
         })
         .then(function (list) {
           data.photos = list;
-          // In static hosting environments (such as GitHub Pages or local files), simulate instant quote receipt without 405 error
-          if (window.location.hostname.includes('github.io') || window.location.protocol === 'file:') {
+          // In static hosting environments (such as GitHub Pages, paas.website preview, or local files), simulate instant quote receipt without 405 error
+          if (window.location.hostname.includes('github.io') || window.location.hostname.includes('paas.website') || window.location.protocol === 'file:') {
             return new Promise(function (resolve) {
               setTimeout(function () { resolve({ ok: true }); }, 300);
             });

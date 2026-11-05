@@ -2069,7 +2069,11 @@
         <span><strong>Dulux Accredited:</strong> 10-Yr Warranty</span>
       </div>
     </div>
-    <div style="display:flex; align-items:center; gap:16px;">
+    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+      <button type="button" onclick="openAeternaOfferModal('packages')" style="background:linear-gradient(90deg,#e8762d,#c5a34e); color:#ffffff; border:none; border-radius:999px; padding:4px 12px; font-size:11px; font-weight:800; letter-spacing:0.03em; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 10px rgba(232,118,45,0.35);">
+        <i class="fa-solid fa-file-pdf"></i> Website Offer · From $1,500 AUD
+      </button>
+      <span style="color:#64748b;">|</span>
       <a href="mailto:quotes@paintersofgeelong.com.au" style="color:#94a3b8; text-decoration:none; font-size:11px;">
         <i class="fa-solid fa-envelope" style="color:var(--brand-orange);"></i> quotes@paintersofgeelong.com.au
       </a>
@@ -2166,6 +2170,7 @@
       <li><a href="projects.html">Projects</a></li>
       <li><a href="areas-of-service.html">Areas of Service</a></li>
       <li><a href="blogs.html">Blogs</a></li>
+      <li><a href="#offer" onclick="event.preventDefault(); document.querySelector('.mobile-menu-overlay').classList.remove('open'); openAeternaOfferModal('packages');" style="color:#f59e0b; font-weight:800;"><i class="fa-solid fa-file-pdf" style="margin-right:6px;"></i> Commercial Website Offer ($1,500+ AUD)</a></li>
       <li><a href="contact-us.html" onclick="document.querySelector('.mobile-menu-overlay').classList.remove('open');" style="color:#e8762d; font-weight:600;">Submit an Enquiry</a></li>
     </ul>
   </div>
@@ -7685,6 +7690,1461 @@ Please provide a quote including full preparation, 3-coat Dulux Weathershield sy
     applyPogPreset('armstrong', document.getElementById('preset-armstrong'));
   });
 
+</script>
+
+<!-- =========================================================================
+     AETERNA EXECUTIVE PDF-STYLE COMMERCIAL OFFER MENU & CONFIGURATOR ($1,500+ AUD)
+     ========================================================================= -->
+<style>
+  /* Persistent Floating Re-Open Pill */
+  .aeterna-offer-pill {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    z-index: 9997;
+    background: linear-gradient(135deg, #0a0f1d 0%, #162440 100%);
+    color: #ffffff;
+    border: 1.5px solid #e8762d;
+    border-radius: 999px;
+    padding: 11px 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55), 0 0 0 3px rgba(232, 118, 45, 0.18);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .aeterna-offer-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 40px rgba(232, 118, 45, 0.35);
+  }
+  .aeterna-offer-pill-badge {
+    background: #e8762d;
+    color: #fff;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  /* Full-Screen PDF Dossier Backdrop */
+  .aeterna-offer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100020;
+    background: rgba(5, 9, 18, 0.86);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+  .aeterna-offer-backdrop.active {
+    display: flex;
+    animation: pogOfferFadeIn 0.26s ease forwards;
+  }
+  @keyframes pogOfferFadeIn {
+    from { opacity: 0; transform: scale(0.985); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  /* Outer PDF Viewer Frame */
+  .aeterna-offer-shell {
+    width: 100%;
+    max-width: 1120px;
+    height: min(93vh, 920px);
+    background: #0d1424;
+    border: 1px solid rgba(197, 163, 78, 0.42);
+    border-radius: 16px;
+    box-shadow: 0 32px 90px rgba(0, 0, 0, 0.78);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Top Executive Menu Chrome */
+  .aeterna-offer-topbar {
+    background: #070b14;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 11px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+  .aeterna-offer-doc-id {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffffff;
+    font-size: 12.5px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+  }
+  .aeterna-offer-doc-tag {
+    background: rgba(232, 118, 45, 0.18);
+    border: 1px solid rgba(232, 118, 45, 0.45);
+    color: #fdba74;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+  .aeterna-offer-top-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pog-top-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 13px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: #162036;
+    color: #f8fafc;
+    transition: all 0.15s ease;
+  }
+  .pog-top-btn:hover {
+    background: #1e2d4a;
+    color: #fff;
+  }
+  .pog-top-btn-pdf {
+    background: rgba(197, 163, 78, 0.16);
+    border-color: rgba(197, 163, 78, 0.5);
+    color: #fde68a;
+  }
+  .pog-top-btn-close {
+    background: #e8762d;
+    border-color: #e8762d;
+    color: #ffffff;
+  }
+  .pog-top-btn-close:hover {
+    background: #d06825;
+  }
+
+  /* Sub-Navigation Menu Tabs */
+  .aeterna-offer-tabs {
+    background: #0f172a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+    padding: 0 18px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .aeterna-tab-btn {
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: #94a3b8;
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 700;
+    padding: 11px 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .aeterna-tab-btn:hover {
+    color: #f8fafc;
+  }
+  .aeterna-tab-btn.active {
+    color: #ffffff;
+    border-bottom-color: #e8762d;
+    background: rgba(232, 118, 45, 0.08);
+  }
+
+  /* Scrollable PDF Paper Stage */
+  .aeterna-offer-stage {
+    flex: 1;
+    overflow-y: auto;
+    padding: 22px 20px;
+    background: radial-gradient(circle at top, #17233b 0%, #0b111e 100%);
+  }
+
+  /* Crisp White PDF Paper Sheet Inside Viewer */
+  .pog-pdf-sheet {
+    max-width: 940px;
+    margin: 0 auto;
+    background: #ffffff;
+    color: #0f172a;
+    border-radius: 10px;
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.48);
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+  }
+  .pog-sheet-ribbon {
+    height: 6px;
+    background: linear-gradient(90deg, #0a0f1d 0%, #e8762d 50%, #c5a34e 100%);
+  }
+  .pog-sheet-body {
+    padding: 26px 30px 30px;
+  }
+
+  .pog-tab-pane {
+    display: none;
+  }
+  .pog-tab-pane.active {
+    display: block;
+  }
+
+  /* PDF Sheet Header Banner */
+  .pog-dossier-hero {
+    background: linear-gradient(135deg, #070b14 0%, #0f1e38 65%, #193156 100%);
+    color: #ffffff;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(197, 163, 78, 0.35);
+  }
+  .pog-dossier-eyebrow {
+    color: #f59e0b;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .pog-dossier-hero h2 {
+    font-size: 19px;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+  }
+  .pog-dossier-hero p {
+    font-size: 12.8px;
+    color: #cbd5e1;
+    line-height: 1.45;
+    margin: 0;
+  }
+
+  /* Meta Strip */
+  .pog-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .pog-meta-item {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px 11px;
+  }
+  .pog-meta-item span {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+    margin-bottom: 3px;
+  }
+  .pog-meta-item strong {
+    font-size: 13px;
+    color: #0a0f1d;
+    font-weight: 800;
+  }
+
+  /* Embedded Live Preview Callout */
+  .pog-live-callout {
+    background: #fff7ed;
+    border: 1.5px solid #fb923c;
+    border-radius: 10px;
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .pog-live-callout-text {
+    font-size: 12.5px;
+    color: #334155;
+  }
+  .pog-live-callout-text strong {
+    color: #9a3412;
+    display: block;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  .pog-live-url-pill {
+    background: #0a0f1d;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    border: none;
+  }
+
+  /* 3 Selectable Edition Cards */
+  .pog-editions-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 22px;
+  }
+  .pog-edition-card {
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 18px 16px;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    position: relative;
+  }
+  .pog-edition-card:hover {
+    border-color: #94a3b8;
+    transform: translateY(-2px);
+  }
+  .pog-edition-card.selected {
+    border-color: #e8762d;
+    background: #fffaf5;
+    box-shadow: 0 10px 26px rgba(232, 118, 45, 0.16);
+  }
+  .pog-ed-pill {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+    width: fit-content;
+  }
+  .pog-ed-pill-base { background: #e2e8f0; color: #1e293b; }
+  .pog-ed-pill-pop { background: #e8762d; color: #ffffff; }
+  .pog-ed-pill-flag { background: #0a0f1d; color: #f59e0b; }
+
+  .pog-edition-card h3 {
+    font-size: 16px;
+    font-weight: 800;
+    color: #0a0f1d;
+    margin: 0 0 6px 0;
+  }
+  .pog-ed-price-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .pog-ed-price {
+    font-size: 26px;
+    font-weight: 800;
+    color: #0a0f1d;
+    letter-spacing: -0.02em;
+  }
+  .pog-edition-card.selected .pog-ed-price {
+    color: #c95d18;
+  }
+  .pog-ed-strike {
+    font-size: 12px;
+    color: #64748b;
+    text-decoration: line-through;
+  }
+  .pog-ed-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 14px 0;
+    font-size: 12.2px;
+    color: #334155;
+    line-height: 1.48;
+  }
+  .pog-ed-list li {
+    margin-bottom: 6px;
+    padding-left: 18px;
+    position: relative;
+  }
+  .pog-ed-list li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #0d9468;
+    font-weight: 800;
+  }
+  .pog-ed-select-btn {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 800;
+    border: 1.5px solid #0a0f1d;
+    background: #ffffff;
+    color: #0a0f1d;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .pog-edition-card.selected .pog-ed-select-btn {
+    background: #e8762d;
+    border-color: #e8762d;
+    color: #ffffff;
+  }
+
+  /* Section Subheading inside PDF Sheet */
+  .pog-sec-title {
+    font-size: 14px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #0a0f1d;
+    border-left: 4px solid #e8762d;
+    padding-left: 10px;
+    margin: 20px 0 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .pog-sec-title small {
+    font-size: 11.5px;
+    color: #64748b;
+    text-transform: none;
+    font-weight: 600;
+  }
+
+  /* Comparison Table */
+  .pog-comp-table-wrap {
+    overflow-x: auto;
+    margin-bottom: 18px;
+  }
+  .pog-comp-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.2px;
+  }
+  .pog-comp-table th {
+    background: #0a0f1d;
+    color: #ffffff;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 800;
+  }
+  .pog-comp-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #e2e8f0;
+    color: #334155;
+  }
+  .pog-comp-table tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  /* Custom Builder Module Rows */
+  .pog-addon-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .pog-addon-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 15px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .pog-addon-item:hover {
+    border-color: #94a3b8;
+  }
+  .pog-addon-item.checked {
+    border-color: #0d9468;
+    background: #f0fdf4;
+  }
+  .pog-addon-item.locked {
+    border-color: #0a0f1d;
+    background: #f8fafc;
+    cursor: default;
+  }
+  .pog-addon-left {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+  }
+  .pog-addon-left input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: #0d9468;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .pog-addon-title {
+    font-size: 13.5px;
+    font-weight: 800;
+    color: #0a0f1d;
+    margin-bottom: 3px;
+  }
+  .pog-addon-desc {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.4;
+  }
+  .pog-addon-right {
+    text-align: right;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .pog-addon-price {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #0d9468;
+  }
+  .pog-addon-melb {
+    font-size: 11px;
+    color: #64748b;
+    text-decoration: line-through;
+  }
+  .pog-mini-test-link {
+    font-size: 11px;
+    font-weight: 700;
+    color: #c95d18;
+    background: #fff7ed;
+    border: 1px solid #fdba74;
+    border-radius: 5px;
+    padding: 2px 7px;
+    cursor: pointer;
+  }
+
+  /* Smart Savings Banner in Custom Builder */
+  .pog-smart-bundle-alert {
+    display: none;
+    background: linear-gradient(90deg, #ecfdf5 0%, #d1fae5 100%);
+    border: 1.5px solid #10b981;
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+    color: #065f46;
+  }
+  .pog-smart-bundle-alert.visible {
+    display: flex;
+  }
+
+  /* Live Tour Cards */
+  .pog-tour-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .pog-tour-card {
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 16px;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .pog-tour-card h4 {
+    font-size: 14.5px;
+    font-weight: 800;
+    color: #0a0f1d;
+    margin: 0 0 4px 0;
+  }
+  .pog-tour-card p {
+    font-size: 12.2px;
+    color: #475569;
+    margin: 0;
+    line-height: 1.45;
+  }
+  .pog-tour-btn {
+    align-self: flex-start;
+    background: #0a0f1d;
+    color: #ffffff;
+    border: none;
+    border-radius: 7px;
+    padding: 8px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .pog-tour-btn:hover {
+    background: #e8762d;
+  }
+
+  /* Sticky Bottom Checkout & Acceptance Bar */
+  .aeterna-offer-footer {
+    background: #070b14;
+    border-top: 1px solid rgba(197, 163, 78, 0.35);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    flex-shrink: 0;
+    color: #ffffff;
+  }
+  .pog-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .pog-sum-title {
+    font-size: 11.5px;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .pog-sum-title strong {
+    display: block;
+    font-size: 14px;
+    color: #ffffff;
+    font-weight: 800;
+  }
+  .pog-sum-numbers {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    background: rgba(255,255,255,0.05);
+    padding: 6px 13px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .pog-sum-total {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fb923c;
+  }
+  .pog-sum-dep {
+    font-size: 12px;
+    color: #34d399;
+    font-weight: 700;
+  }
+  .pog-sum-save {
+    font-size: 11px;
+    color: #fde68a;
+    font-weight: 700;
+  }
+
+  .pog-footer-cta-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .pog-cta-wa {
+    background: #16a34a;
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .pog-cta-pay {
+    background: linear-gradient(90deg, #e8762d 0%, #c95d18 100%);
+    color: #ffffff !important;
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 12.5px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .pog-cta-mail {
+    background: #1e293b;
+    color: #f8fafc !important;
+    border: 1px solid rgba(255,255,255,0.18);
+    text-decoration: none;
+    padding: 10px 13px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  @media (max-width: 860px) {
+    .aeterna-offer-backdrop { padding: 4px; }
+    .aeterna-offer-shell { height: 96vh; border-radius: 12px; }
+    .aeterna-offer-topbar { padding: 8px 12px; gap: 6px; }
+    .aeterna-offer-doc-id { font-size: 11px; gap: 6px; }
+    .aeterna-offer-doc-tag { display: none; }
+    .pog-top-btn { padding: 5px 9px; font-size: 11px; }
+    .aeterna-tab-btn { padding: 9px 11px; font-size: 11.5px; }
+    .aeterna-offer-stage { padding: 10px 8px; }
+    .pog-sheet-body { padding: 14px 12px 18px; }
+    .pog-meta-grid { grid-template-columns: repeat(2, 1fr); }
+    .pog-editions-grid, .pog-tour-grid { grid-template-columns: 1fr; }
+    .aeterna-offer-footer { padding: 9px 12px; gap: 8px; }
+    .pog-summary-left { width: 100%; justify-content: space-between; gap: 6px; }
+    .pog-sum-title strong { font-size: 12px; }
+    .pog-sum-numbers { padding: 4px 9px; gap: 6px; width: 100%; justify-content: space-between; }
+    .pog-sum-total { font-size: 16px; }
+    .pog-sum-dep, .pog-sum-save { font-size: 10.5px; }
+    .pog-footer-cta-group { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .pog-cta-wa, .pog-cta-pay { justify-content: center; padding: 8px 8px; font-size: 11.5px; }
+    .pog-cta-mail { display: none; }
+    .aeterna-offer-pill {
+      bottom: 76px;
+      left: 12px;
+      padding: 9px 14px;
+      font-size: 12px;
+    }
+    .pog-addon-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .pog-addon-right {
+      width: 100%;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      padding-left: 30px;
+    }
+  }
+</style>
+
+<!-- Persistent Floating Trigger Button (Always Available While Testing Site) -->
+<button type="button" id="aeternaOfferTriggerPill" class="aeterna-offer-pill" onclick="openAeternaOfferModal('packages')" aria-label="Open Website Commercial Offer">
+  <i class="fa-solid fa-file-pdf" style="color:#fb923c; font-size:15px;"></i>
+  <span>Website Offer</span>
+  <span class="aeterna-offer-pill-badge">From $1,500 AUD</span>
+</button>
+
+<!-- Executive PDF-Style Commercial Offer Modal -->
+<div id="aeternaOfferModal" class="aeterna-offer-backdrop" role="dialog" aria-modal="true" aria-labelledby="aeternaOfferHeading" onclick="if(event.target===this) closeAeternaOfferModal();">
+  <div class="aeterna-offer-shell">
+
+    <!-- Top PDF Reader Toolbar -->
+    <div class="aeterna-offer-topbar">
+      <div class="aeterna-offer-doc-id">
+        <span style="color:#c5a34e;">▲ AETERNA DIGITAL</span>
+        <span style="color:#475569;">|</span>
+        <span>OFFICIAL COMMERCIAL OFFER — PAINTERS OF GEELONG</span>
+        <span class="aeterna-offer-doc-tag">From $1,500 AUD</span>
+      </div>
+      <div class="aeterna-offer-top-actions">
+        <a class="pog-top-btn pog-top-btn-pdf" href="assets/downloads/Painters_of_Geelong_Commercial_Offer_2026.pdf" download="Painters_of_Geelong_Commercial_Offer_2026.pdf">
+          <i class="fa-solid fa-download"></i> Download Official PDF
+        </a>
+        <a class="pog-top-btn" href="commercial-offer.html" target="_blank" rel="noopener">
+          <i class="fa-solid fa-print"></i> Print View
+        </a>
+        <button type="button" class="pog-top-btn pog-top-btn-close" onclick="closeAeternaOfferModal()">
+          <i class="fa-solid fa-eye"></i> Test Live Website &#10005;
+        </button>
+      </div>
+    </div>
+
+    <!-- Menu Navigation Tabs -->
+    <div class="aeterna-offer-tabs" role="tablist">
+      <button type="button" class="aeterna-tab-btn active" data-pog-tab="packages" onclick="switchPogOfferTab('packages')">
+        <i class="fa-solid fa-file-invoice-dollar"></i> 01 · Offer &amp; Editions ($1,500+)
+      </button>
+      <button type="button" class="aeterna-tab-btn" data-pog-tab="builder" onclick="switchPogOfferTab('builder')">
+        <i class="fa-solid fa-sliders"></i> 02 · Custom Builder (Palettes &amp; Add-Ons)
+      </button>
+      <button type="button" class="aeterna-tab-btn" data-pog-tab="tour" onclick="switchPogOfferTab('tour')">
+        <i class="fa-solid fa-wand-magic-sparkles"></i> 03 · Test Live Client Tools
+      </button>
+      <button type="button" class="aeterna-tab-btn" data-pog-tab="pdf" onclick="switchPogOfferTab('pdf')">
+        <i class="fa-solid fa-file-pdf"></i> 04 · View 4-Page PDF Document
+      </button>
+    </div>
+
+    <!-- Scrollable PDF Sheet Canvas -->
+    <div class="aeterna-offer-stage">
+
+      <!-- ==================== TAB 1: EXECUTIVE PDF OFFER & PACKAGES ==================== -->
+      <div id="pogPane-packages" class="pog-tab-pane active">
+        <div class="pog-pdf-sheet">
+          <div class="pog-sheet-ribbon"></div>
+          <div class="pog-sheet-body">
+
+            <div class="pog-dossier-hero">
+              <div class="pog-dossier-eyebrow">Prepared Exclusively for Mostafa ("Mosi") Nazari &amp; Paris · ABN 74 756 996 878</div>
+              <h2 id="aeternaOfferHeading">Turnkey Website &amp; Interactive Dulux® Colour Platform — Starting at $1,500 AUD</h2>
+              <p>
+                Built to Melbourne &amp; Victoria industry standards — already 100% live and ready for your inspection before you pay a cent. Choose the <strong>$1,500 AUD Base Foundation</strong>, upgrade to our signature <strong>Interactive Dulux® Colour &amp; Quote Editions</strong>, or customize individual modules at 55%–70% below Melbourne agency prices.
+              </p>
+            </div>
+
+            <div class="pog-meta-grid">
+              <div class="pog-meta-item">
+                <span>Client Entity</span>
+                <strong>Painters of Geelong</strong>
+              </div>
+              <div class="pog-meta-item">
+                <span>Starting Base Price</span>
+                <strong style="color:#c95d18;">$1,500 AUD (One-Time)</strong>
+              </div>
+              <div class="pog-meta-item">
+                <span>Payment Terms</span>
+                <strong style="color:#0d9468;">50% Deposit / 50% Live</strong>
+              </div>
+              <div class="pog-meta-item">
+                <span>Code &amp; Domain</span>
+                <strong>100% Yours · $0 Lock-In</strong>
+              </div>
+            </div>
+
+            <div class="pog-live-callout">
+              <div class="pog-live-callout-text">
+                <strong><i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> Zero Blind Agency Risk — Your Live Platform Is Running Right Behind This Menu</strong>
+                Embedded Preview Link: <code>https://paas.website/painters-of-geelong/index.html</code> — test every Dulux® palette, house mask &amp; m² calculator live.
+              </div>
+              <button type="button" class="pog-live-url-pill" onclick="closeAeternaOfferModal()">
+                Inspect Live Website Now &#8599;
+              </button>
+            </div>
+
+            <div class="pog-sec-title">
+              <span>Select Your Turnkey Edition (Click Any Package Below)</span>
+              <small>Just ONE average Geelong repaint ($4,650+ AUD) pays back any edition in full</small>
+            </div>
+
+            <div class="pog-editions-grid">
+              <!-- EDITION 01: $1,500 BASE -->
+              <div class="pog-edition-card selected" id="pogCardEd1" onclick="selectPogEdition('ed1')">
+                <div>
+                  <span class="pog-ed-pill pog-ed-pill-base">01 · Base Version</span>
+                  <h3>Essential Foundation</h3>
+                  <div class="pog-ed-price-wrap">
+                    <span class="pog-ed-price">$1,500 <small style="font-size:13px;">AUD</small></span>
+                    <span class="pog-ed-strike">Melb $3,200</span>
+                  </div>
+                  <ul class="pog-ed-list">
+                    <li><strong>Luxury Coastal Navy Redesign</strong> (Home, About, 5 Services, Projects, Contact)</li>
+                    <li><strong>Mobile 1-Tap Sticky Bar</strong> (Call <code>0431 261 281</code> &amp; Instant WhatsApp)</li>
+                    <li><strong>Sovereign Trust Header</strong> (ABN, $20M Liability, 10-Yr Dulux, 4.9&#9733; Google &amp; hipages)</li>
+                    <li><strong>Custom Domain Email</strong> (<code>quotes@paintersofgeelong.com.au</code> replacing <code>@outlook</code>)</li>
+                    <li><strong>Photo-Upload Quote Form</strong> + Sub-Second Speed (&lt;0.8s) + 30 Days Free Care</li>
+                  </ul>
+                </div>
+                <button type="button" class="pog-ed-select-btn" id="pogBtnEd1">Selected · $1,500 AUD ($750 Deposit)</button>
+              </div>
+
+              <!-- EDITION 02: $2,650 GROWTH & COLOUR STUDIO -->
+              <div class="pog-edition-card" id="pogCardEd2" onclick="selectPogEdition('ed2')">
+                <div>
+                  <span class="pog-ed-pill pog-ed-pill-pop">&#9733; Most Popular · Save $4,150</span>
+                  <h3>Growth &amp; Dulux® Studio</h3>
+                  <div class="pog-ed-price-wrap">
+                    <span class="pog-ed-price">$2,650 <small style="font-size:13px;">AUD</small></span>
+                    <span class="pog-ed-strike">Melb $6,800</span>
+                  </div>
+                  <ul class="pog-ed-list">
+                    <li><strong>Everything in $1,500 Base Version, PLUS:</strong></li>
+                    <li><strong>360° Interactive Dulux® Palette Wheel</strong> (44 Blades / 220 Official Swatches + Filters)</li>
+                    <li><strong>30-Sec Live m² Quote Calculator</strong> with 1-Click Quote Form Auto-Pre-Fill</li>
+                    <li><strong>60fps Before/After Split-Sliders</strong> (Weatherboard, Interior &amp; Merbau Deck)</li>
+                    <li><strong>5-Board Dulux® Catalog + Checklist PDF Modal</strong> &amp; <strong>9 Suburb SEO Pages</strong> + 60d Care</li>
+                  </ul>
+                </div>
+                <button type="button" class="pog-ed-select-btn" id="pogBtnEd2">Select Growth · $2,650 AUD</button>
+              </div>
+
+              <!-- EDITION 03: $3,890 FULL AS-BUILT FLAGSHIP -->
+              <div class="pog-edition-card" id="pogCardEd3" onclick="selectPogEdition('ed3')">
+                <div>
+                  <span class="pog-ed-pill pog-ed-pill-flag">&#9889; 100% As-Built Live Flagship</span>
+                  <h3>Sovereign Turnkey All-In</h3>
+                  <div class="pog-ed-price-wrap">
+                    <span class="pog-ed-price">$3,890 <small style="font-size:13px;">AUD</small></span>
+                    <span class="pog-ed-strike">Melb $14,500</span>
+                  </div>
+                  <ul class="pog-ed-list">
+                    <li><strong>Everything in Growth ($2,650), PLUS:</strong></li>
+                    <li><strong>Photorealistic 4-Zone House Visualizer</strong> (Walls, Colorbond® Roof, Trim, Fence + Day/Sunset)</li>
+                    <li><strong>24/7 AI Trade Quote Concierge Bot</strong> trained on Geelong m² rates &amp; Dulux prep</li>
+                    <li><strong>Full 4K Autopilot Video Cinema Suite</strong> (Hero + Armstrong Creek Transformations)</li>
+                    <li><strong>All 57 Site Pages Unified &amp; Cleaned</strong> + <strong>90 Days Priority Care Free ($0)</strong></li>
+                  </ul>
+                </div>
+                <button type="button" class="pog-ed-select-btn" id="pogBtnEd3">Select Full Flagship · $3,890 AUD</button>
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 16px; margin-bottom:18px; flex-wrap:wrap; gap:10px;">
+              <div style="font-size:12.5px; color:#334155;">
+                <strong>Want to start at $1,500 AUD and hand-pick only specific client palettes or tools?</strong> Use our Melbourne-Standard Modular Configurator:
+              </div>
+              <button type="button" onclick="switchPogOfferTab('builder')" style="background:#0a0f1d; color:#fff; border:none; border-radius:7px; padding:8px 14px; font-size:12px; font-weight:800; cursor:pointer;">
+                Customize From $1,500 Base &#8594;
+              </button>
+            </div>
+
+            <div class="pog-sec-title">
+              <span>Melbourne Web Agency vs. Your Pre-Built AETERNA Platform</span>
+              <small>100% Tax-Deductible B2B Asset · Zero Ongoing Commissions</small>
+            </div>
+
+            <div class="pog-comp-table-wrap">
+              <table class="pog-comp-table">
+                <thead>
+                  <tr>
+                    <th>Standard Criterion</th>
+                    <th>Typical Melbourne / Geelong Agency</th>
+                    <th>Your Engineered Platform (Live Today)</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Interactive Client Palettes</strong></td>
+                    <td>Static colour links that send leads away to Dulux.com.au</td>
+                    <td><strong style="color:#0d9468;">220-Swatch 360° Wheel + 4-Zone House Visualizer</strong> built in-page</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Quote Qualification</strong></td>
+                    <td>Plain 8-field form with 80%+ mobile drop-off</td>
+                    <td><strong style="color:#0d9468;">30-Sec m² Estimator + Photo Upload + 1-Tap WhatsApp</strong></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Delivery &amp; Risk</strong></td>
+                    <td>6–10 weeks wait after paying 50% deposit blind</td>
+                    <td><strong style="color:#0d9468;">48-Hour Live Cutover</strong> — inspect 100% of the build right now</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ownership &amp; Hosting</strong></td>
+                    <td>Locked into proprietary monthly agency retainers</td>
+                    <td><strong style="color:#0d9468;">100% Full Source Code Ownership</strong> (Optional $149/mo AU Care)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 2: CUSTOM BUILDER ($1,500 BASE + MELBOURNE ADD-ONS) ==================== -->
+      <div id="pogPane-builder" class="pog-tab-pane">
+        <div class="pog-pdf-sheet">
+          <div class="pog-sheet-ribbon"></div>
+          <div class="pog-sheet-body">
+
+            <div class="pog-sec-title" style="margin-top:0;">
+              <span>Modular Package Builder — Base $1,500 AUD + Client Elements</span>
+              <small>Melbourne &amp; Victoria Standard Tools · Priced 50%–75% Below Agencies</small>
+            </div>
+
+            <p style="font-size:13px; color:#475569; margin:0 0 14px 0;">
+              Tick any client-facing interactive palette, visualizer, or SEO module below to build a custom package on top of the <strong>$1,500 AUD Foundation Website</strong>. All totals and 50% deposits update instantaneously below.
+            </p>
+
+            <div id="pogSmartBundleAlert" class="pog-smart-bundle-alert">
+              <div id="pogSmartBundleText"></div>
+              <button type="button" id="pogSmartBundleBtn" style="background:#0d9468; color:#fff; border:none; border-radius:7px; padding:7px 13px; font-size:12px; font-weight:800; cursor:pointer;"></button>
+            </div>
+
+            <div class="pog-addon-list">
+              <!-- Locked $1,500 Base -->
+              <div class="pog-addon-item locked">
+                <div class="pog-addon-left">
+                  <input type="checkbox" checked disabled />
+                  <div>
+                    <div class="pog-addon-title">BASE-00 · Essential Trade Foundation Website (Included Base)</div>
+                    <div class="pog-addon-desc">Luxury Coastal Navy UI (Core Pages), Mobile 1-Tap Call/WhatsApp Bar, Trust Badges ($20M Insured / 10-Yr Dulux), <code>quotes@paintersofgeelong.com.au</code> Email, Photo Quote Form &amp; 100% Ownership.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">$1,500 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $3,200</span>
+                </div>
+              </div>
+
+              <!-- MOD-01 -->
+              <label class="pog-addon-item" id="pogModWrap-mod1">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod1', this.checked)" id="pogChk-mod1" />
+                  <div>
+                    <div class="pog-addon-title">MOD-01 · 360° Interactive Dulux® Colour Palette Wheel (220 Swatches) + Lookbook PDF</div>
+                    <div class="pog-addon-desc">44 interactive fan-deck blades across Exterior, Living, Bedroom &amp; Kitchen shades, 5-board Geelong Lookbook Lightbox &amp; 1-click colour transfer into your quote form.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$590 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $1,800</span>
+                  <button type="button" class="pog-mini-test-link" onclick="event.preventDefault(); event.stopPropagation(); jumpToPogFeature('#colour-studio');">Test Live &#8599;</button>
+                </div>
+              </label>
+
+              <!-- MOD-02 -->
+              <label class="pog-addon-item" id="pogModWrap-mod2">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod2', this.checked)" id="pogChk-mod2" />
+                  <div>
+                    <div class="pog-addon-title">MOD-02 · Photorealistic 4-Zone Exterior House Colour Visualizer</div>
+                    <div class="pog-addon-desc">Real Armstrong Creek exterior facade masking for Walls, Colorbond® Roof, Portico Trims &amp; Picket Fence + 28 swatches + Coastal Daylight / Sunset toggle.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$890 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $3,800</span>
+                  <button type="button" class="pog-mini-test-link" onclick="event.preventDefault(); event.stopPropagation(); jumpToPogFeature('#house-visualizer');">Test Live &#8599;</button>
+                </div>
+              </label>
+
+              <!-- MOD-03 -->
+              <label class="pog-addon-item" id="pogModWrap-mod3">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod3', this.checked)" id="pogChk-mod3" />
+                  <div>
+                    <div class="pog-addon-title">MOD-03 · 30-Second Live m² Painting Quote Calculator &amp; Form Pre-Fill</div>
+                    <div class="pog-addon-desc">Interactive Interior / Exterior / Full Repaint / Deck estimator calibrated to Victorian m² rates by property size &amp; surface prep condition.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$450 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $1,600</span>
+                  <button type="button" class="pog-mini-test-link" onclick="event.preventDefault(); event.stopPropagation(); jumpToPogFeature('#calculator');">Test Live &#8599;</button>
+                </div>
+              </label>
+
+              <!-- MOD-04 -->
+              <label class="pog-addon-item" id="pogModWrap-mod4">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod4', this.checked)" id="pogChk-mod4" />
+                  <div>
+                    <div class="pog-addon-title">MOD-04 · 60fps Before / After Restoration Sliders + Homeowner Checklist PDF Modal</div>
+                    <div class="pog-addon-desc">Touch-drag restoration comparison across Weatherboard, Interior Living &amp; Merbau Deck + printable Home Painting Checklist lead-capture popup.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$320 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $950</span>
+                  <button type="button" class="pog-mini-test-link" onclick="event.preventDefault(); event.stopPropagation(); jumpToPogFeature('#transformations');">Test Live &#8599;</button>
+                </div>
+              </label>
+
+              <!-- MOD-05 -->
+              <label class="pog-addon-item" id="pogModWrap-mod5">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod5', this.checked)" id="pogChk-mod5" />
+                  <div>
+                    <div class="pog-addon-title">MOD-05 · 24/7 AI Trade Quote Concierge &amp; WhatsApp Lead Handoff Bot</div>
+                    <div class="pog-addon-desc">Answers after-hours homeowner questions on Dulux 3-coat prep, 10-Yr warranty &amp; ballpark m² pricing, routing warm enquiries straight to Mosi's WhatsApp.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$590 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $2,900</span>
+                </div>
+              </label>
+
+              <!-- MOD-06 -->
+              <label class="pog-addon-item" id="pogModWrap-mod6">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod6', this.checked)" id="pogChk-mod6" />
+                  <div>
+                    <div class="pog-addon-title">MOD-06 · Geelong, Bellarine &amp; Surf Coast Local SEO Pack (9 Suburb Pages + Schema)</div>
+                    <div class="pog-addon-desc">Dedicated SEO landing pages for Highton, Newtown, Belmont, Armstrong Creek, Torquay, Ocean Grove, Grovedale, Waurn Ponds &amp; Lara + 16 Case Studies + 20 Guides.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$550 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $2,200</span>
+                </div>
+              </label>
+
+              <!-- MOD-07 -->
+              <label class="pog-addon-item" id="pogModWrap-mod7">
+                <div class="pog-addon-left">
+                  <input type="checkbox" onchange="togglePogCustomMod('mod7', this.checked)" id="pogChk-mod7" />
+                  <div>
+                    <div class="pog-addon-title">MOD-07 · Trade Job CRM / Quote Calendar Integration (ServiceM8, Tradify, AroFlo)</div>
+                    <div class="pog-addon-desc">Optional automated webhook pushing website quote enquiries &amp; customer photos straight into your trade job-management app or Google Calendar.</div>
+                  </div>
+                </div>
+                <div class="pog-addon-right">
+                  <span class="pog-addon-price">+$390 AUD</span>
+                  <span class="pog-addon-melb">Melb Std $1,100</span>
+                </div>
+              </label>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 3: INTERACTIVE LIVE FEATURE TOUR ==================== -->
+      <div id="pogPane-tour" class="pog-tab-pane">
+        <div class="pog-pdf-sheet">
+          <div class="pog-sheet-ribbon"></div>
+          <div class="pog-sheet-body">
+            <div class="pog-sec-title" style="margin-top:0;">
+              <span>Hands-On Live Inspection — Test Your Built Tools Right Now</span>
+              <small>Click any module below to jump straight to it on the live page</small>
+            </div>
+            <p style="font-size:13px; color:#475569; margin:0 0 16px 0;">
+              Every interactive element below is already engineered specifically for <strong>Painters of Geelong</strong>. Click <strong>Test Live on Site &#8599;</strong> to try it yourself — then tap the orange <strong>Website Offer</strong> button at the bottom-left anytime to return here.
+            </p>
+            <div class="pog-tour-grid">
+              <div class="pog-tour-card">
+                <div>
+                  <h4>&#127912; 360° Dulux® Fan-Deck Wheel (220 Swatches)</h4>
+                  <p>Spin 44 official colour blades, filter by Exterior, Living, Bedroom or Kitchen, inspect LRV specs, and send any colour directly into a quote request.</p>
+                </div>
+                <button type="button" class="pog-tour-btn" onclick="jumpToPogFeature('#colour-studio')">Test Dulux® Wheel Live &#8599;</button>
+              </div>
+              <div class="pog-tour-card">
+                <div>
+                  <h4>&#127968; Live Armstrong Creek House Visualizer</h4>
+                  <p>Recolour Weatherboard/Render Walls, Colorbond® Roof, Portico Trims &amp; Picket Fence in real time, and toggle Coastal Daylight vs. Sunset lighting.</p>
+                </div>
+                <button type="button" class="pog-tour-btn" onclick="jumpToPogFeature('#house-visualizer')">Test House Visualizer Live &#8599;</button>
+              </div>
+              <div class="pog-tour-card">
+                <div>
+                  <h4>&#128208; 30-Second Live m² Quote Calculator</h4>
+                  <p>Select Interior, Exterior, Full Repaint or Deck, pick home size &amp; surface state, view instant AUD ballpark, and pre-fill the quote form in 1 click.</p>
+                </div>
+                <button type="button" class="pog-tour-btn" onclick="jumpToPogFeature('#calculator')">Test m² Calculator Live &#8599;</button>
+              </div>
+              <div class="pog-tour-card">
+                <div>
+                  <h4>&#9889; 60fps Before / After Restoration Sliders</h4>
+                  <p>Drag across real Weatherboard, Interior Living, and Merbau Timber Deck restorations with substrate preparation &amp; 10-year Dulux® warranty specs.</p>
+                </div>
+                <button type="button" class="pog-tour-btn" onclick="jumpToPogFeature('#transformations')">Test Before/After Sliders &#8599;</button>
+              </div>
+              <div class="pog-tour-card">
+                <div>
+                  <h4>&#128214; 5-Board Geelong Lookbook &amp; Checklist PDF</h4>
+                  <p>Open high-res architectural Dulux® colour specification boards in Lightbox view or download the printable 4-page Homeowner Painting Checklist.</p>
+                </div>
+                <button type="button" class="pog-tour-btn" onclick="jumpToPogFeature('#colour-catalog')">Test Colour Lookbook &#8599;</button>
+              </div>
+              <div class="pog-tour-card">
+                <div>
+                  <h4>&#128247; Smart Photo-Upload Quote Form &amp; AI Concierge</h4>
+                  <p>Test drag-and-drop jobsite photo compression (up to 5 photos) and open the bottom-right 24/7 AI Quote Advisor pill.</p>
+                </div>
+                <button type="button" class="pog-tour-btn" onclick="jumpToPogFeature('#appointment')">Test Quote Form Live &#8599;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== TAB 4: EMBEDDED OFFICIAL 4-PAGE PDF VIEWER ==================== -->
+      <div id="pogPane-pdf" class="pog-tab-pane" style="height:100%;">
+        <div class="pog-pdf-sheet" style="max-width:980px;">
+          <div class="pog-sheet-ribbon"></div>
+          <div style="padding:14px 20px; background:#f8fafc; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div style="font-size:13px; color:#0f172a; font-weight:700;">
+              <i class="fa-solid fa-file-pdf" style="color:#e8762d; margin-right:6px;"></i>
+              Painters_of_Geelong_Commercial_Offer_2026.pdf (4 A4 Pages · Embedded Clickable Links)
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="assets/downloads/Painters_of_Geelong_Commercial_Offer_2026.pdf" download="Painters_of_Geelong_Commercial_Offer_2026.pdf" style="background:#e8762d; color:#fff; text-decoration:none; padding:7px 14px; border-radius:7px; font-size:12px; font-weight:800;">
+                <i class="fa-solid fa-download"></i> Save PDF to Device
+              </a>
+              <a href="assets/downloads/Painters_of_Geelong_Commercial_Offer_2026.pdf" target="_blank" rel="noopener" style="background:#0a0f1d; color:#fff; text-decoration:none; padding:7px 14px; border-radius:7px; font-size:12px; font-weight:800;">
+                Open Full-Screen PDF &#8599;
+              </a>
+            </div>
+          </div>
+          <iframe
+            src="assets/downloads/Painters_of_Geelong_Commercial_Offer_2026.pdf#view=FitH"
+            title="Painters of Geelong Official Commercial Offer PDF"
+            style="width:100%; height:64vh; min-height:480px; border:none; display:block; background:#334155;">
+          </iframe>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sticky Bottom Summary & Instant Acceptance Bar -->
+    <div class="aeterna-offer-footer">
+      <div class="pog-summary-left">
+        <div class="pog-sum-title">
+          Selected Configuration:
+          <strong id="pogSelectedLabel">01 · Essential Foundation (Base Website)</strong>
+        </div>
+        <div class="pog-sum-numbers">
+          <span class="pog-sum-total" id="pogTotalAud">$1,500 AUD</span>
+          <span class="pog-sum-dep" id="pogDepositAud">50% Deposit: $750 AUD</span>
+          <span class="pog-sum-save" id="pogSavingsAud">Save $1,700 vs Melb Agency</span>
+        </div>
+      </div>
+      <div class="pog-footer-cta-group">
+        <a id="pogWhatsappAcceptLink" class="pog-cta-wa" href="#" target="_blank" rel="noopener">
+          <i class="fa-brands fa-whatsapp"></i> Accept via WhatsApp
+        </a>
+        <a id="pogPaypalDepositLink" class="pog-cta-pay" href="#" target="_blank" rel="noopener">
+          <i class="fa-solid fa-lock"></i> Pay 50% Deposit ($750 AUD)
+        </a>
+        <a id="pogEmailAcceptLink" class="pog-cta-mail" href="#">
+          <i class="fa-solid fa-envelope"></i> Email Confirmation
+        </a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  // Deterministic Zero-Float Integer AUD Pricing Matrix
+  const POG_EDITIONS = {
+    ed1: {
+      code: 'ed1',
+      label: '01 · Essential Foundation (Base Website)',
+      totalAud: 1500,
+      melbAud: 3200
+    },
+    ed2: {
+      code: 'ed2',
+      label: '02 · Growth & Dulux Colour Studio Edition',
+      totalAud: 2650,
+      melbAud: 6800
+    },
+    ed3: {
+      code: 'ed3',
+      label: '03 · Sovereign Turnkey Flagship (All-Inclusive)',
+      totalAud: 3890,
+      melbAud: 14500
+    }
+  };
+
+  const POG_MODULES = {
+    mod1: { name: '360° Dulux Palette (220 Swatches)', priceAud: 590, melbAud: 1800, inEd2: true },
+    mod2: { name: '4-Zone House Visualizer', priceAud: 890, melbAud: 3800, inEd2: false },
+    mod3: { name: '30s m² Quote Calculator', priceAud: 450, melbAud: 1600, inEd2: true },
+    mod4: { name: '60fps Before/After + Checklist PDF', priceAud: 320, melbAud: 950, inEd2: true },
+    mod5: { name: '24/7 AI Quote Concierge Bot', priceAud: 590, melbAud: 2900, inEd2: false },
+    mod6: { name: '9 Suburb SEO Pages + Schema', priceAud: 550, melbAud: 2200, inEd2: true },
+    mod7: { name: 'ServiceM8 / Tradify / Calendar Sync', priceAud: 390, melbAud: 1100, inEd2: false }
+  };
+
+  const state = {
+    mode: 'edition', // 'edition' | 'custom'
+    editionKey: 'ed1',
+    mods: { mod1: false, mod2: false, mod3: false, mod4: false, mod5: false, mod6: false, mod7: false }
+  };
+
+  function fmtAud(intVal) {
+    return '$' + intVal.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' AUD';
+  }
+
+  function renderPogOfferState() {
+    let totalAud = 1500;
+    let melbAud = 3200;
+    let label = POG_EDITIONS.ed1.label;
+    let itemSummary = '';
+
+    // Highlight Edition cards
+    ['ed1', 'ed2', 'ed3'].forEach(function(k, idx) {
+      const card = document.getElementById('pogCardEd' + (idx + 1));
+      const btn = document.getElementById('pogBtnEd' + (idx + 1));
+      if (!card || !btn) return;
+      const ed = POG_EDITIONS[k];
+      const dep = ed.totalAud / 2;
+      if (state.mode === 'edition' && state.editionKey === k) {
+        card.classList.add('selected');
+        btn.textContent = 'Selected · ' + fmtAud(ed.totalAud) + ' ($' + dep.toLocaleString('en-AU') + ' Deposit)';
+      } else {
+        card.classList.remove('selected');
+        btn.textContent = 'Select · ' + fmtAud(ed.totalAud);
+      }
+    });
+
+    const bundleAlert = document.getElementById('pogSmartBundleAlert');
+    const bundleText = document.getElementById('pogSmartBundleText');
+    const bundleBtn = document.getElementById('pogSmartBundleBtn');
+    if (bundleAlert) bundleAlert.classList.remove('visible');
+
+    if (state.mode === 'edition') {
+      const ed = POG_EDITIONS[state.editionKey];
+      totalAud = ed.totalAud;
+      melbAud = ed.melbAud;
+      label = ed.label;
+      itemSummary = ed.label;
+    } else {
+      const picked = [];
+      let onlyEd2Compatible = true;
+      let hasMod7 = false;
+
+      Object.keys(POG_MODULES).forEach(function(mk) {
+        const wrap = document.getElementById('pogModWrap-' + mk);
+        const chk = document.getElementById('pogChk-' + mk);
+        const active = !!state.mods[mk];
+        if (chk) chk.checked = active;
+        if (wrap) wrap.classList.toggle('checked', active);
+        if (active) {
+          totalAud += POG_MODULES[mk].priceAud;
+          melbAud += POG_MODULES[mk].melbAud;
+          picked.push(POG_MODULES[mk].name);
+          if (!POG_MODULES[mk].inEd2) onlyEd2Compatible = false;
+          if (mk === 'mod7') hasMod7 = true;
+        }
+      });
+
+      if (picked.length === 0) {
+        label = 'Custom Build · Base Foundation Only';
+        itemSummary = 'Base Foundation ($1,500 AUD)';
+      } else {
+        label = 'Custom Build · Base + ' + picked.length + (picked.length === 1 ? ' Module' : ' Modules');
+        itemSummary = 'Base ($1,500) + ' + picked.join(', ');
+      }
+
+      // Smart Bundle Discount Recommendation
+      if (bundleAlert && bundleText && bundleBtn) {
+        if (onlyEd2Compatible && totalAud > 2650) {
+          const extraSave = totalAud - 2650;
+          bundleText.innerHTML = '<strong>Smart Bundle Tip:</strong> Every module you selected is included in <strong>Edition 02 (Growth &amp; Dulux® Studio)</strong> for <strong>$2,650 AUD</strong> — saving you an extra <strong>$' + extraSave + ' AUD</strong>!';
+          bundleBtn.textContent = 'Switch to Edition 02 ($2,650 AUD)';
+          bundleBtn.onclick = function() { selectPogEdition('ed2'); switchPogOfferTab('packages'); };
+          bundleAlert.classList.add('visible');
+        } else if (!hasMod7 && totalAud > 3890) {
+          const extraSave = totalAud - 3890;
+          bundleText.innerHTML = '<strong>Smart Bundle Tip:</strong> Everything you selected (plus all 57 pages &amp; 4K videos) is included in <strong>Edition 03 (Sovereign Flagship)</strong> for <strong>$3,890 AUD</strong> — saving you an extra <strong>$' + extraSave + ' AUD</strong>!';
+          bundleBtn.textContent = 'Switch to Full Flagship ($3,890 AUD)';
+          bundleBtn.onclick = function() { selectPogEdition('ed3'); switchPogOfferTab('packages'); };
+          bundleAlert.classList.add('visible');
+        }
+      }
+    }
+
+    const depositAud = totalAud / 2;
+    const savedAud = melbAud - totalAud;
+
+    const lblEl = document.getElementById('pogSelectedLabel');
+    const totEl = document.getElementById('pogTotalAud');
+    const depEl = document.getElementById('pogDepositAud');
+    const savEl = document.getElementById('pogSavingsAud');
+    const waEl = document.getElementById('pogWhatsappAcceptLink');
+    const ppEl = document.getElementById('pogPaypalDepositLink');
+    const emEl = document.getElementById('pogEmailAcceptLink');
+
+    if (lblEl) lblEl.textContent = label;
+    if (totEl) totEl.textContent = fmtAud(totalAud);
+    if (depEl) depEl.textContent = '50% Deposit: $' + depositAud.toLocaleString('en-AU') + ' AUD';
+    if (savEl) savEl.textContent = 'Save $' + savedAud.toLocaleString('en-AU') + ' vs Melb Agency';
+
+    const msgPlain = 'Hi Dimitar, this is Painters of Geelong (Mosi / Paris). We reviewed our live website at https://paas.website/painters-of-geelong/index.html and want to proceed with: ' + itemSummary + ' — Total: ' + fmtAud(totalAud) + ' (50% Deposit: $' + depositAud + ' AUD).';
+
+    if (waEl) {
+      waEl.href = 'https://wa.me/359884638640?text=' + encodeURIComponent(msgPlain);
+    }
+    if (ppEl) {
+      ppEl.innerHTML = '<i class="fa-solid fa-lock"></i> Pay 50% Deposit ($' + depositAud.toLocaleString('en-AU') + ' AUD)';
+      ppEl.href = 'https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=billing@aeterna.website&currency_code=AUD&amount=' + depositAud + '&item_name=' + encodeURIComponent('Painters of Geelong - ' + label + ' (50% Deposit)');
+    }
+    if (emEl) {
+      emEl.href = 'mailto:dimitar@aeterna.website?subject=' + encodeURIComponent('Painters of Geelong — Website Offer Acceptance (' + fmtAud(totalAud) + ')') + '&body=' + encodeURIComponent(msgPlain);
+    }
+  }
+
+  window.openAeternaOfferModal = function(tabName) {
+    const modal = document.getElementById('aeternaOfferModal');
+    if (!modal) return;
+    if (tabName) window.switchPogOfferTab(tabName);
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  window.closeAeternaOfferModal = function() {
+    const modal = document.getElementById('aeternaOfferModal');
+    if (!modal) return;
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  window.switchPogOfferTab = function(tabName) {
+    document.querySelectorAll('.aeterna-tab-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.getAttribute('data-pog-tab') === tabName);
+    });
+    ['packages', 'builder', 'tour', 'pdf'].forEach(function(p) {
+      const pane = document.getElementById('pogPane-' + p);
+      if (pane) pane.classList.toggle('active', p === tabName);
+    });
+  };
+
+  window.selectPogEdition = function(edKey) {
+    if (!POG_EDITIONS[edKey]) return;
+    state.mode = 'edition';
+    state.editionKey = edKey;
+    renderPogOfferState();
+  };
+
+  window.togglePogCustomMod = function(modKey, checked) {
+    if (!POG_MODULES[modKey]) return;
+    state.mode = 'custom';
+    state.mods[modKey] = !!checked;
+    renderPogOfferState();
+  };
+
+  window.jumpToPogFeature = function(selector) {
+    window.closeAeternaOfferModal();
+    setTimeout(function() {
+      const target = document.querySelector(selector);
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 120);
+  };
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('aeternaOfferModal');
+      if (modal && modal.classList.contains('active')) {
+        window.closeAeternaOfferModal();
+      }
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    renderPogOfferState();
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('clean') !== '1') {
+      setTimeout(function() {
+        window.openAeternaOfferModal('packages');
+      }, 350);
+    }
+  });
+})();
 </script>
 </body>
 </html>
