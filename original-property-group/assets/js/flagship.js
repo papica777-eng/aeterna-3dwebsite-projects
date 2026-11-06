@@ -1,6 +1,6 @@
 /* ==========================================================================
-   ORIGINAL PROPERTY GROUP & ORIGINAL GLAZING 24/7 — INTERACTIVE ENGINE
-   Deterministic Vanilla ES6 • Zero External Dependencies • WCAG 2.1 AA
+   ORIGINAL PROPERTY GROUP & ORIGINAL GLAZING — ARCHITECTURAL ATELIER ENGINE V2
+   60fps Canvas Glass Refraction • Spotlight Bento • Zero Emojis • Exact Math
    ========================================================================== */
 
 (function () {
@@ -10,20 +10,141 @@
   const DISPATCH_WA_INTL = '61411946933';
 
   /* ------------------------------------------------------------------------
-     1. URL PARAMETER CHECK (?clean=1 hides Audit Verification Pill)
+     1. LIVING ARCHITECTURAL GLASS REFRACTION & BLUEPRINT CANVAS
      ------------------------------------------------------------------------ */
-  function initCleanMode() {
+  function initArchitecturalCanvas() {
+    const hero = document.querySelector('.hero-section');
+    if (!hero) return;
+
+    let canvas = hero.querySelector('.hero-canvas');
+    if (!canvas) {
+      canvas = document.createElement('canvas');
+      canvas.className = 'hero-canvas';
+      canvas.setAttribute('aria-hidden', 'true');
+      hero.insertBefore(canvas, hero.firstChild);
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const isGlazing = document.body.classList.contains('theme-glazing');
+    let width = 0;
+    let height = 0;
+    let pointerX = 0.65;
+    let pointerY = 0.35;
+    let targetX = 0.65;
+    let targetY = 0.35;
+    let tick = 0;
+
+    function resize() {
+      const rect = hero.getBoundingClientRect();
+      width = Math.max(320, Math.floor(rect.width));
+      height = Math.max(320, Math.floor(rect.height));
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    window.addEventListener('resize', resize, { passive: true });
+    hero.addEventListener('mousemove', function (e) {
+      const r = hero.getBoundingClientRect();
+      targetX = (e.clientX - r.left) / Math.max(1, r.width);
+      targetY = (e.clientY - r.top) / Math.max(1, r.height);
+    }, { passive: true });
+
+    resize();
+
+    function renderFrame() {
+      tick += 0.006;
+      pointerX += (targetX - pointerX) * 0.06;
+      pointerY += (targetY - pointerY) * 0.06;
+
+      ctx.clearRect(0, 0, width, height);
+
+      // Architectural Glass Caustic Prisms (3 diagonal specular panes)
+      for (let i = 0; i < 3; i++) {
+        const shift = Math.sin(tick + i * 1.4) * 60 + (pointerX - 0.5) * 90;
+        const x0 = width * (0.42 + i * 0.16) + shift;
+        const grad = ctx.createLinearGradient(x0 - 140, 0, x0 + 180, height);
+        if (isGlazing) {
+          grad.addColorStop(0, 'rgba(125, 211, 252, 0)');
+          grad.addColorStop(0.5, 'rgba(125, 211, 252, 0.055)');
+          grad.addColorStop(1, 'rgba(200, 164, 93, 0)');
+        } else {
+          grad.addColorStop(0, 'rgba(200, 164, 93, 0)');
+          grad.addColorStop(0.5, 'rgba(200, 164, 93, 0.055)');
+          grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x0, 0);
+        ctx.lineTo(x0 + 170, 0);
+        ctx.lineTo(x0 - 90, height);
+        ctx.lineTo(x0 - 260, height);
+        ctx.closePath();
+        ctx.fillStyle = grad;
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Subtle Cursor Specular Glow
+      const rad = ctx.createRadialGradient(
+        pointerX * width, pointerY * height, 10,
+        pointerX * width, pointerY * height, 340
+      );
+      rad.addColorStop(0, isGlazing ? 'rgba(125, 211, 252, 0.08)' : 'rgba(200, 164, 93, 0.08)');
+      rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = rad;
+      ctx.fillRect(0, 0, width, height);
+
+      requestAnimationFrame(renderFrame);
+    }
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      requestAnimationFrame(renderFrame);
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     2. SCROLL REVEAL & MOUSE-TRACKING CARD SPOTLIGHT
+     ------------------------------------------------------------------------ */
+  function initChoreographyAndSpotlights() {
+    document.querySelectorAll('.service-card').forEach(function (card) {
+      card.addEventListener('mousemove', function (e) {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+        card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+      }, { passive: true });
+    });
+
+    const targets = document.querySelectorAll('.service-card, .project-card, .spec-row, .stat-card');
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.08 });
+
+      targets.forEach(function (el) {
+        el.classList.add('reveal');
+        io.observe(el);
+      });
+    }
+  }
+
+  /* ------------------------------------------------------------------------
+     3. CLEAN MODE & NAVIGATION / ACCORDIONS
+     ------------------------------------------------------------------------ */
+  function initCleanModeAndNav() {
     const params = new URLSearchParams(window.location.search);
     if (params.get('clean') === '1') {
       const pill = document.getElementById('auditVerifiedPill');
       if (pill) pill.style.display = 'none';
     }
-  }
 
-  /* ------------------------------------------------------------------------
-     2. MOBILE MENU & ACCORDIONS
-     ------------------------------------------------------------------------ */
-  function initNavigationAndAccordions() {
     const menuBtn = document.getElementById('mobileMenuBtn');
     const mainNav = document.getElementById('mainNav');
     if (menuBtn && mainNav) {
@@ -49,8 +170,7 @@
       faqSearch.addEventListener('input', function () {
         const q = faqSearch.value.trim().toLowerCase();
         document.querySelectorAll('.faq-searchable').forEach(function (item) {
-          const text = item.textContent.toLowerCase();
-          const match = !q || text.indexOf(q) !== -1;
+          const match = !q || item.textContent.toLowerCase().indexOf(q) !== -1;
           item.style.display = match ? '' : 'none';
           if (q && match) item.classList.add('open');
         });
@@ -59,7 +179,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     3. ORIGINAL PROPERTY GROUP — MULTI-TRADE SCOPE BUILDER
+     4. ORIGINAL PROPERTY GROUP — MULTI-TRADE SCOPE BUILDER
      ------------------------------------------------------------------------ */
   function initOpgEstimator() {
     const root = document.getElementById('opgEstimator');
@@ -90,27 +210,27 @@
 
       let slaLabel = 'Same-Week Coordinated Trade Dispatch';
       if (urgency.indexOf('24/7') !== -1) {
-        slaLabel = '⚡ < 60 Min Melbourne Emergency Dispatch';
+        slaLabel = '< 60 Min Melbourne Emergency Dispatch';
       } else if (urgency.indexOf('Priority') !== -1) {
         slaLabel = '24–48 Hr Priority Trade Attendance';
       }
 
       const tradeCountText = selectedTrades.length === 1
-        ? '1 Specialist Trade (' + selectedTrades[0] + ')'
-        : selectedTrades.length + ' Coordinated Trades · 1 Point of Contact (' + selectedTrades.join(', ') + ')';
+        ? '1 Division (' + selectedTrades[0] + ')'
+        : selectedTrades.length + ' Coordinated Divisions (' + selectedTrades.join(', ') + ')';
 
       const discountNote = hasDiscount
-        ? ' · Pensioner / NDIS / Strata Priority Rate Applied'
-        : ' · Free Obligation-Free On-Site Quote (ABN 27 564 832 883)';
+        ? ' // Pensioner, NDIS & Strata Priority Applied'
+        : ' // Obligation-Free Quote (ABN 27 564 832 883)';
 
       if (summaryTitleEl) summaryTitleEl.textContent = slaLabel;
-      if (summarySpecEl) summarySpecEl.textContent = propType + ' · ' + tradeCountText + discountNote;
+      if (summarySpecEl) summarySpecEl.textContent = propType + ' // ' + tradeCountText + discountNote;
 
-      const waMsg = 'Hi David (Original Property Group), requesting a quote:\n' +
-        '• Property: ' + propType + '\n' +
-        '• Trades Required: ' + selectedTrades.join(', ') + '\n' +
-        '• Urgency: ' + urgency +
-        (hasDiscount ? '\n• Account: Pensioner / NDIS / Strata Commercial Rate' : '');
+      const waMsg = 'Hi David (Original Property Group), requesting a Melbourne quote:\n' +
+        '- Property: ' + propType + '\n' +
+        '- Divisions: ' + selectedTrades.join(', ') + '\n' +
+        '- Priority: ' + urgency +
+        (hasDiscount ? '\n- Account: Pensioner / NDIS / Strata Commercial Rate' : '');
 
       if (waBtn) {
         waBtn.href = 'https://wa.me/' + DISPATCH_WA_INTL + '?text=' + encodeURIComponent(waMsg);
@@ -128,7 +248,7 @@
             });
           }
           if (msgArea) {
-            msgArea.value = 'Property Type: ' + propType + ' | Trades: ' + selectedTrades.join(', ') + ' | Urgency: ' + urgency + (hasDiscount ? ' | Eligible for Pensioner/NDIS/Strata Rate' : '');
+            msgArea.value = 'Property: ' + propType + ' | Divisions: ' + selectedTrades.join(', ') + ' | Priority: ' + urgency + (hasDiscount ? ' | Pensioner/NDIS/Strata Rate' : '');
           }
           const contactSec = document.getElementById('contact');
           if (contactSec) contactSec.scrollIntoView({ behavior: 'smooth' });
@@ -150,43 +270,43 @@
   }
 
   /* ------------------------------------------------------------------------
-     4. ORIGINAL GLAZING 24/7 — INTEGER-EXACT AS1288 GLASS CALCULATOR
+     5. ORIGINAL GLAZING 24/7 — INTEGER-EXACT AS1288 GLASS CALCULATOR
      ------------------------------------------------------------------------ */
   const GLASS_SPECS = {
     laminate_clear: {
       name: '6.38mm Clear Laminated Safety Glass (AS1288)',
-      kgPerSqmTenths: 158, // 15.8 kg/m²
-      acousticDb: '32 dB Noise Reduction',
+      kgPerSqmTenths: 158,
+      acousticDb: '32 dB Acoustic Rating',
       uvBlock: '99% UV Blocked',
-      standard: 'AS1288 Grade A Human Impact Compliant'
+      standard: 'AS1288 Grade A Human Impact'
     },
     laminate_frosted: {
-      name: '6.38mm Frosted / Translucent Privacy Laminate (AS1288)',
+      name: '6.38mm Translucent Privacy Laminate (AS1288)',
       kgPerSqmTenths: 158,
-      acousticDb: '33 dB Noise Reduction',
-      uvBlock: '99% UV + 100% Privacy',
-      standard: 'AS1288 Grade A Bathroom & Streetfront Compliant'
+      acousticDb: '33 dB Acoustic Rating',
+      uvBlock: '99% UV + Privacy Diffusion',
+      standard: 'AS1288 Grade A Wet-Area & Facade'
     },
     toughened_10: {
-      name: '10mm Toughened Frameless Safety Glass (AS1288)',
-      kgPerSqmTenths: 250, // 25.0 kg/m²
-      acousticDb: '31 dB Noise Reduction',
-      uvBlock: 'High Thermal & Impact Load',
-      standard: 'AS1288 Grade A Shower Screens & Doors'
+      name: '10mm Heat-Toughened Frameless Glass (AS1288)',
+      kgPerSqmTenths: 250,
+      acousticDb: '31 dB Mass Damping',
+      uvBlock: '5x Flexural Strength',
+      standard: 'AS1288 Grade A Showers & Doors'
     },
     double_igu: {
-      name: '24mm Argon Low-E Retrofit Double Glaze Unit (IGU)',
-      kgPerSqmTenths: 300, // 30.0 kg/m²
-      acousticDb: '39 dB Acoustic Insulation',
-      uvBlock: 'Up to 64% Less Heat Loss',
-      standard: 'AS1288 + NatHERS Energy Upgrade Ready'
+      name: '24mm Argon Low-E Insulated Glass Unit (IGU)',
+      kgPerSqmTenths: 300,
+      acousticDb: '39 dB Acoustic Barrier',
+      uvBlock: 'Up to 64% Less Thermal Loss',
+      standard: 'AS1288 + NatHERS Thermal Spec'
     },
     shopfront_1038: {
-      name: '10.38mm Heavy Commercial Shopfront Security Laminate',
+      name: '10.38mm Commercial Shopfront Security Laminate',
       kgPerSqmTenths: 258,
-      acousticDb: '37 dB Commercial Acoustic Barrier',
-      uvBlock: '99% Merchandise Fade Protection',
-      standard: 'AS1288 Commercial Anti-Intrusion Safety'
+      acousticDb: '37 dB Retail Acoustic Rating',
+      uvBlock: '99% Display Fade Control',
+      standard: 'AS1288 Commercial Anti-Intrusion'
     }
   };
 
@@ -215,12 +335,10 @@
       if (isNaN(hMm) || hMm < 100) hMm = 100;
       if (hMm > 6000) hMm = 6000;
 
-      // Exact integer arithmetic: area in hundredths of m² = round((wMm * hMm) / 10000)
       const areaMm2 = wMm * hMm;
       const areaHundredths = Math.max(10, Math.round(areaMm2 / 10000));
       const areaFormatted = (Math.floor(areaHundredths / 100)) + '.' + String(areaHundredths % 100).padStart(2, '0');
 
-      // Exact weight in tenths of kg = round((areaHundredths * kgPerSqmTenths) / 100)
       const weightTenths = Math.max(20, Math.round((areaHundredths * spec.kgPerSqmTenths) / 100));
       const weightFormatted = (Math.floor(weightTenths / 10)) + '.' + (weightTenths % 10);
 
@@ -228,18 +346,18 @@
       const hasDiscount = discountEl && discountEl.checked;
 
       if (outMainEl) {
-        outMainEl.textContent = areaFormatted + ' m² · ~' + weightFormatted + ' kg Panel';
+        outMainEl.textContent = areaFormatted + ' m² // ' + weightFormatted + ' kg Panel';
       }
       if (outSubEl) {
         outSubEl.textContent = spec.standard + ' · ' + spec.acousticDb + ' · ' + spec.uvBlock +
-          (hasDiscount ? ' · Pensioner/NDIS/Trade Discount Eligible' : '');
+          (hasDiscount ? ' · Concession/Partner Rate' : '');
       }
 
-      const waMsg = 'Hi David (Original Glazing 24/7), requesting a fast quote:\n' +
-        '• Glass Spec: ' + spec.name + '\n' +
-        '• Approx Size: ' + wMm + 'mm (W) x ' + hMm + 'mm (H) (' + areaFormatted + ' m²)\n' +
-        '• Service Speed: ' + urgency +
-        (hasDiscount ? '\n• Eligible for Pensioner / NDIS / Business Discount' : '');
+      const waMsg = 'Hi David (Original Glazing 24/7), requesting a Melbourne glass quote:\n' +
+        '- Specification: ' + spec.name + '\n' +
+        '- Dimensions: ' + wMm + 'mm x ' + hMm + 'mm (' + areaFormatted + ' m²)\n' +
+        '- Priority: ' + urgency +
+        (hasDiscount ? '\n- Rate: Pensioner / NDIS / Commercial Partner' : '');
 
       if (waBtn) {
         waBtn.href = 'https://wa.me/' + DISPATCH_WA_INTL + '?text=' + encodeURIComponent(waMsg);
@@ -249,7 +367,7 @@
         formBtn.onclick = function () {
           const msgArea = document.getElementById('quoteDetailsInput');
           if (msgArea) {
-            msgArea.value = 'Glass Spec: ' + spec.name + ' | Approx Dimensions: ' + wMm + 'mm x ' + hMm + 'mm (' + areaFormatted + ' m²) | Urgency: ' + urgency + (hasDiscount ? ' | Pensioner/NDIS/Business Discount' : '');
+            msgArea.value = 'Glass Spec: ' + spec.name + ' | Dimensions: ' + wMm + 'mm x ' + hMm + 'mm (' + areaFormatted + ' m²) | Priority: ' + urgency + (hasDiscount ? ' | Concession/Commercial Rate' : '');
           }
           const contactSec = document.getElementById('contact');
           if (contactSec) contactSec.scrollIntoView({ behavior: 'smooth' });
@@ -267,71 +385,77 @@
   }
 
   /* ------------------------------------------------------------------------
-     5. INTERACTIVE AS1288 GLASS SAFETY CROSS-SECTION SIMULATOR
+     6. ARCHITECTURAL CAD CROSS-SECTION GLASS SIMULATOR (ZERO EMOJIS)
      ------------------------------------------------------------------------ */
   const SIM_DATA = {
     float4: {
-      title: 'Old 3mm–4mm Annealed Float Glass (Non-Compliant Hazard)',
-      safety: '❌ SHATTERS INTO LETHAL SHARDS',
-      safetyColor: '#ef4444',
-      acoustic: '24 dB (Poor)',
-      thermal: '5.9 W/m²K (High Heat Loss)',
-      uv: '18% Blocked',
-      svg: '<svg viewBox="0 0 420 190" width="100%" height="100%">' +
-        '<rect x="195" y="22" width="14" height="146" rx="2" fill="rgba(248,113,113,0.38)" stroke="#ef4444" stroke-width="2"/>' +
-        '<path d="M196 70 L209 92 M208 64 L195 108 M196 112 L209 135" stroke="#fca5a5" stroke-width="2"/>' +
-        '<text x="30" y="95" fill="#fca5a5" font-size="12" font-weight="700">Impact Hazard →</text>' +
-        '<text x="228" y="88" fill="#ffffff" font-size="13" font-weight="800">Single 4mm Float Sheet</text>' +
-        '<text x="228" y="108" fill="#fca5a5" font-size="11.5">Fails AS1288 Human Impact Zones</text>' +
+      title: 'Legacy 3mm–4mm Annealed Float Glass (Non-Compliant)',
+      safety: 'FAIL — FRACTURES INTO SHARDS',
+      safetyColor: '#f87171',
+      acoustic: '24 dB Rw (Minimal)',
+      thermal: '5.9 W/m²K (Uninsulated)',
+      uv: '18% UV Attenuation',
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
+        '<line x1="30" y1="100" x2="178" y2="100" stroke="#f87171" stroke-width="1.2" stroke-dasharray="4 4"/>' +
+        '<polygon points="178,100 170,96 170,104" fill="#f87171"/>' +
+        '<rect x="188" y="24" width="14" height="152" fill="rgba(248,113,113,0.22)" stroke="#f87171" stroke-width="1.5"/>' +
+        '<path d="M189 68 L201 92 M201 64 L189 108 M189 114 L201 138" stroke="#fca5a5" stroke-width="1.5"/>' +
+        '<text x="30" y="88" fill="#f87171" font-size="10">IMPACT VECTOR</text>' +
+        '<text x="222" y="84" fill="#ffffff" font-size="12" font-weight="700">4.0MM ANNEALED MONOLITH</text>' +
+        '<text x="222" y="104" fill="#f87171" font-size="10.5">Prohibited in AS1288 Human Impact Zones</text>' +
+        '<text x="222" y="124" fill="#767d8c" font-size="10">Zero interlayer retention on fracture</text>' +
         '</svg>'
     },
     lam638: {
-      title: '6.38mm Laminated Safety Glass (3mm + 0.38mm PVB + 3mm)',
-      safety: '✅ AS1288 GRADE A — HOLDS IN FRAME',
-      safetyColor: '#10b981',
-      acoustic: '33 dB (Acoustic PVB Core)',
+      title: '6.38mm Architectural Safety Laminate (3mm + 0.38mm PVB + 3mm)',
+      safety: 'GRADE A — AS1288:2021 CERTIFIED',
+      safetyColor: '#34d399',
+      acoustic: '33 dB Rw (Acoustic PVB)',
       thermal: '5.5 W/m²K + Solar Control',
-      uv: '99% UV Rays Blocked',
-      svg: '<svg viewBox="0 0 420 190" width="100%" height="100%">' +
-        '<rect x="176" y="20" width="16" height="150" rx="2" fill="rgba(56,189,248,0.35)" stroke="#38bdf8" stroke-width="1.8"/>' +
-        '<rect x="194" y="20" width="8" height="150" fill="#10b981"/>' +
-        '<rect x="204" y="20" width="16" height="150" rx="2" fill="rgba(56,189,248,0.35)" stroke="#38bdf8" stroke-width="1.8"/>' +
-        '<text x="24" y="95" fill="#6ee7b7" font-size="12" font-weight="700">Impact Contained 🛡️</text>' +
-        '<text x="234" y="78" fill="#ffffff" font-size="13" font-weight="800">Dual 3mm Glass + 0.38mm PVB</text>' +
-        '<text x="234" y="98" fill="#6ee7b7" font-size="11.5">Bonds shards safely upon impact</text>' +
-        '<text x="234" y="118" fill="#94a3b8" font-size="11">Australian Made · Cut On-Site Ready</text>' +
+      uv: '99% UV Spectrum Blocked',
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
+        '<line x1="30" y1="100" x2="160" y2="100" stroke="#7dd3fc" stroke-width="1.2"/>' +
+        '<rect x="170" y="22" width="16" height="156" fill="rgba(125,211,252,0.22)" stroke="#7dd3fc" stroke-width="1.4"/>' +
+        '<rect x="188" y="22" width="7" height="156" fill="#c8a45d"/>' +
+        '<rect x="197" y="22" width="16" height="156" fill="rgba(125,211,252,0.22)" stroke="#7dd3fc" stroke-width="1.4"/>' +
+        '<text x="30" y="88" fill="#7dd3fc" font-size="10">LOAD ARRESTED</text>' +
+        '<text x="230" y="78" fill="#ffffff" font-size="12" font-weight="700">3MM + 0.38MM PVB + 3MM</text>' +
+        '<text x="230" y="98" fill="#34d399" font-size="10.5">Bonds glass fragments safely in rebate</text>' +
+        '<text x="230" y="118" fill="#c8a45d" font-size="10">Cut on-site from Melbourne 24/7 mobile stock</text>' +
         '</svg>'
     },
     tough10: {
-      title: '10mm Toughened Frameless Safety Glass (AS1288 Grade A)',
-      safety: '✅ 5× STRONGER THAN FLOAT GLASS',
-      safetyColor: '#10b981',
-      acoustic: '31 dB Solid Mass Damping',
-      thermal: 'High Thermal Shock Resistance',
-      uv: '42% UV Blocked',
-      svg: '<svg viewBox="0 0 420 190" width="100%" height="100%">' +
-        '<rect x="182" y="20" width="32" height="150" rx="4" fill="rgba(14,165,233,0.42)" stroke="#0ea5e9" stroke-width="2.2"/>' +
-        '<text x="24" y="95" fill="#38bdf8" font-size="12" font-weight="700">500% Strength ⚡</text>' +
-        '<text x="230" y="82" fill="#ffffff" font-size="13" font-weight="800">10mm Heat-Tempered Monolith</text>' +
-        '<text x="230" y="102" fill="#7dd3fc" font-size="11.5">Ideal for Frameless Showers &amp; Doors</text>' +
+      title: '10mm Heat-Tempered Frameless Monolith (AS1288 Grade A)',
+      safety: 'GRADE A — 500% FLEXURAL LOAD',
+      safetyColor: '#34d399',
+      acoustic: '31 dB Rw Solid Mass',
+      thermal: '250°C Thermal Shock Rated',
+      uv: '42% UV Attenuation',
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
+        '<rect x="176" y="22" width="32" height="156" fill="rgba(125,211,252,0.28)" stroke="#e0f2fe" stroke-width="1.6"/>' +
+        '<line x1="176" y1="186" x2="208" y2="186" stroke="#c8a45d" stroke-width="1.2"/>' +
+        '<text x="30" y="102" fill="#e0f2fe" font-size="10">10.0MM TEMPERED</text>' +
+        '<text x="228" y="84" fill="#ffffff" font-size="12" font-weight="700">10MM FRAMELESS ARCHITECTURAL</text>' +
+        '<text x="228" y="104" fill="#7dd3fc" font-size="10.5">Precision CNC-polished edges &amp; hardware cutouts</text>' +
+        '<text x="228" y="124" fill="#767d8c" font-size="10">Frameless showers, entry doors &amp; splashbacks</text>' +
         '</svg>'
     },
     igu24: {
-      title: '24mm Argon Low-E Retrofit Double Glazing (6mm + 12mm Argon + 6mm)',
-      safety: '✅ AS1288 + MAXIMUM ENERGY SAVING',
-      safetyColor: '#10b981',
-      acoustic: '39 dB Whisper-Quiet Interior',
-      thermal: '1.6 W/m²K (Up to 64% Less Loss)',
-      uv: '99% UV + Infrared Barrier',
-      svg: '<svg viewBox="0 0 420 190" width="100%" height="100%">' +
-        '<rect x="156" y="20" width="16" height="150" rx="2" fill="rgba(56,189,248,0.4)" stroke="#38bdf8" stroke-width="1.8"/>' +
-        '<rect x="174" y="20" width="34" height="150" fill="rgba(16,185,129,0.12)" stroke="#10b981" stroke-dasharray="4 3"/>' +
-        '<rect x="210" y="20" width="16" height="150" rx="2" fill="rgba(245,158,11,0.35)" stroke="#f59e0b" stroke-width="1.8"/>' +
-        '<rect x="174" y="156" width="34" height="14" fill="#334155"/>' +
-        '<text x="180" y="96" fill="#6ee7b7" font-size="10" font-weight="800">ARGON</text>' +
-        '<text x="240" y="78" fill="#ffffff" font-size="13" font-weight="800">12mm Sealed Argon Gas Cavity</text>' +
-        '<text x="240" y="98" fill="#fde68a" font-size="11.5">Fits Existing Melbourne Frames</text>' +
-        '<text x="240" y="118" fill="#6ee7b7" font-size="11">Eliminates Condensation &amp; Street Noise</text>' +
+      title: '24mm Argon Low-E Insulated Glass Unit (6mm + 12mm Argon + 6mm)',
+      safety: 'GRADE A + NATHERS THERMAL SPEC',
+      safetyColor: '#34d399',
+      acoustic: '39 dB Rw Acoustic Isolation',
+      thermal: '1.6 W/m²K (-64% Heat Loss)',
+      uv: '99% UV &amp; IR Coating',
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
+        '<rect x="150" y="22" width="15" height="156" fill="rgba(125,211,252,0.28)" stroke="#7dd3fc" stroke-width="1.4"/>' +
+        '<rect x="167" y="22" width="34" height="156" fill="rgba(200,164,93,0.08)" stroke="#c8a45d" stroke-dasharray="3 3"/>' +
+        '<rect x="203" y="22" width="15" height="156" fill="rgba(200,164,93,0.26)" stroke="#e6d1a3" stroke-width="1.4"/>' +
+        '<rect x="167" y="164" width="34" height="14" fill="#1e293b" stroke="#94a3b8" stroke-width="1"/>' +
+        '<text x="169" y="102" fill="#e6d1a3" font-size="9">ARGON</text>' +
+        '<text x="234" y="78" fill="#ffffff" font-size="12" font-weight="700">12MM SEALED ARGON CAVITY</text>' +
+        '<text x="234" y="98" fill="#e6d1a3" font-size="10.5">Retrofits existing Melbourne timber &amp; Al frames</text>' +
+        '<text x="234" y="118" fill="#34d399" font-size="10">Eliminates condensation &amp; arterial road noise</text>' +
         '</svg>'
     }
   };
@@ -361,7 +485,7 @@
       }
       if (acousticEl) acousticEl.textContent = d.acoustic;
       if (thermalEl) thermalEl.textContent = d.thermal;
-      if (uvEl) uvEl.textContent = d.uv;
+      if (uvEl) uvEl.innerHTML = d.uv;
     }
 
     btns.forEach(function (btn) {
@@ -373,7 +497,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     6. BEFORE / AFTER SLIDER & PROJECT FILTERING
+     7. BEFORE / AFTER SLIDER & PROJECT FILTER
      ------------------------------------------------------------------------ */
   function initBeforeAfterAndGallery() {
     document.querySelectorAll('.ba-slider').forEach(function (slider) {
@@ -391,7 +515,7 @@
       syncSlider();
     });
 
-    const filterBtns = Array.from(document.querySelectorAll('.filter-btn'));
+    const filterBtns = Array.from(document.querySelectorAll('.filter-btn[data-filter]'));
     const projectCards = Array.from(document.querySelectorAll('.project-card'));
     if (filterBtns.length && projectCards.length) {
       filterBtns.forEach(function (btn) {
@@ -400,8 +524,7 @@
           filterBtns.forEach(function (b) { b.classList.toggle('active', b === btn); });
           projectCards.forEach(function (card) {
             const c = card.getAttribute('data-cat') || '';
-            const show = cat === 'all' || c.indexOf(cat) !== -1;
-            card.classList.toggle('hidden', !show);
+            card.classList.toggle('hidden', !(cat === 'all' || c.indexOf(cat) !== -1));
           });
         });
       });
@@ -409,7 +532,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     7. WORKING QUOTE FORM + DRAG & DROP PHOTO PREVIEW + DISPATCH ROUTING
+     8. QUOTE FORM + PHOTO PREVIEW + DISPATCH ROUTING (ZERO EMOJIS)
      ------------------------------------------------------------------------ */
   function initQuoteForm() {
     const form = document.getElementById('flagshipQuoteForm');
@@ -442,19 +565,10 @@
     if (dropzone && fileInput) {
       dropzone.addEventListener('click', function () { fileInput.click(); });
       fileInput.addEventListener('change', function () { handleFiles(fileInput.files); });
-      dropzone.addEventListener('dragover', function (e) {
-        e.preventDefault();
-        dropzone.style.borderColor = '#10b981';
-      });
-      dropzone.addEventListener('dragleave', function () {
-        dropzone.style.borderColor = '';
-      });
+      dropzone.addEventListener('dragover', function (e) { e.preventDefault(); });
       dropzone.addEventListener('drop', function (e) {
         e.preventDefault();
-        dropzone.style.borderColor = '';
-        if (e.dataTransfer && e.dataTransfer.files) {
-          handleFiles(e.dataTransfer.files);
-        }
+        if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
       });
     }
 
@@ -468,40 +582,37 @@
       const details = (document.getElementById('quoteDetailsInput') || {}).value || '';
 
       const isGlazing = document.body.classList.contains('theme-glazing');
-      const targetEmail = isGlazing
-        ? 'david@originalglazing.com.au'
-        : 'info@originalpropertygroup.com.au';
+      const targetEmail = isGlazing ? 'david@originalglazing.com.au' : 'info@originalpropertygroup.com.au';
       const refCode = (isGlazing ? 'OG-247-' : 'OPG-MEL-') + String(Math.floor(1000 + Math.random() * 9000));
 
-      const subject = '[' + refCode + '] Quote Request: ' + service + ' — ' + suburb;
+      const subject = '[' + refCode + '] Melbourne Quote Request: ' + service + ' — ' + suburb;
       const bodyLines = [
-        'Job Reference: ' + refCode,
-        'Client Name: ' + name,
+        'Dispatch Reference: ' + refCode,
+        'Client / Agency: ' + name,
         'Phone: ' + phone,
         'Email: ' + email,
         'Melbourne Suburb: ' + suburb,
-        'Service Required: ' + service,
+        'Division Required: ' + service,
         'Photos Selected: ' + attachedFilesCount,
         '',
-        'Project / Repair Details:',
+        'Scope & Measurements:',
         details
       ].join('\n');
 
       const mailtoHref = 'mailto:' + targetEmail +
         '?subject=' + encodeURIComponent(subject) +
         '&body=' + encodeURIComponent(bodyLines);
-
       const waHref = 'https://wa.me/' + DISPATCH_WA_INTL + '?text=' + encodeURIComponent(bodyLines);
 
       if (successBanner) {
         successBanner.innerHTML =
-          '<strong>✅ Dispatch Reference Generated (' + refCode + ')!</strong><br>' +
-          'Thank you, <strong>' + name.replace(/[<>&"]/g, '') + '</strong>. Choose your preferred instant dispatch channel below to send directly to David\'s Melbourne team' +
-          (attachedFilesCount > 0 ? ' (attach your ' + attachedFilesCount + ' selected photo(s) in 1 tap):' : ':') +
-          '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;">' +
-          '<a href="' + waHref + '" target="_blank" rel="noopener" class="btn btn-whatsapp">💬 Send Instantly via WhatsApp</a>' +
-          '<a href="' + mailtoHref + '" class="btn btn-accent">✉️ Send via Email (' + targetEmail + ')</a>' +
-          '<a href="tel:0411946933" class="btn btn-emergency">📞 Call 24/7: ' + DISPATCH_PHONE_DISPLAY + '</a>' +
+          '<strong style="font-family:var(--font-mono);letter-spacing:0.08em;">DISPATCH REFERENCE READY // ' + refCode + '</strong><br>' +
+          'Thank you, <strong>' + name.replace(/[<>&"]/g, '') + '</strong>. Select your preferred dispatch channel below to transmit directly to David\'s Melbourne desk' +
+          (attachedFilesCount > 0 ? ' (attach your ' + attachedFilesCount + ' selected photo(s)):' : ':') +
+          '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">' +
+          '<a href="' + waHref + '" target="_blank" rel="noopener" class="btn btn-accent">Send via WhatsApp</a>' +
+          '<a href="' + mailtoHref + '" class="btn btn-outline">Send via Email (' + targetEmail + ')</a>' +
+          '<a href="tel:0411946933" class="btn btn-emergency">Call 24/7: ' + DISPATCH_PHONE_DISPLAY + '</a>' +
           '</div>';
         successBanner.classList.add('visible');
         successBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -510,79 +621,61 @@
   }
 
   /* ------------------------------------------------------------------------
-     8. 24/7 AI MELBOURNE GLAZING & TRADE TRIAGE CONCIERGE
+     9. CONCIERGE & AUDIT VERIFICATION DRAWER (ZERO EMOJIS)
      ------------------------------------------------------------------------ */
-  function initAiConcierge() {
+  function initHudModals() {
     const toggleBtn = document.getElementById('aiConciergeBtn');
     const win = document.getElementById('aiConciergeWindow');
     const closeBtn = document.getElementById('aiConciergeClose');
     const msgs = document.getElementById('aiConciergeMsgs');
-    if (!toggleBtn || !win || !msgs) return;
 
-    toggleBtn.addEventListener('click', function () {
-      win.classList.toggle('open');
-    });
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function () {
-        win.classList.remove('open');
+    if (toggleBtn && win && msgs) {
+      toggleBtn.addEventListener('click', function () { win.classList.toggle('open'); });
+      if (closeBtn) closeBtn.addEventListener('click', function () { win.classList.remove('open'); });
+
+      const ANSWERS = {
+        emergency: '<strong>24/7 Melbourne Dispatch:</strong> Mobile glazing and make-safe technicians operate 24 hours a day, 7 days a week across Greater Melbourne. Call <a href="tel:0411946933" style="color:var(--accent-light);text-decoration:underline;">0411 946 933</a> for immediate attendance.',
+        as1288: '<strong>AS1288:2021 Certification:</strong> Every 6.38mm laminated, 10mm toughened, and double-glazed panel strictly complies with Australian Standard AS1288. Full tax invoices (ABN 27 564 832 883) and site photos are supplied for insurers and strata.',
+        discounts: '<strong>Concessions &amp; Commercial Accounts:</strong> Dedicated pricing applies for Pensioner Concession Card holders, NDIS participants, real estate property managers, and ongoing body corporate accounts.',
+        trades: '<strong>8 Coordinated Divisions:</strong> Original Property Group unifies 24/7 Glazing (Original Glazing), Roofing &amp; Gutters, Plumbing, Licensed Electrical, Carpentry, Painting &amp; Caulking, Renovations, and Strata Care under one ABN.'
+      };
+
+      document.querySelectorAll('.c-quick-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          const topic = btn.getAttribute('data-topic') || 'emergency';
+          const uDiv = document.createElement('div');
+          uDiv.className = 'c-msg user';
+          uDiv.textContent = btn.textContent;
+          msgs.appendChild(uDiv);
+
+          const bDiv = document.createElement('div');
+          bDiv.className = 'c-msg bot';
+          bDiv.innerHTML = ANSWERS[topic] || ANSWERS.emergency;
+          msgs.appendChild(bDiv);
+          msgs.scrollTop = msgs.scrollHeight;
+        });
       });
     }
 
-    const ANSWERS = {
-      emergency: '🚨 <strong>24/7 Emergency Response:</strong> Our Melbourne glaziers and make-safe technicians operate 24 hours a day, 7 days a week across Inner, Eastern, Southern, Northern & Western suburbs. Call <a href="tel:0411946933" style="color:#38bdf8;font-weight:800;">0411 946 933</a> for immediate dispatch.',
-      as1288: '🛡️ <strong>AS1288 Compliance:</strong> Every piece of 6.38mm laminated and 10mm toughened safety glass we supply and install strictly complies with Australian Safety Standard AS1288. Compliance certificates and tax invoices (ABN 27 564 832 883) are issued for insurance and strata claims.',
-      discounts: '💳 <strong>Discounts & Trade Accounts:</strong> Yes! We proudly provide discounts for <strong>Pensioners, NDIS Participants, Real Estate Agencies, and Strata / Commercial Accounts</strong>, alongside free no-obligation quotes.',
-      trades: '🛠️ <strong>Single Point of Contact (All 8 Trades):</strong> Original Property Group handles Emergency Glazing (via Original Glazing), Roofing & Gutters, Plumbing, Licensed Electrical, Painting, Carpentry/Timber Rot, Renovations, and Handyman Maintenance under one ABN.'
-    };
-
-    document.querySelectorAll('.c-quick-btn').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        const topic = btn.getAttribute('data-topic') || 'emergency';
-        const uDiv = document.createElement('div');
-        uDiv.className = 'c-msg user';
-        uDiv.textContent = btn.textContent;
-        msgs.appendChild(uDiv);
-
-        const bDiv = document.createElement('div');
-        bDiv.className = 'c-msg bot';
-        bDiv.innerHTML = ANSWERS[topic] || ANSWERS.emergency;
-        msgs.appendChild(bDiv);
-        msgs.scrollTop = msgs.scrollHeight;
-      });
-    });
-  }
-
-  /* ------------------------------------------------------------------------
-     9. FORENSIC AUDIT VERIFICATION DRAWER (19/19 DEFECTS RESOLVED)
-     ------------------------------------------------------------------------ */
-  function initAuditDrawer() {
     const pill = document.getElementById('auditVerifiedPill');
     const drawer = document.getElementById('auditDrawer');
-    const closeBtn = document.getElementById('auditDrawerClose');
-    if (!pill || !drawer) return;
-
-    pill.addEventListener('click', function () {
-      drawer.classList.add('open');
-    });
-    if (closeBtn) {
-      closeBtn.addEventListener('click', function () {
-        drawer.classList.remove('open');
-      });
+    const drawerClose = document.getElementById('auditDrawerClose');
+    if (pill && drawer) {
+      pill.addEventListener('click', function () { drawer.classList.add('open'); });
+      if (drawerClose) drawerClose.addEventListener('click', function () { drawer.classList.remove('open'); });
+      drawer.addEventListener('click', function (e) { if (e.target === drawer) drawer.classList.remove('open'); });
     }
-    drawer.addEventListener('click', function (e) {
-      if (e.target === drawer) drawer.classList.remove('open');
-    });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-    initCleanMode();
-    initNavigationAndAccordions();
+    initArchitecturalCanvas();
+    initChoreographyAndSpotlights();
+    initCleanModeAndNav();
     initOpgEstimator();
     initGlazingCalculator();
     initGlassSimulator();
     initBeforeAfterAndGallery();
     initQuoteForm();
-    initAiConcierge();
-    initAuditDrawer();
+    initHudModals();
   });
 })();
