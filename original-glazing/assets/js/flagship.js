@@ -1,6 +1,6 @@
 /* ==========================================================================
-   ORIGINAL PROPERTY GROUP & ORIGINAL GLAZING — ARCHITECTURAL ATELIER ENGINE V2
-   60fps Canvas Glass Refraction • Spotlight Bento • Zero Emojis • Exact Math
+   ORIGINAL PROPERTY GROUP & ORIGINAL GLAZING — 8K ARCHITECTURAL STUDIO ENGINE
+   60fps Specular Glass Caustics • Spotlight Bento • Zero Monospace • Exact Math
    ========================================================================== */
 
 (function () {
@@ -10,7 +10,7 @@
   const DISPATCH_WA_INTL = '61411946933';
 
   /* ------------------------------------------------------------------------
-     1. LIVING ARCHITECTURAL GLASS REFRACTION & BLUEPRINT CANVAS
+     1. 8K SPECULAR ARCHITECTURAL GLASS REFRACTION CANVAS
      ------------------------------------------------------------------------ */
   function initArchitecturalCanvas() {
     const hero = document.querySelector('.hero-section');
@@ -54,32 +54,32 @@
     resize();
 
     function renderFrame() {
-      tick += 0.006;
-      pointerX += (targetX - pointerX) * 0.06;
-      pointerY += (targetY - pointerY) * 0.06;
+      tick += 0.005;
+      pointerX += (targetX - pointerX) * 0.05;
+      pointerY += (targetY - pointerY) * 0.05;
 
       ctx.clearRect(0, 0, width, height);
 
-      // Architectural Glass Caustic Prisms (3 diagonal specular panes)
+      // Smooth 8K Architectural Glass Caustic Light Beams
       for (let i = 0; i < 3; i++) {
-        const shift = Math.sin(tick + i * 1.4) * 60 + (pointerX - 0.5) * 90;
+        const shift = Math.sin(tick + i * 1.4) * 55 + (pointerX - 0.5) * 85;
         const x0 = width * (0.42 + i * 0.16) + shift;
-        const grad = ctx.createLinearGradient(x0 - 140, 0, x0 + 180, height);
+        const grad = ctx.createLinearGradient(x0 - 150, 0, x0 + 190, height);
         if (isGlazing) {
           grad.addColorStop(0, 'rgba(125, 211, 252, 0)');
-          grad.addColorStop(0.5, 'rgba(125, 211, 252, 0.055)');
-          grad.addColorStop(1, 'rgba(200, 164, 93, 0)');
+          grad.addColorStop(0.5, 'rgba(125, 211, 252, 0.05)');
+          grad.addColorStop(1, 'rgba(207, 169, 98, 0)');
         } else {
-          grad.addColorStop(0, 'rgba(200, 164, 93, 0)');
-          grad.addColorStop(0.5, 'rgba(200, 164, 93, 0.055)');
+          grad.addColorStop(0, 'rgba(207, 169, 98, 0)');
+          grad.addColorStop(0.5, 'rgba(207, 169, 98, 0.05)');
           grad.addColorStop(1, 'rgba(255, 255, 255, 0)');
         }
 
         ctx.save();
         ctx.beginPath();
         ctx.moveTo(x0, 0);
-        ctx.lineTo(x0 + 170, 0);
-        ctx.lineTo(x0 - 90, height);
+        ctx.lineTo(x0 + 180, 0);
+        ctx.lineTo(x0 - 80, height);
         ctx.lineTo(x0 - 260, height);
         ctx.closePath();
         ctx.fillStyle = grad;
@@ -87,12 +87,12 @@
         ctx.restore();
       }
 
-      // Subtle Cursor Specular Glow
+      // Soft Ambient Studio Spotlight
       const rad = ctx.createRadialGradient(
         pointerX * width, pointerY * height, 10,
-        pointerX * width, pointerY * height, 340
+        pointerX * width, pointerY * height, 360
       );
-      rad.addColorStop(0, isGlazing ? 'rgba(125, 211, 252, 0.08)' : 'rgba(200, 164, 93, 0.08)');
+      rad.addColorStop(0, isGlazing ? 'rgba(125, 211, 252, 0.075)' : 'rgba(207, 169, 98, 0.075)');
       rad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = rad;
       ctx.fillRect(0, 0, width, height);
@@ -220,11 +220,11 @@
         : selectedTrades.length + ' Coordinated Divisions (' + selectedTrades.join(', ') + ')';
 
       const discountNote = hasDiscount
-        ? ' // Pensioner, NDIS & Strata Priority Applied'
-        : ' // Obligation-Free Quote (ABN 27 564 832 883)';
+        ? ' · Pensioner, NDIS & Strata Priority Applied'
+        : ' · Obligation-Free Quote (ABN 27 564 832 883)';
 
       if (summaryTitleEl) summaryTitleEl.textContent = slaLabel;
-      if (summarySpecEl) summarySpecEl.textContent = propType + ' // ' + tradeCountText + discountNote;
+      if (summarySpecEl) summarySpecEl.textContent = propType + ' · ' + tradeCountText + discountNote;
 
       const waMsg = 'Hi David (Original Property Group), requesting a Melbourne quote:\n' +
         '- Property: ' + propType + '\n' +
@@ -346,7 +346,7 @@
       const hasDiscount = discountEl && discountEl.checked;
 
       if (outMainEl) {
-        outMainEl.textContent = areaFormatted + ' m² // ' + weightFormatted + ' kg Panel';
+        outMainEl.textContent = areaFormatted + ' m² · ' + weightFormatted + ' kg Panel';
       }
       if (outSubEl) {
         outSubEl.textContent = spec.standard + ' · ' + spec.acousticDb + ' · ' + spec.uvBlock +
@@ -385,77 +385,77 @@
   }
 
   /* ------------------------------------------------------------------------
-     6. ARCHITECTURAL CAD CROSS-SECTION GLASS SIMULATOR (ZERO EMOJIS)
+     6. 8K ARCHITECTURAL GLASS SECTION STUDIO (CRISP VECTOR GRAPHICS)
      ------------------------------------------------------------------------ */
   const SIM_DATA = {
     float4: {
       title: 'Legacy 3mm–4mm Annealed Float Glass (Non-Compliant)',
-      safety: 'FAIL — FRACTURES INTO SHARDS',
+      safety: 'Non-Compliant — Fractures Into Shards',
       safetyColor: '#f87171',
       acoustic: '24 dB Rw (Minimal)',
       thermal: '5.9 W/m²K (Uninsulated)',
       uv: '18% UV Attenuation',
-      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
-        '<line x1="30" y1="100" x2="178" y2="100" stroke="#f87171" stroke-width="1.2" stroke-dasharray="4 4"/>' +
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Outfit, Plus Jakarta Sans, sans-serif">' +
+        '<line x1="30" y1="100" x2="178" y2="100" stroke="#f87171" stroke-width="1.5" stroke-dasharray="4 4"/>' +
         '<polygon points="178,100 170,96 170,104" fill="#f87171"/>' +
-        '<rect x="188" y="24" width="14" height="152" fill="rgba(248,113,113,0.22)" stroke="#f87171" stroke-width="1.5"/>' +
+        '<rect x="188" y="24" width="14" height="152" rx="2" fill="rgba(248,113,113,0.24)" stroke="#f87171" stroke-width="1.5"/>' +
         '<path d="M189 68 L201 92 M201 64 L189 108 M189 114 L201 138" stroke="#fca5a5" stroke-width="1.5"/>' +
-        '<text x="30" y="88" fill="#f87171" font-size="10">IMPACT VECTOR</text>' +
-        '<text x="222" y="84" fill="#ffffff" font-size="12" font-weight="700">4.0MM ANNEALED MONOLITH</text>' +
-        '<text x="222" y="104" fill="#f87171" font-size="10.5">Prohibited in AS1288 Human Impact Zones</text>' +
-        '<text x="222" y="124" fill="#767d8c" font-size="10">Zero interlayer retention on fracture</text>' +
+        '<text x="30" y="88" fill="#f87171" font-size="11" font-weight="600">Impact Vector</text>' +
+        '<text x="222" y="82" fill="#ffffff" font-size="14" font-weight="600">4.0 mm Annealed Monolith</text>' +
+        '<text x="222" y="104" fill="#f87171" font-size="12">Prohibited in AS1288 human-impact zones</text>' +
+        '<text x="222" y="124" fill="#8b95a7" font-size="11.5">Zero interlayer retention upon fracture</text>' +
         '</svg>'
     },
     lam638: {
       title: '6.38mm Architectural Safety Laminate (3mm + 0.38mm PVB + 3mm)',
-      safety: 'GRADE A — AS1288:2021 CERTIFIED',
+      safety: 'Grade A — AS1288:2021 Certified',
       safetyColor: '#34d399',
       acoustic: '33 dB Rw (Acoustic PVB)',
       thermal: '5.5 W/m²K + Solar Control',
       uv: '99% UV Spectrum Blocked',
-      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
-        '<line x1="30" y1="100" x2="160" y2="100" stroke="#7dd3fc" stroke-width="1.2"/>' +
-        '<rect x="170" y="22" width="16" height="156" fill="rgba(125,211,252,0.22)" stroke="#7dd3fc" stroke-width="1.4"/>' +
-        '<rect x="188" y="22" width="7" height="156" fill="#c8a45d"/>' +
-        '<rect x="197" y="22" width="16" height="156" fill="rgba(125,211,252,0.22)" stroke="#7dd3fc" stroke-width="1.4"/>' +
-        '<text x="30" y="88" fill="#7dd3fc" font-size="10">LOAD ARRESTED</text>' +
-        '<text x="230" y="78" fill="#ffffff" font-size="12" font-weight="700">3MM + 0.38MM PVB + 3MM</text>' +
-        '<text x="230" y="98" fill="#34d399" font-size="10.5">Bonds glass fragments safely in rebate</text>' +
-        '<text x="230" y="118" fill="#c8a45d" font-size="10">Cut on-site from Melbourne 24/7 mobile stock</text>' +
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Outfit, Plus Jakarta Sans, sans-serif">' +
+        '<line x1="30" y1="100" x2="160" y2="100" stroke="#7dd3fc" stroke-width="1.5"/>' +
+        '<rect x="170" y="22" width="16" height="156" rx="2" fill="rgba(125,211,252,0.25)" stroke="#7dd3fc" stroke-width="1.5"/>' +
+        '<rect x="188" y="22" width="7" height="156" rx="1" fill="#cfa962"/>' +
+        '<rect x="197" y="22" width="16" height="156" rx="2" fill="rgba(125,211,252,0.25)" stroke="#7dd3fc" stroke-width="1.5"/>' +
+        '<text x="30" y="88" fill="#7dd3fc" font-size="11" font-weight="600">Impact Arrested</text>' +
+        '<text x="230" y="78" fill="#ffffff" font-size="14" font-weight="600">3 mm + 0.38 mm PVB + 3 mm</text>' +
+        '<text x="230" y="100" fill="#34d399" font-size="12">Bonds fragments safely inside window rebate</text>' +
+        '<text x="230" y="120" fill="#edd6a6" font-size="11.5">Cut on-site from Melbourne 24/7 mobile fleet</text>' +
         '</svg>'
     },
     tough10: {
       title: '10mm Heat-Tempered Frameless Monolith (AS1288 Grade A)',
-      safety: 'GRADE A — 500% FLEXURAL LOAD',
+      safety: 'Grade A — 500% Flexural Load',
       safetyColor: '#34d399',
       acoustic: '31 dB Rw Solid Mass',
       thermal: '250°C Thermal Shock Rated',
       uv: '42% UV Attenuation',
-      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
-        '<rect x="176" y="22" width="32" height="156" fill="rgba(125,211,252,0.28)" stroke="#e0f2fe" stroke-width="1.6"/>' +
-        '<line x1="176" y1="186" x2="208" y2="186" stroke="#c8a45d" stroke-width="1.2"/>' +
-        '<text x="30" y="102" fill="#e0f2fe" font-size="10">10.0MM TEMPERED</text>' +
-        '<text x="228" y="84" fill="#ffffff" font-size="12" font-weight="700">10MM FRAMELESS ARCHITECTURAL</text>' +
-        '<text x="228" y="104" fill="#7dd3fc" font-size="10.5">Precision CNC-polished edges &amp; hardware cutouts</text>' +
-        '<text x="228" y="124" fill="#767d8c" font-size="10">Frameless showers, entry doors &amp; splashbacks</text>' +
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Outfit, Plus Jakarta Sans, sans-serif">' +
+        '<rect x="176" y="22" width="32" height="156" rx="3" fill="rgba(125,211,252,0.3)" stroke="#e0f2fe" stroke-width="1.6"/>' +
+        '<line x1="176" y1="186" x2="208" y2="186" stroke="#cfa962" stroke-width="1.5"/>' +
+        '<text x="30" y="102" fill="#e0f2fe" font-size="11" font-weight="600">10.0 mm Tempered</text>' +
+        '<text x="228" y="82" fill="#ffffff" font-size="14" font-weight="600">10 mm Frameless Architectural</text>' +
+        '<text x="228" y="104" fill="#7dd3fc" font-size="12">Precision CNC-polished edges &amp; hardware cutouts</text>' +
+        '<text x="228" y="124" fill="#8b95a7" font-size="11.5">Frameless showers, entry doors &amp; splashbacks</text>' +
         '</svg>'
     },
     igu24: {
       title: '24mm Argon Low-E Insulated Glass Unit (6mm + 12mm Argon + 6mm)',
-      safety: 'GRADE A + NATHERS THERMAL SPEC',
+      safety: 'Grade A + NatHERS Thermal Spec',
       safetyColor: '#34d399',
       acoustic: '39 dB Rw Acoustic Isolation',
       thermal: '1.6 W/m²K (-64% Heat Loss)',
       uv: '99% UV &amp; IR Coating',
-      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Space Mono, monospace">' +
-        '<rect x="150" y="22" width="15" height="156" fill="rgba(125,211,252,0.28)" stroke="#7dd3fc" stroke-width="1.4"/>' +
-        '<rect x="167" y="22" width="34" height="156" fill="rgba(200,164,93,0.08)" stroke="#c8a45d" stroke-dasharray="3 3"/>' +
-        '<rect x="203" y="22" width="15" height="156" fill="rgba(200,164,93,0.26)" stroke="#e6d1a3" stroke-width="1.4"/>' +
-        '<rect x="167" y="164" width="34" height="14" fill="#1e293b" stroke="#94a3b8" stroke-width="1"/>' +
-        '<text x="169" y="102" fill="#e6d1a3" font-size="9">ARGON</text>' +
-        '<text x="234" y="78" fill="#ffffff" font-size="12" font-weight="700">12MM SEALED ARGON CAVITY</text>' +
-        '<text x="234" y="98" fill="#e6d1a3" font-size="10.5">Retrofits existing Melbourne timber &amp; Al frames</text>' +
-        '<text x="234" y="118" fill="#34d399" font-size="10">Eliminates condensation &amp; arterial road noise</text>' +
+      svg: '<svg viewBox="0 0 440 200" width="100%" height="100%" font-family="Outfit, Plus Jakarta Sans, sans-serif">' +
+        '<rect x="150" y="22" width="15" height="156" rx="2" fill="rgba(125,211,252,0.3)" stroke="#7dd3fc" stroke-width="1.5"/>' +
+        '<rect x="167" y="22" width="34" height="156" fill="rgba(207,169,98,0.09)" stroke="#cfa962" stroke-dasharray="3 3"/>' +
+        '<rect x="203" y="22" width="15" height="156" rx="2" fill="rgba(207,169,98,0.28)" stroke="#edd6a6" stroke-width="1.5"/>' +
+        '<rect x="167" y="164" width="34" height="14" rx="2" fill="#1e293b" stroke="#94a3b8" stroke-width="1"/>' +
+        '<text x="169" y="102" fill="#edd6a6" font-size="9.5" font-weight="600">Argon</text>' +
+        '<text x="234" y="78" fill="#ffffff" font-size="14" font-weight="600">12 mm Sealed Argon Cavity</text>' +
+        '<text x="234" y="100" fill="#edd6a6" font-size="12">Retrofits existing Melbourne timber &amp; Al frames</text>' +
+        '<text x="234" y="120" fill="#34d399" font-size="11.5">Eliminates condensation &amp; arterial road noise</text>' +
         '</svg>'
     }
   };
@@ -532,7 +532,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     8. QUOTE FORM + PHOTO PREVIEW + DISPATCH ROUTING (ZERO EMOJIS)
+     8. QUOTE FORM + PHOTO PREVIEW + DISPATCH ROUTING
      ------------------------------------------------------------------------ */
   function initQuoteForm() {
     const form = document.getElementById('flagshipQuoteForm');
@@ -606,8 +606,8 @@
 
       if (successBanner) {
         successBanner.innerHTML =
-          '<strong style="font-family:var(--font-mono);letter-spacing:0.08em;">DISPATCH REFERENCE READY // ' + refCode + '</strong><br>' +
-          'Thank you, <strong>' + name.replace(/[<>&"]/g, '') + '</strong>. Select your preferred dispatch channel below to transmit directly to David\'s Melbourne desk' +
+          '<strong style="font-family:var(--font-display);font-size:15px;letter-spacing:0.03em;">Priority Reference Ready: ' + refCode + '</strong><br>' +
+          'Thank you, <strong>' + name.replace(/[<>&"]/g, '') + '</strong>. Choose your preferred channel below to send directly to David\'s Melbourne desk' +
           (attachedFilesCount > 0 ? ' (attach your ' + attachedFilesCount + ' selected photo(s)):' : ':') +
           '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;">' +
           '<a href="' + waHref + '" target="_blank" rel="noopener" class="btn btn-accent">Send via WhatsApp</a>' +
@@ -621,7 +621,7 @@
   }
 
   /* ------------------------------------------------------------------------
-     9. CONCIERGE & AUDIT VERIFICATION DRAWER (ZERO EMOJIS)
+     9. CONCIERGE & AUDIT VERIFICATION DRAWER
      ------------------------------------------------------------------------ */
   function initHudModals() {
     const toggleBtn = document.getElementById('aiConciergeBtn');
