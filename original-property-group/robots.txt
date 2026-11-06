@@ -1,5 +1,2 @@
 User-agent: *
-Allow: /
-
-Sitemap: https://paas.website/original-property-group/sitemap.xml
-
+Disallow: /
