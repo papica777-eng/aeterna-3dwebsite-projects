@@ -1,0 +1,18 @@
+name = "original-glazing-edge-api"
+main = "src/index.js"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+ENVIRONMENT = "production"
+CLIENT_COMPANY = "Original Glazing 24/7 & Original Property Group"
+ABN = "27 564 832 883"
+EMERGENCY_DISPATCH_PHONE = "+61411946933"
+DISPATCH_EMAIL = "david@originalglazing.com.au"
+TELEGRAM_NOTIFICATION_ENABLED = "true"
+
+# Production Route mapping on Cloudflare
+# routes = [
+#   { pattern = "api.originalglazing.com.au/*", zone_name = "originalglazing.com.au" },
+#   { pattern = "api.originalpropertygroup.com.au/*", zone_name = "originalpropertygroup.com.au" }
+# ]

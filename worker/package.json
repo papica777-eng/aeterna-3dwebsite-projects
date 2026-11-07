@@ -1,0 +1,12 @@
+{
+  "name": "original-glazing-edge-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Worker Edge API for Original Glazing 24/7 Melbourne",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "node --test test/worker.test.mjs"
+  }
+}
