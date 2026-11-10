@@ -4,16 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="index, follow">
-  <meta name="description" content="AETERNA LEX SOVEREIGN — Безплатен инструмент за правна помощ и автоматизирано генериране на процесуални документи, съдебни жалби и институционални сигнали за самопредставляващи се български граждани. 100% поверителност — работи изцяло локално и офлайн във вашия браузър.">
+  <meta name="description" content="AETERNA LEX SOVEREIGN v3.5 — Безплатен инструмент за народна правна помощ. Автоматизирано генериране на съдебни възражения по чл. 414 ГПК срещу ЧСИ/колектори, жалби за бавност, освобождаване от такси, достъп до дела и ЗДОИ. 100% поверителност — работи изцяло локално и офлайн.">
   <link rel="canonical" href="https://paas.website/aeterna-lex/">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="AETERNA LEX SOVEREIGN — Национална правна помощ за самопредставляващи се граждани">
-  <meta property="og:description" content="Генератор на съдебни жалби, сигнали и процесуални молби за ССЕВ и съдилищата. Напълно безплатен и защитен.">
+  <meta property="og:title" content="AETERNA LEX SOVEREIGN v3.5 — Народна правна помощ за българските граждани">
+  <meta property="og:description" content="13 безплатни модула за самозащита: възражения срещу ЧСИ и заповеди за изпълнение, сигнали за корупция, жалби по ЗОДОВ и калкулатор за държавни такси.">
   <meta property="og:url" content="https://paas.website/aeterna-lex/">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="AETERNA LEX SOVEREIGN — Генератор на съдебни документи">
-  <meta name="twitter:description" content="Безплатна правна защита за всеки български гражданин.">
-<title>AETERNA LEX SOVEREIGN v3.0 — Генератор на процесуални документи</title>
+<title>AETERNA LEX SOVEREIGN v3.5 — Народна правна помощ и генератор на документи</title>
 <style>
 :root{--bg:#070b14;--bg2:#0f172a;--card:#151f38;--line:#263859;--gold:#f59e0b;--cyan:#06b6d4;--red:#ef4444;--green:#10b981;--txt:#f1f5f9;--mut:#94a3b8}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -104,6 +101,26 @@ table.periods td{padding:3px}
   #doc .ph{background:none;color:#000}
   @page{size:A4;margin:20mm 15mm 20mm 22mm}
 }
+
+/* Mobile Tabs & Citizen Aid Enhancements */
+.mobile-tabs{display:none;margin:12px auto 0;padding:0 18px;max-width:600px;gap:8px}
+.m-tab{flex:1;padding:10px;font-weight:700;font-size:13px;text-transform:uppercase;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--mut);cursor:pointer;transition:all .2s;text-align:center}
+.m-tab.active{background:linear-gradient(135deg,var(--gold),#d97706);color:#000;border-color:var(--gold);box-shadow:0 4px 12px rgba(245,158,11,.3)}
+@media (max-width:1150px){
+  .mobile-tabs{display:flex}
+  .col.left.m-hidden,main.col.m-hidden{display:none!important}
+}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:13px;color:#fff;border:none;cursor:pointer;transition:filter .15s}
+.share-btn:hover{filter:brightness(1.15)}
+.share-viber{background:#7360f2}
+.share-fb{background:#1877f2}
+.share-wa{background:#25d366}
+.share-tg{background:#229ed9}
+.share-copy{background:var(--card);border:1px solid var(--gold);color:var(--gold)}
+.step-card{background:var(--bg2);border-left:3px solid var(--cyan);padding:10px 14px;border-radius:4px;margin-bottom:10px}
+.step-card b{color:var(--gold)}
+
 </style>
 </head>
 <body>
@@ -112,8 +129,8 @@ table.periods td{padding:3px}
   <div class="brand">
     <div class="shield">⚖</div>
     <div>
-      <h1>AETERNA LEX SOVEREIGN v3.0</h1>
-      <span>Генератор на процесуални документи и сигнали за самопредставляващи се граждани</span>
+      <h1>AETERNA LEX SOVEREIGN v3.5</h1>
+      <span>Национална безплатна правна помощ и генератор на документи за българските граждани</span>
     </div>
   </div>
   <div class="toolbar">
@@ -123,10 +140,18 @@ table.periods td{padding:3px}
     <button type="button" class="btn btn-ghost" id="btnImport">Възстанови</button>
     <input type="file" id="importFile" accept="application/json,.json" class="hidden">
     <button type="button" class="btn btn-ghost" id="btnSelfTest">Самопроверка</button>
+    <button type="button" class="btn btn-cyan" id="btnKepGuide" title="Как да подпиша безплатно през мобилен телефон">📱 Подпиши с телефон</button>
+    <button type="button" class="btn btn-gold" id="btnShare" title="Сподели тази безплатна правна помощ с приятели">📢 Сподели</button>
     <button type="button" class="btn btn-ghost" id="btnHelp">Помощ</button>
     <button type="button" class="btn btn-red" id="btnWipe" title="Изтрива всички данни от този браузър">Изтрий данните</button>
   </div>
 </header>
+
+<!-- Mobile Tab Switcher for Citizens on Smartphones -->
+<div class="mobile-tabs no-print" id="mobileTabs">
+  <button type="button" class="m-tab active" id="tabForm">📝 1. Попълване на данни</button>
+  <button type="button" class="m-tab" id="tabDoc">📄 2. Преглед на документа</button>
+</div>
 
 <div class="wrap">
   <aside class="col left">
@@ -208,6 +233,32 @@ table.periods td{padding:3px}
       <div class="calc" id="calcBox"></div>
     </section>
 
+    <section class="card" id="cardCourtFees">
+      <h2><span>5.1. Калкулатор на Държавни такси (Тарифа № 1 към ЗДТ)</span></h2>
+      <div class="row2">
+        <div class="fg">
+          <label>Вид съдебно производство / искане</label>
+          <select id="feeType">
+            <option value="claim">Осъдителен паричен иск (4% върху цената на иска, мин. 50 лв.)</option>
+            <option value="order">Заповед за изпълнение чл. 410/417 ГПК (2% върху иска, мин. 25 лв.)</option>
+            <option value="privateAppeal">Частна жалба (15 лв. твърда такса)</option>
+            <option value="injunction">Обезпечение на бъдещ иск / запор чл. 390 ГПК (40 лв.)</option>
+            <option value="nonMonetary">Неоценяем граждански иск (30 лв. - 80 лв.)</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label>Сума на иска (лв.)</label>
+          <input type="text" id="feeClaimAmount" placeholder="напр. 10 000" inputmode="decimal">
+        </div>
+      </div>
+      <div class="calc" id="feeResultBox">
+        <div class="r"><span>Дължима държавна такса по сметка на съда:</span><strong id="feeResult" style="color:var(--gold);font-size:14px">50.00 лв.</strong></div>
+        <div class="hint" id="feeHint" style="margin-top:6px;color:#38bdf8">
+          💡 <em>Нямате финансова възможност да платите таксата?</em> Изберете от горното меню <strong>МОДУЛ 2 (чл. 83, ал. 2 от ГПК)</strong>, за да поискате от съда пълно освобождаване от държавни такси поради материално затруднение, ТЕЛК, безработица или ниски доходи!
+        </div>
+      </div>
+    </section>
+
     <section class="card">
       <h2><span>6. Приложения, място и дата</span></h2>
       <div class="fg"><label>Приложения (по едно на ред)</label><textarea data-bind="docMeta.attachments" rows="4"></textarea></div>
@@ -262,7 +313,7 @@ table.periods td{padding:3px}
 </div>
 
 <footer class="foot">
-  <div><strong>AETERNA LEX SOVEREIGN v3.0</strong> · Автор: Димитър Продромов · Работи изцяло офлайн; данните остават само в този браузър.</div>
+  <div><strong>AETERNA LEX SOVEREIGN v3.5</strong> · Автор: Димитър Продромов · 100% безплатна народна правна защита · Работи изцяло офлайн; данните остават само във вашия браузър.</div>
   <div>© 2026 · CC BY-NC-ND 4.0 &amp; PSRL v2.0 · Безплатно некомерсиално разпространение без изменения.</div>
 </footer>
 
@@ -279,6 +330,51 @@ table.periods td{padding:3px}
       <li>Безплатното предоставяне на инструмента е допустимо; професионалното възмездно оказване на правна помощ по конкретни дела е запазено за адвокати съгласно Закона за адвокатурата.</li>
     </ul>
     <div style="display:flex;justify-content:flex-end;margin-top:14px"><button type="button" class="btn btn-gold" id="btnAck">Разбрах и приемам</button></div>
+  </div>
+</div>
+
+
+<div class="modal-bg" id="modalKep" role="dialog" aria-modal="true" aria-labelledby="kepTitle">
+  <div class="modal">
+    <h2 id="kepTitle">📱 Как да подпиша безплатно документа от телефона си?</h2>
+    <p style="color:#cbd5e1;margin-bottom:12px">В България вече не е необходимо да имате скъп картов четец или да ходите до поща и нотариус. Всеки гражданин може да подпише официално съдебното си заявление за 2 минути директно от смартфона си:</p>
+    
+    <div class="step-card">
+      <b>Стъпка 1: Изтеглете готовия документ</b><br>
+      Натиснете бутона <strong>„PDF / Печат“</strong> в горния десен ъгъл на страницата и изберете <em>„Запиши като PDF“</em> (Save as PDF) на телефона или компютъра си.
+    </div>
+
+    <div class="step-card">
+      <b>Стъпка 2: Подпишете PDF файла с мобилен КЕП</b><br>
+      Отворете приложението на <strong>Evrotrust (Евротръст)</strong> или <strong>B-Trust Mobile (Борика)</strong> на телефона си. Изберете <em>„Подпиши документ“</em>, качете изтегления PDF файл и го подпишете с пръстов отпечатък/ПИН. Мобилният квалифициран електронен подпис (КЕП) има силата на саморъчен подпис по закон (чл. 13 ЗЕДЕУУ).
+    </div>
+
+    <div class="step-card">
+      <b>Стъпка 3: Изпратете го в ССЕВ за 0 лева</b><br>
+      Влезте в официалния държавен портал <a href="https://edelivery.egov.bg" target="_blank" style="color:var(--cyan);font-weight:700">edelivery.egov.bg</a> (Система за сигурно електронно връчване), изберете като получател съответния съд или прокуратура, прикачете подписания PDF и копирайте готовия придружителен текст от бутона <strong>„Копирай текст за ССЕВ“</strong>. Получавате мигновено удостоверение за входящ номер с правна сила на държавна поща!
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button type="button" class="btn btn-gold" id="btnKepClose">Разбрах, готово</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalShareDialog" role="dialog" aria-modal="true" aria-labelledby="shareTitle">
+  <div class="modal" style="max-width:520px">
+    <h2 id="shareTitle">📢 Сподели AETERNA LEX SOVEREIGN</h2>
+    <p style="color:#cbd5e1">Помогнете на ваши близки, колеги и познати да защитят правата си безплатно срещу институционален произвол, банки, колектори и ЧСИ:</p>
+    
+    <div class="share-grid">
+      <a href="viber://forward?text=Безплатен%20генератор%20на%20съдебни%20жалби%20и%20молби%20за%20българските%20граждани:%20https://paas.website/lex/" class="share-btn share-viber" target="_blank">💜 Viber</a>
+      <a href="https://api.whatsapp.com/send?text=Безплатен%20инструмент%20за%20правна%20помощ%20за%20граждани:%20https://paas.website/lex/" class="share-btn share-wa" target="_blank">💚 WhatsApp</a>
+      <a href="https://www.facebook.com/sharer/sharer.php?u=https://paas.website/lex/" class="share-btn share-fb" target="_blank">💙 Facebook</a>
+      <a href="https://t.me/share/url?url=https://paas.website/lex/&text=Безплатна%20правна%20помощ%20за%20българските%20граждани" class="share-btn share-tg" target="_blank">✈️ Telegram</a>
+    </div>
+
+    <div style="margin-top:14px">
+      <button type="button" class="share-btn share-copy" id="btnCopyShareLink" style="width:100%">🔗 Копирай директния линк (https://paas.website/lex/)</button>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button type="button" class="btn btn-ghost" id="btnShareClose">Затвори</button></div>
   </div>
 </div>
 
@@ -1652,7 +1748,27 @@ function downloadDocFile() {
     p { text-align: justify; text-indent: 28px; margin: 0 0 8px; }
     .ni { text-indent: 0; }
     .sig { width: 100%; margin-top: 35px; border-collapse: collapse; }
-  </style></head><body>`;
+  
+/* Mobile Tabs & Citizen Aid Enhancements */
+.mobile-tabs{display:none;margin:12px auto 0;padding:0 18px;max-width:600px;gap:8px}
+.m-tab{flex:1;padding:10px;font-weight:700;font-size:13px;text-transform:uppercase;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--mut);cursor:pointer;transition:all .2s;text-align:center}
+.m-tab.active{background:linear-gradient(135deg,var(--gold),#d97706);color:#000;border-color:var(--gold);box-shadow:0 4px 12px rgba(245,158,11,.3)}
+@media (max-width:1150px){
+  .mobile-tabs{display:flex}
+  .col.left.m-hidden,main.col.m-hidden{display:none!important}
+}
+.share-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:8px;padding:12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:13px;color:#fff;border:none;cursor:pointer;transition:filter .15s}
+.share-btn:hover{filter:brightness(1.15)}
+.share-viber{background:#7360f2}
+.share-fb{background:#1877f2}
+.share-wa{background:#25d366}
+.share-tg{background:#229ed9}
+.share-copy{background:var(--card);border:1px solid var(--gold);color:var(--gold)}
+.step-card{background:var(--bg2);border-left:3px solid var(--cyan);padding:10px 14px;border-radius:4px;margin-bottom:10px}
+.step-card b{color:var(--gold)}
+
+</style></head><body>`;
   const footer = "</body></html>";
   const sourceHTML = header + content + footer;
   const blob = new Blob(["\ufeff", sourceHTML], { type: "application/msword;charset=utf-8" });
@@ -1854,6 +1970,113 @@ window.addEventListener("DOMContentLoaded", () => {
     $("modalInfo").style.display = "none";
   });
 
+  
+  // ===== МОБИЛНИ ТАБОВЕ ЗА ТЕЛЕФОН =====
+  const tabForm = $("tabForm");
+  const tabDoc = $("tabDoc");
+  const colLeft = document.querySelector(".col.left");
+  const colRight = document.querySelector("main.col");
+
+  if (tabForm && tabDoc && colLeft && colRight) {
+    tabForm.addEventListener("click", () => {
+      tabForm.classList.add("active");
+      tabDoc.classList.remove("active");
+      colLeft.classList.remove("m-hidden");
+      colRight.classList.add("m-hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+    tabDoc.addEventListener("click", () => {
+      tabDoc.classList.add("active");
+      tabForm.classList.remove("active");
+      colRight.classList.remove("m-hidden");
+      colLeft.classList.add("m-hidden");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  // ===== КАЛКУЛАТОР ЗА ДЪРЖАВНИ ТАКСИ (ТАРИФА № 1 ЗДТ) =====
+  function updateCourtFeeCalc() {
+    const feeType = $("feeType").value;
+    const rawVal = $("feeClaimAmount").value.trim().replace(/[\s\u00a0]/g, "").replace(",", ".");
+    const amount = parseFloat(rawVal) || 0;
+    let fee = 0;
+    let desc = "";
+
+    switch (feeType) {
+      case "claim":
+        // 4% върху цената на иска, но не по-малко от 50 лв.
+        fee = Math.max(50.00, amount * 0.04);
+        desc = `4% от ${amount.toLocaleString('bg-BG', {minimumFractionDigits:2})} лв. = ${fee.toLocaleString('bg-BG', {minimumFractionDigits:2})} лв. (законов минимум 50 лв.)`;
+        break;
+      case "order":
+        // 2% върху вземането, минимум 25 лв.
+        fee = Math.max(25.00, amount * 0.02);
+        desc = `2% от ${amount.toLocaleString('bg-BG', {minimumFractionDigits:2})} лв. = ${fee.toLocaleString('bg-BG', {minimumFractionDigits:2})} лв. (законов минимум 25 лв.)`;
+        break;
+      case "privateAppeal":
+        fee = 15.00;
+        desc = "Твърда държавна такса за частна жалба пред окръжен/апелативен съд: 15.00 лв.";
+        break;
+      case "injunction":
+        fee = 40.00;
+        desc = "Твърда държавна такса за обезпечение на бъдещ иск (чл. 390 ГПК): 40.00 лв.";
+        break;
+      case "nonMonetary":
+        fee = 50.00;
+        desc = "Ориентировъчна държавна такса за неоценяем иск (от 30 до 80 лв., определя се от съда).";
+        break;
+    }
+
+    $("feeResult").textContent = fee.toLocaleString('bg-BG', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " лв.";
+  }
+
+  $("feeType").addEventListener("change", updateCourtFeeCalc);
+  $("feeClaimAmount").addEventListener("input", updateCourtFeeCalc);
+  
+  // Автоматично синхронизиране с въведената главница в cardMoney
+  const origMoneyInput = document.querySelector('input[data-bind="money.amount"]');
+  if (origMoneyInput) {
+    origMoneyInput.addEventListener("input", (e) => {
+      $("feeClaimAmount").value = e.target.value;
+      updateCourtFeeCalc();
+    });
+  }
+
+  // ===== КЕП РЪКОВОДСТВО ЗА ТЕЛЕФОН =====
+  $("btnKepGuide").addEventListener("click", () => {
+    $("modalKep").style.display = "flex";
+  });
+  $("btnKepClose").addEventListener("click", () => {
+    $("modalKep").style.display = "none";
+  });
+
+  // ===== СПОДЕЛЯНЕ В СОЦИАЛНИТЕ МРЕЖИ =====
+  $("btnShare").addEventListener("click", () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "AETERNA LEX SOVEREIGN",
+        text: "Безплатен генератор на съдебни жалби, сигнали и възражения за българските граждани",
+        url: "https://paas.website/lex/"
+      }).catch(() => {
+        $("modalShareDialog").style.display = "flex";
+      });
+    } else {
+      $("modalShareDialog").style.display = "flex";
+    }
+  });
+
+  $("btnShareClose").addEventListener("click", () => {
+    $("modalShareDialog").style.display = "none";
+  });
+
+  $("btnCopyShareLink").addEventListener("click", () => {
+    navigator.clipboard.writeText("https://paas.website/lex/").then(() => {
+      showToast("Връзката https://paas.website/lex/ е копирана в клипборда!");
+      $("modalShareDialog").style.display = "none";
+    });
+  });
+
+  updateCourtFeeCalc();
   updateAll();
 });
 </script>
