@@ -1,0 +1,1861 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="index, follow">
+  <meta name="description" content="AETERNA LEX SOVEREIGN — Безплатен инструмент за правна помощ и автоматизирано генериране на процесуални документи, съдебни жалби и институционални сигнали за самопредставляващи се български граждани. 100% поверителност — работи изцяло локално и офлайн във вашия браузър.">
+  <link rel="canonical" href="https://paas.website/aeterna-lex/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AETERNA LEX SOVEREIGN — Национална правна помощ за самопредставляващи се граждани">
+  <meta property="og:description" content="Генератор на съдебни жалби, сигнали и процесуални молби за ССЕВ и съдилищата. Напълно безплатен и защитен.">
+  <meta property="og:url" content="https://paas.website/aeterna-lex/">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AETERNA LEX SOVEREIGN — Генератор на съдебни документи">
+  <meta name="twitter:description" content="Безплатна правна защита за всеки български гражданин.">
+<title>AETERNA LEX SOVEREIGN v3.0 — Генератор на процесуални документи</title>
+<style>
+:root{--bg:#070b14;--bg2:#0f172a;--card:#151f38;--line:#263859;--gold:#f59e0b;--cyan:#06b6d4;--red:#ef4444;--green:#10b981;--txt:#f1f5f9;--mut:#94a3b8}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--txt);line-height:1.5;font-size:14px}
+button{font-family:inherit}
+.top{background:linear-gradient(90deg,#070b14,#111c35 50%,#070b14);border-bottom:2px solid var(--gold);padding:14px 24px;display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:12px;align-items:center}
+.shield{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--gold),#b45309);display:flex;align-items:center;justify-content:center;font-size:22px;color:#000}
+.brand h1{font-size:18px;letter-spacing:1px;text-transform:uppercase}
+.brand span{font-size:11.5px;color:var(--gold);font-weight:600}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px}
+.btn{cursor:pointer;border:1px solid transparent;border-radius:5px;padding:8px 13px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;transition:filter .15s,transform .15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{filter:brightness(1.15)}
+.btn:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+.btn-ghost{background:rgba(6,182,212,.12);color:var(--cyan);border-color:var(--cyan)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#d97706);color:#000}
+.btn-green{background:linear-gradient(135deg,var(--green),#059669);color:#fff}
+.btn-cyan{background:linear-gradient(135deg,var(--cyan),#0284c7);color:#fff}
+.btn-red{background:rgba(239,68,68,.15);color:var(--red);border-color:var(--red)}
+.btn-sm{padding:4px 9px;font-size:10.5px}
+.wrap{max-width:1600px;margin:20px auto;padding:0 18px;display:grid;grid-template-columns:480px 1fr;gap:20px}
+@media (max-width:1150px){.wrap{grid-template-columns:1fr}}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:16px 18px;box-shadow:0 8px 20px rgba(0,0,0,.35)}
+.card h2{font-size:13px;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:8px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.fg{margin-bottom:10px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+label{display:block;font-size:11px;font-weight:600;color:var(--mut);margin-bottom:3px;text-transform:uppercase}
+label .req{color:var(--red)}
+input,select,textarea{width:100%;padding:8px 10px;background:var(--bg2);border:1px solid var(--line);border-radius:4px;color:#fff;font-size:13px;font-family:inherit}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cyan)}
+input.invalid,textarea.invalid,select.invalid{border-color:var(--red)}
+textarea{resize:vertical;min-height:70px}
+.hint{font-size:11px;color:var(--mut);margin-top:3px}
+.hint.err{color:var(--red)}
+.hint.ok{color:var(--green)}
+.desc{font-size:12.5px;color:var(--mut);margin-top:6px}
+.checklist{margin:8px 0 0 18px;font-size:12px;color:#cbd5e1}
+.checklist li{margin-bottom:4px}
+.calc{background:var(--bg2);border-left:4px solid var(--green);padding:10px 12px;border-radius:4px;font-size:12.5px;margin-top:8px}
+.calc .r{display:flex;justify-content:space-between;gap:10px;margin-bottom:4px}
+.calc .t{border-top:1px solid var(--line);padding-top:6px;margin-top:6px;font-weight:700;color:var(--gold)}
+table.periods{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px}
+table.periods th{color:var(--mut);text-align:left;font-weight:600;padding:3px}
+table.periods td{padding:3px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.actions .grp{display:flex;flex-wrap:wrap;gap:8px}
+.val{font-size:12.5px}
+.val li{margin:3px 0 3px 18px}
+.val .e{color:#fca5a5}
+.val .w{color:#fcd34d}
+.val .okm{color:var(--green)}
+.ssev{background:var(--bg2);border:1px solid var(--cyan);border-radius:6px;padding:12px;font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;max-height:300px;overflow:auto;color:#e2e8f0}
+.paper-wrap{background:#232d42;padding:24px;border-radius:8px;border:1px solid var(--line);overflow:auto}
+#doc{background:#fff;color:#000;width:210mm;max-width:100%;min-height:297mm;margin:0 auto;padding:20mm 15mm 20mm 22mm;font-family:'Times New Roman',Times,serif;font-size:12pt;line-height:1.4;box-shadow:0 10px 35px rgba(0,0,0,.7)}
+#doc .rcp{margin-left:45%;margin-bottom:20px}
+#doc .ttl{text-align:center;font-size:15pt;font-weight:bold;letter-spacing:3px;margin-top:10px}
+#doc .sub{text-align:center;font-size:11pt;font-weight:bold;margin:4px 0 16px}
+#doc .parties{border-top:1px solid #000;border-bottom:1px solid #000;padding:6px 0;margin-bottom:14px;font-size:11pt}
+#doc .parties p{text-indent:0;margin:3px 0}
+#doc h3{font-size:11.5pt;margin:12px 0 5px;text-transform:uppercase}
+#doc p{margin:0 0 8px;text-align:justify;text-indent:28px}
+#doc p.ni{text-indent:0}
+#doc ol,#doc ul{margin:4px 0 10px 26px}
+#doc li{margin-bottom:5px;text-align:justify}
+#doc .box{border-left:3px solid #000;background:#f4f4f4;padding:7px 11px;margin:10px 0;font-size:11pt}
+#doc .sig{width:100%;margin-top:30px;border-collapse:collapse}
+#doc .sig td{vertical-align:top;font-size:11.5pt}
+#doc .ph{background:#fff3cd;color:#7a5600;padding:0 3px;border-radius:2px}
+.foot{max-width:1600px;margin:24px auto 30px;padding:14px 18px;border-top:1px solid var(--line);font-size:11px;color:var(--mut);display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--green);color:#fff;padding:11px 20px;border-radius:6px;font-weight:700;box-shadow:0 5px 20px rgba(0,0,0,.5);display:none;z-index:9999;max-width:90vw}
+.toast.bad{background:var(--red)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:9000;padding:16px}
+.modal{background:var(--card);border:1px solid var(--gold);border-radius:10px;max-width:720px;width:100%;max-height:90vh;overflow:auto;padding:22px}
+.modal h2{color:var(--gold);font-size:16px;margin-bottom:12px}
+.modal p,.modal li{font-size:13px;margin-bottom:8px;color:#e2e8f0}
+.modal ul{margin-left:20px}
+.modal pre{background:var(--bg2);padding:10px;border-radius:6px;font-size:12px;white-space:pre-wrap;max-height:50vh;overflow:auto}
+.dl-out{font-size:13px;margin-top:8px}
+.dl-out b{color:var(--gold)}
+.hidden{display:none!important}
+@media print{
+  body{background:#fff!important}
+  .top,.col.left,.no-print,.foot,.toast,.modal-bg{display:none!important}
+  .wrap,.col,.paper-wrap{display:block!important;margin:0!important;padding:0!important;border:0!important;background:#fff!important;max-width:none!important;box-shadow:none!important}
+  #doc{width:auto!important;min-height:0!important;padding:0!important;box-shadow:none!important}
+  #doc .ph{background:none;color:#000}
+  @page{size:A4;margin:20mm 15mm 20mm 22mm}
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="shield">⚖</div>
+    <div>
+      <h1>AETERNA LEX SOVEREIGN v3.0</h1>
+      <span>Генератор на процесуални документи и сигнали за самопредставляващи се граждани</span>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button type="button" class="btn btn-ghost" id="btnDemo" title="Зарежда измислени примерни данни">Примерни данни</button>
+    <button type="button" class="btn btn-ghost" id="btnNewCase" title="Изчиства данните по делото, запазва профила">Нов документ</button>
+    <button type="button" class="btn btn-ghost" id="btnExport">Архив (JSON)</button>
+    <button type="button" class="btn btn-ghost" id="btnImport">Възстанови</button>
+    <input type="file" id="importFile" accept="application/json,.json" class="hidden">
+    <button type="button" class="btn btn-ghost" id="btnSelfTest">Самопроверка</button>
+    <button type="button" class="btn btn-ghost" id="btnHelp">Помощ</button>
+    <button type="button" class="btn btn-red" id="btnWipe" title="Изтрива всички данни от този браузър">Изтрий данните</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <aside class="col left">
+
+    <section class="card">
+      <h2><span>1. Вид документ</span></h2>
+      <div class="fg">
+        <label for="moduleSelect">Модул</label>
+        <select id="moduleSelect"></select>
+      </div>
+      <div class="desc" id="moduleDesc"></div>
+      <details style="margin-top:8px">
+        <summary style="cursor:pointer;font-size:12px;color:var(--cyan)">Контролен списък преди подаване</summary>
+        <ul class="checklist" id="moduleChecklist"></ul>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2><span>2. Подател (ваш профил)</span></h2>
+      <div class="fg"><label>Три имена <span class="req">*</span></label><input data-bind="citizen.name" autocomplete="name"></div>
+      <div class="row2">
+        <div class="fg"><label>ЕГН</label><input data-bind="citizen.egn" inputmode="numeric" maxlength="10"><div class="hint" id="hintEgn"></div></div>
+        <div class="fg"><label>Телефон</label><input data-bind="citizen.phone" autocomplete="tel"></div>
+      </div>
+      <div class="fg"><label>Адрес за призоваване <span class="req">*</span></label><input data-bind="citizen.address" autocomplete="street-address"></div>
+      <div class="row2">
+        <div class="fg"><label>Електронна поща</label><input data-bind="citizen.email" type="email" autocomplete="email"><div class="hint" id="hintEmail"></div></div>
+        <div class="fg"><label>Профил в ССЕВ</label><input data-bind="citizen.ssev" placeholder="напр. по ЕГН"></div>
+      </div>
+      <div class="fg"><label>Социален / здравен статус (по желание)</label><input data-bind="citizen.status" placeholder="напр. ТЕЛК 70% ТНР, решение № …"></div>
+    </section>
+
+    <section class="card">
+      <h2><span>3. Дело и адресат</span></h2>
+      <div class="row2">
+        <div class="fg"><label>Процесуално качество</label>
+          <select data-bind="caseData.role">
+            <option value="ищец">Ищец</option><option value="ответник">Ответник</option><option value="жалбоподател">Жалбоподател</option>
+            <option value="молител">Молител</option><option value="пострадал">Пострадал</option><option value="подател на сигнала">Подател на сигнал</option>
+          </select></div>
+        <div class="fg"><label>Номер на дело / преписка</label><input data-bind="caseData.caseNo" placeholder="напр. гр.д. № 123/2026 г."></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><label>Съд / орган (адресат) <span class="req">*</span></label><input data-bind="caseData.court" placeholder="напр. Районен съд – Бургас"></div>
+        <div class="fg"><label>Горестоящ съд / орган</label><input data-bind="caseData.upperCourt" placeholder="напр. Окръжен съд – Бургас"></div>
+      </div>
+      <div class="fg"><label>Съдия-докладчик / прокурор / длъжностно лице</label><input data-bind="caseData.judge"></div>
+      <div class="fg"><label>Насрещна страна / ответник</label><input data-bind="caseData.defendant" placeholder="наименование или имена"></div>
+      <div class="row2">
+        <div class="fg"><label>ЕИК / БУЛСТАТ</label><input data-bind="caseData.defendantEik" inputmode="numeric" maxlength="13"><div class="hint" id="hintEik"></div></div>
+        <div class="fg"><label>Седалище / адрес</label><input data-bind="caseData.defendantAddress"></div>
+      </div>
+      <div class="fg"><label>Фактическа обстановка (изложете хронологично, с дати)</label><textarea data-bind="caseData.facts" rows="6"></textarea>
+        <div class="hint">Празен ред = нов абзац в документа.</div></div>
+    </section>
+
+    <section class="card" id="cardModuleFields">
+      <h2><span>4. Специфични данни за модула</span></h2>
+      <div id="moduleFields"></div>
+    </section>
+
+    <section class="card" id="cardMoney">
+      <h2><span>5. Цена на иска и законна лихва</span></h2>
+      <div class="row2">
+        <div class="fg"><label>Главница</label><input data-bind="money.amount" inputmode="decimal" placeholder="напр. 25000,00"><div class="hint" id="hintAmount"></div></div>
+        <div class="fg"><label>Валута на въвеждане</label>
+          <select data-bind="money.currency"><option value="EUR">EUR (евро)</option><option value="BGN">BGN (лева → превръщане по 1,95583)</option></select></div>
+      </div>
+      <div class="row2">
+        <div class="fg"><label>Лихва от дата</label><input type="date" data-bind="money.harmDate"></div>
+        <div class="fg"><label>Лихва до дата (празно = днес)</label><input type="date" data-bind="money.calcDate"></div>
+      </div>
+      <div class="fg"><label>Дневна база</label>
+        <select data-bind="money.basis"><option value="360">360 дни</option><option value="365">365 дни</option></select></div>
+      <label>Годишен размер на законната лихва по периоди (ОЛП на БНБ + 10 пункта)</label>
+      <table class="periods"><thead><tr><th>В сила от</th><th>Годишно %</th><th></th></tr></thead><tbody id="periodsBody"></tbody></table>
+      <button type="button" class="btn btn-ghost btn-sm" id="btnAddPeriod" style="margin-top:6px">+ Период</button>
+      <div class="hint">Попълнете действащите полугодишни стойности от bnb.bg. При един ред изчислението е ориентировъчно.</div>
+      <div class="calc" id="calcBox"></div>
+    </section>
+
+    <section class="card">
+      <h2><span>6. Приложения, място и дата</span></h2>
+      <div class="fg"><label>Приложения (по едно на ред)</label><textarea data-bind="docMeta.attachments" rows="4"></textarea></div>
+      <div class="row2">
+        <div class="fg"><label>Населено място</label><input data-bind="docMeta.place"></div>
+        <div class="fg"><label>Дата на документа (празно = днес)</label><input type="date" data-bind="docMeta.date"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2><span>Калкулатор на процесуални срокове</span></h2>
+      <div class="row2">
+        <div class="fg"><label>Начало (дата на съобщението / връчването)</label><input type="date" id="dlStart"></div>
+        <div class="fg"><label>Вид срок</label><select id="dlPreset"></select></div>
+      </div>
+      <div class="row2" id="dlCustomRow">
+        <div class="fg"><label>Брой</label><input type="number" id="dlAmount" min="1" max="365" value="7"></div>
+        <div class="fg"><label>Единица</label><select id="dlUnit"><option value="days">дни</option><option value="weeks">седмици</option><option value="months">месеци</option></select></div>
+      </div>
+      <div class="dl-out" id="dlOut"></div>
+      <div class="hint">Чл. 60 ГПК: срокът по дни не включва началния ден; по седмици/месеци изтича в съответния ден; ако последният ден е неприсъствен — в първия присъствен. Отчитат се официалните празници (вкл. Великден) и прехвърлянето по чл. 154, ал. 2 КТ, но не и допълнително обявени с РМС дни.</div>
+    </section>
+  </aside>
+
+  <main class="col">
+    <section class="card no-print">
+      <div class="actions">
+        <div>
+          <strong style="color:var(--gold)">Готов документ (A4)</strong>
+          <div class="hint">Печат → „Запиши като PDF“ → подпишете PDF файла с КЕП → изпратете през ССЕВ.</div>
+        </div>
+        <div class="grp">
+          <button type="button" class="btn btn-green" id="btnPrint">PDF / Печат</button>
+          <button type="button" class="btn btn-cyan" id="btnDoc">Изтегли .DOC</button>
+          <button type="button" class="btn btn-gold" id="btnTxt">Изтегли текст за ССЕВ</button>
+        </div>
+      </div>
+      <div class="val" id="validationBox" style="margin-top:10px"></div>
+    </section>
+
+    <section class="card no-print">
+      <h2><span>Данни за ССЕВ (edelivery.egov.bg)</span>
+        <span class="grp" style="display:flex;gap:6px">
+          <button type="button" class="btn btn-ghost btn-sm" id="btnCopySubject">Копирай заглавие</button>
+          <button type="button" class="btn btn-ghost btn-sm" id="btnCopyBody">Копирай текст</button>
+        </span></h2>
+      <div class="ssev" id="ssevOut"></div>
+    </section>
+
+    <div class="paper-wrap"><div id="doc"></div></div>
+  </main>
+</div>
+
+<footer class="foot">
+  <div><strong>AETERNA LEX SOVEREIGN v3.0</strong> · Автор: Димитър Продромов · Работи изцяло офлайн; данните остават само в този браузър.</div>
+  <div>© 2026 · CC BY-NC-ND 4.0 &amp; PSRL v2.0 · Безплатно некомерсиално разпространение без изменения.</div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<div class="modal-bg" id="modalAck" role="dialog" aria-modal="true" aria-labelledby="ackTitle">
+  <div class="modal">
+    <h2 id="ackTitle">Преди да започнете</h2>
+    <ul>
+      <li>Платформата генерира <b>шаблони</b> на процесуални документи и сигнали. Тя <b>не е правна консултация</b> и не замества адвокат.</li>
+      <li>Вие носите отговорност за верността на фактите. Декларации с невярно съдържание пред съд са престъпление (чл. 313 НК).</li>
+      <li>Проверявайте действащата редакция на цитираните текстове (lex.bg, parliament.bg) и сроковете по вашето дело — съдът се произнася по конкретните обстоятелства.</li>
+      <li>Всички въведени данни се пазят <b>само локално</b> в този браузър (localStorage). Нищо не се изпраща по мрежата. На споделен компютър използвайте „Изтрий данните“.</li>
+      <li>Безплатното предоставяне на инструмента е допустимо; професионалното възмездно оказване на правна помощ по конкретни дела е запазено за адвокати съгласно Закона за адвокатурата.</li>
+    </ul>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button type="button" class="btn btn-gold" id="btnAck">Разбрах и приемам</button></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalInfo" role="dialog" aria-modal="true" aria-labelledby="infoTitle">
+  <div class="modal">
+    <h2 id="infoTitle"></h2>
+    <div id="infoBody"></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:14px"><button type="button" class="btn btn-gold" id="btnInfoClose">Затвори</button></div>
+  </div>
+</div>
+
+<pre id="selftestOut" class="hidden"></pre>
+
+<script>
+"use strict";
+/* ============================== ЯДРО: ПОМОЩНИ ФУНКЦИИ ============================== */
+const APP = Object.freeze({ version: "3.0.0", storageKey: "aeterna.lex.v3.state", ackKey: "aeterna.lex.v3.ack" });
+const DAY_MS = 86400000;
+const $ = (id) => document.getElementById(id);
+
+function esc(v) {
+  return String(v == null ? "" : v).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function nl2br(v) { return esc(v).replace(/\r?\n/g, "<br>"); }
+function paragraphs(v) {
+  const blocks = String(v || "").split(/\r?\n\s*\r?\n/).map((b) => b.trim()).filter(Boolean);
+  return blocks.map((b) => `<p>${nl2br(b)}</p>`).join("");
+}
+function lines(v) { return String(v || "").split(/\r?\n/).map((s) => s.trim()).filter(Boolean); }
+/** Стойност или видим маркер за непопълнено поле. */
+function F(v, label) {
+  const s = String(v == null ? "" : v).trim();
+  return s ? esc(s) : `<span class="ph">[${esc(label)}]</span>`;
+}
+function T(v, label) { const s = String(v == null ? "" : v).trim(); return s || `[${label}]`; }
+function pad2(n) { return String(n).padStart(2, "0"); }
+
+/* ---------- Пари: целочислено в центове/стотинки (BigInt), без плаваща запетая ---------- */
+const BGN_PER_EUR_NUM = 195583n;
+const BGN_PER_EUR_DEN = 100000n;
+
+function divRound(n, d) {
+  if (typeof n !== "bigint" || typeof d !== "bigint") throw new TypeError("divRound изисква BigInt");
+  if (d <= 0n) throw new RangeError("Делителят трябва да е положителен");
+  if (n >= 0n) return (n * 2n + d) / (2n * d);
+  return -((-n * 2n + d) / (2n * d));
+}
+function parseMoneyToCents(str) {
+  const t = String(str == null ? "" : str).trim().replace(/[\s\u00a0]/g, "").replace(",", ".");
+  if (!/^\d{1,13}(\.\d{1,2})?$/.test(t)) return null;
+  const [w, f = ""] = t.split(".");
+  return BigInt(w) * 100n + BigInt((f + "00").slice(0, 2));
+}
+function bgnToEurCents(bgnCents) { return divRound(bgnCents * BGN_PER_EUR_DEN, BGN_PER_EUR_NUM); }
+function eurToBgnCents(eurCents) { return divRound(eurCents * BGN_PER_EUR_NUM, BGN_PER_EUR_DEN); }
+function fmtCents(c) {
+  if (typeof c !== "bigint") throw new TypeError("fmtCents изисква BigInt");
+  const neg = c < 0n;
+  const s = (neg ? -c : c).toString().padStart(3, "0");
+  const whole = s.slice(0, -2).replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return (neg ? "-" : "") + whole + "," + s.slice(-2);
+}
+/** "13,50" → 1350 базисни пункта; null при невалидно. */
+function parseRateToBp(str) {
+  const t = String(str == null ? "" : str).trim().replace(",", ".");
+  if (!/^\d{1,2}(\.\d{1,2})?$/.test(t)) return null;
+  const [w, f = ""] = t.split(".");
+  return Number(w) * 100 + Number((f + "00").slice(0, 2));
+}
+
+/* ---------- Дати: цели дни от епохата (UTC), без часови зони ---------- */
+function daysInMonth(y, m) { return new Date(Date.UTC(y, m, 0)).getUTCDate(); }
+function dayNum(y, m, d) { return Math.floor(Date.UTC(y, m - 1, d) / DAY_MS); }
+function ymd(n) { const t = new Date(n * DAY_MS); return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() }; }
+function parseISO(s) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s || ""));
+  if (!m) return null;
+  const y = +m[1], mo = +m[2], d = +m[3];
+  if (y < 1900 || y > 2200 || mo < 1 || mo > 12 || d < 1 || d > daysInMonth(y, mo)) return null;
+  return dayNum(y, mo, d);
+}
+function isoOf(n) { const t = ymd(n); return `${t.y}-${pad2(t.m)}-${pad2(t.d)}`; }
+function bgOf(n) { const t = ymd(n); return `${pad2(t.d)}.${pad2(t.m)}.${t.y} г.`; }
+function weekdayOf(n) { return new Date(n * DAY_MS).getUTCDay(); }
+function todayNum() { const d = new Date(); return dayNum(d.getFullYear(), d.getMonth() + 1, d.getDate()); }
+const WEEKDAYS_BG = ["неделя", "понеделник", "вторник", "сряда", "четвъртък", "петък", "събота"];
+
+/* ---------- Празници и срокове ---------- */
+function orthodoxEaster(y) {
+  const a = y % 4, b = y % 7, c = y % 19;
+  const d = (19 * c + 15) % 30;
+  const e = (2 * a + 4 * b - d + 34) % 7;
+  const month = Math.floor((d + e + 114) / 31);
+  const day = ((d + e + 114) % 31) + 1;
+  const julianToGregorian = Math.floor(y / 100) - Math.floor(y / 400) - 2;
+  return dayNum(y, month, day) + julianToGregorian;
+}
+const holidayCache = new Map();
+function holidaySet(y) {
+  if (holidayCache.has(y)) return holidayCache.get(y);
+  const set = new Set();
+  const fixed = [[1, 1], [3, 3], [5, 1], [5, 6], [5, 24], [9, 6], [9, 22], [12, 24], [12, 25], [12, 26]].map(([m, d]) => dayNum(y, m, d));
+  fixed.forEach((x) => set.add(x));
+  const E = orthodoxEaster(y);
+  [E - 2, E - 1, E, E + 1].forEach((x) => set.add(x));
+  for (const f of fixed) {
+    const w = weekdayOf(f);
+    if (w === 0 || w === 6) {
+      let c = f + 1;
+      while (weekdayOf(c) === 0 || weekdayOf(c) === 6 || set.has(c)) c++;
+      set.add(c);
+    }
+  }
+  holidayCache.set(y, set);
+  return set;
+}
+function isWorkingDay(n) {
+  const w = weekdayOf(n);
+  if (w === 0 || w === 6) return false;
+  return !holidaySet(ymd(n).y).has(n);
+}
+function computeDeadline(start, unit, amount) {
+  if (!Number.isInteger(start)) throw new TypeError("Невалидна начална дата");
+  if (!Number.isInteger(amount) || amount < 1 || amount > 3650) throw new RangeError("Невалиден брой");
+  let nominal;
+  if (unit === "days") nominal = start + amount;
+  else if (unit === "weeks") nominal = start + 7 * amount;
+  else if (unit === "months") {
+    const t = ymd(start);
+    const idx = t.m - 1 + amount;
+    const ty = t.y + Math.floor(idx / 12);
+    const tm = (idx % 12) + 1;
+    nominal = dayNum(ty, tm, Math.min(t.d, daysInMonth(ty, tm)));
+  } else throw new RangeError("Невалидна единица");
+  let end = nominal, guard = 0;
+  while (!isWorkingDay(end)) { end++; if (++guard > 40) throw new Error("Неуспешно намиране на присъствен ден"); }
+  return { nominal, end, shifted: end - nominal };
+}
+const DEADLINE_PRESETS = [
+  { id: "chastna", label: "Частна жалба — 1 седмица (чл. 275, ал. 1 ГПК)", unit: "weeks", amount: 1 },
+  { id: "vazzivna", label: "Въззивна жалба — 2 седмици (чл. 259, ал. 1 ГПК)", unit: "weeks", amount: 2 },
+  { id: "kasacionna", label: "Касационна жалба — 1 месец (чл. 283 ГПК)", unit: "months", amount: 1 },
+  { id: "otgovor", label: "Отговор на искова молба — 1 месец (чл. 131 ГПК)", unit: "months", amount: 1 },
+  { id: "neredovnosti", label: "Отстраняване на нередовности — 1 седмица (чл. 129, ал. 2 ГПК)", unit: "weeks", amount: 1 },
+  { id: "obezp", label: "Жалба по обезпечение — 1 седмица (чл. 396 ГПК)", unit: "weeks", amount: 1 },
+  { id: "apk", label: "Оспорване на административен акт — 14 дни (чл. 149, ал. 1 АПК)", unit: "days", amount: 14 },
+  { id: "npk213", label: "Жалба срещу отказ да се образува ДП — 7 дни (чл. 213 НПК)", unit: "days", amount: 7 },
+  { id: "npk243", label: "Жалба срещу прекратяване на ДП — 7 дни (чл. 243, ал. 4 НПК)", unit: "days", amount: 7 },
+  { id: "custom", label: "Собствен срок…", unit: "days", amount: 7 }
+];
+
+/* ---------- Валидиране на ЕГН и ЕИК/БУЛСТАТ ---------- */
+function validateEGN(egn) {
+  const s = String(egn || "").trim();
+  if (!/^\d{10}$/.test(s)) return { ok: false, msg: "ЕГН трябва да съдържа точно 10 цифри" };
+  let y = +s.slice(0, 2), m = +s.slice(2, 4);
+  const d = +s.slice(4, 6);
+  if (m > 40) { m -= 40; y += 2000; } else if (m > 20) { m -= 20; y += 1800; } else y += 1900;
+  if (m < 1 || m > 12 || d < 1 || d > daysInMonth(y, m)) return { ok: false, msg: "Невалидна дата на раждане в ЕГН" };
+  const w = [2, 4, 8, 5, 10, 9, 7, 3, 6];
+  let sum = 0;
+  for (let i = 0; i < 9; i++) sum += Number(s[i]) * w[i];
+  let r = sum % 11; if (r === 10) r = 0;
+  if (r !== Number(s[9])) return { ok: false, msg: "Невалидна контролна цифра на ЕГН" };
+  return { ok: true, msg: `Валидно ЕГН (роден/а ${pad2(d)}.${pad2(m)}.${y} г.)` };
+}
+function eikCheck(digits, w1, w2) {
+  let s = 0; for (let i = 0; i < w1.length; i++) s += digits[i] * w1[i];
+  let r = s % 11;
+  if (r === 10) { s = 0; for (let i = 0; i < w2.length; i++) s += digits[i] * w2[i]; r = s % 11; if (r === 10) r = 0; }
+  return r;
+}
+function validateEIK(eik) {
+  const s = String(eik || "").trim();
+  if (!/^(\d{9}|\d{13})$/.test(s)) return { ok: false, msg: "ЕИК/БУЛСТАТ трябва да е 9 или 13 цифри" };
+  const d = s.split("").map(Number);
+  if (eikCheck(d, [1, 2, 3, 4, 5, 6, 7, 8], [3, 4, 5, 6, 7, 8, 9, 10]) !== d[8]) return { ok: false, msg: "Невалидна контролна цифра — проверете в Търговския регистър / регистър БУЛСТАТ" };
+  if (s.length === 13) {
+    const tail = [d[8], d[9], d[10], d[11]];
+    if (eikCheck(tail, [2, 7, 3, 5], [4, 9, 5, 7]) !== d[12]) return { ok: false, msg: "Невалидна 13-цифрена контролна цифра" };
+  }
+  return { ok: true, msg: "Контролната цифра е вярна" };
+}
+function validateEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(v || "").trim()); }
+
+/* ---------- Законна лихва по периоди ---------- */
+/**
+ * @param {bigint} principalCents главница в центове
+ * @param {number} fromDay начало (включително), {number} toDay край (изключително)
+ * @param {{fromDay:number,bp:number}[]} periods годишни ставки в базисни пунктове
+ * @param {number} basis 360 или 365
+ */
+function computeInterest(principalCents, fromDay, toDay, periods, basis) {
+  if (typeof principalCents !== "bigint" || principalCents < 0n) throw new RangeError("Невалидна главница");
+  if (basis !== 360 && basis !== 365) throw new RangeError("Невалидна база");
+  const res = { days: 0, interest: 0n, breakdown: [], uncovered: 0 };
+  if (!Number.isInteger(fromDay) || !Number.isInteger(toDay) || toDay <= fromDay || !periods.length) return res;
+  const ps = periods.slice().sort((a, b) => a.fromDay - b.fromDay);
+  if (fromDay < ps[0].fromDay) res.uncovered = Math.min(toDay, ps[0].fromDay) - fromDay;
+  let acc = 0n;
+  for (let i = 0; i < ps.length; i++) {
+    const segStart = i === 0 ? fromDay : Math.max(fromDay, ps[i].fromDay);
+    const segEnd = i + 1 < ps.length ? Math.min(toDay, ps[i + 1].fromDay) : toDay;
+    if (segEnd > segStart) {
+      const days = segEnd - segStart;
+      acc += BigInt(days) * BigInt(ps[i].bp);
+      res.breakdown.push({ start: segStart, end: segEnd, days, bp: ps[i].bp,
+        interest: divRound(principalCents * BigInt(days) * BigInt(ps[i].bp), 10000n * BigInt(basis)) });
+    }
+  }
+  res.days = toDay - fromDay;
+  res.interest = divRound(principalCents * acc, 10000n * BigInt(basis));
+  return res;
+}
+/* ============================== ДЕФИНИЦИЯ НА БОЙНИТЕ МОДУЛИ ============================== */
+const MODULES = [
+  {
+    id: "bavnost_255",
+    title: "⚡ МОДУЛ 1: Молба за определяне на срок при бавност (чл. 255 и 256 ГПК)",
+    shortTitle: "Молба за бавност (чл. 255 ГПК)",
+    desc: "Подава се чрез първоинстанционния съд до председателя на горестоящия съд, когато съдът се бави с администриране на искова молба, насрочване на заседание, произнасяне по обезпечение или събиране на доказателства.",
+    checklist: [
+      "Проверете изтекли ли са законните срокове за съответното процесуално действие (чл. 255, ал. 1 ГПК).",
+      "Молбата задължително се адресира ДО Председателя на горестоящия съд ЧРЕЗ съда, който разглежда делото.",
+      "Посочете конкретните дължими действия, които съдията-докладчик бездейства да извърши.",
+      "Не се дължи държавна такса за производството по чл. 255 ГПК."
+    ],
+    customFields: [
+      { key: "delayedActions", label: "Кои конкретни действия са забавени от съдията-докладчик", type: "textarea",
+        defaultValue: "Пълно процесуално бездействие по администрирането на делото: не е постановено дължимото произнасяне по чл. 83, ал. 2 ГПК за освобождаване от такси, не е разпоредено връчване на преписи на ответника по чл. 131 ГПК и не е взето становище по искането за изземване на доказателства по чл. 190 ГПК.",
+        hint: "Опишете точно какво е пропуснато да се извърши." },
+      { key: "delayDuration", label: "Период / дни на неоправданото забавяне", type: "text", defaultValue: "повече от 30 календарни дни", hint: "напр. 35 дни от датата на първоначалната молба" },
+      { key: "requestedDeadline", label: "Искан императивен срок за извършване на действията", type: "text", defaultValue: "24 часа (или най-кратък подходящ срок)", hint: "напр. 24 часа, 3 дни или 1 седмица" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}, ${T(k.upperCourt, "ГОРЕСТОЯЩ СЪД")}`;
+      const ssevSubj = `МОЛБА ПО ЧЛ. 255 И ЧЛ. 256 ГПК ЗА ОПРЕДЕЛЯНЕ НА СРОК ПРИ БАВНОСТ ПО ${T(k.caseNo, "ДЕЛО №")} (СЪДИЯ ${T(k.judge, "СЪДИЯ").toUpperCase()})`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ЧРЕЗ:</strong> ${F(k.court, "КОМПЕТЕНТЕН СЪД")}<br>
+          По ${F(k.caseNo, "ДЕЛО №")}<br>
+          (Докладчик: ${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")})<br><br>
+          <strong>ДО: ПРЕДСЕДАТЕЛЯ НА</strong><br>
+          <strong>${F(k.upperCourt, "ГОРЕСТОЯЩ СЪД")}</strong><br>
+          <em>(Чрез Системата за сигурно електронно връчване — ССЕВ)</em>
+        </div>
+        <div class="ttl">М О Л Б А</div>
+        <div class="sub">ЗА ОПРЕДЕЛЯНЕ НА СРОК ПРИ БАВНОСТ<br>(по реда на чл. 255 и чл. 256 от Гражданския процесуален кодекс — ГПК)</div>
+        <div class="parties">
+          <p><strong>ОТ ПОДАТЕЛЯ (${k.role.toUpperCase()}):</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}${c.status ? ` (${esc(c.status)})` : ""}.</p>
+          <p><em>(Самопредставляващ се суверенен български гражданин на основание чл. 56 от Конституцията на РБ и чл. 28, ал. 1 от ГПК)</em></p>
+          <p><strong>СРЕЩУ / ОТНОСНО НАСРЕЩНАТА СТРАНА:</strong> ${F(k.defendant, "ОТВЕТНИК / НАСРЕЩНА СТРАНА")}${k.defendantEik ? `, ЕИК/БУЛСТАТ: ${esc(k.defendantEik)}` : ""}${k.defendantAddress ? `, адрес: ${esc(k.defendantAddress)}` : ""}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН / ГОСПОЖО ПРЕДСЕДАТЕЛ,</h3>
+        <p>На основание <strong>чл. 255, ал. 1 във връзка с чл. 256, ал. 1 от Гражданския процесуален кодекс (ГПК)</strong>, депозирам настоящата молба за определяне на срок при неоправдана съдебна бавност по <strong>${F(k.caseNo, "ДЕЛО №")}</strong> по описа на ${F(k.court, "СЪД")}, поради продължително и неоправдано процесуално бездействие на съдията-докладчик <strong>${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")}</strong>.</p>
+        <h3>I. ФАКТИЧЕСКИ ОБСТОЯТЕЛСТВА НА ЗАБАВЯНЕТО:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>КОНКРЕТНИ НЕИЗВЪРШЕНИ ДЕЙСТВИЯ:</strong><br>
+          ${nl2br(cust.delayedActions || "Не са извършени дължимите действия по движение на делото.")}<br><br>
+          <strong>ПЕРИОД НА НЕОПРАВДАНО БЕЗДЕЙСТВИЕ:</strong> ${F(cust.delayDuration, "ПЕРИОД НА ЗАБАВЯНЕ")}.
+        </div>
+        <p>Съгласно чл. 6, § 1 от Европейската конвенция за защита на правата на човека (ЕКПЧ) и чл. 13 от ГПК, съдът е длъжен да разгледа и реши делото в разумен срок. Бездействието по настоящото производство неоправдано препятства упражняването на правото на защита и поражда опасност от необратимо увреждане на правата ми.</p>
+        <h3>МОЛЯ ПРЕДСЕДАТЕЛЯ НА ${F(k.upperCourt, "ГОРЕСТОЯЩИЯ СЪД")}:</h3>
+        <ol>
+          <li>На основание чл. 256, ал. 1 от ГПК <strong>ДА КОНСТАТИРАТЕ</strong> неоправдана съдебна бавност по ${F(k.caseNo, "ДЕЛО №")} по описа на ${F(k.court, "СЪД")};</li>
+          <li><strong>ДА ОПРЕДЕЛИТЕ СРОК</strong> от <strong>${F(cust.requestedDeadline, "ИСКАН СРОК")}</strong> на съдията-докладчик ${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")} за незабавно извършване на дължимите съдопроизводствени действия по администриране и движение на делото.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "taksi_83",
+    title: "🛡️ МОДУЛ 2: Освобождаване от държавни такси и разноски (чл. 83, ал. 2 ГПК)",
+    shortTitle: "Освобождаване от такси (чл. 83, ал. 2 ГПК)",
+    desc: "Молба-декларация за 100% освобождаване от заплащане на държавна такса (4% върху иска) и разноски за експертизи при липса на средства, инвалидизация, безработица или тежко социално положение.",
+    checklist: [
+      "Приложете удостоверение за доходи, документ за безработица или експертно решение на ТЕЛК/НЕЛК.",
+      "Всички обстоятелства се декларират под страх от наказателна отговорност по чл. 313 от НК.",
+      "Посочете конкретния размер на държавната такса, от която искате освобождаване.",
+      "Съдът се произнася с нарочно определение, подлежащо на обжалване с частна жалба (чл. 274 ГПК)."
+    ],
+    customFields: [
+      { key: "monthlyIncome", label: "Месечен доход (всички източници)", type: "text", defaultValue: "Нямам трудови доходи; получавам единствено социална пенсия за инвалидност.", hint: "напр. минимална пенсия, обезщетение за безработица или 0.00 лв." },
+      { key: "propertyStatus", label: "Имуществено състояние (недвижими имоти, МПС, банкови сметки)", type: "textarea", defaultValue: "Не притежавам недвижими имоти, от които да реализирам доходи, нито леки автомобили, моторни превозни средства, търговски дружествени дялове или спестявания в търговски банки.", hint: "опишете липсата на ликвидни активи" },
+      { key: "healthCosts", label: "Здравословно състояние и разходи за лечение", type: "textarea", defaultValue: "Притежавам трайно намалена работоспособност (ТЕЛК). Ежемесечните ми разходи за медикаменти, рехабилитация и поддържащи процедури надвишават наличните социални средства.", hint: "посочете ТЕЛК и медикаменти" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}`;
+      const ssevSubj = `МОЛБА И ДЕКЛАРАЦИЯ ПО ЧЛ. 83, АЛ. 2 ОТ ГПК ЗА ПЪЛНО ОСВОБОЖДАВАНЕ ОТ ДЪРЖАВНИ ТАКСИ И РАЗНОСКИ ПО ${T(k.caseNo, "ДЕЛО №")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО:</strong> ${F(k.court, "СЪД")}<br>
+          По ${F(k.caseNo, "ДЕЛО №")}<br>
+          (Съдия-докладчик: ${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")})
+        </div>
+        <div class="ttl">М О Л Б А — Д Е К Л А Р А Ц И Я</div>
+        <div class="sub">ЗА ПЪЛНО ОСВОБОЖДАВАНЕ ОТ ЗАПЛАЩАНЕ НА ДЪРЖАВНИ ТАКСИ И СЪДЕБНИ РАЗНОСКИ<br>(на основание чл. 83, ал. 2 от Гражданския процесуален кодекс — ГПК)</div>
+        <div class="parties">
+          <p><strong>ОТ МОЛИТЕЛЯ (${k.role.toUpperCase()}):</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}${c.status ? ` (${esc(c.status)})` : ""}.</p>
+          <p><em>(Самопредставляващ се гражданин на основание чл. 56 от Конституцията на РБ и чл. 28, ал. 1 от ГПК)</em></p>
+          <p><strong>СРЕЩУ:</strong> ${F(k.defendant, "ОТВЕТНИК")}${k.defendantEik ? `, ЕИК/БУЛСТАТ: ${esc(k.defendantEik)}` : ""}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН / ГОСПОЖО СЪДИЯ,</h3>
+        <p>Във връзка с производството по ${F(k.caseNo, "ДЕЛО №")}, на основание <strong>чл. 83, ал. 2 от Гражданския процесуален кодекс (ГПК)</strong> моля да бъда освободен изцяло (100%) от задължението за заплащане на държавна такса, както и от предварително внасяне на разноски за вещи лица, свидетели и съдебни процедури по делото.</p>
+        <h3>ДЕКЛАРАЦИЯ ЗА ИМУЩЕСТВЕНО И СОЦИАЛНО СЪСТОЯНИЕ:</h3>
+        <p>Декларирам под страх от наказателна отговорност по чл. 313 от Наказателния кодекс следните обстоятелства:</p>
+        <ol>
+          <li><strong>Доходи:</strong> ${nl2br(cust.monthlyIncome || "Липсват доходи.")}</li>
+          <li><strong>Имуществено състояние:</strong> ${nl2br(cust.propertyStatus || "Не притежавам имоти и спестявания.")}</li>
+          <li><strong>Здравословен статус и разходи:</strong> ${nl2br(cust.healthCosts || "Налице са неотложни медицински разходи.")}</li>
+          <li><strong>Фактически контекст по делото:</strong> ${nl2br(k.facts || "Липсват допълнителни данни.")}</li>
+        </ol>
+        <div class="box">
+          Съгласно чл. 6, § 1 от ЕКПЧ и задължителната практика на Конституционния съд и Върховния касационен съд, държавните такси не могат да представляват непреодолима финансова пречка за достъп до съд. Задължаването ми да внеса таксата пряко ще застраши моето и на семейството ми физическо оцеляване.
+        </div>
+        <h3>МОЛЯ УВАЖАЕМИЯ СЪД:</h3>
+        <p class="ni">Да постановите Определение, с което на основание чл. 83, ал. 2 от ГПК <strong>ДА МЕ ОСВОБОДИТЕ НАПЪЛНО</strong> от заплащането на дължимата държавна такса и разноски по ${F(k.caseNo, "ДЕЛО №")}, като дадете ход на съдопроизводството.</p>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "magistrat_312",
+    title: "🔥 МОДУЛ 3: Дисциплинарен сигнал срещу съдия/прокурор (чл. 312 и 372 ЗСВ)",
+    shortTitle: "Дисциплинарен сигнал по ЗСВ",
+    desc: "Сезиране на Министъра на правосъдието, Главния инспектор на ИВСС и Висшия съдебен съвет за системно бездействие, забавяне на актове или накърняване престижа на съдебната власт (чл. 307 ЗСВ).",
+    checklist: [
+      "Посочете конкретните дати на входирани молби и отсъствието на съдебен акт.",
+      "Сигналът се изпраща едновременно до Инспектората към ВСС (ИВСС) и Министерството на правосъдието.",
+      "Изискайте нарочна проверка на сървърните логове в Единната информационна система на съдилищата (ЕИСС).",
+      "Приложете копия от молбите и разписките за електронно връчване."
+    ],
+    customFields: [
+      { key: "breachType", label: "Правна квалификация на нарушението по чл. 307, ал. 3 ЗСВ", type: "text",
+        defaultValue: "чл. 307, ал. 3, т. 1 (системно неспазване на срокове) и т. 4 (накърняване престижа на съдебната власт)", hint: "напр. т. 1, т. 2 или т. 4" },
+      { key: "omittedDates", label: "Хронология на бездействието (дати и входящи номера)", type: "textarea",
+        defaultValue: "Въпреки депозираните с КЕП молби от съответните дати, по делото не е постановено разпореждане или определение, като преписката се задържа неправомерно без процесуално движение.", hint: "опишете входящите номера и дните на забавяне" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `МИНИСТЕРСТВО НА ПРАВОСЪДИЕТО, ИНСПЕКТОРАТ КЪМ ВИСШИЯ СЪДЕБЕН СЪВЕТ, ВИСШ СЪДЕБЕН СЪВЕТ`;
+      const ssevSubj = `ИЗВЪНРЕДЕН ДИСЦИПЛИНАРЕН СИГНАЛ ПО ЧЛ. 312 И ЧЛ. 372 ЗСВ СРЕЩУ ${T(k.judge, "МАГИСТРАТ").toUpperCase()} (${T(k.court, "СЪД")}, ${T(k.caseNo, "ДЕЛО №")})`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО: МИНИСТЪРА НА ПРАВОСЪДИЕТО НА РЕПУБЛИКА БЪЛГАРИЯ</strong><br>
+          <strong>ДО: ГЛАВНИЯ ИНСПЕКТОР НА ИНСПЕКТОРАТА КЪМ ВСС (ИВСС)</strong><br>
+          <strong>ДО: СЪДИЙСКАТА / ПРОКУРОРСКАТА КОЛЕГИЯ НА ВСС</strong><br>
+          <em>(Чрез Системата за сигурно електронно връчване — ССЕВ)</em>
+        </div>
+        <div class="ttl">И З В Ъ Н Р Е Д Е Н   С И Г Н А Л</div>
+        <div class="sub">ЗА ИЗВЪРШЕНИ ДИСЦИПЛИНАРНИ НАРУШЕНИЯ И ПРЕДЛОЖЕНИЕ ЗА ОБРАЗУВАНЕ НА ДИСЦИПЛИНАРНО ПРОИЗВОДСТВО<br>(по реда на чл. 307, чл. 312 и чл. 372 от Закона за съдебната власт — ЗСВ)</div>
+        <div class="parties">
+          <p><strong>ПОДАТЕЛ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}.</p>
+          <p><strong>СРЕЩУ МАГИСТРАТ:</strong> <strong>${F(k.judge, "ТРИ ИМЕНА НА СЪДИЯ / ПРОКУРОР")}</strong>, изпълняващ функции в ${F(k.court, "СЪД / ОРГАН")}, по ${F(k.caseNo, "ДЕЛО / ПРЕПИСКА №")}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН МИНИСТЪР, УВАЖАЕМИ ГЛАВЕН ИНСПЕКТОР,</h3>
+        <p>Сезирам компетентните органи с настоящия мотивиран сигнал за извършени системни и съществени дисциплинарни нарушения от страна на магистрата <strong>${F(k.judge, "СЪДИЯ / ПРОКУРОР")}</strong> при разглеждане на ${F(k.caseNo, "ДЕЛО №")} по описа на ${F(k.court, "СЪД")}.</p>
+        <h3>I. ПРАВНА КВАЛИФИКАЦИЯ НА ДИСЦИПЛИНАРНИТЕ НАРУШЕНИЯ:</h3>
+        <p>Действията и бездействията на магистрата осъществяват съставите на <strong>${F(cust.breachType, "КВАЛИФИКАЦИЯ ПО ЧЛ. 307 ЗСВ")}</strong>.</p>
+        <h3>II. ФАКТИЧЕСКИ ДАННИ И ХРОНОЛОГИЯ:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>КОНКРЕТНИ ДАННИ ЗА БЕЗДЕЙСТВИЕТО:</strong><br>
+          ${nl2br(cust.omittedDates || "Не са посочени дати.")}
+        </div>
+        <p>Подобно процесуално поведение нарушава чл. 4, § 1 от Кодекса за етично поведение на българските магистрати и представлява превратно упражняване на правомощия, което накърнява авторитета на съдебната власт и правото на справедлив процес по чл. 6 от ЕКПЧ.</p>
+        <h3>МОЛЯ:</h3>
+        <ol>
+          <li>Инспекторатът към ВСС (ИВСС) да извърши <strong>незабавна комплексна инспекционна проверка</strong> на движението на ${F(k.caseNo, "ДЕЛО №")}, включително одит на сървърните логове в ЕИСС/ЕПЕП;</li>
+          <li>Министърът на правосъдието и членовете на ВСС на основание чл. 312, ал. 1 от ЗСВ да направят предложение за <strong>ОБРАЗУВАНЕ НА ДИСЦИПЛИНАРНО ПРОИЗВОДСТВО</strong> и налагане на съответното дисциплинарно наказание на ${F(k.judge, "СЪДИЯ / ПРОКУРОР")}.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "policia_288",
+    title: "🚓 МОДУЛ 4: Сигнал за полицейски чадър и длъжностно престъпление (чл. 288 и 282 НК)",
+    shortTitle: "Сигнал за полицейски чадър (чл. 288 НК)",
+    desc: "Подава се до Дирекция „Вътрешна сигурност“ – МВР, Окръжна прокуратура и Инспектората на МВР при укриване на веществени доказателства, отказ от регистриране на сигнали или покровителство на престъпни лица.",
+    checklist: [
+      "Опишете с имена, чинове или длъжности конкретните полицейски служители.",
+      "Посочете кои веществени доказателства (видеозаписи, протоколи, фотоалбуми) са укрити или подправени.",
+      "Изпраща се задължително едновременно до ДВС-МВР и Окръжната прокуратура по компетентност (чл. 145 ЗСВ).",
+      "Поискайте образуване на дисциплинарно производство и отстраняване от длъжност (чл. 69 НПК)."
+    ],
+    customFields: [
+      { key: "officers", label: "Имена, чинове и длъжности на служителите", type: "text",
+        defaultValue: "Длъжностни лица и разследващи полицаи от съответното Районно управление / Областна дирекция на МВР", hint: "посочете конкретни имена и звания" },
+      { key: "hiddenEvidence", label: "Укрити или подправени веществени доказателства / преписки", type: "textarea",
+        defaultValue: "Укриване на оригинален фотоалбум от оглед на местопроизшествие, отказ от изземване на видеозаписи от охранителни камери преди изтичане на срока за запис и съставяне на официални документи с невярно съдържание (чл. 311 НК).", hint: "опишете липсващите доказателства" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `ДИРЕКЦИЯ ВЪТРЕШНА СИГУРНОСТ - МВР, ОКРЪЖНА ПРОКУРАТУРА, МИНИСТЕРСТВО НА ВЪТРЕШНИТЕ РАБОТИ`;
+      const ssevSubj = `СИГНАЛ ЗА ПРЕСТЪПЛЕНИЯ ПО СЛУЖБА ПО ЧЛ. 288, ЧЛ. 282 И ЧЛ. 311 ОТ НК СРЕЩУ ПОЛИЦЕЙСКИ СЛУЖИТЕЛИ ПО ${T(k.caseNo, "ПРЕПИСКА №")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО: ДИРЕКЦИЯ „ВЪТРЕШНА СИГУРНОСТ“ — МВР</strong><br>
+          <strong>ДО: АДМИНИСТРАТИВНИЯ РЪКОВОДИТЕЛ НА ОКРЪЖНА ПРОКУРАТУРА</strong><br>
+          <strong>ДО: ИНСПЕКТОРАТА НА МИНИСТЕРСТВО НА ВЪТРЕШНИТЕ РАБОТИ</strong><br>
+          <em>(Чрез Системата за сигурно електронно връчване — ССЕВ)</em>
+        </div>
+        <div class="ttl">С И Г Н А Л   З А   П Р Е С Т Ъ П Л Е Н И Е</div>
+        <div class="sub">по чл. 288 (осуетяване на наказателно преследване), чл. 282 (длъжностно престъпление) и чл. 311 (документно престъпление) от НК вр. чл. 145 от ЗСВ</div>
+        <div class="parties">
+          <p><strong>ПОДАТЕЛ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}.</p>
+          <p><strong>СРЕЩУ СЛУЖИТЕЛИ:</strong> <strong>${F(cust.officers, "ИМЕНА И ДЛЪЖНОСТИ НА СЛУЖИТЕЛИТЕ")}</strong> от структурата на ${F(k.court, "РАЙОННО УПРАВЛЕНИЕ / ОДМВР")}, по ${F(k.caseNo, "ПРЕПИСКА / ДП №")}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН ДИРЕКТОР, УВАЖАЕМИ ОКРЪЖЕН ПРОКУРОР,</h3>
+        <p>Сезирам Ви с настоящия официален сигнал за извършени умишлени престъпления против правосъдието и службата от полицейски служители, действащи в разрез със служебния си дълг с цел осуетяване на наказателно преследване („полицейски чадър“).</p>
+        <h3>I. ФАКТИЧЕСКИ ДАННИ ЗА ПРЕСТЪПНАТА ДЕЙНОСТ:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>ДАННИ ЗА УКРИВАНЕ И ПОДПРАВЯНЕ НА ДОКАЗАТЕЛСТВА:</strong><br>
+          ${nl2br(cust.hiddenEvidence || "Не са посочени данни.")}
+        </div>
+        <p>Описаните деяния съставляват престъпления по смисъла на чл. 288 НК, тъй като орган на властта съзнателно е пропуснал да изпълни своевременно задълженията си по разследване, за да избави извършителите от наказателно преследване.</p>
+        <h3>МОЛЯ:</h3>
+        <ol>
+          <li>Дирекция „Вътрешна сигурност“ – МВР да образува <strong>незабавна специализирана проверка</strong> и дисциплинарни производства срещу виновните полицейски служители;</li>
+          <li>Окръжната прокуратура на основание чл. 145 от ЗСВ вр. чл. 207 и сл. от НПК да разпореди <strong>ОБРАЗУВАНЕ НА ДОСЪДЕБНО ПРОИЗВОДСТВО</strong> за престъпления по чл. 288, чл. 282 и чл. 311 от НК;</li>
+          <li>Да бъде извършено <strong>принудително изземване</strong> на укритите оригинални материали, преписки и сървърни записи по реда на чл. 160-163 от НПК.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "zodov_isk",
+    title: "🏛️ МОДУЛ 5: Искова молба по ЗОДОВ срещу държавен орган / Прокуратура / МВР",
+    shortTitle: "Искова молба по ЗОДОВ",
+    desc: "Предявяване на осъдителен иск за обезщетение за имуществени и неимуществени вреди (чл. 1 или чл. 2 от ЗОДОВ) от незаконни актове, бездействия, незаконни задържания или прикриване на престъпления.",
+    checklist: [
+      "Посочете конкретния държавен орган (напр. Прокуратура на РБ, ОДМВР, Агенция по вписванията).",
+      "Присъжда се законна лихва от датата на деликта (чл. 84, ал. 3 ЗЗД) до окончателното изплащане.",
+      "По искове по ЗОДОВ се дължи фиксирана държавна такса от 10 лв. за граждани (чл. 9а, ал. 1 ЗОДОВ), а при уважен иск таксите се възстановяват от ответника.",
+      "Поискайте освобождаване от разноски по реда на чл. 83, ал. 2 ГПК при необходимост."
+    ],
+    customFields: [
+      { key: "unlawfulAct", label: "Незаконосъобразен акт / действие / бездействие на органа", type: "textarea",
+        defaultValue: "Незаконосъобразни актове и системни бездействия на длъжностни лица от ответната институция, изразили се в отказ от разследване, забавяне на задължителни актове и нарушаване на презумпцията за невиновност и правото на лична неприкосновеност.", hint: "опишете незаконосъобразния акт или бездействие" },
+      { key: "nonPecuniary", label: "Претърпени неимуществени вреди (болки, страдания, стрес, уронване на авторитет)", type: "textarea",
+        defaultValue: "Продължителен тежък психически стрес, чувство за безпомощност пред институционалния отказ от правосъдие, уронване на доброто име в обществото, безсъние и обостряне на физическите заболявания вследствие на системния тормоз.", hint: "опишете моралните и физически страдания" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}`;
+      const ssevSubj = `ИСКОВА МОЛБА ПО ЧЛ. 1 / ЧЛ. 2 ОТ ЗОДОВ ВР. ЧЛ. 49 ЗЗД ЗА ${m.totalBgn} ЛВ. (${m.totalEur} EUR) СРЕЩУ ${T(k.defendant, "ОТВЕТНИК")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО:</strong> ${F(k.court, "СЪД")}<br>
+          ГРАЖДАНСКО ОТДЕЛЕНИЕ
+        </div>
+        <div class="ttl">И С К О В А   М О Л Б А</div>
+        <div class="sub">по чл. 1 и чл. 2 от Закона за отговорността на държавата и общините за вреди (ЗОДОВ)<br>във връзка с чл. 49 и чл. 45 от ЗЗД и чл. 84, ал. 3 от ЗЗД<br>Цена на иска: <strong>${m.principalBgn} лв. (${m.principalEur} EUR)</strong> главница + натрупана законна лихва</div>
+        <div class="parties">
+          <p><strong>ИЩЕЦ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}${c.status ? ` (${esc(c.status)})` : ""}.</p>
+          <p><strong>ОТВЕТНИК:</strong> <strong>${F(k.defendant, "ДЪРЖАВЕН ОРГАН / ИНСТИТУЦИЯ")}</strong>, БУЛСТАТ: ${F(k.defendantEik, "БУЛСТАТ")}, адрес: ${F(k.defendantAddress, "СЕДАЛИЩЕ И АДРЕС")}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ОКРЪЖЕН / АДМИНИСТРАТИВЕН СЪДИЯ,</h3>
+        <p>Предявявам срещу ответника <strong>${F(k.defendant, "ОТВЕТНИК")}</strong> осъдителен иск по реда на ЗОДОВ за заплащане на парично обезщетение в размер на <strong>${m.principalBgn} лв. (${m.principalEur} EUR)</strong> за претърпени неимуществени и имуществени вреди, ведно със <strong>законната лихва за забава по чл. 84, ал. 3 ЗЗД</strong> от датата на увреждането до окончателното изплащане на вземането.</p>
+        <h3>I. ОСНОВАНИЕ НА ИСКОВАТА ПРЕТЕНЦИЯ:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>ПРОТИВОПРАВНА ИНСТИТУЦИОНАЛНА ДЕЙНОСТ:</strong><br>
+          ${nl2br(cust.unlawfulAct || "Не са посочени данни.")}<br><br>
+          <strong>ПРЕТЪРПЕНИ НЕИМУЩЕСТВЕНИ ВРЕДИ:</strong><br>
+          ${nl2br(cust.nonPecuniary || "Не са описани вреди.")}
+        </div>
+        <h3>II. РАЗМЕР НА ПРЕТЕНЦИЯТА И ЗАКОННА ЛИХВА:</h3>
+        <p>Съгласно чл. 84, ал. 3 от ЗЗД, при непозволено увреждане длъжникът изпада в забава от деня на увреждането, без да е необходима покана. Натрупаната законна лихва към датата на исковата молба възлиза на <strong>${m.interestBgn} лв.</strong> (${m.interestEur} EUR), с което общата стойност на претенцията е <strong>${m.totalBgn} лв. (${m.totalEur} EUR)</strong>.</p>
+        <h3>ПЕТИТУМ — МОЛЯ УВАЖАЕМИЯ СЪД:</h3>
+        <ol>
+          <li>Да призовете ответника на съд и след установяване на обстоятелствата <strong>ДА ОСЪДИТЕ ${F(k.defendant, "ОТВЕТНИК")}</strong> да ми заплати сумата от <strong>${m.principalBgn} лева (${m.principalEur} EUR)</strong>, представляваща обезщетение за причинените вреди;</li>
+          <li><strong>ДА ОСЪДИТЕ</strong> ответника да ми заплати <strong>законната лихва върху главницата</strong>, считано от датата на увреждането до окончателното изплащане на сумата;</li>
+          <li><strong>ДА ОСЪДИТЕ</strong> ответника да ми заплати всички направени по делото разноски на основание чл. 10, ал. 3 от ЗОДОВ.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "zapor_390",
+    title: "🏦 МОДУЛ 6: Молба за запор на банкови сметки / обезпечение на иск (чл. 389 и 390 ГПК)",
+    shortTitle: "Обезпечение чрез запор (чл. 390 ГПК)",
+    desc: "Поискайте незабавно налагане на запор върху банковите сметки или дружествени дялове на ответника преди да е укрил активите си. Съдът се произнася в деня на постъпването в закрито заседание (чл. 395 ГПК).",
+    checklist: [
+      "Може да се иска преди предявяване на иска (чл. 390 ГПК) или по висящо дело (чл. 389 ГПК).",
+      "Приложете убедителни писмени доказателства за вероятната основателност на иска.",
+      "Обосновете обезпечителната нужда: опасност от прехвърляне на активи, теглене на пари или закриване на сметки.",
+      "Съдът може да определи парична гаранция по чл. 391 ГПК, освен ако искът не е подкрепен с категорични писмени доказателства."
+    ],
+    customFields: [
+      { key: "bankAccounts", label: "Банкови сметки / Търговски банки на длъжника", type: "textarea",
+        defaultValue: "Всички банкови сметки на ответника във всички лицензирани търговски банки на територията на Република България, както и дружествените дялове в Търговския регистър.", hint: "посочете конкретни IBAN или поискайте запор във всички банки" },
+      { key: "perilReason", label: "Конкретни обстоятелства, доказващи обезпечителната нужда", type: "textarea",
+        defaultValue: "Ответното дружество/лице извършва активни действия по прехвърляне на активи, пререгистрация на дейност и отклоняване на парични потоци, с което реализирането на бъдещото осъдително решение ще бъде напълно осуетено.", hint: "опишете опасността от укриване на средства" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}`;
+      const ssevSubj = `МОЛБА ЗА ОБЕЗПЕЧАВАНЕ НА ИСК ПО ЧЛ. 390 / ЧЛ. 389 ГПК ЧРЕЗ НАЛАГАНЕ НА ЗАПОР ЗА ${m.principalBgn} ЛВ. СРЕЩУ ${T(k.defendant, "ДЛЪЖНИК")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО:</strong> ${F(k.court, "СЪД")}<br>
+          По ${F(k.caseNo, "ДЕЛО № / БЪДЕЩ ИСК")}
+        </div>
+        <div class="ttl">М О Л Б А   З А   О Б Е З П Е Ч Е Н И Е</div>
+        <div class="sub">по реда на чл. 389 и чл. 390 във връзка с чл. 397, ал. 1, т. 2 от Гражданския процесуален кодекс (ГПК)<br>(чрез налагане на ЗАПОР върху банкови сметки до размера на иска: <strong>${m.principalBgn} лв. / ${m.principalEur} EUR</strong>)</div>
+        <div class="parties">
+          <p><strong>МОЛИТЕЛ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}.</p>
+          <p><strong>ОТВЕТНИК (БЪДЕЩ ОТВЕТНИК):</strong> <strong>${F(k.defendant, "ДЛЪЖНИК")}</strong>, ЕИК/БУЛСТАТ: ${F(k.defendantEik, "ЕИК")}, адрес: ${F(k.defendantAddress, "СЕДАЛИЩЕ И АДРЕС")}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН / ГОСПОЖО СЪДИЯ,</h3>
+        <p>Моля на основание <strong>чл. 389 вр. чл. 390 от ГПК</strong>, в срока по чл. 395, ал. 2 от ГПК (в закрито заседание в деня на постъпването на молбата), да допуснете предварително обезпечение на иска ми срещу ответника с цена <strong>${m.principalBgn} лв. (${m.principalEur} EUR)</strong> чрез налагане на <strong>ЗАПОР върху банковите му сметки</strong>.</p>
+        <h3>I. ДОПУСТИМОСТ, ВЕРОЯТНА ОСНОВАТЕЛНОСТ И ОБЕЗПЕЧИТЕЛНА НУЖДА:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>ОБЕЗПЕЧИТЕЛНА НУЖДА И ОПАСНОСТ:</strong><br>
+          ${nl2br(cust.perilReason || "Налице е риск от осуетяване на изпълнението.")}<br><br>
+          <strong>ТАРГЕТИРАНИ БАНКОВИ СМЕТКИ:</strong><br>
+          ${nl2br(cust.bankAccounts || "Всички банкови сметки на длъжника.")}
+        </div>
+        <p>Искът е подкрепен с убедителни писмени доказателства по смисъла на чл. 391, ал. 1, т. 1 от ГПК, поради което обезпечението следва да бъде допуснато без определяне на гаранция.</p>
+        <h3>МОЛЯ СЪДА:</h3>
+        <ol>
+          <li><strong>ДА ДОПУСНЕТЕ ОБЕЗПЕЧЕНИЕ</strong> на иска за сумата от <strong>${m.principalBgn} лв. (${m.principalEur} EUR)</strong>;</li>
+          <li><strong>ДА НАЛОЖИТЕ ОБЕЗПЕЧИТЕЛНА МЯРКА:</strong> Запор върху банковите сметки на ответника ${F(k.defendant, "ДЛЪЖНИК")} до размера на претендираната сума;</li>
+          <li><strong>ДА ИЗДАДЕТЕ ОБЕЗПЕЧИТЕЛНА ЗАПОВЕД</strong> по реда на чл. 395, ал. 3 от ГПК за незабавно изпълнение чрез съдебен изпълнител.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "izzemvane_190",
+    title: "📂 МОДУЛ 7: Принудително изземване на укрити документи (чл. 190 ГПК вр. чл. 161 ГПК)",
+    shortTitle: "Изземване на документи (чл. 190 ГПК)",
+    desc: "Задължава насрещната страна или болница, държавен орган или банка да представят намиращи се у тях оригинали на документи. При отказ или шиканиране съдът прилага фикцията на чл. 161 ГПК в полза на молителя.",
+    checklist: [
+      "Опишете точно документа (номер, дата, издател, регистър).",
+      "Посочете защо документът се намира именно в държане на ответника или третото лице.",
+      "Формулирайте фактите, които ще доказвате с него.",
+      "Поискайте изрично прилагане на санкцията по чл. 161 ГПК при непредставяне."
+    ],
+    customFields: [
+      { key: "exactDocs", label: "Точен опис на изискваните документи и архиви", type: "textarea",
+        defaultValue: "Оригинал на История на заболяването (ИЗ), оригинален трансфузионен картон от Отделение по трансфузионна хематология (ОТХ), записи от вътрешни дневници, регистри и аудио/видео архиви.", hint: "посочете конкретни номера и наименования на книжата" },
+      { key: "provenCircumstances", label: "Факти и обстоятелства, които ще се доказват с тези документи", type: "textarea",
+        defaultValue: "Доказване на действителната продължителност на болничния престой, количеството прелята кръв, тежестта на получените увреждания, както и установяване на подправка на официални документи по чл. 311 НК.", hint: "какво доказват документите" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}`;
+      const ssevSubj = `ДОКАЗАТЕЛСТВЕНО ИСКАНЕ ПО ЧЛ. 190 И ЧЛ. 192 ВР. ЧЛ. 161 ГПК ЗА ПРИНУДИТЕЛНО ПРЕДСТАВЯНЕ НА ОРИГИНАЛНИ ДОКУМЕНТИ ПО ${T(k.caseNo, "ДЕЛО №")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО:</strong> ${F(k.court, "СЪД")}<br>
+          По ${F(k.caseNo, "ДЕЛО №")}<br>
+          (Съдия-докладчик: ${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")})
+        </div>
+        <div class="ttl">М О Л Б А</div>
+        <div class="sub">за задължаване на насрещната страна и трети лица за представяне на писмени доказателства<br>(по реда на чл. 190 и чл. 192 във връзка с чл. 161 от Гражданския процесуален кодекс — ГПК)</div>
+        <div class="parties">
+          <p><strong>ОТ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}.</p>
+          <p><strong>ПО ДЕЛОТО СРЕЩУ:</strong> ${F(k.defendant, "ОТВЕТНИК")}${k.defendantEik ? `, ЕИК: ${esc(k.defendantEik)}` : ""}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН / ГОСПОЖО СЪДИЯ,</h3>
+        <p>На основание <strong>чл. 190, ал. 1 от ГПК</strong>, правя изрично искане съдът да задължи насрещната страна <strong>${F(k.defendant, "ОТВЕТНИК")}</strong> да представи по делото намиращите се в нейно държане оригинали на документи, които имат съществено значение за изясняване на спора по същество.</p>
+        <h3>I. ОПИС НА ДОКУМЕНТИТЕ И ОБСТОЯТЕЛСТВАТА ЗА ДОКАЗВАНЕ:</h3>
+        <div class="box">
+          <strong>ИЗИСКВАНИ ДОКУМЕНТИ:</strong><br>
+          ${nl2br(cust.exactDocs || "Не са посочени документи.")}<br><br>
+          <strong>ОБСТОЯТЕЛСТВА, КОИТО ЩЕ СЕ ДОКАЗВАТ:</strong><br>
+          ${nl2br(cust.provenCircumstances || "Не са посочени обстоятелства.")}
+        </div>
+        <p>Налице са категорични данни, че посочените документи са налични единствено в архива на ответника и същият недобросъвестно ги задържа, за да препятства пълното изясняване на делото.</p>
+        <h3>МОЛЯ УВАЖАЕМИЯ СЪД:</h3>
+        <ol>
+          <li>На основание чл. 190, ал. 1 от ГПК <strong>ДА ЗАДЪЛЖИТЕ</strong> ответника ${F(k.defendant, "ОТВЕТНИК")} в 7-дневен срок от съобщението да представи по делото в цялостен оригинален вид посочените документи;</li>
+          <li><strong>ИЗРИЧНО ДА УКАЖЕТЕ</strong> на ответника неблагоприятните процесуални последици по <strong>чл. 161 от ГПК</strong>, а именно: че при неоправдано непредставяне или унищожаване на документите съдът ще приеме твърдените от мен факти за напълно доказани.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "vazobnovyavane_420",
+    title: "⚖️ МОДУЛ 8: Възобновяване на наказателно дело (чл. 420 НПК до ВКП и ВКС)",
+    shortTitle: "Възобновяване по чл. 420 НПК",
+    desc: "Искане до Главния прокурор / ВКП и Върховния касационен съд за възобновяване на приключило наказателно дело, отмяна на порочно споразумение и преквалифициране в по-тежко умишлено престъпление (напр. опит за убийство).",
+    checklist: [
+      "Прилага се при новооткрити обстоятелства или неизвестни за съда доказателства (чл. 422, ал. 1, т. 5 НПК).",
+      "Приложете заключение на нова съдебномедицинска експертиза (СМЕ) или официални признания на извършители/длъжностни лица.",
+      "Адресира се до Върховната касационна прокуратура за сезиране на ВКС по чл. 420, ал. 1 НПК.",
+      "Срокът за възобновяване в полза на осъдения не е ограничен, а във вреда — съгласно сроковете по чл. 421 НПК."
+    ],
+    customFields: [
+      { key: "courtAct", label: "Акт, подлежащ на отмяна (споразумение / присъда №, дата и съд)", type: "text",
+        defaultValue: "Определение за одобряване на споразумение по НОХД № …/2024 г. по описа на съответния Районен съд", hint: "посочете номера на наказателното дело" },
+      { key: "newFacts", label: "Новооткрити обстоятелства и съществени процесуални пороци", type: "textarea",
+        defaultValue: "Новооткрита съдебномедицинска експертиза установява реална опасност за живота, масивна кръвозагуба и трайни невъзвратими увреждания, които водят до преквалифициране на деянието в умишлен опит за убийство (чл. 115/116 вр. чл. 18 НК) вместо лека/средна телесна повреда.", hint: "опишете новите факти и експертизи" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `ВЪРХОВНА КАСАЦИОННА ПРОКУРАТУРА, ВЪРХОВЕН КАСАЦИОНЕН СЪД, АПЕЛАТИВНА ПРОКУРАТУРА`;
+      const ssevSubj = `ИСКАНЕ ПО ЧЛ. 420, АЛ. 1 ВР. ЧЛ. 422, АЛ. 1, Т. 5 НПК ЗА ВЪЗОБНОВЯВАНЕ НА НАКАЗАТЕЛНО ДЕЛО ${T(k.caseNo, "НОХД / ДП №")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО: ВЪРХОВНА КАСАЦИОННА ПРОКУРАТУРА (ВКП)</strong><br>
+          <strong>ДО: ВЪРХОВНИЯ КАСАЦИОНЕН СЪД НА РБ (Наказателна колегия)</strong><br>
+          <strong>ДО: АПЕЛАТИВНА ПРОКУРАТУРА</strong><br>
+          <em>(Чрез Системата за сигурно електронно връчване — ССЕВ)</em>
+        </div>
+        <div class="ttl">И С К А Н Е   З А   В Ъ З О Б Н О В Я В А Н Е</div>
+        <div class="sub">на наказателно производство по реда на чл. 420, ал. 1 във връзка с чл. 422, ал. 1, т. 5 от Наказателно-процесуалния кодекс (НПК)</div>
+        <div class="parties">
+          <p><strong>ОТ ПОСТРАДАЛИЯ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}${c.status ? ` (${esc(c.status)})` : ""}.</p>
+          <p><strong>ПО ПРИКЛЮЧИЛО НАКАЗАТЕЛНО ПРОИЗВОДСТВО:</strong> ${F(k.caseNo, "НОХД / ДП №")}, срещу извършителя: ${F(k.defendant, "ИЗВЪРШИТЕЛ / ПОДСЪДИМ")}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН ГЛАВЕН ПРОКУРОР, УВАЖАЕМИ ВЪРХОВНИ СЪДИИ,</h3>
+        <p>В качеството ми на пострадал от тежко престъпление, правя настоящото искане за упражняване на правомощията по <strong>чл. 420, ал. 1 от НПК</strong> и внасяне на искане до Върховния касационен съд за <strong>ВЪЗОБНОВЯВАНЕ</strong> на наказателното производство по ${F(k.caseNo, "ДЕЛО №")}, отмяна на постановения съдебен акт: <strong>${F(cust.courtAct, "АКТ ЗА ОТМЯНА")}</strong> и връщане на делото за ново разглеждане от стадия на разследването.</p>
+        <h3>I. НОВООТКРИТИ ОБСТОЯТЕЛСТВА ПО СМИСЪЛА НА ЧЛ. 422, АЛ. 1, Т. 5 НПК:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>ДАННИ ЗА НОВООТКРИТИТЕ ДОКАЗАТЕЛСТВА И ПРАВНА КВАЛИФИКАЦИЯ:</strong><br>
+          ${nl2br(cust.newFacts || "Не са описани нови доказателства.")}
+        </div>
+        <p>Първоначалното производство е проведено при укриване на медицински факти и превратно квалифициране на деянието. Постановеният съдебен акт препятства разкриването на обективната истина и оставя ненаказано престъпление с изключително висока обществена опасност.</p>
+        <h3>МОЛЯ:</h3>
+        <ol>
+          <li>Върховната касационна прокуратура да упражни правомощията си по чл. 420, ал. 1 от НПК и да изготви <strong>мотивирано искане до ВКС за възобновяване</strong> на производството;</li>
+          <li>Върховният касационен съд на основание чл. 425 от НПК <strong>ДА ОТМЕНИ</strong> атакувания съдебен акт (${F(cust.courtAct, "АКТ ЗА ОТМЯНА")}) и да върне делото за ново разследване по действителната престъпна квалификация.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "chastna_274",
+    title: "⚡ МОДУЛ 9: Частна жалба срещу определение на съд (чл. 274, ал. 1 ГПК)",
+    shortTitle: "Частна жалба (чл. 274 ГПК)",
+    desc: "Обжалване пред горестоящия съд на определения, преграждащи по-нататъшното развитие на делото (прекратяване, спиране, отказ от освобождаване от такси или отказ от обезпечение).",
+    checklist: [
+      "Срокът за частна жалба е 1 седмица от връчване на определението (чл. 275, ал. 1 ГПК).",
+      "Подава се чрез съда, постановил определението, до съответния горестоящ съд.",
+      "Посочете конкретните пороци: нарушение на материалния закон, съдопроизводствените правила или необоснованост.",
+      "Ако сте освободени от такси по чл. 83, ал. 2 ГПК, не се дължи държавна такса за частната жалба."
+    ],
+    customFields: [
+      { key: "appealedOrder", label: "Атакувано определение (номер, дата и съд)", type: "text",
+        defaultValue: "Определение № … от … г. по гр.д. № …/2026 г. на Окръжен съд, с което производството е прекратено", hint: "посочете акта, който атакувате" },
+      { key: "legalDefects", label: "Конкретни пороци на атакувания съдебен акт", type: "textarea",
+        defaultValue: "Съдът е постановил определението си при съществено нарушение на съдопроизводствените правила: превратно тълкуване на процесуалния закон, незачитане на надлежно подадена молба за съединяване/изменение на иска и постановяване на отказ от правосъдие (чл. 56 от Конституцията).", hint: "защо актът е незаконосъобразен" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}, ${T(k.upperCourt, "ВЪЗЗИВЕН СЪД")}`;
+      const ssevSubj = `ЧАСТНА ЖАЛБА ПО ЧЛ. 274, АЛ. 1 ГПК СРЕЩУ ОПРЕДЕЛЕНИЕ ПО ${T(k.caseNo, "ДЕЛО №")} НА ${T(k.court, "СЪД")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ЧРЕЗ:</strong> ${F(k.court, "СЪД, ПОСТАНОВИЛ АКТА")}<br>
+          По ${F(k.caseNo, "ДЕЛО №")}<br>
+          (Докладчик: ${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")})<br><br>
+          <strong>ДО:</strong><br>
+          <strong>${F(k.upperCourt, "ГОРЕСТОЯЩ СЪД")}</strong><br>
+          <em>(Чрез Системата за сигурно електронно връчване — ССЕВ)</em>
+        </div>
+        <div class="ttl">Ч А С Т Н А   Ж А Л Б А</div>
+        <div class="sub">по реда на чл. 274, ал. 1 във връзка с чл. 275 от Гражданския процесуален кодекс (ГПК)</div>
+        <div class="parties">
+          <p><strong>ЖАЛБОПОДАТЕЛ (${k.role.toUpperCase()}):</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}${c.status ? ` (${esc(c.status)})` : ""}.</p>
+          <p><strong>ОТВЕТНИК ПО ЖАЛБАТА:</strong> ${F(k.defendant, "ОТВЕТНА СТРАНА")}${k.defendantEik ? `, ЕИК/БУЛСТАТ: ${esc(k.defendantEik)}` : ""}.</p>
+          <p><strong>АТАКУВАН АКТ:</strong> <strong>${F(cust.appealedOrder, "АТАКУВАНО ОПРЕДЕЛЕНИЕ")}</strong>.</p>
+        </div>
+        <h3>УВАЖАЕМИ ВЪЗЗИВНИ / АПЕЛАТИВНИ СЪДИИ,</h3>
+        <p>В законоустановения едноседмичен срок по чл. 275, ал. 1 от ГПК подавам настоящата частна жалба срещу атакувания съдебен акт, като считам същия за <strong>НЕПРАВИЛЕН, НЕЗАКОНОСЪОБРАЗЕН</strong> и постановен при <strong>СЪЩЕСТВЕНО НАРУШЕНИЕ НА СЪДОПРОИЗВОДСТВЕНИТЕ ПРАВИЛА</strong>.</p>
+        <h3>I. МОТИВИ ЗА НЕЗАКОНОСЪОБРАЗНОСТ:</h3>
+        ${paragraphs(k.facts)}
+        <div class="box">
+          <strong>ПОРОЦИ НА АКТА:</strong><br>
+          ${nl2br(cust.legalDefects || "Не са посочени пороци.")}
+        </div>
+        <p>С атакувания акт първоинстанционният съд неоправдано е лишил жалбоподателя от дължимата му се по закон защита, като е създал пречка за разглеждане на основателната му искова претенция в противоречие с чл. 6 от ЕКПЧ.</p>
+        <h3>МОЛЯ ГОРЕСТОЯЩИЯ СЪД:</h3>
+        <ol>
+          <li><strong>ДА ОТМЕНИТЕ ИЗЦЯЛО</strong> като незаконосъобразно атакуваното определение (${F(cust.appealedOrder, "ОПРЕДЕЛЕНИЕ")});</li>
+          <li><strong>ДА ВЪРНЕТЕ ДЕЛОТО</strong> на първоинстанционния съд със задължителни указания за продължаване на съдопроизводството по надлежния процесуален ред.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  },
+  {
+    id: "uvelichenie_214",
+    title: "📈 МОДУЛ 10: Увеличаване на иска и отказ от служебен адвокат (чл. 214 ГПК)",
+    shortTitle: "Увеличаване на иска (чл. 214 ГПК)",
+    desc: "Увеличаване на размера на предявения осъдителен иск по висящо дело без съгласието на ответника (чл. 214, ал. 1 ГПК) и заявяване на лична защита при саботаж от назначен служебен защитник.",
+    checklist: [
+      "Увеличение на размера на иска се допуска до приключване на първото по делото заседание без съгласие на ответника.",
+      "Включете натрупаната законна лихва по чл. 84, ал. 3 ЗЗД върху новия увеличен размер.",
+      "Потвърдете освобождаването от такси по чл. 83, ал. 2 ГПК и за новия размер на иска.",
+      "Подателят има право по чл. 28, ал. 1 ГПК и чл. 56 от Конституцията да се представлява сам."
+    ],
+    customFields: [
+      { key: "oldAmount", label: "Първоначален размер на главницата", type: "text", defaultValue: "100 000 лв. (51 129.19 EUR)", hint: "преди увеличението" },
+      { key: "newAmount", label: "Нов увеличен размер на иска", type: "text", defaultValue: "200 000 лв. (102 258.38 EUR)", hint: "след увеличението" },
+      { key: "lawyerDismissal", label: "Отказ от служебен адвокат и основание за самостоятелна защита", type: "textarea",
+        defaultValue: "На основание чл. 28 от Закона за правната помощ се отказвам от назначения служебен адвокат поради нарушено доверие и констатирани дисциплинарни нарушения, като заявявам, че ще се представлявам напълно сам на основание чл. 28, ал. 1 от ГПК.", hint: "ако желаете да водите делото лично" }
+    ],
+    render: (c, k, m, cust, meta) => {
+      const ssevRecip = `${T(k.court, "СЪД")}`;
+      const ssevSubj = `МОЛБА ПО ЧЛ. 214, АЛ. 1 ГПК ЗА УВЕЛИЧАВАНЕ НА ИСКА НА ${cust.newAmount || m.principalBgn + " ЛВ."} И ЛИЧНА САМОСТОЯТЕЛНА ЗАЩИТА ПО ${T(k.caseNo, "ДЕЛО №")}`;
+      const docHtml = `
+        <div class="rcp">
+          <strong>ДО:</strong> ${F(k.court, "СЪД")}<br>
+          По ${F(k.caseNo, "ДЕЛО №")}<br>
+          (Съдия-докладчик: ${F(k.judge, "СЪДИЯ-ДОКЛАДЧИК")})
+        </div>
+        <div class="ttl">М О Л Б А</div>
+        <div class="sub">1. ЗА ИЗМЕНЕНИЕ И УВЕЛИЧАВАНЕ НА РАЗМЕРА НА ИСКА (ЧЛ. 214, АЛ. 1 ГПК)<br>2. ЗА САМОСТОЯТЕЛНА ЛИЧНА ЗАЩИТА (ЧЛ. 28, АЛ. 1 ГПК)</div>
+        <div class="parties">
+          <p><strong>ИЩЕЦ:</strong> ${F(c.name, "ТРИ ИМЕНА")}, ЕГН: ${F(c.egn, "ЕГН")}, адрес: ${F(c.address, "АДРЕС")}, тел.: ${F(c.phone, "ТЕЛЕФОН")}, е-поща: ${F(c.email, "ЕЛЕКТРОННА ПОЩА")}${c.status ? ` (${esc(c.status)})` : ""}.</p>
+          <p><strong>ОТВЕТНИК:</strong> ${F(k.defendant, "ОТВЕТНО ЛИЦЕ / ДРУЖЕСТВО")}${k.defendantEik ? `, ЕИК: ${esc(k.defendantEik)}` : ""}.</p>
+        </div>
+        <h3>УВАЖАЕМИ ГОСПОДИН / ГОСПОЖО СЪДИЯ,</h3>
+        <p>Във връзка с висящото производство по ${F(k.caseNo, "ДЕЛО №")}, на основание <strong>чл. 214, ал. 1 от ГПК</strong>, правя следното процесуално изявление:</p>
+        <h3>I. УВЕЛИЧАВАНЕ НА РАЗМЕРА НА ПРЕДЯВЕНИЯ ИСК:</h3>
+        <p>Първоначално предявеният иск бе в размер на <strong>${F(cust.oldAmount, "СТАР РАЗМЕР")}</strong>. С настоящата молба заявявам, че <strong>УВЕЛИЧАВАМ РАЗМЕРА НА ИСКА НА:</strong></p>
+        <div class="box">
+          <strong>НОВ РАЗМЕР НА ПРЕДЯВЕНИЯ ГЛАВЕН ИСК:</strong><br>
+          <strong>${F(cust.newAmount, "НОВ РАЗМЕР НА ИСКА")}</strong>, ведно със законната лихва за забава по чл. 84, ал. 3 ЗЗД от датата на увреждането до окончателното изплащане на вземането.
+        </div>
+        <h3>II. ЛИЧНО САМОПРЕДСТАВЯНЕ И ОТКАЗ ОТ СЛУЖЕБЕН АДВОКАТ:</h3>
+        <div class="box">
+          ${nl2br(cust.lawyerDismissal || "Заявявам самостоятелна защита по чл. 28, ал. 1 ГПК.")}
+        </div>
+        <h3>МОЛЯ УВАЖАЕМИЯ СЪД:</h3>
+        <ol>
+          <li>На основание чл. 214, ал. 1 от ГПК <strong>ДА ДОПУСНЕТЕ УВЕЛИЧЕНИЕТО НА ИСКА</strong> до посочения нов размер от <strong>${F(cust.newAmount, "НОВ РАЗМЕР")}</strong>, ведно със законната лихва;</li>
+          <li><strong>ДА ПОТВЪРДИТЕ</strong> пълното освобождаване от държавни такси по чл. 83, ал. 2 ГПК и за увеличения размер на иска;</li>
+          <li>Да ме конституирате като <strong>лично и самостоятелно действащ ищец</strong> по делото.</li>
+        </ol>
+      `;
+      return { docHtml, ssevRecipient: ssevRecip, ssevSubject: ssevSubj };
+    }
+  }
+];
+
+/* ============================== СЪСТОЯНИЕ НА ПРИЛОЖЕНИЕТО ============================== */
+const DEFAULT_PERIODS = [
+  { from: "2023-07-01", rate: "12.12" },
+  { from: "2024-01-01", rate: "13.79" },
+  { from: "2024-07-01", rate: "13.63" },
+  { from: "2025-01-01", rate: "12.35" },
+  { from: "2025-07-01", rate: "12.20" },
+  { from: "2026-01-01", rate: "12.20" }
+];
+
+let state = {
+  moduleId: "bavnost_255",
+  citizen: { name: "", egn: "", phone: "", address: "", email: "", ssev: "", status: "" },
+  caseData: { role: "ищец", caseNo: "", court: "", upperCourt: "", judge: "", defendant: "", defendantEik: "", defendantAddress: "", facts: "" },
+  money: { amount: "", currency: "EUR", harmDate: "", calcDate: "", basis: "360" },
+  periods: DEFAULT_PERIODS.slice(),
+  moduleCustom: {},
+  docMeta: { attachments: "", place: "гр. Поморие", date: "" }
+};
+
+/* ============================== ИНИЦИАЛИЗАЦИЯ И РЕНДЕРИРАНЕ ============================== */
+function initModulesDropdown() {
+  const sel = $("moduleSelect");
+  sel.innerHTML = "";
+  MODULES.forEach(m => {
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = m.title;
+    sel.appendChild(opt);
+  });
+  sel.value = state.moduleId;
+}
+
+function initDeadlinePresets() {
+  const sel = $("dlPreset");
+  sel.innerHTML = "";
+  DEADLINE_PRESETS.forEach(p => {
+    const opt = document.createElement("option");
+    opt.value = p.id;
+    opt.textContent = p.label;
+    sel.appendChild(opt);
+  });
+  sel.value = "chastna";
+}
+
+function renderModuleFields() {
+  const mod = MODULES.find(m => m.id === state.moduleId) || MODULES[0];
+  $("moduleDesc").textContent = mod.desc;
+  
+  const chk = $("moduleChecklist");
+  chk.innerHTML = "";
+  mod.checklist.forEach(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    chk.appendChild(li);
+  });
+
+  const container = $("moduleFields");
+  container.innerHTML = "";
+  if (!state.moduleCustom[mod.id]) {
+    state.moduleCustom[mod.id] = {};
+  }
+  const custState = state.moduleCustom[mod.id];
+
+  if (!mod.customFields || mod.customFields.length === 0) {
+    container.innerHTML = '<div class="hint">Няма допълнителни специфични полета за този модул.</div>';
+    return;
+  }
+
+  mod.customFields.forEach(f => {
+    if (custState[f.key] === undefined) {
+      custState[f.key] = f.defaultValue || "";
+    }
+    const fg = document.createElement("div");
+    fg.className = "fg";
+    const lbl = document.createElement("label");
+    lbl.textContent = f.label;
+    fg.appendChild(lbl);
+
+    let input;
+    if (f.type === "textarea") {
+      input = document.createElement("textarea");
+      input.rows = 3;
+    } else {
+      input = document.createElement("input");
+      input.type = f.type || "text";
+    }
+    input.value = custState[f.key];
+    input.placeholder = f.placeholder || "";
+    input.addEventListener("input", (e) => {
+      custState[f.key] = e.target.value;
+      saveStateDebounced();
+      updateAll();
+    });
+    fg.appendChild(input);
+
+    if (f.hint) {
+      const h = document.createElement("div");
+      h.className = "hint";
+      h.textContent = f.hint;
+      fg.appendChild(h);
+    }
+    container.appendChild(fg);
+  });
+}
+
+function renderPeriodsTable() {
+  const tbody = $("periodsBody");
+  tbody.innerHTML = "";
+  state.periods.forEach((p, idx) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input type="date" value="${esc(p.from)}" style="padding:4px 6px;font-size:11px" data-pidx="${idx}" data-pfield="from"></td>
+      <td><input type="text" value="${esc(p.rate)}" style="padding:4px 6px;font-size:11px;width:70px" data-pidx="${idx}" data-pfield="rate"></td>
+      <td style="text-align:right"><button type="button" class="btn btn-red btn-sm" data-pdel="${idx}" title="Премахни">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ============================== ДВУПОСОЧНО СВЪРЗВАНЕ ============================== */
+function getByPath(obj, path) {
+  return path.split(".").reduce((acc, part) => (acc ? acc[part] : undefined), obj);
+}
+function setByPath(obj, path, val) {
+  const parts = path.split(".");
+  const last = parts.pop();
+  const target = parts.reduce((acc, part) => {
+    if (!acc[part]) acc[part] = {};
+    return acc[part];
+  }, obj);
+  target[last] = val;
+}
+
+function bindInputs() {
+  document.querySelectorAll("[data-bind]").forEach(el => {
+    const path = el.getAttribute("data-bind");
+    const val = getByPath(state, path);
+    if (val !== undefined && val !== null) {
+      el.value = val;
+    }
+    el.addEventListener("input", (e) => {
+      setByPath(state, path, e.target.value);
+      saveStateDebounced();
+      updateAll();
+    });
+  });
+}
+
+function syncInputsFromState() {
+  document.querySelectorAll("[data-bind]").forEach(el => {
+    const path = el.getAttribute("data-bind");
+    const val = getByPath(state, path);
+    if (val !== undefined && val !== null) {
+      el.value = val;
+    }
+  });
+  $("moduleSelect").value = state.moduleId;
+  renderPeriodsTable();
+  renderModuleFields();
+}
+
+/* ============================== ФИНАНСОВИ ИЗЧИСЛЕНИЯ ============================== */
+function computeCurrentMoney() {
+  const amountStr = state.money.amount;
+  const parsedCents = parseMoneyToCents(amountStr);
+  const currency = state.money.currency || "EUR";
+  const basis = Number(state.money.basis) || 360;
+
+  if (parsedCents === null || parsedCents <= 0n) {
+    return {
+      hasAmount: false,
+      principalEur: "0,00",
+      principalBgn: "0,00",
+      interestEur: "0,00",
+      interestBgn: "0,00",
+      totalEur: "0,00",
+      totalBgn: "0,00",
+      days: 0,
+      breakdown: []
+    };
+  }
+
+  let principalEurCents = 0n;
+  let principalBgnCents = 0n;
+
+  if (currency === "EUR") {
+    principalEurCents = parsedCents;
+    principalBgnCents = eurToBgnCents(parsedCents);
+  } else {
+    principalBgnCents = parsedCents;
+    principalEurCents = bgnToEurCents(parsedCents);
+  }
+
+  const fromDay = parseISO(state.money.harmDate);
+  const toDay = parseISO(state.money.calcDate) || todayNum();
+
+  const periodsParsed = state.periods.map(p => ({
+    fromDay: parseISO(p.from) || dayNum(2023, 1, 1),
+    bp: parseRateToBp(p.rate) || 1200
+  })).filter(p => p.fromDay !== null);
+
+  let interestRes = { days: 0, interest: 0n, breakdown: [], uncovered: 0 };
+  if (fromDay !== null && toDay > fromDay && periodsParsed.length > 0) {
+    interestRes = computeInterest(principalBgnCents, fromDay, toDay, periodsParsed, basis);
+  }
+
+  const interestBgnCents = interestRes.interest;
+  const interestEurCents = bgnToEurCents(interestBgnCents);
+
+  const totalBgnCents = principalBgnCents + interestBgnCents;
+  const totalEurCents = principalEurCents + interestEurCents;
+
+  return {
+    hasAmount: true,
+    principalEur: fmtCents(principalEurCents),
+    principalBgn: fmtCents(principalBgnCents),
+    interestEur: fmtCents(interestEurCents),
+    interestBgn: fmtCents(interestBgnCents),
+    totalEur: fmtCents(totalEurCents),
+    totalBgn: fmtCents(totalBgnCents),
+    days: interestRes.days,
+    breakdown: interestRes.breakdown
+  };
+}
+
+function updateCalcBox(m) {
+  const box = $("calcBox");
+  if (!m.hasAmount) {
+    box.innerHTML = '<div class="hint">Въведете главница и дата на увреждането за изчисляване на законна лихва.</div>';
+    return;
+  }
+  let breakdownHtml = "";
+  if (m.breakdown.length > 0) {
+    breakdownHtml = `
+      <div style="font-size:11.5px;color:var(--mut);margin-top:6px">Разбивка по периоди:</div>
+      <table class="periods">
+        <thead><tr><th>От - До</th><th>Дни</th><th>% год.</th><th>Лихва (лв.)</th></tr></thead>
+        <tbody>
+          ${m.breakdown.map(b => `
+            <tr>
+              <td>${bgOf(b.start)} – ${bgOf(b.end)}</td>
+              <td>${b.days}</td>
+              <td>${(b.bp / 100).toFixed(2)}%</td>
+              <td>+ ${fmtCents(b.interest)} лв.</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      </table>
+    `;
+  }
+
+  box.innerHTML = `
+    <div class="r"><span>Главница:</span><strong>${m.principalBgn} лв. (${m.principalEur} EUR)</strong></div>
+    <div class="r"><span>Изтекли дни забава (чл. 84, ал. 3 ЗЗД):</span><strong>${m.days} дни</strong></div>
+    <div class="r"><span>Законна лихва (общо):</span><strong style="color:var(--green)">+ ${m.interestBgn} лв. (${m.interestEur} EUR)</strong></div>
+    <div class="r t"><span>ОБЩО ЗА СЪБИРАНЕ:</span><span>${m.totalBgn} лв. (${m.totalEur} EUR)</span></div>
+    ${breakdownHtml}
+  `;
+}
+
+/* ============================== КАЛКУЛАТОР НА СРОКОВЕ ============================== */
+function updateDeadlineCalc() {
+  const startStr = $("dlStart").value;
+  const startDay = parseISO(startStr);
+  const out = $("dlOut");
+
+  if (startDay === null) {
+    out.innerHTML = '<span class="hint">Изберете начална дата на връчване/съобщение.</span>';
+    return;
+  }
+
+  const presetId = $("dlPreset").value;
+  let unit = $("dlUnit").value;
+  let amount = parseInt($("dlAmount").value, 10) || 7;
+
+  if (presetId !== "custom") {
+    const p = DEADLINE_PRESETS.find(x => x.id === presetId);
+    if (p) {
+      unit = p.unit;
+      amount = p.amount;
+    }
+  }
+
+  try {
+    const res = computeDeadline(startDay, unit, amount);
+    const nomW = WEEKDAYS_BG[weekdayOf(res.nominal)];
+    const endW = WEEKDAYS_BG[weekdayOf(res.end)];
+
+    let shiftNotice = "";
+    if (res.shifted > 0) {
+      shiftNotice = `<div class="hint" style="color:var(--cyan);margin-top:4px">
+        Номиналният краен ден (${bgOf(res.nominal)}, ${nomW}) е неприсъствен (уикенд/официален празник).<br>
+        Съгласно чл. 60, ал. 6 ГПК срокът изтича в първия следващ присъствен ден (+${res.shifted} дни).
+      </div>`;
+    }
+
+    out.innerHTML = `
+      <div>Краен срок за подаване: <b>${bgOf(res.end)}</b> (${endW}, до 24:00 ч. в ССЕВ)</div>
+      ${shiftNotice}
+    `;
+  } catch (err) {
+    out.innerHTML = `<span class="hint err">${esc(err.message)}</span>`;
+  }
+}
+
+/* ============================== ВАЛИДАЦИЯ И ГРЕШКИ ============================== */
+function validateState() {
+  const errors = [];
+  const warnings = [];
+
+  // Гражданин
+  if (!state.citizen.name.trim()) errors.push("Посочете трите си имена.");
+  if (!state.citizen.address.trim()) errors.push("Посочете адрес за кореспонденция/призоваване.");
+
+  const egnRes = validateEGN(state.citizen.egn);
+  const hintEgn = $("hintEgn");
+  if (state.citizen.egn.trim()) {
+    if (!egnRes.ok) {
+      warnings.push(`ЕГН: ${egnRes.msg}`);
+      hintEgn.textContent = egnRes.msg;
+      hintEgn.className = "hint err";
+    } else {
+      hintEgn.textContent = egnRes.msg;
+      hintEgn.className = "hint ok";
+    }
+  } else {
+    hintEgn.textContent = "";
+  }
+
+  const hintEmail = $("hintEmail");
+  if (state.citizen.email.trim()) {
+    if (!validateEmail(state.citizen.email)) {
+      warnings.push("Невалиден формат на електронна поща.");
+      hintEmail.textContent = "Невалиден имейл адрес";
+      hintEmail.className = "hint err";
+    } else {
+      hintEmail.textContent = "";
+    }
+  } else {
+    hintEmail.textContent = "";
+  }
+
+  // Ответник и ЕИК
+  const hintEik = $("hintEik");
+  if (state.caseData.defendantEik.trim()) {
+    const eikRes = validateEIK(state.caseData.defendantEik);
+    if (!eikRes.ok) {
+      warnings.push(`ЕИК/БУЛСТАТ: ${eikRes.msg}`);
+      hintEik.textContent = eikRes.msg;
+      hintEik.className = "hint err";
+    } else {
+      hintEik.textContent = eikRes.msg;
+      hintEik.className = "hint ok";
+    }
+  } else {
+    hintEik.textContent = "";
+  }
+
+  // Съд
+  if (!state.caseData.court.trim()) errors.push("Посочете съда или органа-адресат.");
+
+  // Пари
+  const hintAmount = $("hintAmount");
+  if (state.money.amount.trim()) {
+    const pc = parseMoneyToCents(state.money.amount);
+    if (pc === null) {
+      warnings.push("Сумата на иска трябва да съдържа коректно число.");
+      hintAmount.textContent = "Невалиден формат на сума (напр. 25000.00)";
+      hintAmount.className = "hint err";
+    } else {
+      hintAmount.textContent = "";
+    }
+  } else {
+    hintAmount.textContent = "";
+  }
+
+  return { errors, warnings };
+}
+
+function updateValidationBox(val) {
+  const box = $("validationBox");
+  if (val.errors.length === 0 && val.warnings.length === 0) {
+    box.innerHTML = '<span class="okm">✔ Всички основни реквизити са надлежно попълнени. Документът е готов за експорт.</span>';
+    return;
+  }
+  let h = "<ul>";
+  val.errors.forEach(e => { h += `<li class="e"><b>Грешка:</b> ${esc(e)}</li>`; });
+  val.warnings.forEach(w => { h += `<li class="w"><b>Внимание:</b> ${esc(w)}</li>`; });
+  h += "</ul>";
+  box.innerHTML = h;
+}
+
+/* ============================== ГЕНЕРАТОР НА ДОКУМЕНТ И ССЕВ ============================== */
+function updateDocumentAndSsev(m) {
+  const mod = MODULES.find(x => x.id === state.moduleId) || MODULES[0];
+  const custState = state.moduleCustom[mod.id] || {};
+
+  const ctx = {
+    c: state.citizen,
+    k: state.caseData,
+    m: m,
+    cust: custState,
+    meta: {
+      place: state.docMeta.place || "гр. Поморие",
+      dateFormatted: state.docMeta.date ? bgOf(parseISO(state.docMeta.date) || todayNum()) : bgOf(todayNum()),
+      attachments: lines(state.docMeta.attachments)
+    }
+  };
+
+  const rendered = mod.render(ctx.c, ctx.k, ctx.m, ctx.cust, ctx.meta);
+
+  // Добавяне на приложения и подпис към документа
+  let attachmentsBlock = "";
+  if (ctx.meta.attachments.length > 0) {
+    attachmentsBlock = `
+      <h3>ПРИЛОЖЕНИЯ:</h3>
+      <ol>
+        ${ctx.meta.attachments.map(a => `<li>${esc(a)}</li>`).join("")}
+      </ol>
+    `;
+  }
+
+  const finalDocHtml = `
+    ${rendered.docHtml}
+    ${attachmentsBlock}
+    <table class="sig">
+      <tr>
+        <td style="width: 50%;">
+          ${esc(ctx.meta.place)}<br>
+          Дата: <strong>${esc(ctx.meta.dateFormatted)}</strong>
+        </td>
+        <td style="width: 50%; text-align: right;">
+          С УВАЖЕНИЕ: ....................................................<br>
+          <strong>/ ${F(ctx.c.name, "ИМЕНА НА ПОДАТЕЛЯ")} /</strong><br>
+          <em>(Подписано с Квалифициран електронен подпис — КЕП)</em>
+        </td>
+      </tr>
+    </table>
+  `;
+
+  $("doc").innerHTML = finalDocHtml;
+
+  // Формиране на текст за ССЕВ
+  const ssevText = `ПОЛУЧАТЕЛ В ССЕВ: ${rendered.ssevRecipient}
+ОТНОСНО (ТЕМА): ${rendered.ssevSubject}
+================================================================================
+ТЕКСТ ЗА СЪОБЩЕНИЕТО В EDELIVERY.EGOV.BG:
+
+ДО: ${rendered.ssevRecipient}
+ОТ: ${ctx.c.name || "[ИМЕНА]"}, ЕГН: ${ctx.c.egn || "[ЕГН]"}
+Адрес: ${ctx.c.address || "[АДРЕС]"} | Тел.: ${ctx.c.phone || "[ТЕЛЕФОН]"} | Е-поща: ${ctx.c.email || "[ЕЛ. ПОЩА]"}
+По дело/преписка: ${ctx.k.caseNo || "[НОМЕР НА ДЕЛО]"} (Докладчик: ${ctx.k.judge || "[СЪДИЯ]"})
+
+УВАЖАЕМИ ДАМИ И ГОСПОДА МАГИСТРАТИ / СЛУЖИТЕЛИ,
+
+Приложено депозирам официален процесуален документ, надлежно подписан с Квалифициран електронен подпис (B-Trust / Evrotrust QES):
+${rendered.ssevSubject}.
+
+${ctx.k.facts ? "Кратко изложение:\n" + ctx.k.facts.trim() + "\n" : ""}
+${m.hasAmount ? `Финансова претенция (чл. 84, ал. 3 ЗЗД):
+- Главница: ${m.principalBgn} лв. (${m.principalEur} EUR)
+- Натрупана законна лихва: ${m.interestBgn} лв. (${m.interestEur} EUR)
+- Общо за събиране: ${m.totalBgn} лв. (${m.totalEur} EUR).\n` : ""}
+Моля за завеждане в деловодния регистър на съда/органа и връщане на входящ номер и дата през ССЕВ.
+
+Дата: ${ctx.meta.dateFormatted}
+С уважение: ${ctx.c.name || "[ИМЕНА]"}
+(Подписано с КЕП)`;
+
+  $("ssevOut").textContent = ssevText;
+  $("ssevOut").dataset.subject = rendered.ssevSubject;
+  $("ssevOut").dataset.body = ssevText;
+}
+
+/* ============================== ОСНОВЕН ЦИКЪЛ НА ОБНОВЯВАНЕ ============================== */
+function updateAll() {
+  const m = computeCurrentMoney();
+  updateCalcBox(m);
+  updateDeadlineCalc();
+  const val = validateState();
+  updateValidationBox(val);
+  updateDocumentAndSsev(m);
+}
+
+/* ============================== СЪХРАНЕНИЕ И ЛОКАЛНА ПАМЕТ ============================== */
+let saveTimer = null;
+function saveStateDebounced() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(APP.storageKey, JSON.stringify(state));
+    } catch (e) {
+      console.warn("Грешка при запис в localStorage:", e);
+    }
+  }, 250);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(APP.storageKey);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      state = Object.assign(state, parsed);
+    }
+  } catch (e) {
+    console.warn("Грешка при четене от localStorage:", e);
+  }
+}
+
+/* ============================== ТОАСТ СЪОБЩЕНИЯ И МОДАЛИ ============================== */
+function showToast(msg, isBad = false) {
+  const t = $("toast");
+  t.textContent = msg;
+  t.className = isBad ? "toast bad" : "toast";
+  t.style.display = "block";
+  setTimeout(() => { t.style.display = "none"; }, 3200);
+}
+
+function showInfoModal(title, html) {
+  $("infoTitle").textContent = title;
+  $("infoBody").innerHTML = html;
+  $("modalInfo").style.display = "flex";
+}
+
+/* ============================== ДЕМО ДАННИ И ИЗЧИСТВАНЕ ============================== */
+function loadDemoPreset() {
+  state.citizen = {
+    name: "ИВАН ПЕТРОВ ИВАНОВ",
+    egn: "8001010008",
+    phone: "0888123456",
+    address: "гр. София, п.к. 1000, бул. „Витоша“ № 100, ап. 12",
+    email: "ivan.ivanov@example.com",
+    ssev: "8001010008",
+    status: "ТЕЛК 70% трайно намалена работоспособност (ЕР № 1234/2025 г.)"
+  };
+  state.caseData = {
+    role: "ищец",
+    caseNo: "гр.д. № 1520 / 2026 г.",
+    court: "Софийски градски съд",
+    upperCourt: "Софийски апелативен съд",
+    judge: "Мария Николова Димитрова",
+    defendant: "„МЕДИЙНА ГРУПА БЪЛГАРИЯ“ ЕООД",
+    defendantEik: "123456789",
+    defendantAddress: "гр. София, ул. „Оборище“ № 20",
+    facts: "Повече от 30 календарни дни от подаване на исковата молба по делото няма постановено произнасяне по чл. 83, ал. 2 ГПК за освобождаване от държавни такси и делото се задържа неоправдано без процесуално движение.\n\nНасрещната страна продължава да разпространява неверни твърдения и укрива доказателства, имащи решаващо значение за правния спор."
+  };
+  state.money = {
+    amount: "25000",
+    currency: "EUR",
+    harmDate: "2024-02-15",
+    calcDate: isoOf(todayNum()),
+    basis: "360"
+  };
+  state.docMeta = {
+    attachments: "1. Копие от Експертно решение на ТЕЛК № 1234/2025 г.\n2. Удостоверение за регистрация и съобщения от ССЕВ\n3. Копие от първоначална искова молба",
+    place: "гр. София",
+    date: isoOf(todayNum())
+  };
+  syncInputsFromState();
+  saveStateDebounced();
+  updateAll();
+  showToast("Заредени са примерни данни за демонстрация.");
+}
+
+function resetCaseData() {
+  state.caseData = { role: "ищец", caseNo: "", court: "", upperCourt: "", judge: "", defendant: "", defendantEik: "", defendantAddress: "", facts: "" };
+  state.money.amount = "";
+  state.money.harmDate = "";
+  state.docMeta.attachments = "";
+  syncInputsFromState();
+  saveStateDebounced();
+  updateAll();
+  showToast("Данните по делото са изчистени. Вашият профил е запазен.");
+}
+
+function wipeAllData() {
+  if (confirm("Сигурни ли сте, че искате да изтриете ВСИЧКИ въведени данни от този браузър? Действието е необратимо.")) {
+    localStorage.removeItem(APP.storageKey);
+    localStorage.removeItem(APP.ackKey);
+    location.reload();
+  }
+}
+
+/* ============================== ЕКСПОРТ И ИМПОРТ ============================== */
+function exportStateToJson() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
+  const a = document.createElement("a");
+  a.setAttribute("href", dataStr);
+  a.setAttribute("download", `aeterna_lex_backup_${isoOf(todayNum())}.json`);
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  showToast("Данните са експортирани в JSON файл.");
+}
+
+function importStateFromJson(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      state = Object.assign(state, parsed);
+      syncInputsFromState();
+      saveStateDebounced();
+      updateAll();
+      showToast("Данните са успешно заредени от файла.");
+    } catch (err) {
+      showToast("Грешка при зареждане на JSON файла: " + err.message, true);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function downloadDocFile() {
+  const content = $("doc").innerHTML;
+  const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+  <head><meta charset='utf-8'><title>Съдебен документ</title>
+  <style>
+    @page { size: A4; margin: 20mm 15mm 20mm 22mm; }
+    body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.4; color: #000; }
+    .rcp { margin-left: 45%; margin-bottom: 20px; }
+    .ttl { text-align: center; font-size: 15pt; font-weight: bold; letter-spacing: 3px; }
+    .sub { text-align: center; font-size: 11pt; font-weight: bold; margin-bottom: 16px; }
+    .parties { border-top: 1px solid #000; border-bottom: 1px solid #000; padding: 6px 0; margin-bottom: 14px; }
+    .box { border-left: 3px solid #000; background: #f4f4f4; padding: 7px 11px; margin: 10px 0; }
+    p { text-align: justify; text-indent: 28px; margin: 0 0 8px; }
+    .ni { text-indent: 0; }
+    .sig { width: 100%; margin-top: 35px; border-collapse: collapse; }
+  </style></head><body>`;
+  const footer = "</body></html>";
+  const sourceHTML = header + content + footer;
+  const blob = new Blob(["\ufeff", sourceHTML], { type: "application/msword;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Sadeben_Akt_${state.moduleId}_${isoOf(todayNum())}.doc`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast("Документът е изтеглен като Word (.DOC) файл.");
+}
+
+function downloadSsevTextFile() {
+  const text = $("ssevOut").textContent;
+  const blob = new Blob(["\ufeff", text], { type: "text/plain;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `SSEV_Pridruzhitelno_Pismo_${isoOf(todayNum())}.txt`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  showToast("Текстът за ССЕВ е изтеглен като текстов файл (.TXT).");
+}
+
+/* ============================== САМОПРОВЕРКА (SELF-TEST SUITE) ============================== */
+function runSelfTest() {
+  const logs = [];
+  function assert(name, cond) {
+    if (cond) {
+      logs.push(`✔ [PASS] ${name}`);
+    } else {
+      logs.push(`✖ [FAIL] ${name}`);
+    }
+  }
+
+  try {
+    // 1. Математика на лихвите и целочисленост
+    assert("divRound(10n, 3n) === 3n", divRound(10n, 3n) === 3n);
+    assert("divRound(11n, 3n) === 4n", divRound(11n, 3n) === 4n);
+    assert("divRound(-11n, 3n) === -4n", divRound(-11n, 3n) === -4n);
+
+    // 2. Валутна конверсия BGN <-> EUR (1.95583)
+    const bgn100k = 10000000n; // 100 000 лв. в стотинки
+    const eurEq = bgnToEurCents(bgn100k);
+    assert("100 000 лв. -> EUR центове === 5112919n (51 129.19 EUR)", eurEq === 5112919n);
+    const backBgn = eurToBgnCents(eurEq);
+    assert("51 129.19 EUR обратно в BGN === 10000001n (отклонение 1 стотинка)", backBgn === 10000001n);
+
+    // 3. Форматиране
+    assert("fmtCents(12345678n) === '123 456,78'", fmtCents(12345678n) === "123 456,78");
+
+    // 4. Валидация на ЕГН
+    assert("ЕГН 8001010008 е валидно", validateEGN("8001010008").ok === true);
+    assert("ЕГН 8001010009 е невалидно (грешна контролна цифра)", validateEGN("8001010009").ok === false);
+
+    // 5. Валидация на ЕИК
+    assert("ЕИК 123456789 е валидно (тестово)", validateEIK("123456789").ok === true);
+    assert("ЕИК 123456780 е невалидно", validateEIK("123456780").ok === false);
+
+    // 6. Срокове и прехвърляне през празници
+    const dayStart = parseISO("2026-04-10"); // Петък преди Великден 2026
+    if (dayStart !== null) {
+      const dlRes = computeDeadline(dayStart, "days", 3);
+      assert("Срок от 3 дни след Разпети петък се прехвърля след Светли вторник", dlRes.shifted > 0);
+    }
+
+    // 7. Проверка на всички модули
+    assert("Дефинирани са точно 10 правни модула", MODULES.length === 10);
+    MODULES.forEach(m => {
+      const r = m.render(state.citizen, state.caseData, computeCurrentMoney(), {}, { place: "Поморие", dateFormatted: "11.11.2026 г.", attachments: [] });
+      assert(`Модул '${m.id}' генерира валиден HTML и ССЕВ обект`, typeof r.docHtml === "string" && typeof r.ssevSubject === "string");
+    });
+
+  } catch (err) {
+    logs.push(`Критична грешка при тест: ${err.message}`);
+  }
+
+  const resultsHtml = `<pre style="font-family:Consolas,monospace;font-size:12px;background:var(--bg2);padding:12px;border-radius:6px;max-height:400px;overflow:auto">${logs.map(esc).join("\n")}</pre>`;
+  showInfoModal("Резултати от автоматичната самопроверка", resultsHtml);
+}
+
+/* ============================== ЗАКРЕПВАНЕ НА СЪБИТИЯ ============================== */
+window.addEventListener("DOMContentLoaded", () => {
+  // Проверка за отказ от отговорност
+  if (!localStorage.getItem(APP.ackKey)) {
+    $("modalAck").style.display = "flex";
+  }
+  $("btnAck").addEventListener("click", () => {
+    localStorage.setItem(APP.ackKey, "true");
+    $("modalAck").style.display = "none";
+  });
+
+  loadState();
+  initModulesDropdown();
+  initDeadlinePresets();
+  bindInputs();
+  syncInputsFromState();
+
+  // Избор на модул
+  $("moduleSelect").addEventListener("change", (e) => {
+    state.moduleId = e.target.value;
+    renderModuleFields();
+    saveStateDebounced();
+    updateAll();
+  });
+
+  // Периоди за лихва: бутон за добавяне
+  $("btnAddPeriod").addEventListener("click", () => {
+    state.periods.push({ from: isoOf(todayNum()), rate: "12.00" });
+    renderPeriodsTable();
+    saveStateDebounced();
+    updateAll();
+  });
+
+  // Периоди за лихва: редакция и триене
+  $("periodsBody").addEventListener("input", (e) => {
+    const idx = e.target.getAttribute("data-pidx");
+    const field = e.target.getAttribute("data-pfield");
+    if (idx !== null && field) {
+      state.periods[Number(idx)][field] = e.target.value;
+      saveStateDebounced();
+      updateAll();
+    }
+  });
+  $("periodsBody").addEventListener("click", (e) => {
+    const delIdx = e.target.getAttribute("data-pdel");
+    if (delIdx !== null) {
+      state.periods.splice(Number(delIdx), 1);
+      renderPeriodsTable();
+      saveStateDebounced();
+      updateAll();
+    }
+  });
+
+  // Калкулатор на процесуални срокове
+  $("dlStart").value = isoOf(todayNum());
+  $("dlStart").addEventListener("input", updateDeadlineCalc);
+  $("dlPreset").addEventListener("change", (e) => {
+    if (e.target.value === "custom") {
+      $("dlCustomRow").style.display = "grid";
+    } else {
+      $("dlCustomRow").style.display = "none";
+    }
+    updateDeadlineCalc();
+  });
+  $("dlAmount").addEventListener("input", updateDeadlineCalc);
+  $("dlUnit").addEventListener("change", updateDeadlineCalc);
+
+  // Бутони за експорт и копиране
+  $("btnPrint").addEventListener("click", () => window.print());
+  $("btnDoc").addEventListener("click", downloadDocFile);
+  $("btnTxt").addEventListener("click", downloadSsevTextFile);
+
+  $("btnCopySubject").addEventListener("click", () => {
+    const subj = $("ssevOut").dataset.subject || "";
+    navigator.clipboard.writeText(subj).then(() => {
+      showToast("Заглавието (темата) за ССЕВ е копирано в клипборда.");
+    });
+  });
+
+  $("btnCopyBody").addEventListener("click", () => {
+    const body = $("ssevOut").dataset.body || $("ssevOut").textContent;
+    navigator.clipboard.writeText(body).then(() => {
+      showToast("Пълният текст за ССЕВ е копиран в клипборда.");
+    });
+  });
+
+  // Горна лента с инструменти
+  $("btnDemo").addEventListener("click", loadDemoPreset);
+  $("btnNewCase").addEventListener("click", resetCaseData);
+  $("btnWipe").addEventListener("click", wipeAllData);
+  $("btnExport").addEventListener("click", exportStateToJson);
+  $("btnImport").addEventListener("click", () => $("importFile").click());
+  $("importFile").addEventListener("change", (e) => {
+    if (e.target.files && e.target.files[0]) {
+      importStateFromJson(e.target.files[0]);
+    }
+  });
+  $("btnSelfTest").addEventListener("click", runSelfTest);
+
+  $("btnHelp").addEventListener("click", () => {
+    const helpHtml = `
+      <p><strong>AETERNA LEX SOVEREIGN v3.0</strong> е самостоятелен инструмент за изготвяне на официални правни книжа, сигнали и жалби за самопредставляващи се граждани съгласно чл. 28, ал. 1 от ГПК и чл. 56 от Конституцията на РБ.</p>
+      <ul>
+        <li><strong>Модули (1 до 10):</strong> Изберете съответния тип процесуално оръжие от падащото меню (бавност, такси, сигнали по ЗСВ/НК, ЗОДОВ, запор, документи, възобновяване, частна жалба).</li>
+        <li><strong>Законна лихва (чл. 84, ал. 3 ЗЗД):</strong> Сметките се правят автоматично по периоди на ОЛП + 10 пункта без грешка от плаваща запетая. Конверсията в EUR става по официалния фиксиран курс на БНБ (1.95583).</li>
+        <li><strong>Експорт и подаване:</strong> Използвайте „PDF / Печат“ за записване на официален A4 документ, след което го подпишете с КЕП (B-Trust, Evrotrust и др.) и го изпратете в Системата за сигурно електронно връчване (<a href="https://edelivery.egov.bg" target="_blank" style="color:var(--cyan)">edelivery.egov.bg</a>) заедно с генерирания придружителен текст.</li>
+        <li><strong>Пълна поверителност:</strong> Всички данни се съхраняват единствено във вашия браузър (localStorage). Никаква информация не напуска вашия компютър или телефон.</li>
+      </ul>
+    `;
+    showInfoModal("Помощ и инструкции за ползване", helpHtml);
+  });
+
+  $("btnInfoClose").addEventListener("click", () => {
+    $("modalInfo").style.display = "none";
+  });
+
+  updateAll();
+});
+</script>
+</body>
+</html>
