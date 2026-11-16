@@ -122,73 +122,83 @@
       50% { transform: scale(1.12); opacity: 0.55; }
     }
 
-    /* ════════ TOP HUD BAR (HAMBURGER + SEARCH + TELEMETRY) ════════ */
+    /* ════════ STELLARIUM TOP TOOLBAR (HAMBURGER + CENTER SEARCH + TELEMETRY) ════════ */
     .top-hud-strip {
-      position: fixed; top: 16px; left: 16px; right: 16px; z-index: 50;
-      display: flex; align-items: center; justify-content: space-between; gap: 12px;
-      pointer-events: none; transition: opacity 0.3s;
+      position: fixed; top: 0; left: 0; right: 0; height: 50px; z-index: 50;
+      padding: 0 14px;
+      background: linear-gradient(to bottom, rgba(6, 10, 18, 0.86) 0%, rgba(6, 10, 18, 0.52) 100%);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
+      pointer-events: auto; transition: opacity 0.3s;
     }
-    .top-left-cluster { display: flex; align-items: center; gap: 10px; pointer-events: auto; flex-wrap: wrap; }
+    .top-left-cluster { display: flex; align-items: center; gap: 10px; min-width: 0; }
     .btn-drawer-toggle {
-      display: inline-flex; align-items: center; gap: 10px;
-      height: 44px; padding: 0 16px; border-radius: 22px;
-      background: var(--hud-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--gold-border); color: var(--ivory);
-      font-family: var(--font-display); font-size: 12px; font-weight: 700; letter-spacing: 1.5px;
-      cursor: pointer; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6); transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 36px; padding: 0 12px; border-radius: 18px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14); color: var(--ivory);
+      font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
     }
-    .btn-drawer-toggle:hover { background: rgba(20, 26, 40, 0.95); border-color: var(--gold-bright); box-shadow: 0 0 20px var(--gold-glow); }
-    .btn-drawer-toggle .delta { color: var(--gold); font-size: 14px; }
+    .btn-drawer-toggle:hover { background: rgba(197, 163, 78, 0.16); border-color: var(--gold); color: var(--gold-bright); }
+    .btn-drawer-toggle .delta { color: var(--gold); font-size: 13px; }
+    .stel-brand-title {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: 1.4px; color: #fff;
+      white-space: nowrap;
+    }
+    .stel-brand-title sup { font-family: var(--font-mono); font-size: 9px; color: var(--gold-bright); letter-spacing: 0.6px; font-weight: 700; }
 
     .search-capsule {
-      position: relative; width: 320px; max-width: calc(100vw - 180px);
+      position: relative; width: 340px; max-width: 44vw; justify-self: center;
     }
     .search-capsule input {
-      width: 100%; height: 44px; padding: 0 16px 0 40px; border-radius: 22px;
-      background: var(--hud-glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      border: 1px solid var(--border); color: #fff; font-family: var(--font-sans); font-size: 13px;
-      outline: none; box-shadow: 0 8px 30px rgba(0,0,0,0.5); transition: border-color 0.2s;
+      width: 100%; height: 34px; padding: 0 16px 0 36px; border-radius: 17px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.14); color: #fff; font-family: var(--font-sans); font-size: 12.5px;
+      outline: none; transition: border-color 0.2s, background 0.2s;
     }
-    .search-capsule input:focus { border-color: var(--gold); }
-    .search-capsule input::placeholder { color: var(--muted); }
+    .search-capsule input:focus { border-color: var(--gold); background: rgba(9, 13, 21, 0.92); }
+    .search-capsule input::placeholder { color: rgba(226, 232, 240, 0.55); }
     .search-icon {
-      position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
-      color: var(--gold); font-size: 14px; pointer-events: none;
+      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
+      color: var(--gold); font-size: 13px; pointer-events: none;
     }
     .search-dropdown {
-      position: absolute; top: 50px; left: 0; right: 0;
+      position: absolute; top: 40px; left: 0; right: 0;
       background: var(--hud-glass-solid); backdrop-filter: blur(24px);
       border: 1px solid var(--gold-border); border-radius: 14px;
-      overflow: hidden; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.85);
+      overflow: hidden; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.85); z-index: 90;
     }
     .search-dropdown.open { display: block; }
     .search-hit {
-      padding: 10px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+      padding: 9px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12.5px;
     }
     .search-hit:hover { background: rgba(197, 163, 78, 0.14); }
 
     .top-right-telemetry {
-      pointer-events: auto; display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
     }
     .telemetry-pill {
-      height: 44px; padding: 0 16px; border-radius: 22px;
-      background: var(--hud-glass); backdrop-filter: blur(20px);
-      border: 1px solid var(--border); display: flex; align-items: center; gap: 10px;
-      font-family: var(--font-mono); font-size: 11px; color: var(--muted);
+      height: 34px; padding: 0 12px; border-radius: 17px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 10.5px; color: #cbd5e1; white-space: nowrap;
     }
-    .telemetry-pill .pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
+    .telemetry-pill .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
     .btn-order-top {
-      height: 44px; padding: 0 20px; border-radius: 22px;
+      height: 34px; padding: 0 16px; border-radius: 17px;
       background: linear-gradient(135deg, var(--gold) 0%, #9b7d31 100%);
-      color: #05070c; font-weight: 800; font-size: 11.5px; letter-spacing: 1.2px; text-transform: uppercase;
-      border: none; cursor: pointer; box-shadow: 0 4px 22px var(--gold-glow); transition: all 0.2s;
+      color: #05070c; font-weight: 800; font-size: 11px; letter-spacing: 0.9px; text-transform: uppercase;
+      border: none; cursor: pointer; box-shadow: 0 4px 18px var(--gold-glow); transition: all 0.2s; white-space: nowrap;
     }
     .btn-order-top:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
     /* ════════ STELLARIUM LEFT SIDE MENU DRAWER ════════ */
     #sideDrawer {
-      position: fixed; top: 72px; left: 16px; bottom: 82px; width: 356px; max-width: calc(100vw - 32px);
+      position: fixed; top: 62px; left: 12px; bottom: 76px; width: 352px; max-width: calc(100vw - 24px);
       z-index: 45; border-radius: 18px;
       background: var(--hud-glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
       border: 1px solid var(--gold-border); box-shadow: 0 25px 65px rgba(0, 0, 0, 0.8);
@@ -272,13 +282,20 @@
 
     /* ════════ FLOATING PLANET INSPECTOR CARD (STELLARIUM OBJECT PANEL) ════════ */
     #planetInspector {
-      position: fixed; top: 72px; right: 16px; width: 410px; max-width: calc(100vw - 32px); max-height: calc(100vh - 156px);
-      z-index: 44; border-radius: 18px; overflow-y: auto;
-      background: var(--hud-glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      position: fixed; top: 62px; right: 12px; width: 396px; max-width: calc(100vw - 24px); max-height: calc(100vh - 142px);
+      z-index: 44; border-radius: 14px; overflow-y: auto;
+      background: rgba(18, 24, 34, 0.72); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
       border: 1px solid var(--gold-border); box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
       display: none; flex-direction: column;
       scrollbar-width: thin; scrollbar-color: var(--gold-border) transparent;
     }
+    .insp-astro-table {
+      display: grid; grid-template-columns: 78px 1fr; gap: 4px 10px;
+      padding: 8px 10px; border-radius: 8px; background: rgba(4, 7, 13, 0.55);
+      border: 1px solid rgba(255,255,255,0.08); font-family: var(--font-mono); font-size: 10.5px;
+    }
+    .insp-astro-k { color: var(--muted); }
+    .insp-astro-v { color: #f8fafc; font-weight: 700; text-align: right; }
     #planetInspector.open { display: flex; animation: panelSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
     @keyframes panelSlideIn {
       from { opacity: 0; transform: translateX(18px); }
@@ -350,27 +367,58 @@
     }
     .btn-insp-sub:hover { border-color: var(--gold); color: var(--gold-bright); }
 
-    /* ════════ BOTTOM STELLARIUM CONTROLS BAR ════════ */
+    /* ════════ STELLARIUM 3-ZONE BOTTOM BAR (LOCATION + SVG ICONS + CLOCK) ════════ */
+    .stel-bottom-wrapper {
+      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      padding: 0 12px 10px;
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
+      pointer-events: none; transition: opacity 0.3s;
+    }
+    .stel-corner-btn {
+      pointer-events: auto;
+      display: flex; flex-direction: column; justify-content: center;
+      min-height: 46px; padding: 6px 14px; border-radius: 10px;
+      background: rgba(12, 18, 28, 0.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer;
+      text-align: left; transition: all 0.18s; white-space: nowrap;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.65);
+    }
+    .stel-corner-btn:hover { border-color: var(--gold); background: rgba(20, 28, 42, 0.92); }
+    .stel-corner-main { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #f8fafc; line-height: 1.2; }
+    .stel-corner-sub { font-family: var(--font-mono); font-size: 9.5px; color: var(--gold-bright); line-height: 1.25; }
     .bottom-hud-dock {
-      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 50;
-      background: var(--hud-glass); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-      border: 1px solid var(--border); border-radius: 999px;
-      padding: 6px 10px; display: flex; align-items: center; gap: 4px;
+      pointer-events: auto;
+      background: rgba(10, 15, 24, 0.76); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      padding: 4px 8px; display: flex; align-items: center; gap: 2px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.8); max-width: calc(100vw - 24px); overflow-x: auto;
       scrollbar-width: none;
     }
     .bottom-hud-dock::-webkit-scrollbar { display: none; }
     .dock-btn {
       display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-width: 72px; padding: 6px 10px; border-radius: 999px; border: none;
-      background: transparent; color: var(--muted); cursor: pointer; transition: all 0.15s;
+      min-width: 58px; padding: 5px 7px; border-radius: 8px; border: none;
+      background: transparent; color: #fff; cursor: pointer; transition: opacity 0.18s, background 0.18s;
+      opacity: 0.44; position: relative;
     }
-    .dock-btn:hover { background: rgba(255,255,255,0.07); color: #fff; }
-    .dock-btn.active { background: rgba(197, 163, 78, 0.18); color: var(--gold-bright); }
+    .dock-btn svg { width: 22px; height: 22px; display: block; }
+    .dock-btn:hover { opacity: 0.85; background: rgba(255,255,255,0.07); }
+    .dock-btn.active { opacity: 1; background: rgba(56, 189, 248, 0.14); }
+    .dock-btn.active::after {
+      content: ""; position: absolute; bottom: 2px; left: 26%; right: 26%; height: 2px;
+      border-radius: 2px; background: var(--gold-bright);
+    }
     .dock-icon { font-size: 16px; line-height: 1.2; }
-    .dock-lbl { font-size: 9.5px; font-weight: 600; letter-spacing: 0.4px; margin-top: 2px; white-space: nowrap; }
+    .dock-lbl { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; margin-top: 3px; white-space: nowrap; color: #e2e8f0; }
+
+    @media (max-width: 960px) {
+      .stel-brand-title, .stel-corner-btn { display: none; }
+      .top-hud-strip { grid-template-columns: auto 1fr auto; }
+      .search-capsule { width: 100%; max-width: none; }
+    }
 
     /* Restore Zen HUD Chip */
+    body.zen-hidden #topHud, body.zen-hidden #bottomWrapper { opacity: 0; pointer-events: none; }
     #btnRestoreHud {
       position: fixed; bottom: 20px; right: 20px; z-index: 60; display: none;
       padding: 10px 18px; border-radius: 999px; background: var(--hud-glass); border: 1px solid var(--gold);
@@ -485,27 +533,31 @@
     <div class="reticle-corner rc-br"></div>
   </div>
 
-  <!-- ════════ TOP FLOATING HUD BAR ════════ -->
+  <!-- ════════ STELLARIUM TOP TOOLBAR BAR ════════ -->
   <header class="top-hud-strip" id="topHud">
     <div class="top-left-cluster">
-      <button type="button" class="btn-drawer-toggle" id="btnToggleDrawer">
-        <span class="delta">▲</span>
+      <button type="button" class="btn-drawer-toggle" id="btnToggleDrawer" title="Toggle Website Explorer Drawer">
+        <span class="delta">☰</span>
         <span>EXPLORE SITES</span>
       </button>
-
-      <div class="search-capsule">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="cosmosSearch" placeholder="Search business industry (e.g. plumber, cafe, shop)..." autocomplete="off">
-        <div class="search-dropdown" id="searchDropdown"></div>
+      <div class="stel-brand-title">
+        <span>ÆTERNA</span>
+        <sup>WEB OBSERVATORY</sup>
       </div>
+    </div>
+
+    <div class="search-capsule">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="cosmosSearch" placeholder="Search business industry, studio or star (e.g. cafe, Sirius)..." autocomplete="off">
+      <div class="search-dropdown" id="searchDropdown"></div>
     </div>
 
     <div class="top-right-telemetry">
       <div class="telemetry-pill">
         <span class="pulse"></span>
-        <span id="fovTelemetry">AZM 142° &middot; ALT +18° &middot; FOV 60°</span>
+        <span id="fovTelemetry">AZM 25° &middot; ALT +18° &middot; FOV 58°</span>
       </div>
-      <button type="button" class="btn-order-top" id="btnTopOpenConfig">⚡ Configure &amp; Order ($495+)</button>
+      <button type="button" class="btn-order-top" id="btnTopOpenConfig">⚡ Configure ($495+)</button>
     </div>
   </header>
 
@@ -580,6 +632,13 @@
         </div>
       </div>
 
+      <div class="insp-astro-table" id="inspAstroTable">
+        <span class="insp-astro-k">RA / Dec</span>
+        <span class="insp-astro-v" id="inspRaDec">00h 00m 00s &nbsp; +00° 00'</span>
+        <span class="insp-astro-k">Az / Alt</span>
+        <span class="insp-astro-v" id="inspAzAlt">025° 00' &nbsp; +18° 00'</span>
+      </div>
+
       <div class="insp-features" id="inspFeatures"></div>
 
       <div class="insp-pricing-banner">
@@ -600,53 +659,61 @@
     </div>
   </section>
 
-  <!-- ════════ BOTTOM STELLARIUM HUD CONTROLS DOCK ════════ -->
-  <nav class="bottom-hud-dock" id="bottomDock">
-    <button type="button" class="dock-btn active" id="togConstellations" title="Toggle Industry Constellation Lines">
-      <span class="dock-icon">✨</span>
-      <span class="dock-lbl">Constellations</span>
+  <!-- ════════ STELLARIUM 3-ZONE BOTTOM OBSERVATION BAR ════════ -->
+  <div class="stel-bottom-wrapper" id="bottomWrapper">
+    <button type="button" class="stel-corner-btn" id="btnLocationCycle" title="Click to switch Observatory Latitude (tilts Equatorial Grid)">
+      <span class="stel-corner-main" id="lblObsLoc">📍 Melbourne</span>
+      <span class="stel-corner-sub" id="lblObsCoords">37.8°S · 144.9°E</span>
     </button>
-    <button type="button" class="dock-btn active" id="togGrid" title="Toggle Spherical Celestial Coordinate Grid">
-      <span class="dock-icon">🌐</span>
-      <span class="dock-lbl">Sky Grid</span>
+
+    <nav class="bottom-hud-dock" id="bottomDock">
+      <button type="button" class="dock-btn active" id="togConstellations" title="Constellation Network Lines">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="17" r="1.6" fill="currentColor"/><circle cx="10" cy="6" r="1.6" fill="currentColor"/><circle cx="19" cy="14" r="1.6" fill="currentColor"/><path d="M6.6 15.2 L9.4 7.8 M11.6 7.4 L17.6 12.8 M8 16.6 L17.2 14.5"/></svg>
+        <span class="dock-lbl">Constellations</span>
+      </button>
+      <button type="button" class="dock-btn active" id="togAtmo" title="Toggle Preetham Atmospheric Scattering Glow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 18h18"/><path d="M6 18a6 6 0 0 1 12 0" fill="rgba(255,255,255,0.22)"/><path d="M12 4v2M18.4 6.6l-1.4 1.4M5.6 6.6L7 8"/></svg>
+        <span class="dock-lbl">Atmosphere</span>
+      </button>
+      <button type="button" class="dock-btn active" id="togLandscape" title="Toggle 360° Panoramic Horizon Ridge &amp; Ground Mist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 19l6-8 4 5 4-6 6 9H2z" fill="rgba(255,255,255,0.18)"/><circle cx="17" cy="6.5" r="2"/></svg>
+        <span class="dock-lbl">Landscape</span>
+      </button>
+      <button type="button" class="dock-btn active" id="togGrid" title="Toggle Alt / Azimuthal Coordinate Grid">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M3 12h18M12 3v18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></svg>
+        <span class="dock-lbl">Azimuthal</span>
+      </button>
+      <button type="button" class="dock-btn active" id="togEqGrid" title="Toggle Tilted Equatorial J2000 Sky Grid">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4.6" ry="9" transform="rotate(-22 12 12)"/><path d="M3.5 9.2c5.5 2.4 11.5 2.4 17 0M3.5 14.8c5.5-2.4 11.5-2.4 17 0"/></svg>
+        <span class="dock-lbl">Equatorial</span>
+      </button>
+      <button type="button" class="dock-btn active" id="togLabels" title="Toggle Celestial Website &amp; Star Labels">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h10l5 5-5 5H4V7z"/><circle cx="8" cy="12" r="1.2" fill="currentColor"/></svg>
+        <span class="dock-lbl">Labels</span>
+      </button>
+      <button type="button" class="dock-btn active" id="togVortex" title="Cycle Millennium 8K Liquid Gold Vortex Overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 12c0-2 2-3 4-2s2 4 0 6-6 2-8-1-1-8 3-10 9-1 11 4"/></svg>
+        <span class="dock-lbl" id="lblVortex">Vortex</span>
+      </button>
+      <button type="button" class="dock-btn" id="togNight" title="Astronomer Red Night Vision Filter">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.8" fill="currentColor"/></svg>
+        <span class="dock-lbl">Night</span>
+      </button>
+      <button type="button" class="dock-btn" id="btnResetCamera" title="Reset Telescope &amp; Auto-Orbit">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+        <span class="dock-lbl">Reset</span>
+      </button>
+      <button type="button" class="dock-btn" id="btnZenMode" title="Zen / Fullscreen Pure Sky View">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+        <span class="dock-lbl">Fullscreen</span>
+      </button>
+    </nav>
+
+    <button type="button" class="stel-corner-btn" id="btnTimeCycle" style="text-align:right;" title="Click to cycle Sky Illumination (Deep Night / Twilight Dusk / Cosmic Glow)">
+      <span class="stel-corner-main" id="lblObsTime">16:47:00</span>
+      <span class="stel-corner-sub" id="lblObsSkyPhase">🌙 Astronomical Night</span>
     </button>
-    <button type="button" class="dock-btn active" id="togHorizon" title="Toggle Horizon Silhouette &amp; Compass">
-      <span class="dock-icon">🧭</span>
-      <span class="dock-lbl">Horizon</span>
-    </button>
-    <button type="button" class="dock-btn active" id="togLabels" title="Toggle Planet Chart Labels">
-      <span class="dock-icon">🏷️</span>
-      <span class="dock-lbl">Labels</span>
-    </button>
-    <button type="button" class="dock-btn active" id="togAutoOrbit" title="Toggle Gentle Cosmic Rotation">
-      <span class="dock-icon">🔄</span>
-      <span class="dock-lbl">Auto-Orbit</span>
-    </button>
-    <button type="button" class="dock-btn" id="togNight" title="Astronomer Red Night Vision Filter">
-      <span class="dock-icon">👁️</span>
-      <span class="dock-lbl">Night Mode</span>
-    </button>
-    <button type="button" class="dock-btn" id="btnZoomIn" title="Zoom In Telescope (+)">
-      <span class="dock-icon">➕</span>
-      <span class="dock-lbl">Zoom In</span>
-    </button>
-    <button type="button" class="dock-btn" id="btnZoomOut" title="Zoom Out Telescope (-)">
-      <span class="dock-icon">➖</span>
-      <span class="dock-lbl">Zoom Out</span>
-    </button>
-    <button type="button" class="dock-btn" id="btnResetCamera" title="Reset Camera to Galaxy Overview">
-      <span class="dock-icon">🔭</span>
-      <span class="dock-lbl">Reset</span>
-    </button>
-    <button type="button" class="dock-btn active" id="togVortex" title="Cycle 8K Liquid Gold Vortex Shader Overlay (Cosmic / Full 8K / Off)">
-      <span class="dock-icon">🌀</span>
-      <span class="dock-lbl" id="lblVortex">Vortex: On</span>
-    </button>
-    <button type="button" class="dock-btn" id="btnZenMode" title="Hide UI for Pure 3D Universe">
-      <span class="dock-icon">⛶</span>
-      <span class="dock-lbl">Zen Mode</span>
-    </button>
-  </nav>
+  </div>
 
   <button type="button" id="btnRestoreHud">✦ Show Observatory HUD</button>
 
@@ -1172,15 +1239,45 @@
     let activeCategory = "all";
 
     let showConstellations = true;
-    let showGrid = true;
+    let showAtmosphere = true;
     let showHorizon = true;
+    let showGrid = true;
+    let showEqGrid = true;
     let showLabels = true;
     let vortexMode = "on"; // "on" | "max" | "off"
     let vortexCtrl = null;
 
+    const OBS_LOCATIONS = [
+      { name: "Melbourne", lat: -37.81, lon: 144.96, label: "📍 Melbourne", coords: "37.8°S · 144.9°E" },
+      { name: "Pomorie",   lat: 42.56,  lon: 27.64,  label: "📍 Pomorie HQ", coords: "42.6°N · 27.6°E" },
+      { name: "Atacama",   lat: -23.02, lon: -67.75, label: "📍 Atacama ALMA", coords: "23.0°S · 67.8°W" }
+    ];
+    let obsLocIdx = 0;
+
+    const SKY_PHASES = [
+      { name: "🌙 Astronomical Night", sunGlow: 0.34, skyTint: [0.05, 0.14, 0.34], fogGlow: 0.25 },
+      { name: "🌇 Stellarium Twilight", sunGlow: 0.92, skyTint: [0.16, 0.28, 0.56], fogGlow: 0.62 },
+      { name: "🌌 Deep Space Dark",    sunGlow: 0.14, skyTint: [0.02, 0.05, 0.14], fogGlow: 0.10 }
+    ];
+    let skyPhaseIdx = 0;
+
+    const NAV_STARS = [
+      { id: "star-sirius",     name: "Sirius (α CMa)",     mag: -1.46, azDeg: 82,  altDeg: 38, color: "#cce4ff", hex: "#93c5fd" },
+      { id: "star-canopus",    name: "Canopus (α Car)",    mag: -0.74, azDeg: 148, altDeg: 28, color: "#fff7e0", hex: "#fde68a" },
+      { id: "star-rigel",      name: "Rigel (β Ori)",      mag: 0.13,  azDeg: 58,  altDeg: 29, color: "#b6d8ff", hex: "#7dd3fc" },
+      { id: "star-betelgeuse", name: "Betelgeuse (α Ori)", mag: 0.42,  azDeg: 44,  altDeg: 36, color: "#ffb884", hex: "#fb923c" },
+      { id: "star-vega",       name: "Vega (α Lyr)",       mag: 0.03,  azDeg: 312, altDeg: 41, color: "#d8ebff", hex: "#bae6fd" },
+      { id: "star-antares",    name: "Antares (α Sco)",    mag: 1.06,  azDeg: 232, altDeg: 24, color: "#ff9d6e", hex: "#f87171" },
+      { id: "star-aldebaran",  name: "Aldebaran (α Tau)",  mag: 0.86,  azDeg: 34,  altDeg: 27, color: "#ffc288", hex: "#fbbf24" },
+      { id: "star-spica",      name: "Spica (α Vir)",      mag: 0.97,  azDeg: 194, altDeg: 35, color: "#c2deff", hex: "#93c5fd" },
+      { id: "star-altair",     name: "Altair (α Aql)",     mag: 0.76,  azDeg: 282, altDeg: 31, color: "#ffffff", hex: "#e2e8f0" },
+      { id: "star-polaris",    name: "Polaris (α UMi)",    mag: 1.98,  azDeg: 0,   altDeg: 42, color: "#fff2cc", hex: "#fde047" }
+    ];
+
     const SPHERE_RADIUS = 58;
 
     function deg2rad(d) { return d * Math.PI / 180; }
+    function rad2deg(r) { return r * 180 / Math.PI; }
     function sphToVec3(azDeg, altDeg, r) {
       const az = deg2rad(azDeg);
       const alt = deg2rad(altDeg);
@@ -1192,6 +1289,31 @@
       };
     }
 
+    function azAltToRaDec(azDeg, altDeg, latDeg, lstDeg) {
+      const az = deg2rad(azDeg), alt = deg2rad(altDeg), lat = deg2rad(latDeg);
+      const sinDec = Math.sin(alt) * Math.sin(lat) + Math.cos(alt) * Math.cos(lat) * Math.cos(az);
+      const decRad = Math.asin(Math.max(-1, Math.min(1, sinDec)));
+      const cosH = (Math.sin(alt) - Math.sin(lat) * sinDec) / (Math.cos(lat) * Math.cos(decRad) || 1e-6);
+      let H = rad2deg(Math.acos(Math.max(-1, Math.min(1, cosH))));
+      if (Math.sin(az) > 0) H = 360 - H;
+      const raDeg = (lstDeg - H + 360) % 360;
+      return { raDeg, decDeg: rad2deg(decRad) };
+    }
+    function formatRA(deg) {
+      const hrs = deg / 15;
+      const h = Math.floor(hrs);
+      const m = Math.floor((hrs - h) * 60);
+      const s = Math.floor(((hrs - h) * 60 - m) * 60);
+      return `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
+    }
+    function formatDegMin(deg) {
+      const sign = deg < 0 ? "-" : "+";
+      const a = Math.abs(deg);
+      const d = Math.floor(a);
+      const m = Math.floor((a - d) * 60);
+      return `${sign}${String(d).padStart(2, "0")}° ${String(m).padStart(2, "0")}'`;
+    }
+
     // =========================================================================
     // 3. THREE.JS 3D COSMIC OBSERVATORY SCENE
     // =========================================================================
@@ -1201,7 +1323,7 @@
 
     let renderer, scene, camera;
     let planetMeshes = {};
-    let constellationGroup, gridGroup, horizonGroup, starField, vortexPlane;
+    let constellationGroup, gridGroup, eqGridGroup, horizonGroup, atmoDome, starField, vortexPlane, atmoUniforms, mistUniforms;
     let clock = typeof THREE !== "undefined" ? new THREE.Clock() : null;
 
     function init3DUniverse() {
@@ -1329,10 +1451,56 @@
       starField = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.75, vertexColors: true, transparent: true, opacity: 0.85 }));
       scene.add(starField);
 
-      // B. Spherical Celestial Coordinate Grid (Stellarium RA / Dec Lines)
+      // A4. Named Navigation Stars (Stellarium Bright Star Layer)
+      const navGroup = new THREE.Group();
+      NAV_STARS.forEach(s => {
+        const sp = sphToVec3(s.azDeg, s.altDeg, 138);
+        const core = new THREE.Mesh(
+          new THREE.SphereGeometry(0.45, 12, 12),
+          new THREE.MeshBasicMaterial({ color: s.color })
+        );
+        core.position.set(sp.x, sp.y, sp.z);
+        navGroup.add(core);
+      });
+      scene.add(navGroup);
+
+      // A5. Preetham / Rayleigh Atmospheric Twilight Dome (Toggleable like Stellarium)
+      atmoUniforms = {
+        uSunGlow: { value: SKY_PHASES[0].sunGlow },
+        uSkyTint: { value: new THREE.Vector3(...SKY_PHASES[0].skyTint) },
+        uSunDir:  { value: new THREE.Vector3(0.45, -0.05, -0.89).normalize() }
+      };
+      atmoDome = new THREE.Mesh(
+        new THREE.SphereGeometry(212, 48, 32),
+        new THREE.ShaderMaterial({
+          uniforms: atmoUniforms,
+          vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+          fragmentShader: `
+            uniform float uSunGlow;
+            uniform vec3 uSkyTint;
+            uniform vec3 uSunDir;
+            varying vec3 vDir;
+            void main() {
+              float elev = clamp(vDir.y, 0.0, 1.0);
+              float horizonBand = pow(1.0 - elev, 4.2);
+              float sunCos = max(dot(normalize(vDir), uSunDir), 0.0);
+              float mieGlow = pow(sunCos, 6.0) * 0.45 + pow(sunCos, 24.0) * 0.55;
+              vec3 twilightCol = uSkyTint * (0.28 + 1.15 * horizonBand);
+              vec3 warmDusk = vec3(0.96, 0.56, 0.24) * mieGlow * horizonBand * uSunGlow;
+              vec3 finalAtmo = (twilightCol * uSunGlow) + warmDusk;
+              float alpha = clamp((horizonBand * 0.65 + 0.12) * uSunGlow * step(-0.04, vDir.y), 0.0, 0.88);
+              gl_FragColor = vec4(finalAtmo, alpha);
+            }
+          `,
+          transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false
+        })
+      );
+      scene.add(atmoDome);
+
+      // B. Spherical Alt/Az Coordinate Grid (Azimuthal Grid in Cyan / Gold Horizon)
       gridGroup = new THREE.Group();
       const gridMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.14 });
-      const goldLineMat = new THREE.LineBasicMaterial({ color: 0xc5a34e, transparent: true, opacity: 0.25 });
+      const goldLineMat = new THREE.LineBasicMaterial({ color: 0xc5a34e, transparent: true, opacity: 0.28 });
 
       [-20, 0, 20, 40, 60, 80].forEach(alt => {
         const pts = [];
@@ -1352,21 +1520,96 @@
       }
       scene.add(gridGroup);
 
-      // C. Horizon Mountain Silhouette & Ground Disk (Altitude <= 0)
+      // B2. Tilted Equatorial J2000 Sky Grid (Copper-Orange, tilted by Observer Latitude)
+      eqGridGroup = new THREE.Group();
+      const eqMat = new THREE.LineBasicMaterial({ color: 0xfb923c, transparent: true, opacity: 0.16 });
+      const eqEquatorMat = new THREE.LineBasicMaterial({ color: 0xfb923c, transparent: true, opacity: 0.36 });
+      [-60, -40, -20, 0, 20, 40, 60, 80].forEach(dec => {
+        const pts = [];
+        for (let ra = 0; ra <= 360; ra += 6) {
+          const v = sphToVec3(ra, dec, 104);
+          pts.push(new THREE.Vector3(v.x, v.y, v.z));
+        }
+        eqGridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), dec === 0 ? eqEquatorMat : eqMat));
+      });
+      for (let ra = 0; ra < 360; ra += 30) {
+        const pts = [];
+        for (let dec = -80; dec <= 88; dec += 4) {
+          const v = sphToVec3(ra, dec, 104);
+          pts.push(new THREE.Vector3(v.x, v.y, v.z));
+        }
+        eqGridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), eqMat));
+      }
+      eqGridGroup.rotation.x = deg2rad(90 - Math.abs(OBS_LOCATIONS[obsLocIdx].lat));
+      scene.add(eqGridGroup);
+
+      // C. Stellarium 360° Panoramic Mountain & Forest Silhouette + Ground Mist Band
       horizonGroup = new THREE.Group();
+      const ridgeCyl = new THREE.CylinderGeometry(96, 96, 28, 160, 1, true);
+      horizonGroup.add(new THREE.Mesh(
+        ridgeCyl,
+        new THREE.ShaderMaterial({
+          vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+          fragmentShader: `
+            varying vec2 vUv;
+            void main() {
+              float a = vUv.x * 6.2831853;
+              float mountain = 0.44
+                + 0.08 * sin(a * 3.0 + 0.7)
+                + 0.05 * cos(a * 7.0 - 1.2)
+                + 0.03 * sin(a * 13.0 + 2.1)
+                + 0.015 * sin(a * 41.0);
+              float mask = 1.0 - smoothstep(mountain - 0.008, mountain + 0.008, vUv.y);
+              if (mask < 0.02) discard;
+              vec3 treeCol = vec3(0.03, 0.07, 0.05);
+              vec3 meadowCol = vec3(0.05, 0.11, 0.07);
+              vec3 ridgeRim = vec3(0.11, 0.19, 0.14);
+              float rim = smoothstep(mountain - 0.03, mountain, vUv.y);
+              vec3 col = mix(meadowCol, treeCol, clamp((vUv.y / mountain), 0.0, 1.0));
+              col = mix(col, ridgeRim, rim * 0.55);
+              gl_FragColor = vec4(col, mask * 0.96);
+            }
+          `,
+          transparent: true, side: THREE.BackSide, depthWrite: true
+        })
+      ));
+
+      mistUniforms = { uFogGlow: { value: SKY_PHASES[0].fogGlow } };
+      const mistMesh = new THREE.Mesh(
+        new THREE.CylinderGeometry(93, 93, 18, 96, 1, true),
+        new THREE.ShaderMaterial({
+          uniforms: mistUniforms,
+          vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+          fragmentShader: `
+            uniform float uFogGlow;
+            varying vec2 vUv;
+            void main() {
+              float haze = smoothstep(0.95, 0.35, vUv.y) * smoothstep(0.18, 0.48, vUv.y);
+              gl_FragColor = vec4(vec3(0.14, 0.24, 0.38) * uFogGlow, haze * 0.55);
+            }
+          `,
+          transparent: true, side: THREE.BackSide, depthWrite: false
+        })
+      );
+      mistMesh.position.y = 2.0;
+      horizonGroup.add(mistMesh);
+
       const hPts = [];
       for (let a = 0; a <= 360; a += 2) {
-        const hill = Math.sin(deg2rad(a * 3)) * 1.4 + Math.cos(deg2rad(a * 7)) * 0.8 - 1.5;
-        const v = sphToVec3(a, hill, 98);
+        const radA = deg2rad(a);
+        const mNorm = 0.44 + 0.08 * Math.sin(radA * 3.0 + 0.7) + 0.05 * Math.cos(radA * 7.0 - 1.2) + 0.03 * Math.sin(radA * 13.0 + 2.1);
+        const hillDeg = (mNorm - 0.5) * 16.5;
+        const v = sphToVec3(a, hillDeg, 95);
         hPts.push(new THREE.Vector3(v.x, v.y, v.z));
       }
-      horizonGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(hPts), new THREE.LineBasicMaterial({ color: 0xc5a34e, transparent: true, opacity: 0.45 })));
+      horizonGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(hPts), new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.22 })));
+
       const groundMesh = new THREE.Mesh(
-        new THREE.CircleGeometry(110, 64),
-        new THREE.MeshBasicMaterial({ color: 0x020306, transparent: true, opacity: 0.85, side: THREE.DoubleSide })
+        new THREE.CircleGeometry(105, 64),
+        new THREE.MeshBasicMaterial({ color: 0x050b08, transparent: true, opacity: 0.96, side: THREE.DoubleSide })
       );
       groundMesh.rotation.x = Math.PI / 2;
-      groundMesh.position.y = -4;
+      groundMesh.position.y = -13;
       horizonGroup.add(groundMesh);
       scene.add(horizonGroup);
 
@@ -1623,29 +1866,48 @@
       });
     });
 
-    // Top Search Capsule
+    // Top Search Capsule (Planets + Studios + Bright Navigation Stars)
     const searchInput = document.getElementById("cosmosSearch");
     const searchDrop = document.getElementById("searchDropdown");
     searchInput.addEventListener("input", () => {
       const q = searchInput.value.trim().toLowerCase();
       if (!q) { searchDrop.classList.remove("open"); return; }
-      const hits = WEBSITE_PLANETS.filter(p =>
+      const pHits = WEBSITE_PLANETS.filter(p =>
         p.name.toLowerCase().includes(q) ||
         p.shortName.toLowerCase().includes(q) ||
         p.niche.toLowerCase().includes(q)
       );
-      if (!hits.length) {
-        searchDrop.innerHTML = `<div class="search-hit" style="color:var(--muted)">No worlds matching "${q}"</div>`;
+      const sHits = NAV_STARS.filter(s => s.name.toLowerCase().includes(q));
+      if (!pHits.length && !sHits.length) {
+        searchDrop.innerHTML = `<div class="search-hit" style="color:var(--muted)">No worlds or stars matching "${q}"</div>`;
       } else {
-        searchDrop.innerHTML = hits.map(p => `
+        const pHtml = pHits.map(p => `
           <div class="search-hit" data-pid="${p.id}">
             <span><strong style="color:${p.hex}">●</strong> ${p.shortName}</span>
             <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--gold)">${p.priceLabel.split(' ')[0]}</span>
           </div>
         `).join("");
+        const sHtml = sHits.map(s => `
+          <div class="search-hit" data-star="${s.id}">
+            <span><strong style="color:${s.hex}">★</strong> ${s.name}</span>
+            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--cyan)">mag ${s.mag}</span>
+          </div>
+        `).join("");
+        searchDrop.innerHTML = pHtml + sHtml;
         searchDrop.querySelectorAll("[data-pid]").forEach(item => {
           item.addEventListener("click", () => {
             selectPlanet(item.getAttribute("data-pid"), true);
+            searchDrop.classList.remove("open");
+            searchInput.value = "";
+          });
+        });
+        searchDrop.querySelectorAll("[data-star]").forEach(item => {
+          item.addEventListener("click", () => {
+            const st = NAV_STARS.find(x => x.id === item.getAttribute("data-star"));
+            if (st) {
+              targetAz = st.azDeg; targetAlt = st.altDeg; targetFov = 36;
+              isFlying = true; autoOrbit = false;
+            }
             searchDrop.classList.remove("open");
             searchInput.value = "";
           });
@@ -1683,13 +1945,12 @@
         targetFov = 38;
         isFlying = true;
         autoOrbit = false;
-        document.getElementById("togAutoOrbit").classList.remove("active");
       }
 
       // Update floating label active highlight
       Object.keys(labelEls).forEach(k => labelEls[k].classList.toggle("active", k === id));
 
-      // Hydrate Right Planet Inspector Panel
+      // Hydrate Right Planet Inspector Panel + Live Stellarium RA/Dec Coordinates
       if (p.heroImg) document.getElementById("inspHeroImg").src = p.heroImg;
       document.getElementById("inspEyebrow").textContent = `${p.cat.toUpperCase()} GALAXY // AZM ${p.azDeg}° ALT +${p.altDeg}°`;
       document.getElementById("inspTitle").textContent = p.name;
@@ -1697,6 +1958,14 @@
       document.getElementById("inspSpeed").textContent = p.speed;
       document.getElementById("inspPrice").textContent = p.priceLabel;
       document.getElementById("inspSubPrice").textContent = p.priceSub;
+
+      const loc = OBS_LOCATIONS[obsLocIdx];
+      const lstDeg = ((Date.now() / 1000) * 0.00417 + loc.lon) % 360;
+      const eq = azAltToRaDec(p.azDeg, p.altDeg, loc.lat, lstDeg);
+      const raEl = document.getElementById("inspRaDec");
+      const azEl = document.getElementById("inspAzAlt");
+      if (raEl) raEl.textContent = `${formatRA(eq.raDeg)}  ·  ${formatDegMin(eq.decDeg)}`;
+      if (azEl) azEl.textContent = `${String(p.azDeg).padStart(3, "0")}° 00'  ·  +${String(p.altDeg).padStart(2, "0")}° 00'`;
 
       document.getElementById("inspFeatures").innerHTML = p.features.map(f =>
         `<div class="insp-feat-row"><span class="check">✓</span><span>${f}</span></div>`
@@ -1800,7 +2069,7 @@
     document.getElementById("clientBizCity").addEventListener("input", recalcModular);
 
     // =========================================================================
-    // 8. DRAWER & BOTTOM DOCK TOGGLES
+    // 8. DRAWER & STELLARIUM 3-ZONE BOTTOM BAR CONTROLS
     // =========================================================================
     document.getElementById("btnToggleDrawer").addEventListener("click", () => {
       document.getElementById("sideDrawer").classList.toggle("collapsed");
@@ -1811,44 +2080,69 @@
       this.classList.toggle("active", showConstellations);
       if (constellationGroup) constellationGroup.visible = showConstellations;
     });
+    document.getElementById("togAtmo").addEventListener("click", function() {
+      showAtmosphere = !showAtmosphere;
+      this.classList.toggle("active", showAtmosphere);
+      if (atmoDome) atmoDome.visible = showAtmosphere;
+    });
+    document.getElementById("togLandscape").addEventListener("click", function() {
+      showHorizon = !showHorizon;
+      this.classList.toggle("active", showHorizon);
+      if (horizonGroup) horizonGroup.visible = showHorizon;
+      compassEls.forEach(c => { c.el.style.display = showHorizon ? "block" : "none"; });
+    });
     document.getElementById("togGrid").addEventListener("click", function() {
       showGrid = !showGrid;
       this.classList.toggle("active", showGrid);
       if (gridGroup) gridGroup.visible = showGrid;
     });
-    document.getElementById("togHorizon").addEventListener("click", function() {
-      showHorizon = !showHorizon;
-      this.classList.toggle("active", showHorizon);
-      if (horizonGroup) horizonGroup.visible = showHorizon;
-      compassEls.forEach(c => { c.el.style.display = showHorizon ? "block" : "none"; });
+    document.getElementById("togEqGrid").addEventListener("click", function() {
+      showEqGrid = !showEqGrid;
+      this.classList.toggle("active", showEqGrid);
+      if (eqGridGroup) eqGridGroup.visible = showEqGrid;
     });
     document.getElementById("togLabels").addEventListener("click", function() {
       showLabels = !showLabels;
       this.classList.toggle("active", showLabels);
       Object.values(labelEls).forEach(el => { el.style.display = showLabels ? "flex" : "none"; });
     });
-    document.getElementById("togAutoOrbit").addEventListener("click", function() {
-      autoOrbit = !autoOrbit;
-      this.classList.toggle("active", autoOrbit);
-    });
     document.getElementById("togNight").addEventListener("click", function() {
       document.body.classList.toggle("night-vision");
       this.classList.toggle("active", document.body.classList.contains("night-vision"));
     });
-    document.getElementById("btnZoomIn").addEventListener("click", () => {
-      isFlying = false;
-      camFov = Math.max(22, camFov - 8);
-      targetFov = camFov;
-    });
-    document.getElementById("btnZoomOut").addEventListener("click", () => {
-      isFlying = false;
-      camFov = Math.min(92, camFov + 8);
-      targetFov = camFov;
-    });
     document.getElementById("btnResetCamera").addEventListener("click", () => {
       targetAlt = 22; targetFov = 58; isFlying = true; autoOrbit = true;
-      document.getElementById("togAutoOrbit").classList.add("active");
     });
+
+    // Observer Location Cycle (Tilts J2000 Equatorial Sphere & updates RA/Dec)
+    document.getElementById("btnLocationCycle").addEventListener("click", () => {
+      obsLocIdx = (obsLocIdx + 1) % OBS_LOCATIONS.length;
+      const loc = OBS_LOCATIONS[obsLocIdx];
+      document.getElementById("lblObsLoc").textContent = loc.label;
+      document.getElementById("lblObsCoords").textContent = loc.coords;
+      if (eqGridGroup) eqGridGroup.rotation.x = deg2rad(90 - Math.abs(loc.lat));
+      if (selectedPlanetId) selectPlanet(selectedPlanetId, false);
+    });
+
+    // Sky Illumination / Preetham Twilight Phase Cycle + Live Clock Tick
+    document.getElementById("btnTimeCycle").addEventListener("click", () => {
+      skyPhaseIdx = (skyPhaseIdx + 1) % SKY_PHASES.length;
+      const ph = SKY_PHASES[skyPhaseIdx];
+      document.getElementById("lblObsSkyPhase").textContent = ph.name;
+      if (atmoUniforms) {
+        atmoUniforms.uSunGlow.value = ph.sunGlow;
+        atmoUniforms.uSkyTint.value.set(...ph.skyTint);
+      }
+      if (mistUniforms) mistUniforms.uFogGlow.value = ph.fogGlow;
+    });
+    function tickObsClock() {
+      const el = document.getElementById("lblObsTime");
+      if (!el) return;
+      const now = new Date();
+      el.textContent = now.toTimeString().slice(0, 8);
+    }
+    tickObsClock();
+    setInterval(tickObsClock, 1000);
     // =========================================================================
     // 8B. MILLENNIUM 8K LIQUID GOLD VORTEX OVERLAY CONTROLLER
     // =========================================================================
@@ -1889,15 +2183,19 @@
     document.getElementById("btnZenMode").addEventListener("click", () => {
       document.getElementById("sideDrawer").classList.add("collapsed");
       document.getElementById("planetInspector").classList.remove("open");
-      document.getElementById("topHud").style.display = "none";
-      document.getElementById("bottomDock").style.display = "none";
+      document.body.classList.add("zen-hidden");
       document.getElementById("btnRestoreHud").style.display = "block";
+      if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      }
     });
     document.getElementById("btnRestoreHud").addEventListener("click", function() {
       this.style.display = "none";
-      document.getElementById("topHud").style.display = "flex";
-      document.getElementById("bottomDock").style.display = "flex";
+      document.body.classList.remove("zen-hidden");
       document.getElementById("sideDrawer").classList.remove("collapsed");
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch(() => {});
+      }
     });
 
     // =========================================================================
@@ -1921,7 +2219,6 @@
       velX = -dx * sens * 0.65;
       velY = dy * sens * 0.65;
       autoOrbit = false;
-      document.getElementById("togAutoOrbit").classList.remove("active");
       lastX = e.clientX; lastY = e.clientY;
     });
     window.addEventListener("pointerup", (e) => {
@@ -2000,6 +2297,7 @@
         });
 
         if (vortexPlane) vortexPlane.rotateZ(0.0008);
+        if (eqGridGroup) eqGridGroup.rotation.y = elapsed * 0.004;
         if (vortexCtrl) vortexCtrl.setScroll(camAz * 14);
 
         renderer.render(scene, camera);
