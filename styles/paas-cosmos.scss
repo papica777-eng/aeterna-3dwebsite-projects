@@ -1,0 +1,1683 @@
+@use 'sass:color';
+
+// =============================================================================
+// AETERNA COSMOS x STELLARIUM WEB ENGINE — MASTER SCSS DESIGN SYSTEM
+// =============================================================================
+
+$bg-obsidian: #020307;
+$bg-glass: rgba(8, 12, 24, 0.78);
+$bg-glass-deep: rgba(5, 8, 17, 0.90);
+$bg-surface: rgba(255, 255, 255, 0.035);
+$bg-surface-hover: rgba(255, 255, 255, 0.07);
+
+$gold: #c5a34e;
+$gold-bright: #fde047;
+$gold-soft: #f5d782;
+$gold-glow: rgba(197, 163, 78, 0.34);
+$gold-border: rgba(197, 163, 78, 0.42);
+$cyan-accent: #38bdf8;
+$emerald-live: #22c55e;
+$danger-night: rgba(165, 8, 8, 0.42);
+
+$text-primary: #f8fafc;
+$text-secondary: #cbd5e1;
+$text-muted: #8b9bb4;
+
+$border-subtle: rgba(255, 255, 255, 0.11);
+$border-bright: rgba(255, 255, 255, 0.22);
+
+$font-display: 'Cinzel', Georgia, serif;
+$font-editorial: 'Cormorant Garamond', Georgia, serif;
+$font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+$font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+$radius-panel: 16px;
+$radius-card: 12px;
+$radius-pill: 999px;
+
+$z-canvas: 1;
+$z-hud: 30;
+$z-popover: 45;
+$z-modal: 90;
+
+@mixin glass-panel($blur: 20px, $bg: $bg-glass) {
+  background: $bg;
+  backdrop-filter: blur($blur) saturate(1.25);
+  -webkit-backdrop-filter: blur($blur) saturate(1.25);
+  border: 1px solid $border-subtle;
+  box-shadow: 0 22px 54px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+@mixin thin-scrollbar($thumb: rgba(197, 163, 78, 0.32)) {
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $thumb;
+    border-radius: 4px;
+  }
+}
+
+@mixin gold-cta {
+  background: linear-gradient(135deg, #b89137 0%, #f5d782 50%, $gold 100%);
+  color: #06080f;
+  font-family: $font-mono;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.75px;
+  border: none;
+  box-shadow: 0 4px 20px $gold-glow;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 26px rgba(245, 215, 130, 0.42);
+    filter: brightness(1.06);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+// Reset & Base
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: $bg-obsidian;
+  color: $text-primary;
+  font-family: $font-sans;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+// =============================================================================
+// STELLARIUM WASM CANVAS & NIGHT VISION FILTER
+// =============================================================================
+#stel-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: $z-canvas;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+#nightModeOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: $z-canvas + 2;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(185, 12, 12, 0.34), rgba(110, 0, 0, 0.56));
+  mix-blend-mode: multiply;
+  transition: opacity 0.35s ease;
+
+  &.active {
+    opacity: 1;
+  }
+}
+
+// =============================================================================
+// SYNCHRONIZED 3D SKY BEACONS (BUSINESS WORLDS & 8K MILLENNIUM STUDIOS)
+// =============================================================================
+#paasWorldPins {
+  position: fixed;
+  inset: 0;
+  z-index: $z-hud - 10;
+  pointer-events: none;
+  overflow: hidden;
+
+  .paas-pin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 9px 3px 5px;
+    border-radius: $radius-pill;
+    background: rgba(5, 8, 18, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: pointer;
+    transform-origin: center center;
+    transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+    will-change: transform, opacity;
+
+    .pin-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      position: relative;
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: -4px;
+        border-radius: 50%;
+        border: 1px solid currentColor;
+        opacity: 0.45;
+      }
+    }
+
+    .pin-label {
+      font-family: $font-mono;
+      font-size: 9.5px;
+      letter-spacing: 0.4px;
+      color: $text-primary;
+      white-space: nowrap;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+    }
+
+    .pin-live {
+      font-family: $font-mono;
+      font-size: 8px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      text-transform: uppercase;
+    }
+
+    &:hover, &.active {
+      background: rgba(12, 16, 30, 0.92);
+      border-color: $gold-bright;
+      box-shadow: 0 0 18px rgba(197, 163, 78, 0.42);
+      z-index: 4;
+
+      .pin-label {
+        color: $gold-bright;
+      }
+    }
+  }
+}
+
+// Subtle Boot Splash
+#bootCurtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: radial-gradient(circle at 50% 42%, #0a1020 0%, $bg-obsidian 72%);
+  display: grid;
+  place-items: center;
+  transition: opacity 0.55s ease, visibility 0.55s ease;
+
+  &.ready {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .boot-inner {
+    text-align: center;
+    padding: 28px 34px;
+    border-radius: $radius-panel;
+    @include glass-panel(18px, rgba(8, 12, 24, 0.86));
+    border-color: $gold-border;
+    max-width: 390px;
+    width: calc(100vw - 32px);
+
+    .boot-logo {
+      font-family: $font-display;
+      font-size: 20px;
+      letter-spacing: 3px;
+      color: $gold-bright;
+      margin-bottom: 6px;
+    }
+
+    .boot-sub {
+      font-family: $font-mono;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      color: $text-muted;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .boot-bar {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 99px;
+      overflow: hidden;
+
+      span {
+        display: block;
+        width: 45%;
+        height: 100%;
+        background: linear-gradient(90deg, $gold, $gold-bright);
+        animation: bootSlide 1.15s ease-in-out infinite;
+      }
+    }
+
+    .boot-status {
+      margin-top: 10px;
+      font-family: $font-mono;
+      font-size: 11px;
+      color: $text-secondary;
+    }
+  }
+}
+
+@keyframes bootSlide {
+  0% { transform: translateX(-110%); }
+  100% { transform: translateX(260%); }
+}
+
+// =============================================================================
+// STELLARIUM DATA STREAM PROGRESS PILLS
+// =============================================================================
+#stelProgressRack {
+  position: fixed;
+  top: 72px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: $z-hud;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+  max-width: 560px;
+
+  .stel-prog-pill {
+    @include glass-panel(12px, rgba(6, 10, 20, 0.84));
+    border-radius: $radius-pill;
+    padding: 4px 10px;
+    font-family: $font-mono;
+    font-size: 10px;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .bar {
+      width: 52px;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      overflow: hidden;
+
+      i {
+        display: block;
+        height: 100%;
+        background: $gold-bright;
+        transition: width 0.2s linear;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// TOP HUD BAR (SLIM OBSIDIAN COCKPIT)
+// =============================================================================
+#topBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-hud + 5;
+  height: 60px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: linear-gradient(180deg, rgba(2, 3, 8, 0.92) 0%, rgba(2, 3, 8, 0.42) 74%, transparent 100%);
+  pointer-events: none;
+
+  > * {
+    pointer-events: auto;
+  }
+
+  .brand-cluster {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex-shrink: 0;
+  }
+
+  .hud-btn-menu {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    height: 36px;
+    padding: 0 13px;
+    border-radius: $radius-pill;
+    @include glass-panel(16px);
+    color: $text-primary;
+    font-family: $font-mono;
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+
+    &:hover, &.open {
+      border-color: $gold;
+      color: $gold-bright;
+      background: rgba(197, 163, 78, 0.14);
+    }
+
+    .badge-count {
+      padding: 1px 6px;
+      border-radius: $radius-pill;
+      background: rgba(197, 163, 78, 0.22);
+      color: $gold-bright;
+      font-size: 9.5px;
+    }
+  }
+
+  .brand-title {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    text-decoration: none;
+    color: $text-primary;
+
+    strong {
+      font-family: $font-display;
+      font-size: 16px;
+      letter-spacing: 2.2px;
+      color: $gold-bright;
+    }
+
+    span {
+      font-family: $font-mono;
+      font-size: 9.5px;
+      letter-spacing: 1.4px;
+      color: $text-muted;
+      text-transform: uppercase;
+    }
+  }
+
+  .search-wrap {
+    flex: 1;
+    max-width: 440px;
+    position: relative;
+
+    input {
+      width: 100%;
+      height: 36px;
+      padding: 0 34px 0 36px;
+      border-radius: $radius-pill;
+      @include glass-panel(18px, rgba(8, 12, 24, 0.84));
+      color: $text-primary;
+      font-size: 12.5px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+
+      &::placeholder {
+        color: $text-muted;
+      }
+
+      &:focus {
+        border-color: $gold;
+        box-shadow: 0 0 0 3px rgba(197, 163, 78, 0.14);
+      }
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      stroke: $text-muted;
+      pointer-events: none;
+    }
+
+    .search-clear {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.08);
+      color: $text-secondary;
+      font-size: 13px;
+      cursor: pointer;
+      display: none;
+      place-items: center;
+
+      &.visible {
+        display: grid;
+      }
+    }
+  }
+
+  .search-dropdown {
+    position: absolute;
+    top: 42px;
+    left: 0;
+    right: 0;
+    @include glass-panel(22px, $bg-glass-deep);
+    border-color: $gold-border;
+    border-radius: 14px;
+    padding: 6px;
+    max-height: 360px;
+    overflow-y: auto;
+    @include thin-scrollbar;
+    display: none;
+
+    &.open {
+      display: block;
+    }
+
+    .sr-item {
+      padding: 8px 11px;
+      border-radius: 9px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      transition: background 0.14s;
+
+      &:hover {
+        background: rgba(197, 163, 78, 0.16);
+      }
+
+      .sr-title {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .sr-sub {
+        font-size: 10.5px;
+        color: $text-muted;
+      }
+
+      .sr-tag {
+        font-family: $font-mono;
+        font-size: 9.5px;
+        padding: 2px 7px;
+        border-radius: $radius-pill;
+        background: rgba(197, 163, 78, 0.16);
+        color: $gold-bright;
+        white-space: nowrap;
+
+        &.celestial {
+          background: rgba(56, 189, 248, 0.16);
+          color: #7dd3fc;
+        }
+      }
+    }
+  }
+
+  .top-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .tel-pill {
+    @include glass-panel(16px);
+    height: 36px;
+    padding: 0 12px;
+    border-radius: $radius-pill;
+    font-family: $font-mono;
+    font-size: 10.5px;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    b {
+      color: $gold-bright;
+      font-weight: 600;
+    }
+  }
+
+  .btn-order-top {
+    height: 36px;
+    padding: 0 15px;
+    border-radius: $radius-pill;
+    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    @include gold-cta;
+  }
+}
+
+// =============================================================================
+// LEFT EXPLORE DRAWER (WEBSITES, MILLENNIUM 8K STUDIOS & LIVE BRAND INJECTOR)
+// =============================================================================
+#leftDrawer {
+  position: fixed;
+  top: 64px;
+  left: 14px;
+  bottom: 72px;
+  width: 326px;
+  max-width: calc(100vw - 28px);
+  @include glass-panel(22px, rgba(8, 12, 24, 0.88));
+  border-radius: $radius-panel;
+  z-index: $z-hud + 3;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(-115%);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  .drawer-head {
+    padding: 13px 15px 10px;
+    border-bottom: 1px solid $border-subtle;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+
+    h2 {
+      font-family: $font-display;
+      font-size: 13.5px;
+      letter-spacing: 1.5px;
+      color: $gold-bright;
+    }
+
+    p {
+      font-size: 11px;
+      color: $text-muted;
+      margin-top: 2px;
+    }
+  }
+
+  .btn-close-round {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid $border-subtle;
+    background: rgba(255, 255, 255, 0.05);
+    color: $text-primary;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 15px;
+    line-height: 1;
+    transition: border-color 0.15s, background 0.15s;
+
+    &:hover {
+      border-color: $gold;
+      background: rgba(197, 163, 78, 0.18);
+    }
+  }
+
+  .cat-bar {
+    padding: 9px 13px;
+    border-bottom: 1px solid $border-subtle;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    flex-shrink: 0;
+
+    .cat-pill {
+      padding: 4px 9px;
+      border-radius: $radius-pill;
+      border: 1px solid $border-subtle;
+      background: $bg-surface;
+      color: $text-secondary;
+      font-family: $font-mono;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+        color: #fff;
+      }
+
+      &.active {
+        background: rgba(197, 163, 78, 0.22);
+        border-color: $gold;
+        color: $gold-bright;
+      }
+    }
+  }
+
+  .brand-box {
+    padding: 9px 13px;
+    border-bottom: 1px solid $border-subtle;
+    background: rgba(197, 163, 78, 0.05);
+    flex-shrink: 0;
+
+    label {
+      display: block;
+      font-family: $font-mono;
+      font-size: 9.5px;
+      letter-spacing: 1px;
+      color: $gold;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .brand-row {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 6px;
+
+      input {
+        width: 100%;
+        height: 29px;
+        padding: 0 9px;
+        border-radius: 7px;
+        border: 1px solid $border-subtle;
+        background: rgba(3, 5, 11, 0.82);
+        color: #fff;
+        font-size: 11.5px;
+        outline: none;
+
+        &:focus {
+          border-color: $gold;
+        }
+      }
+    }
+  }
+
+  .drawer-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 9px 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    @include thin-scrollbar;
+  }
+
+  .world-card {
+    padding: 9px 11px;
+    border-radius: $radius-card;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: border-color 0.16s, background 0.16s, transform 0.16s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.24);
+      transform: translateX(2px);
+    }
+
+    &.active {
+      background: rgba(197, 163, 78, 0.14);
+      border-color: $gold;
+    }
+
+    .wc-orb {
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .wc-meta {
+      flex: 1;
+      min-width: 0;
+
+      .wc-title {
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .wc-sub {
+        font-size: 10.5px;
+        color: $text-muted;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin-top: 1px;
+      }
+    }
+
+    .wc-price {
+      font-family: $font-mono;
+      font-size: 10.5px;
+      color: $gold-bright;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+  }
+}
+
+// =============================================================================
+// RIGHT COMPACT INSPECTOR PANEL (NEVER CLIPS ON 720p LAPTOP SCREENS!)
+// =============================================================================
+#inspectorPanel {
+  position: fixed;
+  top: 64px;
+  right: 14px;
+  width: 356px;
+  max-width: calc(100vw - 28px);
+  max-height: calc(100vh - 146px);
+  @include glass-panel(24px, rgba(8, 12, 24, 0.88));
+  border-color: $gold-border;
+  border-radius: $radius-panel;
+  z-index: $z-hud + 2;
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  animation: inspPop 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.open {
+    display: flex;
+  }
+
+  .insp-head {
+    position: relative;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid $border-subtle;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, rgba(197, 163, 78, 0.10) 0%, rgba(12, 18, 36, 0.65) 100%);
+
+    .insp-badge-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: radial-gradient(circle at 30% 25%, rgba(197, 163, 78, 0.22), rgba(5, 8, 18, 0.94));
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .insp-head-meta {
+      flex: 1;
+      min-width: 0;
+      padding-right: 22px;
+
+      .insp-kicker {
+        font-family: $font-mono;
+        font-size: 9.5px;
+        letter-spacing: 1.1px;
+        color: $gold;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      h3 {
+        font-family: $font-editorial;
+        font-size: 19px;
+        line-height: 1.12;
+        font-weight: 700;
+        color: #fff;
+        margin-top: 2px;
+      }
+    }
+
+    .btn-insp-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      border: 1px solid $border-subtle;
+      background: rgba(5, 8, 16, 0.8);
+      color: #fff;
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      font-size: 15px;
+
+      &:hover {
+        border-color: $gold;
+        color: $gold-bright;
+      }
+    }
+  }
+
+  .insp-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 11px 14px;
+    @include thin-scrollbar;
+  }
+
+  .insp-desc {
+    font-size: 12px;
+    line-height: 1.48;
+    color: $text-secondary;
+    margin-bottom: 10px;
+  }
+
+  .insp-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    margin-bottom: 9px;
+
+    .tel-box {
+      padding: 6px 8px;
+      border-radius: 9px;
+      background: $bg-surface;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      .tel-k {
+        font-family: $font-mono;
+        font-size: 8.5px;
+        letter-spacing: 0.7px;
+        color: $text-muted;
+        text-transform: uppercase;
+      }
+
+      .tel-v {
+        font-family: $font-mono;
+        font-size: 11.5px;
+        font-weight: 700;
+        color: #fff;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .insp-sky-coords {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 3px 10px;
+    padding: 7px 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.025);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    font-family: $font-mono;
+    font-size: 10.5px;
+    color: $text-muted;
+    margin-bottom: 9px;
+
+    span:nth-child(even) {
+      color: #e2e8f0;
+      text-align: right;
+    }
+  }
+
+  .insp-feats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+
+    .feat-row {
+      display: flex;
+      gap: 7px;
+      font-size: 11.5px;
+      color: $text-secondary;
+      line-height: 1.35;
+
+      &::before {
+        content: '✓';
+        color: $gold-bright;
+        font-weight: 700;
+        flex-shrink: 0;
+      }
+    }
+  }
+
+  .insp-price-card {
+    padding: 8px 11px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(197, 163, 78, 0.14), rgba(197, 163, 78, 0.04));
+    border: 1px solid rgba(197, 163, 78, 0.35);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+
+    .p-tag {
+      font-family: $font-mono;
+      font-size: 8.5px;
+      color: $gold;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+    }
+
+    .p-main {
+      font-family: $font-display;
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .p-sub {
+      font-size: 10px;
+      color: $text-secondary;
+      text-align: right;
+      max-width: 140px;
+    }
+  }
+
+  // Pinned footer ensures buttons NEVER get clipped off bottom on laptops!
+  .insp-footer {
+    padding: 10px 14px 12px;
+    border-top: 1px solid $border-subtle;
+    background: rgba(4, 7, 15, 0.92);
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+    flex-shrink: 0;
+
+    .btn-launch {
+      width: 100%;
+      height: 38px;
+      border-radius: 10px;
+      font-size: 11.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      @include gold-cta;
+    }
+
+    .btn-row-sec {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+    }
+
+    .btn-sec {
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.05);
+      color: $text-primary;
+      font-family: $font-mono;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      text-decoration: none;
+      transition: all 0.16s;
+
+      &:hover {
+        border-color: $gold;
+        color: $gold-bright;
+        background: rgba(197, 163, 78, 0.12);
+      }
+    }
+  }
+}
+
+@keyframes inspPop {
+  from { opacity: 0; transform: translateY(10px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+// =============================================================================
+// STELLARIUM ULTRA VISUALS POPOVER (NATIVE WASM UNIFORM TUNING + TOUR)
+// =============================================================================
+#ultraDrawer {
+  position: fixed;
+  bottom: 72px;
+  left: 50%;
+  transform: translateX(-50%) translateY(14px);
+  width: min(560px, calc(100vw - 24px));
+  @include glass-panel(24px, rgba(6, 10, 20, 0.92));
+  border-color: $gold-border;
+  border-radius: $radius-panel;
+  padding: 13px 15px;
+  z-index: $z-popover;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s;
+
+  &.open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .ud-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    span {
+      font-family: $font-mono;
+      font-size: 10.5px;
+      letter-spacing: 1.2px;
+      color: $gold-bright;
+      text-transform: uppercase;
+    }
+  }
+
+  .ud-sliders {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 11px;
+
+    .slider-box {
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: $bg-surface;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+
+      .sl-top {
+        display: flex;
+        justify-content: space-between;
+        font-family: $font-mono;
+        font-size: 9.5px;
+        color: $text-secondary;
+        margin-bottom: 5px;
+
+        b {
+          color: $gold-bright;
+        }
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: $gold-bright;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .ud-toggles {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 11px;
+
+    .fx-chip {
+      padding: 5px 10px;
+      border-radius: $radius-pill;
+      border: 1px solid $border-subtle;
+      background: $bg-surface;
+      color: $text-secondary;
+      font-family: $font-mono;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+
+      &:hover {
+        border-color: $border-bright;
+        color: #fff;
+      }
+
+      &.active {
+        background: rgba(197, 163, 78, 0.22);
+        border-color: $gold;
+        color: $gold-bright;
+      }
+    }
+  }
+
+  .ud-presets {
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    padding-top: 9px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+
+    .preset-lbl {
+      font-family: $font-mono;
+      font-size: 9.5px;
+      color: $text-muted;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    .preset-btn {
+      padding: 4px 9px;
+      border-radius: 7px;
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      background: rgba(56, 189, 248, 0.09);
+      color: #bae6fd;
+      font-family: $font-mono;
+      font-size: 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+
+      &:hover {
+        border-color: $gold;
+        background: rgba(197, 163, 78, 0.20);
+        color: $gold-bright;
+      }
+    }
+  }
+}
+
+// =============================================================================
+// STELLARIUM BOTTOM SVG CONTROL DOCK + OBSERVER / CLOCK CORNERS
+// =============================================================================
+#bottomDock {
+  position: fixed;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: $z-hud + 3;
+  @include glass-panel(22px, rgba(6, 9, 20, 0.84));
+  border-radius: $radius-pill;
+  padding: 5px 10px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  max-width: calc(100vw - 260px);
+  overflow-x: auto;
+  @include thin-scrollbar;
+
+  .stel-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid transparent;
+    background: transparent;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    opacity: 0.48;
+    transition: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
+
+    img {
+      width: 22px;
+      height: 22px;
+      filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7));
+      pointer-events: none;
+    }
+
+    .txt-ico {
+      font-size: 14px;
+      color: $text-primary;
+      font-family: $font-mono;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    &:hover {
+      opacity: 0.92;
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-1px);
+    }
+
+    &.active {
+      opacity: 1;
+      background: rgba(197, 163, 78, 0.20);
+      border-color: $gold-border;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 2px;
+        width: 12px;
+        height: 2px;
+        border-radius: 2px;
+        background: $gold-bright;
+      }
+    }
+  }
+
+  .dock-sep {
+    width: 1px;
+    height: 22px;
+    background: rgba(255, 255, 255, 0.12);
+    margin: 0 3px;
+    flex-shrink: 0;
+  }
+
+  .dock-pill-btn {
+    height: 32px;
+    padding: 0 10px;
+    border-radius: $radius-pill;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: $text-secondary;
+    font-family: $font-mono;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: all 0.16s;
+
+    &:hover, &.active {
+      border-color: $gold;
+      color: $gold-bright;
+      background: rgba(197, 163, 78, 0.16);
+    }
+  }
+}
+
+.corner-badge {
+  position: fixed;
+  bottom: 12px;
+  z-index: $z-hud + 2;
+  @include glass-panel(18px, rgba(6, 9, 20, 0.80));
+  border-radius: 12px;
+  padding: 6px 11px;
+  font-family: $font-mono;
+  font-size: 10.5px;
+  color: $text-secondary;
+  line-height: 1.3;
+
+  &.left {
+    left: 14px;
+    cursor: pointer;
+    transition: border-color 0.18s;
+
+    &:hover {
+      border-color: $gold;
+    }
+
+    strong {
+      color: #fff;
+      font-size: 11px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  }
+
+  &.right {
+    right: 14px;
+    text-align: right;
+
+    strong {
+      color: #fff;
+      font-size: 11px;
+    }
+
+    .time-controls {
+      margin-top: 3px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 4px;
+
+      button {
+        padding: 1px 6px;
+        border-radius: 5px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.05);
+        color: $text-secondary;
+        font-family: $font-mono;
+        font-size: 9.5px;
+        cursor: pointer;
+
+        &:hover, &.active {
+          border-color: $gold;
+          color: $gold-bright;
+          background: rgba(197, 163, 78, 0.16);
+        }
+      }
+    }
+
+    .agpl-note {
+      margin-top: 3px;
+      font-size: 8.5px;
+      color: $text-muted;
+
+      a {
+        color: $gold;
+        text-decoration: none;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
+
+#locPopover {
+  position: fixed;
+  bottom: 66px;
+  left: 14px;
+  z-index: $z-popover;
+  @include glass-panel(22px, $bg-glass-deep);
+  border-color: $gold-border;
+  border-radius: 12px;
+  padding: 8px;
+  width: 230px;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+
+  &.open {
+    display: flex;
+  }
+
+  button {
+    text-align: left;
+    padding: 7px 10px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: $text-secondary;
+    font-family: $font-mono;
+    font-size: 10.5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+
+    &:hover, &.active {
+      background: rgba(197, 163, 78, 0.16);
+      border-color: rgba(197, 163, 78, 0.35);
+      color: $gold-bright;
+    }
+  }
+}
+
+// =============================================================================
+// FULLSCREEN PREVIEW & $495+ COMMERCIAL CONFIGURATOR MODALS
+// =============================================================================
+.full-modal {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal;
+  background: rgba(2, 3, 8, 0.94);
+  backdrop-filter: blur(18px);
+  display: none;
+  flex-direction: column;
+
+  &.open {
+    display: flex;
+  }
+
+  .modal-bar {
+    height: 54px;
+    padding: 0 16px;
+    border-bottom: 1px solid $border-subtle;
+    background: rgba(6, 9, 18, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-shrink: 0;
+
+    .modal-title {
+      font-family: $font-editorial;
+      font-size: 19px;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+
+      .btn-ext {
+        padding: 7px 12px;
+        border-radius: 8px;
+        border: 1px solid $border-subtle;
+        background: rgba(255, 255, 255, 0.06);
+        color: $text-primary;
+        font-family: $font-mono;
+        font-size: 10.5px;
+        text-decoration: none;
+
+        &:hover {
+          border-color: $gold;
+          color: $gold-bright;
+        }
+      }
+
+      .btn-close-modal {
+        padding: 7px 13px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(239, 68, 68, 0.14);
+        color: #fecaca;
+        font-family: $font-mono;
+        font-size: 10.5px;
+        cursor: pointer;
+
+        &:hover {
+          background: rgba(239, 68, 68, 0.28);
+        }
+      }
+    }
+  }
+
+  .preview-frame {
+    flex: 1;
+    width: 100%;
+    border: none;
+    background: #fff;
+  }
+
+  .config-dialog {
+    margin: auto;
+    width: min(740px, 95vw);
+    max-height: 90vh;
+    overflow-y: auto;
+    @include thin-scrollbar;
+    @include glass-panel(26px, #080d1a);
+    border-color: $gold-border;
+    border-radius: 18px;
+    padding: 22px 24px;
+    position: relative;
+
+    .cfg-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 14px;
+
+      .cfg-tab {
+        padding: 9px 12px;
+        border-radius: 9px;
+        border: 1px solid $border-subtle;
+        background: $bg-surface;
+        color: $text-secondary;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+
+        &.active {
+          border-color: $gold;
+          background: rgba(197, 163, 78, 0.16);
+          color: $gold-bright;
+        }
+      }
+    }
+
+    .addon-check-card {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.11);
+      background: $bg-surface;
+      display: flex;
+      gap: 11px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      cursor: pointer;
+
+      input {
+        width: 16px;
+        height: 16px;
+        accent-color: $gold-bright;
+        margin-top: 2px;
+      }
+
+      &:hover {
+        border-color: $gold-border;
+      }
+    }
+
+    .tier-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 9px;
+      margin-bottom: 12px;
+
+      .tier-card {
+        padding: 13px;
+        border-radius: 11px;
+        background: $bg-surface;
+        border: 1px solid rgba(255, 255, 255, 0.11);
+
+        &.featured {
+          border-color: $gold;
+          background: rgba(197, 163, 78, 0.08);
+        }
+
+        .tk {
+          font-family: $font-mono;
+          font-size: 9.5px;
+          color: $text-muted;
+        }
+
+        .tv {
+          font-family: $font-display;
+          font-size: 18px;
+          font-weight: 700;
+          color: #fff;
+          margin: 4px 0;
+        }
+
+        .td {
+          font-size: 11px;
+          color: $text-muted;
+          margin-bottom: 10px;
+        }
+
+        a {
+          @include gold-cta;
+          width: 100%;
+          height: 32px;
+          border-radius: 8px;
+          font-size: 10px;
+          display: grid;
+          place-items: center;
+          text-decoration: none;
+        }
+      }
+    }
+
+    .wire-box {
+      padding: 11px 13px;
+      border-radius: 10px;
+      background: rgba(197, 163, 78, 0.06);
+      border: 1px dashed $gold-border;
+      font-family: $font-mono;
+      font-size: 10.5px;
+      line-height: 1.55;
+      color: $text-secondary;
+    }
+  }
+}
+
+// =============================================================================
+// RESPONSIVE BREAKPOINTS (LAPTOP 720p & MOBILE)
+// =============================================================================
+@media (max-height: 680px) {
+  #inspectorPanel {
+    top: 58px;
+    max-height: calc(100vh - 132px);
+
+    .insp-head {
+      padding: 9px 12px 8px;
+
+      .insp-badge-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 19px;
+      }
+
+      h3 {
+        font-size: 16.5px;
+      }
+    }
+
+    .insp-scroll {
+      padding: 8px 12px;
+    }
+
+    .insp-footer {
+      padding: 8px 12px 10px;
+    }
+  }
+}
+
+@media (max-width: 960px) {
+  #topBar {
+    .tel-pill, .brand-title span {
+      display: none;
+    }
+  }
+
+  .corner-badge {
+    display: none;
+  }
+
+  #bottomDock {
+    max-width: calc(100vw - 20px);
+  }
+}
+
+@media (max-width: 640px) {
+  #topBar {
+    .brand-title {
+      display: none;
+    }
+  }
+
+  #inspectorPanel {
+    top: auto;
+    bottom: 66px;
+    left: 10px;
+    right: 10px;
+    width: auto;
+    max-height: 56vh;
+  }
+}

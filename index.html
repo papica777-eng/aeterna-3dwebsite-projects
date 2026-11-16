@@ -1,2399 +1,396 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>AETERNA COSMOS // Interactive Planetary Business Website Observatory — paas.website</title>
-  <meta name="description" content="Explore our interactive 3D planetary universe of custom-engineered business websites. Rotate the cosmos, select your industry planet, preview live in 8K, and launch your digital flagship.">
-  <link rel="canonical" href="https://paas.website/">
-  <meta name="theme-color" content="#05070c">
-
-  <!-- Open Graph / Social -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://paas.website/">
-  <meta property="og:title" content="AETERNA COSMOS // Planetary Web Architecture Observatory">
-  <meta property="og:description" content="Interactive 3D Stellarium-grade website explorer. Pick your business industry planet, preview it live with your brand name, and launch in minutes.">
-  <meta property="og:image" content="https://paas.website/assets/awwwards_hero_hq.jpg">
-
-  <!-- Fonts: Cinzel, Cormorant Garamond, Plus Jakarta Sans, Space Mono -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-
-  <style>
-    :root {
-      --bg-cosmos: #04060b;
-      --hud-glass: rgba(9, 13, 21, 0.84);
-      --hud-glass-solid: rgba(9, 13, 21, 0.96);
-      --hud-card: rgba(16, 22, 34, 0.72);
-      --gold: #c5a34e;
-      --gold-bright: #f0d78c;
-      --gold-glow: rgba(197, 163, 78, 0.38);
-      --gold-border: rgba(197, 163, 78, 0.38);
-      --cyan: #38bdf8;
-      --emerald: #10b981;
-      --ivory: #f7f5f0;
-      --muted: #8e98a8;
-      --border: rgba(255, 255, 255, 0.1);
-      --font-display: "Cinzel", Georgia, serif;
-      --font-serif: "Cormorant Garamond", Georgia, serif;
-      --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-mono: "Space Mono", monospace;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%; height: 100%; overflow: hidden;
-      background: var(--bg-cosmos); color: var(--ivory);
-      font-family: var(--font-sans); user-select: none; -webkit-user-select: none;
-    }
-
-    /* ════════ STELLARIUM NIGHT VISION FILTER ════════ */
-    #nightModeOverlay {
-      position: fixed; inset: 0; z-index: 99999;
-      background: #ff2400; mix-blend-mode: multiply;
-      pointer-events: none; visibility: hidden; opacity: 0.9;
-    }
-    body.night-vision #nightModeOverlay { visibility: visible; }
-
-    /* ════════ 3D COSMOS VIEWPORT ════════ */
-    #cosmosCanvas {
-      position: fixed; inset: 0; width: 100vw; height: 100vh;
-      display: block; z-index: 1; cursor: grab; touch-action: none;
-    }
-    #cosmosCanvas:active { cursor: grabbing; }
-    #vortexOverlayCanvas {
-      position: fixed; inset: 0; width: 100vw; height: 100vh;
-      display: block; z-index: 2; pointer-events: none;
-      mix-blend-mode: screen; opacity: 0.40;
-      transition: opacity 0.45s ease;
-    }
-    body.vortex-max #vortexOverlayCanvas { opacity: 0.84; mix-blend-mode: lighten; }
-    body.vortex-off #vortexOverlayCanvas { opacity: 0; visibility: hidden; }
-
-    /* 2D Astronomical Labels & Compass Layer */
-    #hudOverlayLayer {
-      position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden;
-    }
-    .star-label {
-      position: absolute; transform: translate(14px, -50%);
-      pointer-events: auto; cursor: pointer;
-      display: flex; align-items: center; gap: 7px;
-      padding: 4px 10px; border-radius: 999px;
-      background: rgba(6, 9, 15, 0.65); border: 1px solid rgba(255, 255, 255, 0.14);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      transition: border-color 0.2s, background 0.2s, transform 0.15s;
-      white-space: nowrap;
-    }
-    .star-label:hover, .star-label.active {
-      background: rgba(15, 21, 34, 0.92);
-      border-color: var(--gold);
-      box-shadow: 0 0 18px var(--gold-glow);
-      z-index: 15;
-    }
-    .star-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .star-name { font-family: var(--font-display); font-size: 10.5px; font-weight: 700; letter-spacing: 0.9px; color: #fff; }
-    .star-price { font-family: var(--font-mono); font-size: 9.5px; color: var(--gold-bright); }
-
-    .compass-marker {
-      position: absolute; bottom: 72px; transform: translateX(-50%);
-      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
-      color: rgba(197, 163, 78, 0.65); letter-spacing: 1px;
-      pointer-events: none; text-shadow: 0 2px 8px #000;
-    }
-    .compass-marker.cardinal { color: var(--gold); font-size: 13px; }
-
-    /* Stellarium Target Reticle */
-    #targetReticle {
-      position: fixed; width: 64px; height: 64px;
-      transform: translate(-50%, -50%); pointer-events: none; z-index: 6;
-      display: none; transition: opacity 0.2s;
-    }
-    .reticle-corner {
-      position: absolute; width: 14px; height: 14px; border-color: var(--gold-bright); border-style: solid;
-      animation: reticlePulse 2s ease-in-out infinite;
-    }
-    .rc-tl { top: 0; left: 0; border-width: 2px 0 0 2px; }
-    .rc-tr { top: 0; right: 0; border-width: 2px 2px 0 0; }
-    .rc-bl { bottom: 0; left: 0; border-width: 0 0 2px 2px; }
-    .rc-br { bottom: 0; right: 0; border-width: 0 2px 2px 0; }
-    @keyframes reticlePulse {
-      0%, 100% { transform: scale(1); opacity: 0.95; }
-      50% { transform: scale(1.12); opacity: 0.55; }
-    }
-
-    /* ════════ STELLARIUM TOP TOOLBAR (HAMBURGER + CENTER SEARCH + TELEMETRY) ════════ */
-    .top-hud-strip {
-      position: fixed; top: 0; left: 0; right: 0; height: 50px; z-index: 50;
-      padding: 0 14px;
-      background: linear-gradient(to bottom, rgba(6, 10, 18, 0.86) 0%, rgba(6, 10, 18, 0.52) 100%);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-      display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 12px;
-      pointer-events: auto; transition: opacity 0.3s;
-    }
-    .top-left-cluster { display: flex; align-items: center; gap: 10px; min-width: 0; }
-    .btn-drawer-toggle {
-      display: inline-flex; align-items: center; gap: 8px;
-      height: 36px; padding: 0 12px; border-radius: 18px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.14); color: var(--ivory);
-      font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
-      cursor: pointer; transition: all 0.2s; white-space: nowrap;
-    }
-    .btn-drawer-toggle:hover { background: rgba(197, 163, 78, 0.16); border-color: var(--gold); color: var(--gold-bright); }
-    .btn-drawer-toggle .delta { color: var(--gold); font-size: 13px; }
-    .stel-brand-title {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-family: var(--font-display); font-size: 14px; font-weight: 700; letter-spacing: 1.4px; color: #fff;
-      white-space: nowrap;
-    }
-    .stel-brand-title sup { font-family: var(--font-mono); font-size: 9px; color: var(--gold-bright); letter-spacing: 0.6px; font-weight: 700; }
-
-    .search-capsule {
-      position: relative; width: 340px; max-width: 44vw; justify-self: center;
-    }
-    .search-capsule input {
-      width: 100%; height: 34px; padding: 0 16px 0 36px; border-radius: 17px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.14); color: #fff; font-family: var(--font-sans); font-size: 12.5px;
-      outline: none; transition: border-color 0.2s, background 0.2s;
-    }
-    .search-capsule input:focus { border-color: var(--gold); background: rgba(9, 13, 21, 0.92); }
-    .search-capsule input::placeholder { color: rgba(226, 232, 240, 0.55); }
-    .search-icon {
-      position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
-      color: var(--gold); font-size: 13px; pointer-events: none;
-    }
-    .search-dropdown {
-      position: absolute; top: 40px; left: 0; right: 0;
-      background: var(--hud-glass-solid); backdrop-filter: blur(24px);
-      border: 1px solid var(--gold-border); border-radius: 14px;
-      overflow: hidden; display: none; box-shadow: 0 20px 50px rgba(0,0,0,0.85); z-index: 90;
-    }
-    .search-dropdown.open { display: block; }
-    .search-hit {
-      padding: 9px 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 12.5px;
-    }
-    .search-hit:hover { background: rgba(197, 163, 78, 0.14); }
-
-    .top-right-telemetry {
-      display: flex; align-items: center; justify-content: flex-end; gap: 10px;
-    }
-    .telemetry-pill {
-      height: 34px; padding: 0 12px; border-radius: 17px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 8px;
-      font-family: var(--font-mono); font-size: 10.5px; color: #cbd5e1; white-space: nowrap;
-    }
-    .telemetry-pill .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--emerald); box-shadow: 0 0 8px var(--emerald); }
-    .btn-order-top {
-      height: 34px; padding: 0 16px; border-radius: 17px;
-      background: linear-gradient(135deg, var(--gold) 0%, #9b7d31 100%);
-      color: #05070c; font-weight: 800; font-size: 11px; letter-spacing: 0.9px; text-transform: uppercase;
-      border: none; cursor: pointer; box-shadow: 0 4px 18px var(--gold-glow); transition: all 0.2s; white-space: nowrap;
-    }
-    .btn-order-top:hover { transform: translateY(-1px); filter: brightness(1.1); }
-
-    /* ════════ STELLARIUM LEFT SIDE MENU DRAWER ════════ */
-    #sideDrawer {
-      position: fixed; top: 62px; left: 12px; bottom: 76px; width: 352px; max-width: calc(100vw - 24px);
-      z-index: 45; border-radius: 18px;
-      background: var(--hud-glass); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--gold-border); box-shadow: 0 25px 65px rgba(0, 0, 0, 0.8);
-      display: flex; flex-direction: column; overflow: hidden;
-      transform: translateX(0); transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s;
-    }
-    #sideDrawer.collapsed {
-      transform: translateX(calc(-100% - 30px)); opacity: 0; pointer-events: none;
-    }
-    .drawer-header {
-      padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
-    }
-    .drawer-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-    .drawer-title-row h2 { font-family: var(--font-display); font-size: 14px; letter-spacing: 1.6px; color: var(--gold-bright); }
-    .drawer-sub { font-size: 11.5px; color: var(--muted); }
-
-    /* Personalize Business Injector inside Side Menu */
-    .biz-injector {
-      padding: 12px 18px; background: rgba(197, 163, 78, 0.06);
-      border-bottom: 1px solid var(--border);
-    }
-    .biz-inj-label {
-      font-family: var(--font-mono); font-size: 9.5px; color: var(--gold); letter-spacing: 0.8px;
-      text-transform: uppercase; margin-bottom: 6px; display: block;
-    }
-    .biz-inj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .biz-inj-grid input {
-      width: 100%; background: rgba(5, 8, 14, 0.85); border: 1px solid rgba(255,255,255,0.12);
-      color: #fff; font-size: 11.5px; padding: 7px 10px; border-radius: 7px; outline: none;
-    }
-    .biz-inj-grid input:focus { border-color: var(--gold); }
-
-    /* Constellation Filter Chips */
-    .filter-strip {
-      padding: 10px 18px; display: flex; gap: 6px; overflow-x: auto; border-bottom: 1px solid var(--border);
-      scrollbar-width: none;
-    }
-    .filter-strip::-webkit-scrollbar { display: none; }
-    .chip-filter {
-      flex-shrink: 0; padding: 5px 11px; border-radius: 999px;
-      background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255,255,255,0.08);
-      color: var(--muted); font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.15s;
-    }
-    .chip-filter:hover { color: #fff; border-color: rgba(255,255,255,0.25); }
-    .chip-filter.active { background: var(--gold); color: #05070c; border-color: var(--gold); font-weight: 700; }
-
-    /* Scrollable Planet Catalog */
-    .planet-catalog {
-      flex: 1; overflow-y: auto; padding: 10px 12px; display: flex; flex-direction: column; gap: 8px;
-      scrollbar-width: thin; scrollbar-color: var(--gold-border) transparent;
-    }
-    .planet-item {
-      display: flex; align-items: center; gap: 12px; padding: 11px 12px; border-radius: 12px;
-      background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255,255,255,0.06);
-      cursor: pointer; transition: all 0.2s;
-    }
-    .planet-item:hover { background: rgba(255, 255, 255, 0.07); border-color: rgba(197,163,78,0.4); transform: translateX(3px); }
-    .planet-item.selected { background: rgba(197, 163, 78, 0.13); border-color: var(--gold); box-shadow: 0 4px 20px rgba(197,163,78,0.16); }
-    .orb-thumb {
-      width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; position: relative;
-      box-shadow: inset -6px -6px 12px rgba(0,0,0,0.7), 0 0 14px rgba(255,255,255,0.18);
-    }
-    .planet-meta { flex: 1; min-width: 0; }
-    .planet-name { font-size: 13px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .planet-niche { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .planet-right { text-align: right; flex-shrink: 0; }
-    .planet-price-tag { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--gold-bright); }
-    .planet-live-tag { font-size: 9.5px; color: var(--emerald); font-weight: 700; letter-spacing: 0.4px; }
-
-    .drawer-footer {
-      padding: 10px 14px; border-top: 1px solid var(--border);
-      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
-      background: rgba(5, 7, 12, 0.7);
-    }
-    .btn-drawer-foot {
-      padding: 8px 10px; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center;
-      text-decoration: none; cursor: pointer; border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04); color: var(--ivory); transition: all 0.15s;
-    }
-    .btn-drawer-foot:hover { border-color: var(--gold); color: var(--gold-bright); }
-
-    /* ════════ FLOATING PLANET INSPECTOR CARD (STELLARIUM OBJECT PANEL) ════════ */
-    #planetInspector {
-      position: fixed; top: 62px; right: 12px; width: 396px; max-width: calc(100vw - 24px); max-height: calc(100vh - 142px);
-      z-index: 44; border-radius: 14px; overflow-y: auto;
-      background: rgba(18, 24, 34, 0.72); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-      border: 1px solid var(--gold-border); box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
-      display: none; flex-direction: column;
-      scrollbar-width: thin; scrollbar-color: var(--gold-border) transparent;
-    }
-    .insp-astro-table {
-      display: grid; grid-template-columns: 78px 1fr; gap: 4px 10px;
-      padding: 8px 10px; border-radius: 8px; background: rgba(4, 7, 13, 0.55);
-      border: 1px solid rgba(255,255,255,0.08); font-family: var(--font-mono); font-size: 10.5px;
-    }
-    .insp-astro-k { color: var(--muted); }
-    .insp-astro-v { color: #f8fafc; font-weight: 700; text-align: right; }
-    #planetInspector.open { display: flex; animation: panelSlideIn 0.25s cubic-bezier(0.16, 1, 0.3, 1); }
-    @keyframes panelSlideIn {
-      from { opacity: 0; transform: translateX(18px); }
-      to { opacity: 1; transform: translateX(0); }
-    }
-    .insp-hero-banner {
-      position: relative; width: 100%; height: 152px; overflow: hidden;
-      background: #03050a; flex-shrink: 0; border-bottom: 1px solid var(--border);
-    }
-    .insp-hero-banner img {
-      width: 100%; height: 100%; object-fit: cover; display: block;
-    }
-    .insp-hero-banner::after {
-      content: ""; position: absolute; inset: 0;
-      background: linear-gradient(to bottom, rgba(5,7,12,0.1) 20%, rgba(9, 13, 21, 0.98) 100%);
-    }
-    .insp-close-floating {
-      position: absolute; top: 10px; right: 12px; z-index: 5;
-      background: rgba(6, 9, 15, 0.72); border: 1px solid rgba(255,255,255,0.2);
-      color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
-      font-size: 16px; backdrop-filter: blur(8px);
-    }
-    .insp-close-floating:hover { border-color: var(--gold); color: var(--gold-bright); }
-    .insp-head {
-      padding: 12px 20px 14px; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
-    }
-    .insp-eyebrow { font-family: var(--font-mono); font-size: 10px; color: var(--gold); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px; }
-    .insp-title { font-family: var(--font-serif); font-size: 26px; font-weight: 600; line-height: 1.1; color: #fff; }
-    .btn-insp-close {
-      background: rgba(255,255,255,0.07); border: none; color: var(--muted);
-      width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 16px; flex-shrink: 0;
-    }
-    .btn-insp-close:hover { color: #fff; background: rgba(255,255,255,0.16); }
-
-    .insp-body { padding: 16px 20px 20px; display: flex; flex-direction: column; gap: 14px; }
-    .insp-desc { font-size: 13px; color: #cbd5e1; line-height: 1.55; }
-    .insp-telemetry-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-    }
-    .tel-box {
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
-    }
-    .tel-k { font-family: var(--font-mono); font-size: 9px; color: var(--muted); text-transform: uppercase; }
-    .tel-v { font-family: var(--font-mono); font-size: 11.5px; font-weight: 700; color: var(--gold-bright); margin-top: 2px; }
-
-    .insp-features { display: grid; gap: 6px; font-size: 12px; color: var(--ivory); }
-    .insp-feat-row { display: flex; align-items: center; gap: 8px; }
-    .insp-feat-row span.check { color: var(--emerald); font-weight: 800; }
-
-    .insp-pricing-banner {
-      background: rgba(197, 163, 78, 0.08); border: 1px solid var(--gold-border);
-      border-radius: 10px; padding: 12px 14px;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .insp-actions { display: grid; gap: 8px; }
-    .btn-launch-live {
-      width: 100%; padding: 12px; border-radius: 10px; border: none; cursor: pointer;
-      background: linear-gradient(135deg, var(--gold) 0%, #9b7d31 100%);
-      color: #05070c; font-weight: 800; font-size: 12.5px; letter-spacing: 1px; text-transform: uppercase;
-      box-shadow: 0 6px 24px var(--gold-glow); transition: all 0.2s;
-    }
-    .btn-launch-live:hover { transform: translateY(-2px); filter: brightness(1.08); }
-    .btn-secondary-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .btn-insp-sub {
-      padding: 10px; border-radius: 8px; border: 1px solid var(--border);
-      background: rgba(255,255,255,0.04); color: #fff; font-size: 11.5px; font-weight: 700;
-      cursor: pointer; text-align: center; text-decoration: none; transition: all 0.15s;
-    }
-    .btn-insp-sub:hover { border-color: var(--gold); color: var(--gold-bright); }
-
-    /* ════════ STELLARIUM 3-ZONE BOTTOM BAR (LOCATION + SVG ICONS + CLOCK) ════════ */
-    .stel-bottom-wrapper {
-      position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
-      padding: 0 12px 10px;
-      display: flex; align-items: flex-end; justify-content: space-between; gap: 10px;
-      pointer-events: none; transition: opacity 0.3s;
-    }
-    .stel-corner-btn {
-      pointer-events: auto;
-      display: flex; flex-direction: column; justify-content: center;
-      min-height: 46px; padding: 6px 14px; border-radius: 10px;
-      background: rgba(12, 18, 28, 0.78); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-      border: 1px solid rgba(255, 255, 255, 0.14); color: #fff; cursor: pointer;
-      text-align: left; transition: all 0.18s; white-space: nowrap;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.65);
-    }
-    .stel-corner-btn:hover { border-color: var(--gold); background: rgba(20, 28, 42, 0.92); }
-    .stel-corner-main { font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: #f8fafc; line-height: 1.2; }
-    .stel-corner-sub { font-family: var(--font-mono); font-size: 9.5px; color: var(--gold-bright); line-height: 1.25; }
-    .bottom-hud-dock {
-      pointer-events: auto;
-      background: rgba(10, 15, 24, 0.76); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
-      padding: 4px 8px; display: flex; align-items: center; gap: 2px;
-      box-shadow: 0 12px 40px rgba(0,0,0,0.8); max-width: calc(100vw - 24px); overflow-x: auto;
-      scrollbar-width: none;
-    }
-    .bottom-hud-dock::-webkit-scrollbar { display: none; }
-    .dock-btn {
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
-      min-width: 58px; padding: 5px 7px; border-radius: 8px; border: none;
-      background: transparent; color: #fff; cursor: pointer; transition: opacity 0.18s, background 0.18s;
-      opacity: 0.44; position: relative;
-    }
-    .dock-btn svg { width: 22px; height: 22px; display: block; }
-    .dock-btn:hover { opacity: 0.85; background: rgba(255,255,255,0.07); }
-    .dock-btn.active { opacity: 1; background: rgba(56, 189, 248, 0.14); }
-    .dock-btn.active::after {
-      content: ""; position: absolute; bottom: 2px; left: 26%; right: 26%; height: 2px;
-      border-radius: 2px; background: var(--gold-bright);
-    }
-    .dock-icon { font-size: 16px; line-height: 1.2; }
-    .dock-lbl { font-size: 9px; font-weight: 600; letter-spacing: 0.3px; margin-top: 3px; white-space: nowrap; color: #e2e8f0; }
-
-    @media (max-width: 960px) {
-      .stel-brand-title, .stel-corner-btn { display: none; }
-      .top-hud-strip { grid-template-columns: auto 1fr auto; }
-      .search-capsule { width: 100%; max-width: none; }
-    }
-
-    /* Restore Zen HUD Chip */
-    body.zen-hidden #topHud, body.zen-hidden #bottomWrapper { opacity: 0; pointer-events: none; }
-    #btnRestoreHud {
-      position: fixed; bottom: 20px; right: 20px; z-index: 60; display: none;
-      padding: 10px 18px; border-radius: 999px; background: var(--hud-glass); border: 1px solid var(--gold);
-      color: var(--gold-bright); font-size: 12px; font-weight: 700; cursor: pointer;
-      backdrop-filter: blur(16px);
-    }
-
-    /* ════════ LIVE WEBSITE PREVIEW MODAL (LAPTOP / MOBILE FRAME) ════════ */
-    .full-modal {
-      position: fixed; inset: 0; z-index: 200; background: rgba(3, 5, 10, 0.9);
-      backdrop-filter: blur(18px); display: none; align-items: center; justify-content: center; padding: 18px;
-    }
-    .full-modal.open { display: flex; }
-    .browser-chassis {
-      width: 100%; max-width: 1380px; height: 92vh; background: #090d16;
-      border: 1px solid var(--gold-border); border-radius: 14px; overflow: hidden;
-      display: flex; flex-direction: column; box-shadow: 0 35px 100px rgba(0,0,0,0.95);
-    }
-    .browser-bar {
-      padding: 10px 16px; background: #0e1422; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
-    }
-    .browser-url {
-      flex: 1; min-width: 180px; max-width: 500px; background: rgba(0,0,0,0.45);
-      border: 1px solid var(--border); border-radius: 8px; padding: 6px 14px;
-      font-family: var(--font-mono); font-size: 11.5px; color: #cbd5e1;
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    }
-    .browser-viewport-area {
-      flex: 1; background: #04060b; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0;
-    }
-    #liveSiteIframe {
-      width: 100%; height: 100%; border: none; background: #04060b; transition: width 0.3s ease, border-radius 0.3s ease;
-    }
-    #liveSiteIframe.mobile-mode {
-      width: 390px; height: 94%; border-radius: 28px; border: 8px solid #1e293b; box-shadow: 0 20px 60px rgba(0,0,0,0.85);
-    }
-
-    /* ════════ CONFIGURATOR & PRO-FORMA INVOICE MODAL ════════ */
-    .config-dialog {
-      width: 100%; max-width: 820px; max-height: 92vh; overflow-y: auto;
-      background: #0b0f19; border: 1px solid var(--gold-border); border-radius: 16px; padding: 28px;
-      box-shadow: 0 30px 90px rgba(0,0,0,0.95);
-    }
-    .cfg-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; }
-    .cfg-tab {
-      padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border); background: rgba(255,255,255,0.03);
-      color: var(--muted); font-size: 12px; font-weight: 700; cursor: pointer;
-    }
-    .cfg-tab.active { background: var(--gold); color: #05070c; border-color: var(--gold); }
-    .addon-check-card {
-      display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 10px;
-      background: rgba(255,255,255,0.03); border: 1px solid var(--border); margin-bottom: 8px; cursor: pointer;
-    }
-    .addon-check-card:hover { border-color: var(--gold-border); }
-    .addon-check-card input { width: 17px; height: 17px; accent-color: var(--gold); margin-top: 2px; }
-    .pay-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 16px; }
-    .btn-pay-card {
-      padding: 12px; border-radius: 8px; text-align: center; text-decoration: none; font-weight: 800; font-size: 12px;
-      display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; border: none;
-    }
-    .wire-box {
-      margin-top: 16px; padding: 14px; border-radius: 10px; background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border); font-family: var(--font-mono); font-size: 11px; color: #cbd5e1;
-      line-height: 1.6;
-    }
-
-    @media (max-width: 900px) {
-      .telemetry-pill { display: none; }
-      #sideDrawer { width: calc(100vw - 32px); top: 68px; bottom: 80px; }
-      #planetInspector { top: auto; bottom: 80px; left: 16px; right: 16px; width: auto; max-height: 55vh; }
-      .search-capsule { width: 180px; }
-    }
-
-    /* Cosmos 8K Texture Loader Curtain */
-    #cosmosBootOverlay {
-      position: fixed; inset: 0; z-index: 99990; background: #03050a;
-      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-      transition: opacity 0.6s ease, visibility 0.6s ease;
-    }
-    #cosmosBootOverlay.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .boot-ring { width: 42px; height: 42px; border: 2px solid rgba(197,163,78,0.2); border-top-color: var(--gold); border-radius: 50%; animation: bootSpin 0.8s linear infinite; }
-    @keyframes bootSpin { to { transform: rotate(360deg); } }
-    .boot-text { font-family: var(--font-mono); font-size: 11px; letter-spacing: 2px; color: var(--gold-bright); }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>AETERNA PAAS // 3D Planetarium Observatory & Bespoke Digital Worlds</title>
+  <meta name="description" content="Explore real-time C/ERFA/WebGL2 astronomy powered by Stellarium Web Engine fused with AETERNA interactive 3D website flagships, 8K shaders, and turnkey business platforms starting at $495." />
+  <meta name="theme-color" content="#020307" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles/paas-cosmos.css" />
 </head>
 <body>
+  <!-- STELLARIUM C/C++/ERFA/WebGL2 WASM SKY ENGINE -->
+  <canvas id="stel-canvas" aria-label="Interactive 3D Stellarium Observatory Sky"></canvas>
+  <div id="nightModeOverlay" aria-hidden="true"></div>
 
-  <!-- 8K Texture Streaming Telemetry Loader -->
-  <div id="cosmosBootOverlay">
-    <div class="boot-ring"></div>
-    <div class="boot-text" id="bootProgressText">STREAMING 8K NASA / SOLAR TEXTURES... 0%</div>
+  <!-- SYNCHRONIZED 3D SKY BEACONS (BUSINESS WORLDS & MILLENNIUM 8K STUDIOS) -->
+  <div id="paasWorldPins" aria-label="Interactive Website & Studio Beacons"></div>
+
+  <!-- STELLARIUM STREAMING DATA PROGRESS -->
+  <div id="stelProgressRack" aria-live="polite"></div>
+
+  <!-- BOOT SPLASH CURTAIN -->
+  <div id="bootCurtain" role="status">
+    <div class="boot-inner">
+      <div class="boot-logo">AETERNA COSMOS</div>
+      <div class="boot-sub">Stellarium Web Engine &bull; WebGL2 + ERFA WASM</div>
+      <div class="boot-bar"><span></span></div>
+      <div class="boot-status" id="bootStatus">Loading Compiled Astronomy Kernel...</div>
+    </div>
   </div>
 
-  <!-- Authentic Stellarium Red Night Vision Filter -->
-  <div id="nightModeOverlay"></div>
-
-  <!-- 3D Three.js Planetary Observatory Canvas -->
-  <canvas id="cosmosCanvas"></canvas>
-
-  <!-- Live Millennium 8K Procedural Liquid Gold Vortex Shader Layer -->
-  <canvas id="vortexOverlayCanvas"></canvas>
-
-  <!-- Floating Dynamic Star/Planet Labels & Horizon Compass Layer -->
-  <div id="hudOverlayLayer"></div>
-
-  <!-- Astronomical Target Reticle -->
-  <div id="targetReticle">
-    <div class="reticle-corner rc-tl"></div>
-    <div class="reticle-corner rc-tr"></div>
-    <div class="reticle-corner rc-bl"></div>
-    <div class="reticle-corner rc-br"></div>
-  </div>
-
-  <!-- ════════ STELLARIUM TOP TOOLBAR BAR ════════ -->
-  <header class="top-hud-strip" id="topHud">
-    <div class="top-left-cluster">
-      <button type="button" class="btn-drawer-toggle" id="btnToggleDrawer" title="Toggle Website Explorer Drawer">
-        <span class="delta">☰</span>
-        <span>EXPLORE SITES</span>
+  <!-- TOP COCKPIT HUD -->
+  <header id="topBar">
+    <div class="brand-cluster">
+      <button type="button" class="hud-btn-menu" id="btnExploreSites" title="Explore Business Websites & 8K Studios">
+        <span>&#9776; Explore Sites</span>
+        <span class="badge-count" id="countSitesBadge">15</span>
       </button>
-      <div class="stel-brand-title">
-        <span>ÆTERNA</span>
-        <sup>WEB OBSERVATORY</sup>
-      </div>
+      <a class="brand-title" href="./classic/index.html" title="Open Classic AETERNA Studio">
+        <strong>AETERNA</strong>
+        <span>PaaS Observatory</span>
+      </a>
     </div>
 
-    <div class="search-capsule">
-      <span class="search-icon">🔍</span>
-      <input type="text" id="cosmosSearch" placeholder="Search business industry, studio or star (e.g. cafe, Sirius)..." autocomplete="off">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Search business industry, 8K studio, star or planet (e.g. Saturn, M31, Cafe)" />
+      <button type="button" class="search-clear" id="btnClearSearch" aria-label="Clear search">&times;</button>
       <div class="search-dropdown" id="searchDropdown"></div>
     </div>
 
-    <div class="top-right-telemetry">
-      <div class="telemetry-pill">
-        <span class="pulse"></span>
-        <span id="fovTelemetry">AZM 25° &middot; ALT +18° &middot; FOV 58°</span>
-      </div>
-      <button type="button" class="btn-order-top" id="btnTopOpenConfig">⚡ Configure ($495+)</button>
+    <div class="top-right">
+      <div class="tel-pill" id="hudTelCoords">AZM <b>48.0&deg;</b> &middot; ALT <b>+24.0&deg;</b> &middot; FOV <b>72.0&deg;</b></div>
+      <button type="button" class="btn-order-top" id="btnTopConfigure">Configure ($495+)</button>
     </div>
   </header>
 
-  <!-- ════════ STELLARIUM LEFT COLLAPSIBLE SIDE MENU ════════ -->
-  <aside id="sideDrawer">
-    <div class="drawer-header">
-      <div class="drawer-title-row">
-        <h2>AETERNA WEBSITES UNIVERSE</h2>
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--emerald);">15 SYSTEMS</span>
+  <!-- LEFT EXPLORE DRAWER -->
+  <aside id="leftDrawer" aria-label="Website Systems & 8K Studios Catalog">
+    <div class="drawer-head">
+      <div>
+        <h2>DIGITAL SYSTEMS &amp; 8K STUDIOS</h2>
+        <p>Click any world to slew &amp; launch interactive live demo</p>
       </div>
-      <div class="drawer-sub">Select a Website Planet to fly there, test it live &amp; claim for your brand.</div>
+      <button type="button" class="btn-close-round" id="btnCloseLeft" aria-label="Close Explorer">&times;</button>
     </div>
 
-    <!-- Live Client Brand Injector -->
-    <div class="biz-injector">
-      <label class="biz-inj-label">✨ LIVE TEST WITH YOUR BUSINESS NAME:</label>
-      <div class="biz-inj-grid">
-        <input type="text" id="clientBizName" placeholder="Your Business Name">
-        <input type="text" id="clientBizCity" placeholder="City (e.g. Melbourne)">
+    <div class="cat-bar" id="catBar">
+      <button type="button" class="cat-pill active" data-cat="all">All (15)</button>
+      <button type="button" class="cat-pill" data-cat="trades">Trades</button>
+      <button type="button" class="cat-pill" data-cat="hospitality">Caf&eacute;s</button>
+      <button type="button" class="cat-pill" data-cat="ecommerce">E-Commerce</button>
+      <button type="button" class="cat-pill" data-cat="sports">Sports</button>
+      <button type="button" class="cat-pill" data-cat="clinic">Clinics &amp; Legal</button>
+      <button type="button" class="cat-pill" data-cat="luxury">Luxury</button>
+      <button type="button" class="cat-pill" data-cat="labs">8K &amp; 3D Labs</button>
+    </div>
+
+    <div class="brand-box">
+      <label>Live Brand &amp; City Preview Injector</label>
+      <div class="brand-row">
+        <input id="brandNameInput" type="text" placeholder="Your Brand Name" />
+        <input id="brandCityInput" type="text" placeholder="City / Suburb" />
       </div>
     </div>
 
-    <!-- Sector Constellation Filters -->
-    <div class="filter-strip" id="filterStrip">
-      <button type="button" class="chip-filter active" data-cat="all">All Worlds</button>
-      <button type="button" class="chip-filter" data-cat="trades">Trades ($495+)</button>
-      <button type="button" class="chip-filter" data-cat="ecommerce">E-Commerce</button>
-      <button type="button" class="chip-filter" data-cat="hospitality">Hospitality</button>
-      <button type="button" class="chip-filter" data-cat="sports">Fitness &amp; MMA</button>
-      <button type="button" class="chip-filter" data-cat="clinic">Clinics &amp; Legal</button>
-      <button type="button" class="chip-filter" data-cat="luxury">3D &amp; Real Estate</button>
-      <button type="button" class="chip-filter" data-cat="labs">🛸 8K &amp; 3D Engines</button>
-    </div>
-
-    <!-- Planet Selector List -->
-    <div class="planet-catalog" id="planetCatalog"></div>
-
-    <div class="drawer-footer">
-      <button type="button" class="btn-drawer-foot" id="btnDrawerInvoice">🧾 Quote &amp; Invoice</button>
-      <a href="./classic/index.html" class="btn-drawer-foot">🏛 Classic View</a>
-    </div>
+    <div class="drawer-scroll" id="drawerCardsList"></div>
   </aside>
 
-  <!-- ════════ FLOATING PLANET INSPECTOR CARD (RIGHT) ════════ -->
-  <section id="planetInspector">
-    <div class="insp-hero-banner">
-      <img id="inspHeroImg" src="./textures/cosmos_vulcan.webp" alt="Planet Architectural Backdrop">
-      <button type="button" class="insp-close-floating" id="btnCloseInspector">&times;</button>
-    </div>
+  <!-- RIGHT COMPACT INSPECTOR PANEL (ALWAYS FITS LAPTOP VIEWPORTS) -->
+  <section id="inspectorPanel" aria-live="polite" aria-label="Object & System Inspector">
     <div class="insp-head">
-      <div>
-        <div class="insp-eyebrow" id="inspEyebrow">CONSTELLATION // SYSTEM</div>
-        <h3 class="insp-title" id="inspTitle">Planet Name</h3>
+      <div class="insp-badge-icon" id="inspBadgeIcon">&#10022;</div>
+      <div class="insp-head-meta">
+        <div class="insp-kicker" id="inspKicker">SECTOR // TELEMETRY</div>
+        <h3 id="inspTitle">Target Name</h3>
       </div>
+      <button type="button" class="btn-insp-close" id="btnCloseInspector" aria-label="Close Inspector">&times;</button>
     </div>
 
-    <div class="insp-body">
+    <div class="insp-scroll">
       <p class="insp-desc" id="inspDesc"></p>
 
-      <div class="insp-telemetry-grid">
-        <div class="tel-box">
-          <div class="tel-k">LIGHTHOUSE</div>
-          <div class="tel-v">100 / 100</div>
-        </div>
-        <div class="tel-box">
-          <div class="tel-k">LOAD SPEED</div>
-          <div class="tel-v" id="inspSpeed">&lt; 0.4s</div>
-        </div>
-        <div class="tel-box">
-          <div class="tel-k">OWNERSHIP</div>
-          <div class="tel-v" style="color:var(--emerald)">100% CODE</div>
-        </div>
+      <div class="insp-stats">
+        <div class="tel-box"><div class="tel-k" id="stat1K">LIGHTHOUSE</div><div class="tel-v" id="stat1V">100 / 100</div></div>
+        <div class="tel-box"><div class="tel-k" id="stat2K">SPEED</div><div class="tel-v" id="stat2V">0.3s</div></div>
+        <div class="tel-box"><div class="tel-k" id="stat3K">OWNERSHIP</div><div class="tel-v" id="stat3V">100% CODE</div></div>
       </div>
 
-      <div class="insp-astro-table" id="inspAstroTable">
-        <span class="insp-astro-k">RA / Dec</span>
-        <span class="insp-astro-v" id="inspRaDec">00h 00m 00s &nbsp; +00° 00'</span>
-        <span class="insp-astro-k">Az / Alt</span>
-        <span class="insp-astro-v" id="inspAzAlt">025° 00' &nbsp; +18° 00'</span>
-      </div>
+      <div class="insp-sky-coords" id="inspSkyCoords"></div>
+      <div class="insp-feats" id="inspFeatures"></div>
 
-      <div class="insp-features" id="inspFeatures"></div>
-
-      <div class="insp-pricing-banner">
+      <div class="insp-price-card" id="inspPriceCard">
         <div>
-          <div style="font-family:var(--font-mono);font-size:9.5px;color:var(--gold);text-transform:uppercase">RECOMMENDED LAUNCH</div>
-          <div style="font-size:17px;font-weight:800;color:#fff" id="inspPrice">$495 AUD Base</div>
+          <div class="p-tag" id="inspPriceTag">RECOMMENDED LAUNCH</div>
+          <div class="p-main" id="inspPriceMain">$495 Base Launchpad</div>
         </div>
-        <div style="font-size:11px;color:var(--muted);text-align:right" id="inspSubPrice">+ Optional Add-ons</div>
+        <div class="p-sub" id="inspPriceSub">Turnkey Code Delivery</div>
       </div>
+    </div>
 
-      <div class="insp-actions">
-        <button type="button" class="btn-launch-live" id="btnLaunchPreview">👁 LAUNCH LIVE INTERACTIVE WEBSITE</button>
-        <div class="btn-secondary-row">
-          <button type="button" class="btn-insp-sub" id="btnInspConfigure">⚙️ Customize &amp; Buy</button>
-          <a href="#" target="_blank" rel="noopener" class="btn-insp-sub" id="btnInspExternal">↗ Open Full Tab</a>
-        </div>
+    <div class="insp-footer">
+      <button type="button" class="btn-launch" id="btnInspPrimary">&#128065; LAUNCH LIVE INTERACTIVE WEBSITE</button>
+      <div class="btn-row-sec">
+        <button type="button" class="btn-sec" id="btnInspConfigure">&#9881; Customize &amp; Buy</button>
+        <a class="btn-sec" id="btnInspExt" href="./classic/index.html" target="_blank" rel="noopener">Open Tab &#8599;</a>
       </div>
     </div>
   </section>
 
-  <!-- ════════ STELLARIUM 3-ZONE BOTTOM OBSERVATION BAR ════════ -->
-  <div class="stel-bottom-wrapper" id="bottomWrapper">
-    <button type="button" class="stel-corner-btn" id="btnLocationCycle" title="Click to switch Observatory Latitude (tilts Equatorial Grid)">
-      <span class="stel-corner-main" id="lblObsLoc">📍 Melbourne</span>
-      <span class="stel-corner-sub" id="lblObsCoords">37.8°S · 144.9°E</span>
-    </button>
+  <!-- ULTRA VISUALS POPOVER (NATIVE WASM UNIFORM TUNING + WONDERS TOUR) -->
+  <div id="ultraDrawer" role="dialog" aria-label="Stellarium Ultra Visuals & Sky Presets">
+    <div class="ud-head">
+      <span>&#10024; Stellarium Ultra Visuals &amp; Astronomy Presets</span>
+      <button type="button" class="btn-close-round" id="btnCloseUltra" aria-label="Close Ultra Visuals">&times;</button>
+    </div>
 
-    <nav class="bottom-hud-dock" id="bottomDock">
-      <button type="button" class="dock-btn active" id="togConstellations" title="Constellation Network Lines">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="17" r="1.6" fill="currentColor"/><circle cx="10" cy="6" r="1.6" fill="currentColor"/><circle cx="19" cy="14" r="1.6" fill="currentColor"/><path d="M6.6 15.2 L9.4 7.8 M11.6 7.4 L17.6 12.8 M8 16.6 L17.2 14.5"/></svg>
-        <span class="dock-lbl">Constellations</span>
-      </button>
-      <button type="button" class="dock-btn active" id="togAtmo" title="Toggle Preetham Atmospheric Scattering Glow">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 18h18"/><path d="M6 18a6 6 0 0 1 12 0" fill="rgba(255,255,255,0.22)"/><path d="M12 4v2M18.4 6.6l-1.4 1.4M5.6 6.6L7 8"/></svg>
-        <span class="dock-lbl">Atmosphere</span>
-      </button>
-      <button type="button" class="dock-btn active" id="togLandscape" title="Toggle 360° Panoramic Horizon Ridge &amp; Ground Mist">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M2 19l6-8 4 5 4-6 6 9H2z" fill="rgba(255,255,255,0.18)"/><circle cx="17" cy="6.5" r="2"/></svg>
-        <span class="dock-lbl">Landscape</span>
-      </button>
-      <button type="button" class="dock-btn active" id="togGrid" title="Toggle Alt / Azimuthal Coordinate Grid">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><path d="M3 12h18M12 3v18M5.6 5.6l12.8 12.8M18.4 5.6L5.6 18.4"/></svg>
-        <span class="dock-lbl">Azimuthal</span>
-      </button>
-      <button type="button" class="dock-btn active" id="togEqGrid" title="Toggle Tilted Equatorial J2000 Sky Grid">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4.6" ry="9" transform="rotate(-22 12 12)"/><path d="M3.5 9.2c5.5 2.4 11.5 2.4 17 0M3.5 14.8c5.5-2.4 11.5-2.4 17 0"/></svg>
-        <span class="dock-lbl">Equatorial</span>
-      </button>
-      <button type="button" class="dock-btn active" id="togLabels" title="Toggle Celestial Website &amp; Star Labels">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h10l5 5-5 5H4V7z"/><circle cx="8" cy="12" r="1.2" fill="currentColor"/></svg>
-        <span class="dock-lbl">Labels</span>
-      </button>
-      <button type="button" class="dock-btn active" id="togVortex" title="Cycle Millennium 8K Liquid Gold Vortex Overlay">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 12c0-2 2-3 4-2s2 4 0 6-6 2-8-1-1-8 3-10 9-1 11 4"/></svg>
-        <span class="dock-lbl" id="lblVortex">Vortex</span>
-      </button>
-      <button type="button" class="dock-btn" id="togNight" title="Astronomer Red Night Vision Filter">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 12s3.8-6 10-6 10 6 10 6-3.8 6-10 6-10-6-10-6z"/><circle cx="12" cy="12" r="2.8" fill="currentColor"/></svg>
-        <span class="dock-lbl">Night</span>
-      </button>
-      <button type="button" class="dock-btn" id="btnResetCamera" title="Reset Telescope &amp; Auto-Orbit">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-        <span class="dock-lbl">Reset</span>
-      </button>
-      <button type="button" class="dock-btn" id="btnZenMode" title="Zen / Fullscreen Pure Sky View">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
-        <span class="dock-lbl">Fullscreen</span>
-      </button>
-    </nav>
-
-    <button type="button" class="stel-corner-btn" id="btnTimeCycle" style="text-align:right;" title="Click to cycle Sky Illumination (Deep Night / Twilight Dusk / Cosmic Glow)">
-      <span class="stel-corner-main" id="lblObsTime">16:47:00</span>
-      <span class="stel-corner-sub" id="lblObsSkyPhase">🌙 Astronomical Night</span>
-    </button>
-  </div>
-
-  <button type="button" id="btnRestoreHud">✦ Show Observatory HUD</button>
-
-  <!-- ════════ LIVE INTERACTIVE BROWSER PREVIEW MODAL ════════ -->
-  <div class="full-modal" id="modalPreview">
-    <div class="browser-chassis">
-      <div class="browser-bar">
-        <div style="display:flex;gap:6px;">
-          <span style="width:11px;height:11px;border-radius:50%;background:#ef4444;display:inline-block;"></span>
-          <span style="width:11px;height:11px;border-radius:50%;background:#f59e0b;display:inline-block;"></span>
-          <span style="width:11px;height:11px;border-radius:50%;background:#10b981;display:inline-block;"></span>
-        </div>
-        <div class="browser-url" id="modalPreviewUrl">https://paas.website</div>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button type="button" class="cfg-tab active" id="btnModeDesktop" style="padding:5px 12px;margin:0;border:none;">💻 Desktop</button>
-          <button type="button" class="cfg-tab" id="btnModeMobile" style="padding:5px 12px;margin:0;border:none;">📱 Mobile</button>
-          <a href="#" target="_blank" rel="noopener" id="btnModalOpenTab" class="btn-drawer-foot" style="padding:5px 12px;">↗ Tab</a>
-          <button type="button" class="btn-order-top" id="btnModalOrder" style="height:32px;padding:0 14px;font-size:10.5px;">⚡ I Want This Site</button>
-          <button type="button" class="btn-insp-close" id="btnClosePreviewModal">&times;</button>
-        </div>
+    <div class="ud-sliders">
+      <div class="slider-box">
+        <div class="sl-top"><span>Exposure</span><b id="valExposure">1.15&times;</b></div>
+        <input id="rngExposure" type="range" min="0.4" max="3.0" step="0.05" value="1.15" />
       </div>
-      <div class="browser-viewport-area">
-        <iframe id="liveSiteIframe" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      <div class="slider-box">
+        <div class="sl-top"><span>Light Pollution</span><b id="valBortle">Class 2</b></div>
+        <input id="rngBortle" type="range" min="1" max="9" step="1" value="2" />
       </div>
+      <div class="slider-box">
+        <div class="sl-top"><span>Star Scale</span><b id="valStarScale">1.10&times;</b></div>
+        <input id="rngStarScale" type="range" min="0.6" max="2.2" step="0.05" value="1.1" />
+      </div>
+    </div>
+
+    <div class="ud-toggles" id="fxTogglesRow">
+      <button type="button" class="fx-chip active" data-fx="satellites">&#128752; Satellites &amp; TLE</button>
+      <button type="button" class="fx-chip" data-fx="ecliptic">&#9788; Ecliptic Line</button>
+      <button type="button" class="fx-chip" data-fx="meridian">&#9737; Meridian Line</button>
+      <button type="button" class="fx-chip active" data-fx="hints">&#9673; Planet Labels</button>
+      <button type="button" class="fx-chip" data-fx="bigmoon">&#127765; 4&times; Supermoon</button>
+    </div>
+
+    <div class="ud-presets" id="fxPresetsRow">
+      <span class="preset-lbl">Quick Slew:</span>
+      <button type="button" class="preset-btn" data-preset="NAME Moon">&#127765; Moon</button>
+      <button type="button" class="preset-btn" data-preset="NAME Jupiter">&#129680; Jupiter</button>
+      <button type="button" class="preset-btn" data-preset="NAME Saturn">&#129680; Saturn</button>
+      <button type="button" class="preset-btn" data-preset="M31">&#127756; Andromeda M31</button>
+      <button type="button" class="preset-btn" data-preset="M42">&#10024; Orion M42</button>
+      <button type="button" class="preset-btn" data-preset="world:millennium-8k-raymarch">&#128142; 8K Raymarch Studio</button>
+      <button type="button" class="preset-btn" data-preset="world:millennium-vortex">&#127744; 8K Liquid Vortex</button>
     </div>
   </div>
 
-  <!-- ════════ MODULAR CONFIGURATOR & PRO-FORMA INVOICE MODAL ════════ -->
+  <!-- BOTTOM OBSIDIAN CONTROL DOCK (GENUINE STELLARIUM SVG BUTTONS) -->
+  <nav id="bottomDock" aria-label="Observatory Sky Layers">
+    <button type="button" class="stel-btn active" id="btnStelCstLines" title="Constellations Lines & Labels">
+      <img src="./symbols/btn-cst-lines.svg" alt="Constellation Lines" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelCstArt" title="Constellation Artwork (Johan Meuris)">
+      <img src="./symbols/btn-cst-art.svg" alt="Constellation Artwork" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelAtmo" title="Atmosphere Scattering (Preetham Sky)">
+      <img src="./symbols/btn-atmosphere.svg" alt="Atmosphere" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelLandscape" title="Guereins 360 Horizon Landscape">
+      <img src="./symbols/btn-landscape.svg" alt="Landscape" />
+    </button>
+    <button type="button" class="stel-btn" id="btnStelAzGrid" title="Azimuthal Coordinate Grid">
+      <img src="./symbols/btn-azimuthal-grid.svg" alt="Azimuthal Grid" />
+    </button>
+    <button type="button" class="stel-btn" id="btnStelEqGrid" title="Equatorial RA/Dec Grid">
+      <img src="./symbols/btn-equatorial-grid.svg" alt="Equatorial Grid" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelDso" title="Deep Sky Objects (Nebulae & Galaxies)">
+      <img src="./symbols/btn-nebulae.svg" alt="Deep Sky Objects" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelMilkyWay" title="Milky Way HiPS Panorama">
+      <span class="txt-ico">&#10035;</span>
+    </button>
+
+    <span class="dock-sep"></span>
+
+    <button type="button" class="dock-pill-btn active" id="btnStelBeacons" title="Toggle Website World Beacons">
+      &#127760; Sites
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnToggleUltra" title="Ultra Visuals Sliders & Sky Tours">
+      &#10024; Ultra FX
+    </button>
+    <button type="button" class="stel-btn" id="btnNightMode" title="Red Astronomer Night Mode">
+      <img src="./symbols/btn-night-mode.svg" alt="Night Mode" />
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnUnlockTarget" style="display:none;" title="Release Locked Target">
+      &#128275; Unlock
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnResetHorizon" title="Reset Horizon View">
+      &#10226; Reset
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnFullscreen" title="Fullscreen Mode">
+      &#9974;
+    </button>
+  </nav>
+
+  <!-- BOTTOM-LEFT LOCATION SWITCHER -->
+  <div class="corner-badge left" id="cornerLocation" title="Click to switch Observatory Latitude / Longitude">
+    <strong id="locNameOut">Melbourne Observatory <span style="color:var(--gold,#c5a34e);">[AU]</span></strong>
+    <div id="locCoordsOut">37.81&deg;S &middot; 144.96&deg;E &middot; 31m</div>
+  </div>
+  <div id="locPopover" role="menu">
+    <button type="button" class="active" data-loc="melbourne"><span>Melbourne</span><span>37.8&deg;S</span></button>
+    <button type="button" data-loc="sofia"><span>Sofia Vitosha</span><span>42.7&deg;N</span></button>
+    <button type="button" data-loc="atacama"><span>Atacama Paranal</span><span>Bortle 1</span></button>
+    <button type="button" data-loc="london"><span>Greenwich London</span><span>51.5&deg;N</span></button>
+    <button type="button" data-loc="nyc"><span>New York</span><span>40.7&deg;N</span></button>
+    <button type="button" data-loc="tokyo"><span>Tokyo Mitaka</span><span>35.7&deg;N</span></button>
+  </div>
+
+  <!-- BOTTOM-RIGHT SIMULATED UTC CLOCK & AGPLv3 ENGINE CREDIT -->
+  <div class="corner-badge right" id="cornerClock">
+    <strong id="clockTimeOut">--:--:-- UTC</strong>
+    <div id="clockDateOut">Astronomical Dusk</div>
+    <div class="time-controls" id="timeControls">
+      <button type="button" data-tact="0" title="Pause Simulation">||</button>
+      <button type="button" class="active" data-tact="1" title="Real-Time">1&times;</button>
+      <button type="button" data-tact="100" title="100x Warp">100&times;</button>
+      <button type="button" data-tact="1000" title="1000x Warp">1000&times;</button>
+      <button type="button" data-tact="sunset" title="Jump to Evening Twilight">Dusk</button>
+      <button type="button" data-tact="plus2h" title="Advance +2 Hours">+2h</button>
+    </div>
+    <div class="agpl-note">
+      Engine: Stellarium Web (<a href="./LICENSE-AGPL-3.0.txt" target="_blank" rel="noopener">GNU AGPL v3</a>)
+    </div>
+  </div>
+
+  <!-- FULLSCREEN LIVE INTERACTIVE PREVIEW MODAL -->
+  <div class="full-modal" id="modalPreview">
+    <div class="modal-bar">
+      <div class="modal-title" id="previewTitle">Interactive Preview</div>
+      <div class="modal-actions">
+        <span id="previewExtNote" style="display:none;font-family:var(--font-mono);font-size:10px;color:#fcd34d;">If blocked by third-party headers, use Open New Tab &rarr;</span>
+        <a id="previewExtLink" class="btn-ext" href="./classic/index.html" target="_blank" rel="noopener">Open New Tab &#8599;</a>
+        <button type="button" class="btn-order-top" id="btnPreviewCfg">Order Package ($495+)</button>
+        <button type="button" class="btn-close-modal" id="btnClosePreview">&times; Close</button>
+      </div>
+    </div>
+    <iframe class="preview-frame" id="previewFrame" title="Live Interactive Website Preview"></iframe>
+  </div>
+
+  <!-- $495+ MODULAR & ENTERPRISE COMMERCIAL CONFIGURATOR MODAL -->
   <div class="full-modal" id="modalConfig">
     <div class="config-dialog">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <div>
-          <div style="font-family:var(--font-mono);font-size:10px;color:var(--gold);letter-spacing:1.4px;">AETERNA COMMERCIAL ARCHITECT</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:#c5a34e;letter-spacing:1.4px;">AETERNA COMMERCIAL ARCHITECT</div>
           <h3 style="font-family:var(--font-display);font-size:20px;color:#fff;">Configure Your Website Package</h3>
         </div>
-        <button type="button" class="btn-insp-close" id="btnCloseConfigModal">&times;</button>
+        <button type="button" class="btn-close-round" id="btnCloseConfig" aria-label="Close Configurator">&times;</button>
       </div>
 
-      <div class="cfg-tabs">
-        <button type="button" class="cfg-tab active" data-mode="modular">⚡ $495 Base Launchpad + Modular Add-ons</button>
-        <button type="button" class="cfg-tab" data-mode="enterprise">💎 Bespoke Enterprise Flagships ($1,500 – $8,900)</button>
+      <div class="cfg-tabs" id="cfgTabs">
+        <button type="button" class="cfg-tab active" data-mode="modular">&#9889; $495 Base Launchpad + Modular Add-ons</button>
+        <button type="button" class="cfg-tab" data-mode="enterprise">&#128142; Bespoke Enterprise Flagships ($1,500 &ndash; $8,900)</button>
       </div>
 
-      <!-- TAB 1: MODULAR $495 BASE + ADD-ONS -->
       <div id="paneModular">
-        <div class="addon-check-card" style="border-color:var(--gold);background:rgba(197,163,78,0.08);">
-          <input type="checkbox" checked disabled>
+        <div class="addon-check-card" style="border-color:#c5a34e;background:rgba(197,163,78,0.08);">
+          <input type="checkbox" checked disabled />
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13.5px;">
               <span>Base Business Launchpad (Turnkey Foundation)</span>
-              <span style="color:var(--gold-bright);font-family:var(--font-mono);">$495 AUD / USD</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">$495 AUD / USD</span>
             </div>
-            <div style="font-size:11.5px;color:var(--muted);">Mobile-first high-speed design, verified business info, Google Map, tap-to-call button, SSL &amp; edge deployment.</div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Mobile-first high-speed design, verified business info, Google Map, tap-to-call button, SSL &amp; edge deployment.</div>
           </div>
         </div>
 
         <label class="addon-check-card">
-          <input type="checkbox" class="mod-addon" data-price="450">
+          <input type="checkbox" class="mod-addon" data-price="450" data-label="Local Suburb SEO Booster" />
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
               <span>1. Local Suburb &amp; City SEO Booster (5 Target Pages)</span>
-              <span style="color:var(--gold-bright);font-family:var(--font-mono);">+ $450</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $450</span>
             </div>
-            <div style="font-size:11.5px;color:var(--muted);">Dedicated suburb landing pages + Schema.org LocalBusiness markup to dominate local Google Maps.</div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Dedicated suburb landing pages + Schema.org LocalBusiness markup to dominate local Google Maps.</div>
           </div>
         </label>
 
         <label class="addon-check-card">
-          <input type="checkbox" class="mod-addon" data-price="450">
+          <input type="checkbox" class="mod-addon" data-price="450" data-label="Interactive Quote Calculator" />
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
               <span>2. Interactive Quote / Area / Pricing Calculator</span>
-              <span style="color:var(--gold-bright);font-family:var(--font-mono);">+ $450</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $450</span>
             </div>
-            <div style="font-size:11.5px;color:var(--muted);">Clients calculate job cost &amp; send structured specs straight to your WhatsApp/SMS.</div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Clients calculate job cost &amp; send structured specs straight to your WhatsApp/SMS.</div>
           </div>
         </label>
 
         <label class="addon-check-card">
-          <input type="checkbox" class="mod-addon" data-price="350">
+          <input type="checkbox" class="mod-addon" data-price="350" data-label="24/7 Emergency SMS Intake" />
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
               <span>3. 24/7 Emergency SMS Intake &amp; Auto-Responder</span>
-              <span style="color:var(--gold-bright);font-family:var(--font-mono);">+ $350</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $350</span>
             </div>
-            <div style="font-size:11.5px;color:var(--muted);">Immediate missed-call SMS capture so you never lose urgent clients to competitors.</div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Immediate missed-call SMS capture so you never lose urgent clients to competitors.</div>
           </div>
         </label>
 
         <label class="addon-check-card">
-          <input type="checkbox" class="mod-addon" data-price="120" data-rec="true">
+          <input type="checkbox" class="mod-addon" data-price="120" data-rec="true" data-label="Managed Edge Care" />
           <div style="flex:1;">
             <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
               <span>4. Managed Edge Care, Domain &amp; Unlimited Updates</span>
-              <span style="color:var(--gold-bright);font-family:var(--font-mono);">+ $120 / mo</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $120 / mo</span>
             </div>
-            <div style="font-size:11.5px;color:var(--muted);">Custom domain renewal, SSL, 99.99% global uptime SLA &amp; monthly content updates.</div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Custom domain renewal, SSL, 99.99% global uptime SLA &amp; monthly content updates.</div>
           </div>
         </label>
 
-        <div style="margin-top:16px;padding:16px;background:rgba(255,255,255,0.03);border:1px solid var(--gold-border);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+        <div style="margin-top:14px;padding:15px;background:rgba(255,255,255,0.03);border:1px solid rgba(197,163,78,0.42);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div>
-            <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);">CONFIGURED PACKAGE TOTAL:</div>
-            <div id="modTotalOut" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:var(--gold-bright);">$495</div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:#8b9bb4;">CONFIGURED PACKAGE TOTAL:</div>
+            <div id="modTotalOut" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:#fde047;">$495</div>
           </div>
-          <a id="btnModWhatsApp" href="https://wa.me/359884638640" target="_blank" rel="noopener" class="btn-order-top" style="display:inline-flex;align-items:center;text-decoration:none;background:#25d366;color:#05070c;">⚡ Launch via WhatsApp</a>
+          <a id="btnModWhatsApp" href="https://wa.me/359884638640" target="_blank" rel="noopener" class="btn-order-top" style="text-decoration:none;background:#25d366;color:#05070c;">&#9889; Launch via WhatsApp</a>
         </div>
       </div>
 
-      <!-- TAB 2: BESPOKE ENTERPRISE TIERS -->
       <div id="paneEnterprise" style="display:none;">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;">
-          <div class="tel-box" style="padding:14px;">
-            <div class="tel-k">TIER 01 &bull; EXPRESS</div>
-            <div class="tel-v" style="font-size:18px;margin:4px 0;">$1,500</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">5-Page Bespoke Brand Site</div>
-            <a href="https://buy.stripe.com/9B6cMZga86Qa9IE8gDfAc00" target="_blank" rel="noopener" class="btn-order-top" style="width:100%;height:32px;font-size:10px;display:grid;place-items:center;text-decoration:none;">Pay Stripe ($1,500)</a>
+        <div class="tier-grid">
+          <div class="tier-card">
+            <div class="tk">TIER 01 &bull; EXPRESS</div>
+            <div class="tv">$1,500</div>
+            <div class="td">5-Page Bespoke Brand Site</div>
+            <a href="https://buy.stripe.com/9B6cMZga86Qa9IE8gDfAc00" target="_blank" rel="noopener">Pay Stripe ($1,500)</a>
           </div>
-          <div class="tel-box" style="padding:14px;border-color:var(--gold);">
-            <div class="tel-k" style="color:var(--gold);">TIER 02 &bull; PRO</div>
-            <div class="tel-v" style="font-size:18px;margin:4px 0;">$2,800</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">12-Page Corporate + Visual CMS</div>
-            <a href="https://buy.stripe.com/9B614hcXW4I25sodAXfAc01" target="_blank" rel="noopener" class="btn-order-top" style="width:100%;height:32px;font-size:10px;display:grid;place-items:center;text-decoration:none;">Pay Stripe ($2,800)</a>
+          <div class="tier-card featured">
+            <div class="tk" style="color:#c5a34e;">TIER 02 &bull; PRO</div>
+            <div class="tv">$2,800</div>
+            <div class="td">12-Page Corporate + Visual CMS</div>
+            <a href="https://buy.stripe.com/9B614hcXW4I25sodAXfAc01" target="_blank" rel="noopener">Pay Stripe ($2,800)</a>
           </div>
-          <div class="tel-box" style="padding:14px;">
-            <div class="tel-k">TIER 03 &bull; 3D WEBGL</div>
-            <div class="tel-v" style="font-size:18px;margin:4px 0;">$4,900</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Spatial Interactive 3D Shaders</div>
-            <a href="https://buy.stripe.com/9B6cMZ5vub6q0840ObfAc02" target="_blank" rel="noopener" class="btn-order-top" style="width:100%;height:32px;font-size:10px;display:grid;place-items:center;text-decoration:none;">Pay Stripe ($4,900)</a>
+          <div class="tier-card">
+            <div class="tk">TIER 03 &bull; 3D WEBGL</div>
+            <div class="tv">$4,900</div>
+            <div class="td">Spatial Interactive 3D Shaders</div>
+            <a href="https://buy.stripe.com/9B6cMZ5vub6q0840ObfAc02" target="_blank" rel="noopener">Pay Stripe ($4,900)</a>
           </div>
-          <div class="tel-box" style="padding:14px;">
-            <div class="tel-k">TIER 04 &bull; E-COMM</div>
-            <div class="tel-v" style="font-size:18px;margin:4px 0;">$8,900</div>
-            <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Full Store + Tax Invoicing</div>
-            <a href="https://buy.stripe.com/aFa5kx8HG1vQ7AwbsPfAc03" target="_blank" rel="noopener" class="btn-order-top" style="width:100%;height:32px;font-size:10px;display:grid;place-items:center;text-decoration:none;">Pay Stripe ($8,900)</a>
+          <div class="tier-card">
+            <div class="tk">TIER 04 &bull; E-COMM</div>
+            <div class="tv">$8,900</div>
+            <div class="td">Full Store + Tax Invoicing</div>
+            <a href="https://buy.stripe.com/aFa5kx8HG1vQ7AwbsPfAc03" target="_blank" rel="noopener">Pay Stripe ($8,900)</a>
           </div>
         </div>
 
         <div class="wire-box">
-          <strong style="color:var(--gold);">OFFICIAL CORPORATE PAYMENT CHANNELS (100% CODE OWNERSHIP COVENANT):</strong><br>
-          &bull; PayPal Business: <strong>billing@aeterna.website</strong> | Corporate Entity: AETERNA Technologies EOOD (UIC/VAT: BG101327948)<br>
-          &bull; SEPA / SWIFT IBAN: <strong>BG22INTF40012011857631</strong> (BIC: INTFBGSF &middot; iCard AD)<br>
+          <strong style="color:#c5a34e;">OFFICIAL CORPORATE PAYMENT CHANNELS (100% CODE OWNERSHIP COVENANT):</strong><br />
+          &bull; PayPal Business: <strong>billing@aeterna.website</strong> | Entity: AETERNA Technologies EOOD (UIC/VAT: BG101327948)<br />
+          &bull; SEPA / SWIFT IBAN: <strong>BG22INTF40012011857631</strong> (BIC: INTFBGSF &middot; iCard AD)<br />
           &bull; Direct Architect WhatsApp / Call: <strong>+359 884 638 640</strong> (dimitar@aeterna.website)
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Three.js r128 Engine + Millennium 8K Liquid Vortex GPU Shader -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="./engines/aeterna_liquid_vortex.js"></script>
-
-  <script>
-  (function() {
-    'use strict';
-
-    // =========================================================================
-    // 1. CATALOG OF BUSINESS WEBSITE PLANETS (CELESTIAL COORDINATES & TEMPLATES)
-    // =========================================================================
-    const WEBSITE_PLANETS = [
-      {
-        id: "vulcan-trades",
-        name: "Planet Vulcan // Trades & Services",
-        shortName: "Trades & Dispatch 24/7",
-        niche: "Plumbers, Electricians, Roofers, Builders, Glaziers",
-        cat: "trades",
-        azDeg: 25, altDeg: 18, color: 0xf59e0b, hex: "#f59e0b", glow: 0xfbbf24, radius: 1.45, hasRing: false,
-        heroImg: "./textures/cosmos_vulcan.webp",
-        speed: "0.3s",
-        priceLabel: "$495 Base Launchpad",
-        priceSub: "+ Optional SEO & Calculator Add-ons",
-        url: "./demos/trades.html",
-        externalUrl: "./demos/trades.html",
-        isCustomizable: true,
-        desc: "Brutal obsidian-and-gold digital flagship tailored for high-margin trade businesses. Built to stop losing emergency call-outs on Google with 1-tap phone routing and interactive pre-qualification.",
-        features: [
-          "Instant 24/7 Emergency Call Routing & Intake Terminal",
-          "Interactive m² / Scope Estimator (Add-on)",
-          "VBA / Licensing Compliance Plaques & Local Suburb Coverage",
-          "Dynamic Brand Injection: Enter your name in the side menu!"
-        ]
-      },
-      {
-        id: "olivine-hospitality",
-        name: "Planet Olivine // Hospitality & Cafés",
-        shortName: "Cafés, Restaurants & Bakeries",
-        niche: "Artisan Cafés, Restaurants, Wine Bars, Boutiques",
-        cat: "hospitality",
-        azDeg: 68, altDeg: 26, color: 0x63b292, hex: "#63b292", glow: 0xd4f23b, radius: 1.35, hasRing: false,
-        heroImg: "./textures/cosmos_sunrise.webp",
-        speed: "0.4s",
-        priceLabel: "$495 Base Launchpad",
-        priceSub: "Warm Cream & Sage Editorial Edition",
-        url: "./demos/hospitality.html",
-        externalUrl: "./demos/hospitality.html",
-        isCustomizable: true,
-        desc: "Fresh, inviting Silicon-Valley warm editorial aesthetic (#f7f4ee Ivory Cream + Sage Green + Poppins). Engineered for cafés, artisan bakeries, and restaurants seeking frictionless table reservations.",
-        features: [
-          "Zero-Commission Direct Table Reservation Engine",
-          "Clean Seasonal Menu & Signature Dish Showcase",
-          "Warm Editorial Readability Inspired by Top SaaS Agencies",
-          "Dynamic Brand Injection from the Left Side Menu"
-        ]
-      },
-      {
-        id: "anchialo-ecommerce",
-        name: "Planet Anchialo // Global E-Commerce",
-        shortName: "Multi-Currency E-Commerce",
-        niche: "Retail Brands, Wellness, Cosmetics, Apothecary",
-        cat: "ecommerce",
-        azDeg: 112, altDeg: 22, color: 0x10b981, hex: "#10b981", glow: 0x34d399, radius: 1.65, hasRing: true,
-        heroImg: "./textures/cosmos_night_earth.webp",
-        speed: "0.35s",
-        priceLabel: "$8,900 Turnkey Store",
-        priceSub: "0% Shopify Fees Forever (Live Client Site)",
-        url: "https://anchialo.com",
-        externalUrl: "https://anchialo.com",
-        isCustomizable: false,
-        desc: "Production-proven international store (LIVE at anchialo.com). Features 4-currency real-time pricing (AUD/USD/EUR/BGN), 300 DPI label inspection, and automated ATO GST tax invoicing.",
-        features: [
-          "LIVE Client Flagship (anchialo.com) — Click Preview to Inspect",
-          "4-Currency Dynamic Engine & Automated Courier Barcodes",
-          "Zero Monthly Shopify or SaaS Percentage Cuts",
-          "100% Source Code & Intellectual Property Transfer"
-        ]
-      },
-      {
-        id: "cptmma-academy",
-        name: "Planet CPT MMA // Sports & Coaching",
-        shortName: "Academies & Video Vaults",
-        niche: "Combat Academies, Gyms, Online Coaching Portals",
-        cat: "sports",
-        azDeg: 158, altDeg: 32, color: 0xef4444, hex: "#ef4444", glow: 0xfca5a5, radius: 1.55, hasRing: false,
-        heroImg: "./textures/cosmos_crimson.webp",
-        speed: "0.4s",
-        priceLabel: "$4,900 Portal Build",
-        priceSub: "40-Lesson Encrypted Vault (Live Site)",
-        url: "https://cptmma.com",
-        externalUrl: "https://cptmma.com",
-        isCustomizable: false,
-        desc: "Live dual-division sports academy and encrypted 40-lesson HD training vault engineered for ONE Championship veteran Sotir Kichukov in Melbourne, complete with instant PayID & PayPal checkout.",
-        features: [
-          "LIVE Client Flagship (cptmma.com) — Streaming Video Portal",
-          "VIP Member Access Codes & Encrypted Lesson Protection",
-          "Integrated Merchandise Checkout & Training Timetable",
-          "Dual-Division Brand Architecture (Combat + Canine K9)"
-        ]
-      },
-      {
-        id: "immersion-apparel",
-        name: "Planet Immersion // 3D Apparel & Gym",
-        shortName: "3D Interactive Store & Academy",
-        niche: "Martial Arts Clubs, Streetwear, Fitness Studios",
-        cat: "sports",
-        azDeg: 200, altDeg: 16, color: 0x06b6d4, hex: "#06b6d4", glow: 0x67e8f9, radius: 1.38, hasRing: false,
-        heroImg: "./textures/cosmos_juno.webp",
-        speed: "0.38s",
-        priceLabel: "$4,900 Spatial Portal",
-        priceSub: "Hosted Live on paas.website/immersion-mma",
-        url: "./immersion-mma/index.html",
-        externalUrl: "./immersion-mma/index.html",
-        isCustomizable: false,
-        desc: "Multi-page combat sports flagship featuring interactive 3D gear visualization, class timetables (BJJ, Muay Thai, Kids Bullyproof), and automated trial bookings.",
-        features: [
-          "Live Multi-Page Portal Built Directly on Bare Metal",
-          "Interactive 3D Rashguard & Compression Gear Simulator",
-          "Direct Student & Trial Membership Lead Capture",
-          "Sub-0.4s Instant Page Transitions"
-        ]
-      },
-      {
-        id: "helios-clinic",
-        name: "Planet Helios // Clinics & Aesthetics",
-        shortName: "Medical, Dental & Beauty",
-        niche: "Dental Practices, Cosmetic Clinics, Hair & Spa",
-        cat: "clinic",
-        azDeg: 245, altDeg: 28, color: 0x38bdf8, hex: "#38bdf8", glow: 0xbae6fd, radius: 1.4, hasRing: true,
-        heroImg: "./textures/cosmos_sunrise.webp",
-        speed: "0.32s",
-        priceLabel: "$495 Base Launchpad",
-        priceSub: "or $1,500 Express Multi-Page Practice",
-        url: "./demos/clinic.html",
-        externalUrl: "./demos/clinic.html",
-        isCustomizable: true,
-        desc: "Crisp Swiss clinical precision design. Eliminates HotDoc/booking aggregator commissions with direct encrypted patient intake forms and diagnostic clarity.",
-        features: [
-          "Encrypted Zero-Bloat Patient Appointment Request Console",
-          "AHPRA / GDPR Trust Badges & Treatment Specialization",
-          "Zero Third-Party Booking Commissions Per Patient",
-          "Dynamic Practice Name & City Hydration from Menu"
-        ]
-      },
-      {
-        id: "themis-legal",
-        name: "Planet Themis // Legal & Sovereign AI",
-        shortName: "Law Firms & SaaS Utilities",
-        niche: "Lawyers, Financial Advisors, Tax & Civic Portals",
-        cat: "clinic",
-        azDeg: 290, altDeg: 20, color: 0xc5a34e, hex: "#c5a34e", glow: 0xfef08a, radius: 1.48, hasRing: true,
-        heroImg: "./textures/cosmos_juno.webp",
-        speed: "0.25s",
-        priceLabel: "$1,500 – $2,800",
-        priceSub: "Client-Side Zero-Leakage Architecture",
-        url: "./lex/index.html",
-        externalUrl: "./lex/index.html",
-        isCustomizable: false,
-        desc: "Live production legal engine (paas.website/lex/) demonstrating zero-latency client-side document synthesis, statutory fee calculation, and cryptographic privacy.",
-        features: [
-          "LIVE Client-Side Legal Automation System (13 Active Modules)",
-          "Instant Fee Calculators & Print-Ready PDF Synthesis",
-          "100% Local Privacy Architecture — Zero Server Data Leakage",
-          "Deployable as Bespoke Firm Portal or Client Intake Tool"
-        ]
-      },
-      {
-        id: "vance-luxury-estate",
-        name: "Planet Vance // Real Estate & Luxury",
-        shortName: "Real Estate, Auto & Wealth",
-        niche: "Luxury Property, Developers, Family Offices, Supercar Dealers",
-        cat: "luxury",
-        azDeg: 332, altDeg: 34, color: 0xa855f7, hex: "#a855f7", glow: 0xe9d5ff, radius: 1.5, hasRing: false,
-        heroImg: "./textures/cosmos_night_earth.webp",
-        speed: "0.45s",
-        priceLabel: "$4,900 Spatial Luxury",
-        priceSub: "Interactive 3D WebGL Portfolio",
-        url: "./demos/luxury-estate.html",
-        externalUrl: "./demos/luxury-estate.html",
-        isCustomizable: true,
-        desc: "Architectural obsidian showcase featuring a live WebGL2 procedural gold geometry core, portfolio mandate cards, and VIP consultation routing.",
-        features: [
-          "Live Interactive Three.js 3D Monolith & Geometric Grid",
-          "Cormorant Garamond Haute Horlogerie Editorial Design",
-          "Private Mandate Cards ($8M–$15M Architectural Portfolio)",
-          "Custom Brand Injection from Sidebar Controls"
-        ]
-      },
-      {
-        id: "aeterna-flagship",
-        name: "Solaris Core // AETERNA Classic Studio",
-        shortName: "Flagship Agency & 3D R&D",
-        niche: "All Custom Flagships, 3D Shaders, Enterprise Commissions",
-        cat: "luxury",
-        azDeg: 0, altDeg: 52, color: 0xfde047, hex: "#fde047", glow: 0xffffff, radius: 1.9, hasRing: true,
-        heroImg: "./textures/cosmos_vortex.webp",
-        speed: "0.3s",
-        priceLabel: "$1,500 – $8,900",
-        priceSub: "Full 4-Step Engineering & IP Transfer",
-        url: "./classic/index.html",
-        externalUrl: "./classic/index.html",
-        isCustomizable: false,
-        desc: "Our zenith solar core housing the full AETERNA DIGITAL classic agency studio showcase, Biomechanical Chameleon engine, and 3D Tourbillon R&D lab.",
-        features: [
-          "Direct Portal to Classic Studio View (/classic/)",
-          "Bespoke Stripe, PayPal & Corporate IBAN Checkout Tiers",
-          "3D Spatial WebGL Sandboxes & Liquid Gold Shaders",
-          "Bilateral NDA & Permanent Intellectual Property Transfer"
-        ]
-      },
-      {
-        id: "millennium-vortex",
-        name: "Nova Vortex // 8K Liquid Gold Shader",
-        shortName: "Procedural 8K Gold Vortex",
-        niche: "Luxury Interactive Backgrounds, Flagship Brand Portals",
-        cat: "labs",
-        azDeg: 46, altDeg: 46, color: 0xfbbf24, hex: "#fbbf24", glow: 0xfef08a, radius: 1.42, hasRing: true,
-        heroImg: "./textures/cosmos_vortex.webp",
-        speed: "60 FPS",
-        priceLabel: "$4,900 Spatial Shader",
-        priceSub: "Native Per-Pixel WebGL GPU Engine (No Video)",
-        url: "./studios/liquid-vortex.html",
-        externalUrl: "./studios/liquid-vortex.html",
-        isCustomizable: false,
-        desc: "Millennium Studio Engine (37_AETERNA_3D_SOVEREIGN_STUDIO): renders liquid 24K gold and black-lacquer spiral ribbons, ACES filmic bokeh spheres, and scroll-reactive stardust mathematically on every pixel.",
-        features: [
-          "Resolution-Independent GPU Fragment Shader (1080p / 4K / 8K)",
-          "Cursor Parallax & Scroll-Driven Spiral Twist API",
-          "Zero Video File Downloads (~12 KB Total Engine Payload)",
-          "Also Active Live on This Cosmos via Bottom Dock 🌀 Vortex"
-        ]
-      },
-      {
-        id: "millennium-8k-raymarch",
-        name: "Kintsugi Prime // 8K HDR Raymarcher",
-        shortName: "8K HDR Multi-Pass Studio",
-        niche: "Jewellery, Architecture, Spatial Flagship Showcases",
-        cat: "labs",
-        azDeg: 118, altDeg: 48, color: 0xf59e0b, hex: "#f59e0b", glow: 0xfde047, radius: 1.52, hasRing: true,
-        heroImg: "./textures/cosmos_vulcan.webp",
-        speed: "WebGL2 HDR",
-        priceLabel: "$4,900 – $8,900",
-        priceSub: "5 SDF Manifolds + 7680×4320 PNG Exporter",
-        url: "./studios/8k-raymarch.html",
-        externalUrl: "./studios/8k-raymarch.html",
-        isCustomizable: false,
-        desc: "Full WebGL2 RGBA16F HDR raymarching engine featuring Cook-Torrance GGX shading, 1-bounce reflections, separable anamorphic bloom, FXAA, and native 4×4 RGSS tiled 8K PNG export.",
-        features: [
-          "5 Live Switchable SDF Geometries (Kintsugi Torus, Knot, SU(3), Helix, Crystal DNA)",
-          "Real-Time Gold Vein Density, Relief Height & Exposure Sliders",
-          "True 7680×4320 (8K DCI) Client-Side Tiled PNG Export",
-          "Optional Live Rust Kernel Telemetry Hook (:8090)"
-        ]
-      },
-      {
-        id: "millennium-cad-studio",
-        name: "Orion CAD // Exploded Thin-Film 3D",
-        shortName: "3D Optical & CAD Studio",
-        niche: "Manufacturing, Aerospace, Biotech Hardware Configurators",
-        cat: "labs",
-        azDeg: 184, altDeg: 44, color: 0x38bdf8, hex: "#38bdf8", glow: 0x7dd3fc, radius: 1.44, hasRing: false,
-        heroImg: "./textures/cosmos_juno.webp",
-        speed: "Three r170",
-        priceLabel: "$4,900 Spatial CAD",
-        priceSub: "Snell Dispersion, Section Cut & GLB Export",
-        url: "./studios/cad-studio.html",
-        externalUrl: "./studios/cad-studio.html",
-        isCustomizable: false,
-        desc: "Real-time Three.js r170 exploded-assembly CAD configurator with thin-film optical iridescence, Snell refractive dispersion, cross-section slicing, UnrealBloom, and binary GLB export.",
-        features: [
-          "Interactive Exploded CMOS & Optical Sensor Assembly",
-          "Real-Time Section Cut Slicing & Physical Iridescence",
-          "One-Click Binary .GLB 3D Mesh & 4K Snapshot Export",
-          "Embeddable Directly Into Product E-Commerce Pages"
-        ]
-      },
-      {
-        id: "millennium-particle-field",
-        name: "Pulsar Vector // 3D Particle Dynamics",
-        shortName: "Quantum Particle Vector Field",
-        niche: "FinTech, SaaS Telemetry, AI Startups, Interactive Heroes",
-        cat: "labs",
-        azDeg: 252, altDeg: 46, color: 0xf43f5e, hex: "#f43f5e", glow: 0xfda4af, radius: 1.36, hasRing: false,
-        heroImg: "./textures/cosmos_crimson.webp",
-        speed: "0.35s",
-        priceLabel: "$2,800 Pro Interactive",
-        priceSub: "Three.js GPU Vector Field + Live KaTeX HUD",
-        url: "./studios/dynamical-field.html",
-        externalUrl: "./studios/dynamical-field.html",
-        isCustomizable: false,
-        desc: "Real-time WebGL particle flow field and dynamical phase-space visualizer from the Millennium engine suite — engineered for SaaS dashboards, interactive hero canvases, and live telemetry.",
-        features: [
-          "Real-Time GPU Vector Attractor & Particle Trajectories",
-          "Interactive Parameter Controls & Orbit Inspection",
-          "Integrated KaTeX Mathematical Overlay Panel",
-          "Zero Server Overhead — Pure Client-Side WebGL"
-        ]
-      },
-      {
-        id: "millennium-spectral-wilson",
-        name: "Wilsonian Halo // 3D Spectral Lattice",
-        shortName: "Spectral & Lattice Visualizer",
-        niche: "Deep-Tech R&D, Cybersecurity, Data Platforms",
-        cat: "labs",
-        azDeg: 315, altDeg: 50, color: 0xa855f7, hex: "#a855f7", glow: 0xd8b4fe, radius: 1.40, hasRing: true,
-        heroImg: "./textures/cosmos_night_earth.webp",
-        speed: "0.30s",
-        priceLabel: "$2,800 Pro 3D Dashboard",
-        priceSub: "WebGL2 3D Spectral Matrix & Topology HUD",
-        url: "./studios/spectral-wilson.html",
-        externalUrl: "./studios/spectral-wilson.html",
-        isCustomizable: false,
-        desc: "Live 3D WebGL2 Wilson Plaquette and eigenvalue spectrum explorer ported straight from AETERNA Millennium visualizations — ideal for analytical dashboards and enterprise R&D portals.",
-        features: [
-          "Interactive 3D Eigenvalue & Plaquette Manifold Mesh",
-          "Dark Glassmorphic Telemetry HUD Overlay",
-          "Responsive Camera Orbit & Live Mode Switching",
-          "Ready for Live API / SSE / WebSocket Telemetry Feeds"
-        ]
-      },
-      {
-        id: "millennium-thom-cusp",
-        name: "Catastrophe Cusp // 3D Coherence Engine",
-        shortName: "Thom Cusp 3D Explorer",
-        niche: "Quant Finance, Biotech SaaS, Complex Systems Analytics",
-        cat: "labs",
-        azDeg: 86, altDeg: 58, color: 0x10b981, hex: "#10b981", glow: 0x6ee7b7, radius: 1.34, hasRing: false,
-        heroImg: "./textures/cosmos_sunrise.webp",
-        speed: "0.28s",
-        priceLabel: "$2,800 Analytics WebApp",
-        priceSub: "Interactive 3D Catastrophe Surface Simulator",
-        url: "./studios/thom-cusp.html",
-        externalUrl: "./studios/thom-cusp.html",
-        isCustomizable: false,
-        desc: "Interactive 3D Thom Cusp catastrophe surface and Sovereign Coherence (SCI = 0.2314) explorer rendered smoothly in Three.js for high-stakes scientific and SaaS data visualization.",
-        features: [
-          "Real-Time 3D Bifurcation Manifold & Control Trajectory",
-          "Zero-Bloat Single-File Deployment Architecture (20 KB)",
-          "Full OrbitControls Inspection & Custom Color Grading",
-          "Deployable as Standalone Micro-App or Embedded Widget"
-        ]
-      }
-    ];
-
-    // Constellation Connections (edges linking related worlds in the sky)
-    const CONSTELLATIONS = [
-      ["vulcan-trades", "olivine-hospitality"],
-      ["olivine-hospitality", "anchialo-ecommerce"],
-      ["anchialo-ecommerce", "cptmma-academy"],
-      ["cptmma-academy", "immersion-apparel"],
-      ["helios-clinic", "themis-legal"],
-      ["themis-legal", "vance-luxury-estate"],
-      ["vance-luxury-estate", "aeterna-flagship"],
-      ["vulcan-trades", "aeterna-flagship"],
-      ["anchialo-ecommerce", "aeterna-flagship"],
-      ["aeterna-flagship", "millennium-vortex"],
-      ["millennium-vortex", "millennium-thom-cusp"],
-      ["millennium-thom-cusp", "millennium-8k-raymarch"],
-      ["millennium-8k-raymarch", "millennium-cad-studio"],
-      ["millennium-cad-studio", "millennium-particle-field"],
-      ["millennium-particle-field", "millennium-spectral-wilson"],
-      ["millennium-spectral-wilson", "aeterna-flagship"]
-    ];
-
-    // =========================================================================
-    // 2. SPHERICAL PLANETARIUM CAMERA & STATE ENGINE
-    // =========================================================================
-    let camAz = 25;      // Degrees 0..360 (Horizontal orbit - centered on Vulcan)
-    let camAlt = 18;     // Degrees -10..85 (Vertical pitch)
-    let camFov = 58;     // Zoom field of view 24..90
-    let targetAz = 25, targetAlt = 18, targetFov = 58;
-    let isFlying = false;
-    let autoOrbit = true;
-    let selectedPlanetId = "vulcan-trades";
-    let activeCategory = "all";
-
-    let showConstellations = true;
-    let showAtmosphere = true;
-    let showHorizon = true;
-    let showGrid = true;
-    let showEqGrid = true;
-    let showLabels = true;
-    let vortexMode = "on"; // "on" | "max" | "off"
-    let vortexCtrl = null;
-
-    const OBS_LOCATIONS = [
-      { name: "Melbourne", lat: -37.81, lon: 144.96, label: "📍 Melbourne", coords: "37.8°S · 144.9°E" },
-      { name: "Pomorie",   lat: 42.56,  lon: 27.64,  label: "📍 Pomorie HQ", coords: "42.6°N · 27.6°E" },
-      { name: "Atacama",   lat: -23.02, lon: -67.75, label: "📍 Atacama ALMA", coords: "23.0°S · 67.8°W" }
-    ];
-    let obsLocIdx = 0;
-
-    const SKY_PHASES = [
-      { name: "🌙 Astronomical Night", sunGlow: 0.34, skyTint: [0.05, 0.14, 0.34], fogGlow: 0.25 },
-      { name: "🌇 Stellarium Twilight", sunGlow: 0.92, skyTint: [0.16, 0.28, 0.56], fogGlow: 0.62 },
-      { name: "🌌 Deep Space Dark",    sunGlow: 0.14, skyTint: [0.02, 0.05, 0.14], fogGlow: 0.10 }
-    ];
-    let skyPhaseIdx = 0;
-
-    const NAV_STARS = [
-      { id: "star-sirius",     name: "Sirius (α CMa)",     mag: -1.46, azDeg: 82,  altDeg: 38, color: "#cce4ff", hex: "#93c5fd" },
-      { id: "star-canopus",    name: "Canopus (α Car)",    mag: -0.74, azDeg: 148, altDeg: 28, color: "#fff7e0", hex: "#fde68a" },
-      { id: "star-rigel",      name: "Rigel (β Ori)",      mag: 0.13,  azDeg: 58,  altDeg: 29, color: "#b6d8ff", hex: "#7dd3fc" },
-      { id: "star-betelgeuse", name: "Betelgeuse (α Ori)", mag: 0.42,  azDeg: 44,  altDeg: 36, color: "#ffb884", hex: "#fb923c" },
-      { id: "star-vega",       name: "Vega (α Lyr)",       mag: 0.03,  azDeg: 312, altDeg: 41, color: "#d8ebff", hex: "#bae6fd" },
-      { id: "star-antares",    name: "Antares (α Sco)",    mag: 1.06,  azDeg: 232, altDeg: 24, color: "#ff9d6e", hex: "#f87171" },
-      { id: "star-aldebaran",  name: "Aldebaran (α Tau)",  mag: 0.86,  azDeg: 34,  altDeg: 27, color: "#ffc288", hex: "#fbbf24" },
-      { id: "star-spica",      name: "Spica (α Vir)",      mag: 0.97,  azDeg: 194, altDeg: 35, color: "#c2deff", hex: "#93c5fd" },
-      { id: "star-altair",     name: "Altair (α Aql)",     mag: 0.76,  azDeg: 282, altDeg: 31, color: "#ffffff", hex: "#e2e8f0" },
-      { id: "star-polaris",    name: "Polaris (α UMi)",    mag: 1.98,  azDeg: 0,   altDeg: 42, color: "#fff2cc", hex: "#fde047" }
-    ];
-
-    const SPHERE_RADIUS = 58;
-
-    function deg2rad(d) { return d * Math.PI / 180; }
-    function rad2deg(r) { return r * 180 / Math.PI; }
-    function sphToVec3(azDeg, altDeg, r) {
-      const az = deg2rad(azDeg);
-      const alt = deg2rad(altDeg);
-      const cosAlt = Math.cos(alt);
-      return {
-        x: r * cosAlt * Math.sin(az),
-        y: r * Math.sin(alt),
-        z: -r * cosAlt * Math.cos(az)
-      };
-    }
-
-    function azAltToRaDec(azDeg, altDeg, latDeg, lstDeg) {
-      const az = deg2rad(azDeg), alt = deg2rad(altDeg), lat = deg2rad(latDeg);
-      const sinDec = Math.sin(alt) * Math.sin(lat) + Math.cos(alt) * Math.cos(lat) * Math.cos(az);
-      const decRad = Math.asin(Math.max(-1, Math.min(1, sinDec)));
-      const cosH = (Math.sin(alt) - Math.sin(lat) * sinDec) / (Math.cos(lat) * Math.cos(decRad) || 1e-6);
-      let H = rad2deg(Math.acos(Math.max(-1, Math.min(1, cosH))));
-      if (Math.sin(az) > 0) H = 360 - H;
-      const raDeg = (lstDeg - H + 360) % 360;
-      return { raDeg, decDeg: rad2deg(decRad) };
-    }
-    function formatRA(deg) {
-      const hrs = deg / 15;
-      const h = Math.floor(hrs);
-      const m = Math.floor((hrs - h) * 60);
-      const s = Math.floor(((hrs - h) * 60 - m) * 60);
-      return `${String(h).padStart(2, "0")}h ${String(m).padStart(2, "0")}m ${String(s).padStart(2, "0")}s`;
-    }
-    function formatDegMin(deg) {
-      const sign = deg < 0 ? "-" : "+";
-      const a = Math.abs(deg);
-      const d = Math.floor(a);
-      const m = Math.floor((a - d) * 60);
-      return `${sign}${String(d).padStart(2, "0")}° ${String(m).padStart(2, "0")}'`;
-    }
-
-    // =========================================================================
-    // 3. THREE.JS 3D COSMIC OBSERVATORY SCENE
-    // =========================================================================
-    const canvas = document.getElementById("cosmosCanvas");
-    const hudLayer = document.getElementById("hudOverlayLayer");
-    const reticleEl = document.getElementById("targetReticle");
-
-    let renderer, scene, camera;
-    let planetMeshes = {};
-    let constellationGroup, gridGroup, eqGridGroup, horizonGroup, atmoDome, starField, vortexPlane, atmoUniforms, mistUniforms;
-    let clock = typeof THREE !== "undefined" ? new THREE.Clock() : null;
-
-    function init3DUniverse() {
-      const bootEl = document.getElementById("cosmosBootOverlay");
-      if (typeof THREE === "undefined") {
-        if (bootEl) bootEl.classList.add("hidden");
-        return;
-      }
-
-      // =========================================================================
-      // 3. THREE.JS 8K / 4K NASA & SOLAR SYSTEM SCOPE OBSERVATORY SCENE
-      // =========================================================================
-      renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, powerPreference: "high-performance" });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(window.innerWidth, window.innerHeight);
-
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x020409);
-
-      camera = new THREE.PerspectiveCamera(camFov, window.innerWidth / window.innerHeight, 0.1, 500);
-      camera.position.set(0, 0, 0);
-
-      // Texture Streaming Progress Manager
-      const bootTxt = document.getElementById("bootProgressText");
-      const manager = new THREE.LoadingManager();
-      manager.onProgress = function (url, loaded, total) {
-        const pct = Math.min(100, Math.round((loaded / Math.max(1, total)) * 100));
-        if (bootTxt) bootTxt.textContent = `CALIBRATING 8K PLANETARY TEXTURES... ${pct}%`;
-      };
-      manager.onLoad = function () {
-        setTimeout(() => { if (bootEl) bootEl.classList.add("hidden"); }, 180);
-      };
-      manager.onError = function () {
-        if (bootEl) bootEl.classList.add("hidden");
-      };
-      // Safety curtain reveal so slow networks never stall entrance
-      setTimeout(() => { if (bootEl) bootEl.classList.add("hidden"); }, 2200);
-
-      const texLoader = new THREE.TextureLoader(manager);
-      const maxTexSize = renderer.capabilities ? renderer.capabilities.maxTextureSize : 4096;
-
-      // Solar Lighting: Primary golden directional light from Solaris Az=0 Alt=52 + soft cosmic rim light
-      scene.add(new THREE.AmbientLight(0x283550, 0.55));
-      const solarLight = new THREE.DirectionalLight(0xfff5db, 2.2);
-      const solPos = sphToVec3(0, 52, 80);
-      solarLight.position.set(solPos.x, solPos.y, solPos.z);
-      scene.add(solarLight);
-      const deepSpaceRim = new THREE.DirectionalLight(0x38bdf8, 0.45);
-      deepSpaceRim.position.set(-40, -25, -40);
-      scene.add(deepSpaceRim);
-
-      // A. TRUE 8K MILKY WAY EQUIRECTANGULAR SKYBOX DOME (with 4K mobile GPU safe fallback)
-      const skyPath = maxTexSize >= 8192 ? "./textures/8k_stars_milky_way.jpg" : "./textures/4k_stars_milky_way.webp";
-      const skyTex = texLoader.load(skyPath);
-      const skyDome = new THREE.Mesh(
-        new THREE.SphereGeometry(240, 64, 48),
-        new THREE.MeshBasicMaterial({ map: skyTex, side: THREE.BackSide, depthWrite: false, color: 0xdddddd })
-      );
-      skyDome.rotation.y = 0.6;
-      skyDome.rotation.x = 0.28;
-      scene.add(skyDome);
-
-      // A2. Deep-Space JWST Carina Nebula & Architect's Spinning Spiral Vortex Portal
-      const carinaTex = texLoader.load("./textures/jwst_carina.webp");
-      const vortexTex = texLoader.load("./textures/cosmos_vortex.webp");
-      const nebulaVert = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
-      const nebulaFrag = `
-        uniform sampler2D uMap;
-        uniform float uStrength;
-        varying vec2 vUv;
-        void main() {
-          vec2 c = vUv - 0.5;
-          float radial = smoothstep(0.49, 0.14, length(c));
-          vec4 tex = texture2D(uMap, vUv);
-          gl_FragColor = vec4(tex.rgb * uStrength, radial * 0.65);
-        }
-      `;
-      const carinaPlane = new THREE.Mesh(
-        new THREE.PlaneGeometry(115, 72),
-        new THREE.ShaderMaterial({
-          uniforms: { uMap: { value: carinaTex }, uStrength: { value: 0.72 } },
-          vertexShader: nebulaVert, fragmentShader: nebulaFrag,
-          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
-        })
-      );
-      const carinaPos = sphToVec3(220, 24, 175);
-      carinaPlane.position.set(carinaPos.x, carinaPos.y, carinaPos.z);
-      carinaPlane.lookAt(0, 0, 0);
-      scene.add(carinaPlane);
-
-      vortexPlane = new THREE.Mesh(
-        new THREE.PlaneGeometry(92, 92),
-        new THREE.ShaderMaterial({
-          uniforms: { uMap: { value: vortexTex }, uStrength: { value: 0.85 } },
-          vertexShader: nebulaVert, fragmentShader: nebulaFrag,
-          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
-        })
-      );
-      const vPos = sphToVec3(12, 46, 160);
-      vortexPlane.position.set(vPos.x, vPos.y, vPos.z);
-      vortexPlane.lookAt(0, 0, 0);
-      scene.add(vortexPlane);
-
-      // A3. Parallax Foreground Starfield (2,600 crisp stars for parallax depth over 8K sky)
-      const starGeo = new THREE.BufferGeometry();
-      const starCount = 2600;
-      const positions = new Float32Array(starCount * 3);
-      const colors = new Float32Array(starCount * 3);
-      const palette = [
-        new THREE.Color(0xffffff), new THREE.Color(0xffe9b3),
-        new THREE.Color(0xc5a34e), new THREE.Color(0x93c5fd)
-      ];
-      for (let i = 0; i < starCount; i++) {
-        const az = Math.random() * 360;
-        const alt = -12 + Math.random() * 100;
-        const dist = 125 + Math.random() * 75;
-        const p = sphToVec3(az, alt, dist);
-        positions[i * 3] = p.x; positions[i * 3 + 1] = p.y; positions[i * 3 + 2] = p.z;
-        const c = palette[Math.floor(Math.random() * palette.length)];
-        const intensity = 0.5 + Math.random() * 0.5;
-        colors[i * 3] = c.r * intensity; colors[i * 3 + 1] = c.g * intensity; colors[i * 3 + 2] = c.b * intensity;
-      }
-      starGeo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-      starGeo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
-      starField = new THREE.Points(starGeo, new THREE.PointsMaterial({ size: 0.75, vertexColors: true, transparent: true, opacity: 0.85 }));
-      scene.add(starField);
-
-      // A4. Named Navigation Stars (Stellarium Bright Star Layer)
-      const navGroup = new THREE.Group();
-      NAV_STARS.forEach(s => {
-        const sp = sphToVec3(s.azDeg, s.altDeg, 138);
-        const core = new THREE.Mesh(
-          new THREE.SphereGeometry(0.45, 12, 12),
-          new THREE.MeshBasicMaterial({ color: s.color })
-        );
-        core.position.set(sp.x, sp.y, sp.z);
-        navGroup.add(core);
-      });
-      scene.add(navGroup);
-
-      // A5. Preetham / Rayleigh Atmospheric Twilight Dome (Toggleable like Stellarium)
-      atmoUniforms = {
-        uSunGlow: { value: SKY_PHASES[0].sunGlow },
-        uSkyTint: { value: new THREE.Vector3(...SKY_PHASES[0].skyTint) },
-        uSunDir:  { value: new THREE.Vector3(0.45, -0.05, -0.89).normalize() }
-      };
-      atmoDome = new THREE.Mesh(
-        new THREE.SphereGeometry(212, 48, 32),
-        new THREE.ShaderMaterial({
-          uniforms: atmoUniforms,
-          vertexShader: `varying vec3 vDir; void main(){ vDir = normalize(position); gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-          fragmentShader: `
-            uniform float uSunGlow;
-            uniform vec3 uSkyTint;
-            uniform vec3 uSunDir;
-            varying vec3 vDir;
-            void main() {
-              float elev = clamp(vDir.y, 0.0, 1.0);
-              float horizonBand = pow(1.0 - elev, 4.2);
-              float sunCos = max(dot(normalize(vDir), uSunDir), 0.0);
-              float mieGlow = pow(sunCos, 6.0) * 0.45 + pow(sunCos, 24.0) * 0.55;
-              vec3 twilightCol = uSkyTint * (0.28 + 1.15 * horizonBand);
-              vec3 warmDusk = vec3(0.96, 0.56, 0.24) * mieGlow * horizonBand * uSunGlow;
-              vec3 finalAtmo = (twilightCol * uSunGlow) + warmDusk;
-              float alpha = clamp((horizonBand * 0.65 + 0.12) * uSunGlow * step(-0.04, vDir.y), 0.0, 0.88);
-              gl_FragColor = vec4(finalAtmo, alpha);
-            }
-          `,
-          transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false
-        })
-      );
-      scene.add(atmoDome);
-
-      // B. Spherical Alt/Az Coordinate Grid (Azimuthal Grid in Cyan / Gold Horizon)
-      gridGroup = new THREE.Group();
-      const gridMat = new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.14 });
-      const goldLineMat = new THREE.LineBasicMaterial({ color: 0xc5a34e, transparent: true, opacity: 0.28 });
-
-      [-20, 0, 20, 40, 60, 80].forEach(alt => {
-        const pts = [];
-        for (let a = 0; a <= 360; a += 5) {
-          const v = sphToVec3(a, alt, 105);
-          pts.push(new THREE.Vector3(v.x, v.y, v.z));
-        }
-        gridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), alt === 0 ? goldLineMat : gridMat));
-      });
-      for (let az = 0; az < 360; az += 30) {
-        const pts = [];
-        for (let alt = -20; alt <= 88; alt += 4) {
-          const v = sphToVec3(az, alt, 105);
-          pts.push(new THREE.Vector3(v.x, v.y, v.z));
-        }
-        gridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), gridMat));
-      }
-      scene.add(gridGroup);
-
-      // B2. Tilted Equatorial J2000 Sky Grid (Copper-Orange, tilted by Observer Latitude)
-      eqGridGroup = new THREE.Group();
-      const eqMat = new THREE.LineBasicMaterial({ color: 0xfb923c, transparent: true, opacity: 0.16 });
-      const eqEquatorMat = new THREE.LineBasicMaterial({ color: 0xfb923c, transparent: true, opacity: 0.36 });
-      [-60, -40, -20, 0, 20, 40, 60, 80].forEach(dec => {
-        const pts = [];
-        for (let ra = 0; ra <= 360; ra += 6) {
-          const v = sphToVec3(ra, dec, 104);
-          pts.push(new THREE.Vector3(v.x, v.y, v.z));
-        }
-        eqGridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), dec === 0 ? eqEquatorMat : eqMat));
-      });
-      for (let ra = 0; ra < 360; ra += 30) {
-        const pts = [];
-        for (let dec = -80; dec <= 88; dec += 4) {
-          const v = sphToVec3(ra, dec, 104);
-          pts.push(new THREE.Vector3(v.x, v.y, v.z));
-        }
-        eqGridGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), eqMat));
-      }
-      eqGridGroup.rotation.x = deg2rad(90 - Math.abs(OBS_LOCATIONS[obsLocIdx].lat));
-      scene.add(eqGridGroup);
-
-      // C. Stellarium 360° Panoramic Mountain & Forest Silhouette + Ground Mist Band
-      horizonGroup = new THREE.Group();
-      const ridgeCyl = new THREE.CylinderGeometry(96, 96, 28, 160, 1, true);
-      horizonGroup.add(new THREE.Mesh(
-        ridgeCyl,
-        new THREE.ShaderMaterial({
-          vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-          fragmentShader: `
-            varying vec2 vUv;
-            void main() {
-              float a = vUv.x * 6.2831853;
-              float mountain = 0.44
-                + 0.08 * sin(a * 3.0 + 0.7)
-                + 0.05 * cos(a * 7.0 - 1.2)
-                + 0.03 * sin(a * 13.0 + 2.1)
-                + 0.015 * sin(a * 41.0);
-              float mask = 1.0 - smoothstep(mountain - 0.008, mountain + 0.008, vUv.y);
-              if (mask < 0.02) discard;
-              vec3 treeCol = vec3(0.03, 0.07, 0.05);
-              vec3 meadowCol = vec3(0.05, 0.11, 0.07);
-              vec3 ridgeRim = vec3(0.11, 0.19, 0.14);
-              float rim = smoothstep(mountain - 0.03, mountain, vUv.y);
-              vec3 col = mix(meadowCol, treeCol, clamp((vUv.y / mountain), 0.0, 1.0));
-              col = mix(col, ridgeRim, rim * 0.55);
-              gl_FragColor = vec4(col, mask * 0.96);
-            }
-          `,
-          transparent: true, side: THREE.BackSide, depthWrite: true
-        })
-      ));
-
-      mistUniforms = { uFogGlow: { value: SKY_PHASES[0].fogGlow } };
-      const mistMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(93, 93, 18, 96, 1, true),
-        new THREE.ShaderMaterial({
-          uniforms: mistUniforms,
-          vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-          fragmentShader: `
-            uniform float uFogGlow;
-            varying vec2 vUv;
-            void main() {
-              float haze = smoothstep(0.95, 0.35, vUv.y) * smoothstep(0.18, 0.48, vUv.y);
-              gl_FragColor = vec4(vec3(0.14, 0.24, 0.38) * uFogGlow, haze * 0.55);
-            }
-          `,
-          transparent: true, side: THREE.BackSide, depthWrite: false
-        })
-      );
-      mistMesh.position.y = 2.0;
-      horizonGroup.add(mistMesh);
-
-      const hPts = [];
-      for (let a = 0; a <= 360; a += 2) {
-        const radA = deg2rad(a);
-        const mNorm = 0.44 + 0.08 * Math.sin(radA * 3.0 + 0.7) + 0.05 * Math.cos(radA * 7.0 - 1.2) + 0.03 * Math.sin(radA * 13.0 + 2.1);
-        const hillDeg = (mNorm - 0.5) * 16.5;
-        const v = sphToVec3(a, hillDeg, 95);
-        hPts.push(new THREE.Vector3(v.x, v.y, v.z));
-      }
-      horizonGroup.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(hPts), new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.22 })));
-
-      const groundMesh = new THREE.Mesh(
-        new THREE.CircleGeometry(105, 64),
-        new THREE.MeshBasicMaterial({ color: 0x050b08, transparent: true, opacity: 0.96, side: THREE.DoubleSide })
-      );
-      groundMesh.rotation.x = Math.PI / 2;
-      groundMesh.position.y = -13;
-      horizonGroup.add(groundMesh);
-      scene.add(horizonGroup);
-
-      // D. Constellation Network Lines
-      constellationGroup = new THREE.Group();
-      CONSTELLATIONS.forEach(pair => {
-        const p1 = WEBSITE_PLANETS.find(p => p.id === pair[0]);
-        const p2 = WEBSITE_PLANETS.find(p => p.id === pair[1]);
-        if (!p1 || !p2) return;
-        const v1 = sphToVec3(p1.azDeg, p1.altDeg, SPHERE_RADIUS);
-        const v2 = sphToVec3(p2.azDeg, p2.altDeg, SPHERE_RADIUS);
-        constellationGroup.add(new THREE.Line(
-          new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(v1.x, v1.y, v1.z), new THREE.Vector3(v2.x, v2.y, v2.z)]),
-          new THREE.LineBasicMaterial({ color: 0xc5a34e, transparent: true, opacity: 0.34 })
-        ));
-      });
-      scene.add(constellationGroup);
-
-      // E. 9 PHOTOREALISTIC 4K TEXTURED PLANETARY BUSINESS WORLDS
-      const TEX_MAP = {
-        "vulcan-trades": { surface: "./textures/4k_mars.webp", atmo: 0xf59e0b, rough: 0.85, metal: 0.05 },
-        "olivine-hospitality": { surface: "./textures/4k_earth_day.webp", night: "./textures/4k_earth_night.webp", clouds: "./textures/4k_earth_clouds.webp", atmo: 0x38bdf8, rough: 0.55, metal: 0.05 },
-        "anchialo-ecommerce": { surface: "./textures/2k_uranus.webp", tint: 0x6ee7b7, atmo: 0x10b981, rough: 0.45, metal: 0.1 },
-        "cptmma-academy": { surface: "./textures/4k_jupiter.webp", atmo: 0xef4444, rough: 0.72, metal: 0.0 },
-        "immersion-apparel": { surface: "./textures/2k_neptune.webp", atmo: 0x06b6d4, rough: 0.55, metal: 0.1 },
-        "helios-clinic": { surface: "./textures/4k_venus.webp", tint: 0xe0f2fe, atmo: 0x7dd3fc, rough: 0.6, metal: 0.05 },
-        "themis-legal": { surface: "./textures/4k_saturn.webp", ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xc5a34e, rough: 0.7, metal: 0.05 },
-        "vance-luxury-estate": { surface: "./textures/4k_mercury.webp", tint: 0xd8b4fe, atmo: 0xa855f7, rough: 0.5, metal: 0.35, cage: true },
-        "aeterna-flagship": { surface: "./textures/4k_sun.webp", atmo: 0xfde047, emissive: true },
-        "millennium-vortex": { surface: "./textures/4k_sun.webp", tint: 0xfbbf24, ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xfbbf24, rough: 0.25, metal: 0.65, cage: true },
-        "millennium-8k-raymarch": { surface: "./textures/4k_venus.webp", tint: 0xf59e0b, ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xfde047, rough: 0.3, metal: 0.55, cage: true },
-        "millennium-cad-studio": { surface: "./textures/2k_neptune.webp", tint: 0x7dd3fc, atmo: 0x38bdf8, rough: 0.25, metal: 0.5, cage: true },
-        "millennium-particle-field": { surface: "./textures/4k_mars.webp", tint: 0xfda4af, atmo: 0xf43f5e, rough: 0.6, metal: 0.15 },
-        "millennium-spectral-wilson": { surface: "./textures/2k_uranus.webp", tint: 0xd8b4fe, ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xa855f7, rough: 0.4, metal: 0.4, cage: true },
-        "millennium-thom-cusp": { surface: "./textures/4k_jupiter.webp", tint: 0x6ee7b7, atmo: 0x10b981, rough: 0.45, metal: 0.25 }
-      };
-
-      const moonTex = texLoader.load("./textures/4k_moon.webp");
-
-      const atmoVShader = `varying vec3 vNormal; varying vec3 vViewPos; void main(){ vec4 mv=modelViewMatrix*vec4(position,1.0); vViewPos=mv.xyz; vNormal=normalize(normalMatrix*normal); gl_Position=projectionMatrix*mv; }`;
-      const atmoFShader = `
-        uniform vec3 uGlow;
-        uniform float uStrength;
-        varying vec3 vNormal; varying vec3 vViewPos;
-        void main() {
-          vec3 viewDir = normalize(-vViewPos);
-          float rim = pow(clamp(1.0 - dot(viewDir, normalize(vNormal)), 0.0, 1.0), 2.8);
-          gl_FragColor = vec4(uGlow, rim * uStrength);
-        }
-      `;
-
-      WEBSITE_PLANETS.forEach((p, idx) => {
-        const cfg = TEX_MAP[p.id] || { surface: "./textures/4k_mars.webp", atmo: p.glow, rough: 0.75, metal: 0.1 };
-        const group = new THREE.Group();
-        const pos = sphToVec3(p.azDeg, p.altDeg, SPHERE_RADIUS);
-        group.position.set(pos.x, pos.y, pos.z);
-
-        const sphereGeo = new THREE.SphereGeometry(p.radius, 52, 52);
-        const surfTex = texLoader.load(cfg.surface);
-
-        let bodyMat;
-        if (cfg.emissive) {
-          // Real Glowing Solar Photosphere Sun Shader
-          bodyMat = new THREE.MeshBasicMaterial({ map: surfTex, color: 0xfffae0 });
-        } else if (cfg.night) {
-          // Living 4K Earth Day/Night Terminator Shader with Golden City Lights
-          const nightTex = texLoader.load(cfg.night);
-          bodyMat = new THREE.ShaderMaterial({
-            uniforms: {
-              uDay: { value: surfTex },
-              uNight: { value: nightTex },
-              uSunDir: { value: solarLight.position.clone().normalize() }
-            },
-            vertexShader: `
-              varying vec2 vUv; varying vec3 vWorldNormal;
-              void main() {
-                vUv = uv;
-                vWorldNormal = normalize(mat3(modelMatrix) * normal);
-                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-              }
-            `,
-            fragmentShader: `
-              uniform sampler2D uDay; uniform sampler2D uNight; uniform vec3 uSunDir;
-              varying vec2 vUv; varying vec3 vWorldNormal;
-              void main() {
-                float d = dot(normalize(vWorldNormal), uSunDir);
-                float mixFactor = smoothstep(-0.18, 0.25, d);
-                vec3 dayCol = texture2D(uDay, vUv).rgb * max(0.18, d * 1.15);
-                vec3 nightCol = texture2D(uNight, vUv).rgb * 1.45;
-                gl_FragColor = vec4(mix(nightCol, dayCol, mixFactor), 1.0);
-              }
-            `
-          });
-        } else {
-          bodyMat = new THREE.MeshStandardMaterial({
-            map: surfTex,
-            color: cfg.tint || 0xffffff,
-            roughness: cfg.rough ?? 0.7,
-            metalness: cfg.metal ?? 0.08
-          });
-        }
-
-        const planetBody = new THREE.Mesh(sphereGeo, bodyMat);
-        planetBody.userData = { planetId: p.id };
-        // Slight realistic planetary axial tilt
-        planetBody.rotation.z = 0.18;
-        group.add(planetBody);
-
-        // Separately Spinning 4K Volumetric Earth Clouds Layer
-        let cloudMesh = null;
-        if (cfg.clouds) {
-          const cloudTex = texLoader.load(cfg.clouds);
-          cloudMesh = new THREE.Mesh(
-            new THREE.SphereGeometry(p.radius * 1.018, 44, 44),
-            new THREE.MeshStandardMaterial({ map: cloudTex, transparent: true, opacity: 0.42, depthWrite: false, blending: THREE.AdditiveBlending })
-          );
-          group.add(cloudMesh);
-        }
-
-        // Atmospheric Fresnel Rayleigh Glow Halo
-        const atmoMesh = new THREE.Mesh(
-          new THREE.SphereGeometry(p.radius * (cfg.emissive ? 1.28 : 1.14), 36, 36),
-          new THREE.ShaderMaterial({
-            uniforms: { uGlow: { value: new THREE.Color(cfg.atmo) }, uStrength: { value: cfg.emissive ? 0.95 : 0.72 } },
-            vertexShader: atmoVShader, fragmentShader: atmoFShader,
-            transparent: true, blending: THREE.AdditiveBlending, side: THREE.BackSide, depthWrite: false
-          })
-        );
-        group.add(atmoMesh);
-
-        // Real Cassini Ring Geometry with Explicit Radial UVs
-        if (p.hasRing) {
-          const innerR = p.radius * 1.38;
-          const outerR = p.radius * 2.35;
-          const ringGeo = new THREE.RingGeometry(innerR, outerR, 96);
-          // Recompute radial UV coordinates so concentric planetary rings map cleanly
-          const posAttr = ringGeo.attributes.position;
-          const uvAttr = ringGeo.attributes.uv;
-          const v3 = new THREE.Vector3();
-          for (let j = 0; j < posAttr.count; j++) {
-            v3.fromBufferAttribute(posAttr, j);
-            const rLen = v3.length();
-            uvAttr.setXY(j, (rLen - innerR) / (outerR - innerR), 0.5);
-          }
-          let ringMat;
-          if (cfg.ringTex) {
-            ringMat = new THREE.MeshBasicMaterial({ map: texLoader.load(cfg.ringTex), transparent: true, side: THREE.DoubleSide, opacity: 0.9 });
-          } else {
-            ringMat = new THREE.MeshBasicMaterial({ color: p.glow, transparent: true, opacity: 0.35, side: THREE.DoubleSide });
-          }
-          const ring = new THREE.Mesh(ringGeo, ringMat);
-          ring.rotation.x = Math.PI / 2.55;
-          ring.rotation.y = 0.28;
-          group.add(ring);
-        }
-
-        // Optional Wireframe Astrolabe Cage on Real Estate Luxury World
-        let cageMesh = null;
-        if (cfg.cage) {
-          cageMesh = new THREE.Mesh(
-            new THREE.IcosahedronGeometry(p.radius * 1.45, 1),
-            new THREE.MeshBasicMaterial({ color: 0xc5a34e, wireframe: true, transparent: true, opacity: 0.25 })
-          );
-          group.add(cageMesh);
-        }
-
-        // Textured 4K Cratered Moon Satellite
-        const moon = new THREE.Mesh(
-          new THREE.SphereGeometry(0.18, 20, 20),
-          new THREE.MeshStandardMaterial({ map: moonTex, roughness: 0.9 })
-        );
-        moon.position.set(p.radius * 1.85, 0.25, 0);
-        group.add(moon);
-
-        group.userData = { planet: p, body: planetBody, clouds: cloudMesh, cage: cageMesh, moon: moon };
-        scene.add(group);
-        planetMeshes[p.id] = group;
-      });
-    }
-
-    // =========================================================================
-    // 4. INTERACTIVE HUD LABELS & COMPASS CREATION
-    // =========================================================================
-    const labelEls = {};
-    const compassDirs = [
-      { lbl: "N", az: 0, card: true }, { lbl: "NE", az: 45, card: false },
-      { lbl: "E", az: 90, card: true }, { lbl: "SE", az: 135, card: false },
-      { lbl: "S", az: 180, card: true }, { lbl: "SW", az: 225, card: false },
-      { lbl: "W", az: 270, card: true }, { lbl: "NW", az: 315, card: false }
-    ];
-    const compassEls = [];
-
-    function initHudMarkers() {
-      WEBSITE_PLANETS.forEach(p => {
-        const el = document.createElement("div");
-        el.className = "star-label";
-        el.innerHTML = `<span class="star-dot" style="background:${p.hex};box-shadow:0 0 8px ${p.hex}"></span>
-                        <span class="star-name">${p.shortName}</span>
-                        <span class="star-price">${p.cat === 'trades' || p.cat === 'hospitality' ? '$495+' : 'LIVE'}</span>`;
-        el.addEventListener("click", (e) => {
-          e.stopPropagation();
-          selectPlanet(p.id, true);
-        });
-        hudLayer.appendChild(el);
-        labelEls[p.id] = el;
-      });
-
-      compassDirs.forEach(c => {
-        const el = document.createElement("div");
-        el.className = "compass-marker" + (c.card ? " cardinal" : "");
-        el.textContent = c.lbl;
-        hudLayer.appendChild(el);
-        compassEls.push({ el, az: c.az });
-      });
-    }
-
-    // =========================================================================
-    // 5. SIDE MENU RENDERING, FILTERING & LIVE SEARCH
-    // =========================================================================
-    function renderCatalog() {
-      const catEl = document.getElementById("planetCatalog");
-      catEl.innerHTML = "";
-      const filtered = WEBSITE_PLANETS.filter(p => activeCategory === "all" || p.cat === activeCategory);
-
-      filtered.forEach(p => {
-        const card = document.createElement("div");
-        card.className = "planet-item" + (p.id === selectedPlanetId ? " selected" : "");
-        card.innerHTML = `
-          <div class="orb-thumb" style="background-image:url('${p.heroImg}');background-size:cover;background-position:center;border:1px solid ${p.hex};box-shadow:inset -5px -5px 10px rgba(0,0,0,0.75), 0 0 12px ${p.hex}55;"></div>
-          <div class="planet-meta">
-            <div class="planet-name">${p.shortName}</div>
-            <div class="planet-niche">${p.niche}</div>
-          </div>
-          <div class="planet-right">
-            <div class="planet-price-tag">${p.priceLabel.split(' ')[0]}</div>
-            <div class="planet-live-tag">${p.isCustomizable ? '★ CUSTOM DEMO' : '● LIVE SITE'}</div>
-          </div>
-        `;
-        card.addEventListener("click", () => selectPlanet(p.id, true));
-        catEl.appendChild(card);
-      });
-    }
-
-    document.querySelectorAll(".chip-filter").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll(".chip-filter").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        activeCategory = btn.getAttribute("data-cat");
-        renderCatalog();
-        const firstMatch = WEBSITE_PLANETS.find(p => activeCategory === "all" || p.cat === activeCategory);
-        if (firstMatch && activeCategory !== "all") {
-          selectPlanet(firstMatch.id, true);
-        }
-      });
-    });
-
-    // Top Search Capsule (Planets + Studios + Bright Navigation Stars)
-    const searchInput = document.getElementById("cosmosSearch");
-    const searchDrop = document.getElementById("searchDropdown");
-    searchInput.addEventListener("input", () => {
-      const q = searchInput.value.trim().toLowerCase();
-      if (!q) { searchDrop.classList.remove("open"); return; }
-      const pHits = WEBSITE_PLANETS.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.shortName.toLowerCase().includes(q) ||
-        p.niche.toLowerCase().includes(q)
-      );
-      const sHits = NAV_STARS.filter(s => s.name.toLowerCase().includes(q));
-      if (!pHits.length && !sHits.length) {
-        searchDrop.innerHTML = `<div class="search-hit" style="color:var(--muted)">No worlds or stars matching "${q}"</div>`;
-      } else {
-        const pHtml = pHits.map(p => `
-          <div class="search-hit" data-pid="${p.id}">
-            <span><strong style="color:${p.hex}">●</strong> ${p.shortName}</span>
-            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--gold)">${p.priceLabel.split(' ')[0]}</span>
-          </div>
-        `).join("");
-        const sHtml = sHits.map(s => `
-          <div class="search-hit" data-star="${s.id}">
-            <span><strong style="color:${s.hex}">★</strong> ${s.name}</span>
-            <span style="font-family:var(--font-mono);font-size:10.5px;color:var(--cyan)">mag ${s.mag}</span>
-          </div>
-        `).join("");
-        searchDrop.innerHTML = pHtml + sHtml;
-        searchDrop.querySelectorAll("[data-pid]").forEach(item => {
-          item.addEventListener("click", () => {
-            selectPlanet(item.getAttribute("data-pid"), true);
-            searchDrop.classList.remove("open");
-            searchInput.value = "";
-          });
-        });
-        searchDrop.querySelectorAll("[data-star]").forEach(item => {
-          item.addEventListener("click", () => {
-            const st = NAV_STARS.find(x => x.id === item.getAttribute("data-star"));
-            if (st) {
-              targetAz = st.azDeg; targetAlt = st.altDeg; targetFov = 36;
-              isFlying = true; autoOrbit = false;
-            }
-            searchDrop.classList.remove("open");
-            searchInput.value = "";
-          });
-        });
-      }
-      searchDrop.classList.add("open");
-    });
-    document.addEventListener("click", (e) => {
-      if (!e.target.closest(".search-capsule")) searchDrop.classList.remove("open");
-    });
-
-    // =========================================================================
-    // 6. PLANET SELECTION, FLY-TO CAMERA & INSPECTOR HYDRATION
-    // =========================================================================
-    function buildHydratedUrl(planet) {
-      if (!planet.isCustomizable) return planet.url;
-      const biz = document.getElementById("clientBizName").value.trim();
-      const city = document.getElementById("clientBizCity").value.trim();
-      const q = new URLSearchParams();
-      if (biz) q.set("business", biz);
-      if (city) q.set("city", city);
-      const qs = q.toString();
-      return qs ? `${planet.url}?${qs}` : planet.url;
-    }
-
-    function selectPlanet(id, flyTo = true) {
-      const p = WEBSITE_PLANETS.find(x => x.id === id);
-      if (!p) return;
-      selectedPlanetId = id;
-      renderCatalog();
-
-      if (flyTo) {
-        targetAz = p.azDeg;
-        targetAlt = p.altDeg;
-        targetFov = 38;
-        isFlying = true;
-        autoOrbit = false;
-      }
-
-      // Update floating label active highlight
-      Object.keys(labelEls).forEach(k => labelEls[k].classList.toggle("active", k === id));
-
-      // Hydrate Right Planet Inspector Panel + Live Stellarium RA/Dec Coordinates
-      if (p.heroImg) document.getElementById("inspHeroImg").src = p.heroImg;
-      document.getElementById("inspEyebrow").textContent = `${p.cat.toUpperCase()} GALAXY // AZM ${p.azDeg}° ALT +${p.altDeg}°`;
-      document.getElementById("inspTitle").textContent = p.name;
-      document.getElementById("inspDesc").textContent = p.desc;
-      document.getElementById("inspSpeed").textContent = p.speed;
-      document.getElementById("inspPrice").textContent = p.priceLabel;
-      document.getElementById("inspSubPrice").textContent = p.priceSub;
-
-      const loc = OBS_LOCATIONS[obsLocIdx];
-      const lstDeg = ((Date.now() / 1000) * 0.00417 + loc.lon) % 360;
-      const eq = azAltToRaDec(p.azDeg, p.altDeg, loc.lat, lstDeg);
-      const raEl = document.getElementById("inspRaDec");
-      const azEl = document.getElementById("inspAzAlt");
-      if (raEl) raEl.textContent = `${formatRA(eq.raDeg)}  ·  ${formatDegMin(eq.decDeg)}`;
-      if (azEl) azEl.textContent = `${String(p.azDeg).padStart(3, "0")}° 00'  ·  +${String(p.altDeg).padStart(2, "0")}° 00'`;
-
-      document.getElementById("inspFeatures").innerHTML = p.features.map(f =>
-        `<div class="insp-feat-row"><span class="check">✓</span><span>${f}</span></div>`
-      ).join("");
-
-      const fullUrl = buildHydratedUrl(p);
-      document.getElementById("btnInspExternal").href = fullUrl;
-      if (vortexCtrl) {
-        vortexCtrl.setTarget({
-          center: [0.5 + Math.sin(deg2rad(p.azDeg)) * 0.12, 0.5 + (p.altDeg - 30) * 0.003],
-          zoom: p.cat === "labs" ? 1.15 : 0.98
-        });
-      }
-      document.getElementById("planetInspector").classList.add("open");
-      if (window.innerWidth < 900 && flyTo) {
-        document.getElementById("sideDrawer").classList.add("collapsed");
-      }
-    }
-
-    document.getElementById("btnCloseInspector").addEventListener("click", () => {
-      document.getElementById("planetInspector").classList.remove("open");
-    });
-
-    // Global helper callable from inside demo iframes!
-    window.openPlanetConfigurator = function(mode) {
-      document.getElementById("modalPreview").classList.remove("open");
-      document.getElementById("liveSiteIframe").src = "about:blank";
-      syncVortexLayer(false);
-      document.getElementById("modalConfig").classList.add("open");
-    };
-
-    // Launch Live Interactive Website Modal
-    document.getElementById("btnLaunchPreview").addEventListener("click", () => {
-      const p = WEBSITE_PLANETS.find(x => x.id === selectedPlanetId) || WEBSITE_PLANETS[0];
-      const url = buildHydratedUrl(p);
-      document.getElementById("modalPreviewUrl").textContent = url.startsWith("http") ? url : "https://paas.website/" + url.replace("./", "");
-      document.getElementById("btnModalOpenTab").href = url;
-      syncVortexLayer(true);
-      document.getElementById("liveSiteIframe").src = url;
-      document.getElementById("modalPreview").classList.add("open");
-    });
-
-    document.getElementById("btnClosePreviewModal").addEventListener("click", () => {
-      document.getElementById("modalPreview").classList.remove("open");
-      document.getElementById("liveSiteIframe").src = "about:blank";
-      syncVortexLayer(false);
-    });
-    document.getElementById("btnModeDesktop").addEventListener("click", function() {
-      this.classList.add("active");
-      document.getElementById("btnModeMobile").classList.remove("active");
-      document.getElementById("liveSiteIframe").classList.remove("mobile-mode");
-    });
-    document.getElementById("btnModeMobile").addEventListener("click", function() {
-      this.classList.add("active");
-      document.getElementById("btnModeDesktop").classList.remove("active");
-      document.getElementById("liveSiteIframe").classList.add("mobile-mode");
-    });
-    document.getElementById("btnModalOrder").addEventListener("click", () => {
-      window.openPlanetConfigurator();
-    });
-
-    // =========================================================================
-    // 7. CONFIGURATOR MODAL & ADD-ON CALCULATOR LOGIC
-    // =========================================================================
-    const openCfg = () => document.getElementById("modalConfig").classList.add("open");
-    document.getElementById("btnTopOpenConfig").addEventListener("click", openCfg);
-    document.getElementById("btnInspConfigure").addEventListener("click", openCfg);
-    document.getElementById("btnDrawerInvoice").addEventListener("click", openCfg);
-    document.getElementById("btnCloseConfigModal").addEventListener("click", () => {
-      document.getElementById("modalConfig").classList.remove("open");
-    });
-
-    document.querySelectorAll(".cfg-tab").forEach(tab => {
-      if (!tab.dataset.mode) return;
-      tab.addEventListener("click", () => {
-        document.querySelectorAll(".cfg-tab[data-mode]").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        const m = tab.getAttribute("data-mode");
-        document.getElementById("paneModular").style.display = m === "modular" ? "block" : "none";
-        document.getElementById("paneEnterprise").style.display = m === "enterprise" ? "block" : "none";
-      });
-    });
-
-    function recalcModular() {
-      let oneOff = 495, rec = 0;
-      document.querySelectorAll(".mod-addon:checked").forEach(c => {
-        const val = parseInt(c.dataset.price, 10);
-        if (c.dataset.rec) rec += val;
-        else oneOff += val;
-      });
-      const txt = rec > 0 ? `$${oneOff} + $${rec}/mo` : `$${oneOff} One-Off`;
-      document.getElementById("modTotalOut").textContent = txt;
-      const biz = document.getElementById("clientBizName").value.trim() || "My Business";
-      const city = document.getElementById("clientBizCity").value.trim() || "";
-      const pName = (WEBSITE_PLANETS.find(x => x.id === selectedPlanetId) || {}).shortName || "Website";
-      const waMsg = encodeURIComponent(`Hello Dimitar! I explored paas.website and want to launch [${pName}] for "${biz}" (${city}). Configured Package: ${txt}.`);
-      document.getElementById("btnModWhatsApp").href = `https://wa.me/359884638640?text=${waMsg}`;
-    }
-    document.querySelectorAll(".mod-addon").forEach(c => c.addEventListener("change", recalcModular));
-    document.getElementById("clientBizName").addEventListener("input", recalcModular);
-    document.getElementById("clientBizCity").addEventListener("input", recalcModular);
-
-    // =========================================================================
-    // 8. DRAWER & STELLARIUM 3-ZONE BOTTOM BAR CONTROLS
-    // =========================================================================
-    document.getElementById("btnToggleDrawer").addEventListener("click", () => {
-      document.getElementById("sideDrawer").classList.toggle("collapsed");
-    });
-
-    document.getElementById("togConstellations").addEventListener("click", function() {
-      showConstellations = !showConstellations;
-      this.classList.toggle("active", showConstellations);
-      if (constellationGroup) constellationGroup.visible = showConstellations;
-    });
-    document.getElementById("togAtmo").addEventListener("click", function() {
-      showAtmosphere = !showAtmosphere;
-      this.classList.toggle("active", showAtmosphere);
-      if (atmoDome) atmoDome.visible = showAtmosphere;
-    });
-    document.getElementById("togLandscape").addEventListener("click", function() {
-      showHorizon = !showHorizon;
-      this.classList.toggle("active", showHorizon);
-      if (horizonGroup) horizonGroup.visible = showHorizon;
-      compassEls.forEach(c => { c.el.style.display = showHorizon ? "block" : "none"; });
-    });
-    document.getElementById("togGrid").addEventListener("click", function() {
-      showGrid = !showGrid;
-      this.classList.toggle("active", showGrid);
-      if (gridGroup) gridGroup.visible = showGrid;
-    });
-    document.getElementById("togEqGrid").addEventListener("click", function() {
-      showEqGrid = !showEqGrid;
-      this.classList.toggle("active", showEqGrid);
-      if (eqGridGroup) eqGridGroup.visible = showEqGrid;
-    });
-    document.getElementById("togLabels").addEventListener("click", function() {
-      showLabels = !showLabels;
-      this.classList.toggle("active", showLabels);
-      Object.values(labelEls).forEach(el => { el.style.display = showLabels ? "flex" : "none"; });
-    });
-    document.getElementById("togNight").addEventListener("click", function() {
-      document.body.classList.toggle("night-vision");
-      this.classList.toggle("active", document.body.classList.contains("night-vision"));
-    });
-    document.getElementById("btnResetCamera").addEventListener("click", () => {
-      targetAlt = 22; targetFov = 58; isFlying = true; autoOrbit = true;
-    });
-
-    // Observer Location Cycle (Tilts J2000 Equatorial Sphere & updates RA/Dec)
-    document.getElementById("btnLocationCycle").addEventListener("click", () => {
-      obsLocIdx = (obsLocIdx + 1) % OBS_LOCATIONS.length;
-      const loc = OBS_LOCATIONS[obsLocIdx];
-      document.getElementById("lblObsLoc").textContent = loc.label;
-      document.getElementById("lblObsCoords").textContent = loc.coords;
-      if (eqGridGroup) eqGridGroup.rotation.x = deg2rad(90 - Math.abs(loc.lat));
-      if (selectedPlanetId) selectPlanet(selectedPlanetId, false);
-    });
-
-    // Sky Illumination / Preetham Twilight Phase Cycle + Live Clock Tick
-    document.getElementById("btnTimeCycle").addEventListener("click", () => {
-      skyPhaseIdx = (skyPhaseIdx + 1) % SKY_PHASES.length;
-      const ph = SKY_PHASES[skyPhaseIdx];
-      document.getElementById("lblObsSkyPhase").textContent = ph.name;
-      if (atmoUniforms) {
-        atmoUniforms.uSunGlow.value = ph.sunGlow;
-        atmoUniforms.uSkyTint.value.set(...ph.skyTint);
-      }
-      if (mistUniforms) mistUniforms.uFogGlow.value = ph.fogGlow;
-    });
-    function tickObsClock() {
-      const el = document.getElementById("lblObsTime");
-      if (!el) return;
-      const now = new Date();
-      el.textContent = now.toTimeString().slice(0, 8);
-    }
-    tickObsClock();
-    setInterval(tickObsClock, 1000);
-    // =========================================================================
-    // 8B. MILLENNIUM 8K LIQUID GOLD VORTEX OVERLAY CONTROLLER
-    // =========================================================================
-    const vortexCanvasEl = document.getElementById("vortexOverlayCanvas");
-
-    function syncVortexLayer(suspendForModal = false) {
-      const btn = document.getElementById("togVortex");
-      const lbl = document.getElementById("lblVortex");
-      document.body.classList.toggle("vortex-max", !suspendForModal && vortexMode === "max");
-      document.body.classList.toggle("vortex-off", suspendForModal || vortexMode === "off");
-      if (btn) btn.classList.toggle("active", vortexMode !== "off");
-      if (lbl) lbl.textContent = vortexMode === "max" ? "Vortex: 8K" : (vortexMode === "on" ? "Vortex: On" : "Vortex: Off");
-
-      const shouldRun = !suspendForModal && vortexMode !== "off" && vortexCanvasEl && window.AeternaLiquidVortex;
-      if (shouldRun && !vortexCtrl) {
-        try {
-          vortexCtrl = window.AeternaLiquidVortex.mount(vortexCanvasEl, {
-            center: [0.5, 0.5],
-            zoom: vortexMode === "max" ? 1.12 : 0.96,
-            maxDpr: 1.5
-          });
-        } catch (err) {
-          vortexCtrl = null;
-        }
-      } else if (shouldRun && vortexCtrl) {
-        vortexCtrl.setTarget({ zoom: vortexMode === "max" ? 1.12 : 0.96 });
-      } else if (!shouldRun && vortexCtrl) {
-        vortexCtrl.destroy();
-        vortexCtrl = null;
-      }
-    }
-
-    document.getElementById("togVortex").addEventListener("click", () => {
-      vortexMode = vortexMode === "on" ? "max" : (vortexMode === "max" ? "off" : "on");
-      syncVortexLayer(false);
-    });
-
-    document.getElementById("btnZenMode").addEventListener("click", () => {
-      document.getElementById("sideDrawer").classList.add("collapsed");
-      document.getElementById("planetInspector").classList.remove("open");
-      document.body.classList.add("zen-hidden");
-      document.getElementById("btnRestoreHud").style.display = "block";
-      if (document.documentElement.requestFullscreen && !document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-    });
-    document.getElementById("btnRestoreHud").addEventListener("click", function() {
-      this.style.display = "none";
-      document.body.classList.remove("zen-hidden");
-      document.getElementById("sideDrawer").classList.remove("collapsed");
-      if (document.fullscreenElement && document.exitFullscreen) {
-        document.exitFullscreen().catch(() => {});
-      }
-    });
-
-    // =========================================================================
-    // 9. POINTER ORBIT, WHEEL ZOOM & RAYCAST CLICK SELECTION
-    // =========================================================================
-    let isDragging = false, dragDist = 0, lastX = 0, lastY = 0, velX = 0, velY = 0;
-    const raycaster = typeof THREE !== "undefined" ? new THREE.Raycaster() : null;
-
-    canvas.addEventListener("pointerdown", (e) => {
-      isDragging = true; dragDist = 0; lastX = e.clientX; lastY = e.clientY;
-      velX = 0; velY = 0; isFlying = false;
-    });
-    window.addEventListener("pointermove", (e) => {
-      if (!isDragging) return;
-      const dx = e.clientX - lastX;
-      const dy = e.clientY - lastY;
-      dragDist += Math.hypot(dx, dy);
-      const sens = camFov * 0.0022;
-      camAz = (camAz - dx * sens + 360) % 360;
-      camAlt = Math.max(-12, Math.min(84, camAlt + dy * sens));
-      velX = -dx * sens * 0.65;
-      velY = dy * sens * 0.65;
-      autoOrbit = false;
-      lastX = e.clientX; lastY = e.clientY;
-    });
-    window.addEventListener("pointerup", (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      // Treat click (< 6px drag) on canvas as raycast check against planets
-      if (dragDist < 6 && raycaster && camera) {
-        const mouse = new THREE.Vector2((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
-        raycaster.setFromCamera(mouse, camera);
-        const bodies = Object.values(planetMeshes).map(g => g.userData.body);
-        const hits = raycaster.intersectObjects(bodies, false);
-        if (hits.length > 0 && hits[0].object.userData.planetId) {
-          selectPlanet(hits[0].object.userData.planetId, true);
-        }
-      }
-    });
-    canvas.addEventListener("wheel", (e) => {
-      e.preventDefault();
-      isFlying = false;
-      targetFov = Math.max(22, Math.min(92, camFov + e.deltaY * 0.045));
-      camFov = targetFov;
-    }, { passive: false });
-
-    // =========================================================================
-    // 10. ANIMATION LOOP & 2D HUD PROJECTION
-    // =========================================================================
-    function shortestAzDiff(from, to) {
-      let d = (to - from + 540) % 360 - 180;
-      return d;
-    }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const dt = clock ? clock.getDelta() : 0.016;
-      const elapsed = clock ? clock.getElapsedTime() : 0;
-
-      if (isFlying) {
-        const dAz = shortestAzDiff(camAz, targetAz);
-        const dAlt = targetAlt - camAlt;
-        const dFov = targetFov - camFov;
-        camAz = (camAz + dAz * 0.075 + 360) % 360;
-        camAlt += dAlt * 0.075;
-        camFov += dFov * 0.08;
-        if (Math.abs(dAz) < 0.25 && Math.abs(dAlt) < 0.25 && Math.abs(dFov) < 0.25) {
-          isFlying = false;
-        }
-      } else if (!isDragging) {
-        if (Math.abs(velX) > 0.01 || Math.abs(velY) > 0.01) {
-          camAz = (camAz + velX + 360) % 360;
-          camAlt = Math.max(-12, Math.min(84, camAlt + velY));
-          velX *= 0.92; velY *= 0.92;
-        } else if (autoOrbit) {
-          camAz = (camAz + 0.045) % 360;
-        }
-      }
-
-      if (camera && renderer && scene) {
-        if (Math.abs(camera.fov - camFov) > 0.05) {
-          camera.fov = camFov;
-          camera.updateProjectionMatrix();
-        }
-        const lookPt = sphToVec3(camAz, camAlt, 50);
-        camera.lookAt(lookPt.x, lookPt.y, lookPt.z);
-
-        // Animate 4K textured planets, cloud spheres, astrolabe cages & cratered moons
-        Object.values(planetMeshes).forEach((g, idx) => {
-          g.userData.body.rotation.y += 0.0022;
-          if (g.userData.clouds) g.userData.clouds.rotation.y += 0.0031;
-          if (g.userData.cage) {
-            g.userData.cage.rotation.y -= 0.004;
-            g.userData.cage.rotation.x += 0.002;
-          }
-          const m = g.userData.moon;
-          const rad = g.userData.planet.radius * 1.85;
-          m.position.set(Math.cos(elapsed * 0.7 + idx) * rad, Math.sin(elapsed * 0.5) * 0.4, Math.sin(elapsed * 0.7 + idx) * rad);
-        });
-
-        if (vortexPlane) vortexPlane.rotateZ(0.0008);
-        if (eqGridGroup) eqGridGroup.rotation.y = elapsed * 0.004;
-        if (vortexCtrl) vortexCtrl.setScroll(camAz * 14);
-
-        renderer.render(scene, camera);
-
-        // Project 3D positions onto 2D HUD layer
-        const w = window.innerWidth, h = window.innerHeight;
-        const camDir = new THREE.Vector3();
-        camera.getWorldDirection(camDir);
-
-        WEBSITE_PLANETS.forEach(p => {
-          const el = labelEls[p.id];
-          const g = planetMeshes[p.id];
-          if (!el || !g) return;
-          const pos = g.position.clone();
-          const dirToObj = pos.clone().normalize();
-          const inFront = camDir.dot(dirToObj) > 0.2;
-
-          if (!inFront || (!showLabels && p.id !== selectedPlanetId)) {
-            el.style.opacity = "0";
-            el.style.pointerEvents = "none";
-            if (p.id === selectedPlanetId) reticleEl.style.display = "none";
-            return;
-          }
-
-          pos.project(camera);
-          const sx = (pos.x * 0.5 + 0.5) * w;
-          const sy = (-(pos.y * 0.5) + 0.5) * h;
-
-          if (sx < -40 || sx > w + 40 || sy < -40 || sy > h + 40) {
-            el.style.opacity = "0";
-            if (p.id === selectedPlanetId) reticleEl.style.display = "none";
-            return;
-          }
-
-          el.style.left = sx + "px";
-          el.style.top = sy + "px";
-          const catMatch = (activeCategory === "all" || p.cat === activeCategory);
-          el.style.opacity = showLabels ? (catMatch ? "1" : "0.28") : "0";
-          el.style.pointerEvents = showLabels ? "auto" : "none";
-
-          if (p.id === selectedPlanetId) {
-            reticleEl.style.display = "block";
-            reticleEl.style.left = sx + "px";
-            reticleEl.style.top = sy + "px";
-          }
-        });
-
-        // Project Horizon Compass Bearings
-        if (showHorizon) {
-          compassEls.forEach(c => {
-            const v = sphToVec3(c.az, 0.5, 90);
-            const pVec = new THREE.Vector3(v.x, v.y, v.z);
-            const inFront = camDir.dot(pVec.clone().normalize()) > 0.25;
-            if (!inFront) {
-              c.el.style.opacity = "0";
-              return;
-            }
-            pVec.project(camera);
-            const sx = (pVec.x * 0.5 + 0.5) * w;
-            c.el.style.left = sx + "px";
-            c.el.style.opacity = "1";
-          });
-        }
-      }
-
-      // Telemetry Pill Readout
-      const tel = document.getElementById("fovTelemetry");
-      if (tel) {
-        tel.textContent = `AZM ${Math.round(camAz)}° · ALT ${camAlt >= 0 ? "+" : ""}${Math.round(camAlt)}° · FOV ${Math.round(camFov)}°`;
-      }
-    }
-
-    window.addEventListener("resize", () => {
-      if (renderer && camera) {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-      }
-    });
-
-    // Boot Observatory
-    init3DUniverse();
-    syncVortexLayer(false);
-    initHudMarkers();
-    renderCatalog();
-    recalcModular();
-    // Collapse sidebar automatically on narrow screens on boot, keep open on desktop
-    if (window.innerWidth < 900) {
-      document.getElementById("sideDrawer").classList.add("collapsed");
-      animate();
-    } else {
-      // Lock smoothly onto Planet Vulcan on desktop launch so inspector + reticle are active
-      selectPlanet("vulcan-trades", false);
-      animate();
-    }
-  })();
-  </script>
+  <!-- COMPILED STELLARIUM WASM + PAAS COSMOS ENGINE (NO SPINNING SPHERES) -->
+  <script src="./engine/stellarium-web-engine.js"></script>
+  <script src="./scripts/paas-cosmos.js" defer></script>
 </body>
 </html>
