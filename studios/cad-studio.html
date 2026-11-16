@@ -1,0 +1,1583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AETERNA // QUANTUM OPTICAL SENSOR &amp; CMOS EXPLODED CAD STUDIO</title>
+    <meta name="description" content="AETERNA Real-Time Three.js r170 CAD Studio: Thin-Film Iridescence, Refractive Dispersion, Snell Ray-Tracing, CAD Section Cut, UnrealBloom, GLB &amp; PNG Export">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-studio: #080c14;
+            --panel-bg: rgba(7, 13, 24, 0.86);
+            --panel-border: rgba(0, 243, 255, 0.34);
+            --cyan-glow: #00f3ff;
+            --gold-glow: #d4af37;
+            --violet-ar: #b042ff;
+            --green-ar: #00ffaa;
+            --text-main: #dce7f5;
+            --text-dim: #7a8ea8;
+            --font-head: 'Orbitron', system-ui, sans-serif;
+            --font-body: 'Rajdhani', system-ui, sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at 50% 45%, #161e2e 0%, #0b1019 55%, #04060a 100%);
+            color: var(--text-main);
+            font-family: var(--font-body);
+        }
+        #webgl-canvas {
+            position: absolute;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            z-index: 1;
+        }
+        .hud-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px 26px;
+        }
+        .interactive { pointer-events: auto; }
+
+        .hud-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .brand-card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--panel-border);
+            border-left: 4px solid var(--cyan-glow);
+            padding: 13px 20px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.75);
+            max-width: 680px;
+        }
+        .brand-title {
+            font-family: var(--font-head);
+            font-size: 16px;
+            font-weight: 900;
+            letter-spacing: 2.2px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .brand-title .badge {
+            background: rgba(0, 243, 255, 0.14);
+            border: 1px solid var(--cyan-glow);
+            color: var(--cyan-glow);
+            font-size: 9px;
+            padding: 2px 7px;
+            border-radius: 2px;
+            font-weight: 700;
+        }
+        .brand-sub {
+            font-size: 11px;
+            font-family: var(--font-code);
+            color: var(--text-dim);
+            letter-spacing: 0.9px;
+            margin-top: 4px;
+        }
+        .telemetry-strip {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-top: 8px;
+            font-size: 11px;
+            font-family: var(--font-code);
+            color: #92b0d3;
+        }
+        .telemetry-strip span strong { color: var(--cyan-glow); }
+
+        .viewport-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            align-items: flex-end;
+        }
+        .ctrl-row-inline {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .hud-pill {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            color: var(--cyan-glow);
+            padding: 7px 13px;
+            font-family: var(--font-head);
+            font-size: 10px;
+            letter-spacing: 1.2px;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: all 0.18s ease;
+            text-transform: uppercase;
+        }
+        .hud-pill:hover, .hud-pill.active {
+            background: var(--cyan-glow);
+            color: #020712;
+            box-shadow: 0 0 16px rgba(0, 243, 255, 0.6);
+        }
+        .hud-pill.violet {
+            border-color: var(--violet-ar);
+            color: var(--violet-ar);
+        }
+        .hud-pill.violet:hover, .hud-pill.violet.active {
+            background: var(--violet-ar);
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(176, 66, 255, 0.7);
+        }
+        .hud-pill.gold {
+            border-color: var(--gold-glow);
+            color: var(--gold-glow);
+        }
+        .hud-pill.gold:hover, .hud-pill.gold.active {
+            background: var(--gold-glow);
+            color: #06080c;
+            box-shadow: 0 0 16px rgba(212, 175, 55, 0.65);
+        }
+        .hud-pill.green {
+            border-color: var(--green-ar);
+            color: var(--green-ar);
+        }
+        .hud-pill.green:hover, .hud-pill.green.active {
+            background: var(--green-ar);
+            color: #02120b;
+            box-shadow: 0 0 16px rgba(0, 255, 170, 0.65);
+        }
+        .hud-pill.danger {
+            border-color: #f43f5e;
+            color: #f43f5e;
+        }
+        .hud-pill.danger:hover, .hud-pill.danger.active {
+            background: #f43f5e;
+            color: #ffffff;
+            box-shadow: 0 0 16px rgba(244, 63, 94, 0.7);
+        }
+
+        .hud-side-left {
+            position: absolute;
+            left: 26px;
+            top: 132px;
+            width: 335px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .cad-panel {
+            background: var(--panel-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--panel-border);
+            padding: 14px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+        .panel-heading {
+            font-family: var(--font-head);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1.8px;
+            color: var(--cyan-glow);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.25);
+            padding-bottom: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .scene-tree {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            max-height: 270px;
+            overflow-y: auto;
+        }
+        .scene-node {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 9px;
+            background: rgba(14, 25, 44, 0.55);
+            border: 1px solid rgba(0, 243, 255, 0.15);
+            font-size: 11px;
+            font-family: var(--font-code);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .scene-node:hover {
+            border-color: var(--cyan-glow);
+            background: rgba(0, 243, 255, 0.12);
+        }
+        .scene-node.selected {
+            border-color: var(--green-ar);
+            background: rgba(0, 255, 170, 0.16);
+            color: #ffffff;
+        }
+        .node-tag {
+            font-size: 9px;
+            color: var(--cyan-glow);
+            background: rgba(0, 243, 255, 0.12);
+            padding: 2px 6px;
+            border-radius: 2px;
+            white-space: nowrap;
+        }
+        .node-tag.ar {
+            color: var(--green-ar);
+            background: rgba(0, 255, 170, 0.12);
+        }
+
+        .material-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--panel-border);
+            border-right: 4px solid var(--green-ar);
+            padding: 12px 16px;
+            font-family: var(--font-code);
+            font-size: 10.5px;
+            line-height: 1.55;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+        .mat-title {
+            font-family: var(--font-head);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--green-ar);
+            letter-spacing: 1.4px;
+            margin-bottom: 5px;
+        }
+
+        .hud-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
+        .slider-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 440px;
+        }
+        .slider-box {
+            background: var(--panel-bg);
+            backdrop-filter: blur(14px);
+            border: 1px solid var(--panel-border);
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: var(--font-head);
+            letter-spacing: 1.3px;
+            color: #ffffff;
+        }
+        .slider-label span.val {
+            color: var(--green-ar);
+            font-family: var(--font-code);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 5px;
+            background: #101c2e;
+            outline: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: var(--green-ar);
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--green-ar);
+        }
+        .camera-presets {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            justify-content: flex-end;
+        }
+        .reticle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            pointer-events: none;
+            opacity: 0.2;
+            border: 1px dashed var(--cyan-glow);
+            border-radius: 50%;
+        }
+        .offline-banner {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 99;
+            background: rgba(4, 7, 13, 0.94);
+            color: #f8fafc;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 32px;
+            font-family: var(--font-code);
+        }
+    </style>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+        }
+    }
+    </script>
+</head>
+<body>
+    <canvas id="webgl-canvas"></canvas>
+    <div class="reticle"></div>
+
+    <div class="offline-banner" id="offline-banner">
+        <div>
+            <h2 style="color: var(--cyan-glow); margin-bottom: 10px;">Three.js r170 CDN Module Load Failed</h2>
+            <p id="offline-msg" style="color: #94a3b8; max-width: 520px;"></p>
+        </div>
+    </div>
+
+    <div class="hud-layer">
+        <div class="hud-header">
+            <div class="brand-card interactive">
+                <div class="brand-title">
+                    <span>🔱 AETERNA // QUANTUM OPTICAL CAD STUDIO</span>
+                    <span class="badge">THREE.JS r170 + BLOOM</span>
+                </div>
+                <div class="brand-sub">CARBON DOME // SNELL DISPERSION OPTICS // IRIDESCENT AR CMOS // 48 GOLD PINS</div>
+                <div class="telemetry-strip">
+                    <span>FPS: <strong id="lbl-fps">--.-</strong></span>
+                    <span>IBL: <strong id="lbl-hdri">FLOAT16 HDR SOFTBOX RIG</strong></span>
+                    <span>AR COATING: <strong id="lbl-ar">THIN-FILM [240–580nm]</strong></span>
+                    <span>KERNEL: <strong id="lbl-kernel">STANDALONE (0x00 SAFE)</strong></span>
+                    <span>TEP DRIVE: <strong id="lbl-tep">22.75 mV @ 11.77 Hz</strong></span>
+                </div>
+            </div>
+
+            <div class="viewport-controls interactive">
+                <div class="ctrl-row-inline">
+                    <button class="hud-pill active" id="btn-mode-pbr">PBR Studio</button>
+                    <button class="hud-pill violet" id="btn-mode-ar">CMOS AR Filter</button>
+                    <button class="hud-pill" id="btn-mode-wire">Wireframe</button>
+                </div>
+                <div class="ctrl-row-inline">
+                    <button class="hud-pill green active" id="btn-rays">Snell Ray-Trace: ON</button>
+                    <button class="hud-pill active" id="btn-led">LED Ring: 100%</button>
+                    <button class="hud-pill active" id="btn-orbit">Auto-Orbit: ON</button>
+                </div>
+                <div class="ctrl-row-inline">
+                    <button class="hud-pill green" id="btn-live-cad">Kernel SSE (:8090)</button>
+                    <button class="hud-pill" data-cad-scen="nominal">Orch-OR</button>
+                    <button class="hud-pill" data-cad-scen="vagal">Vagal 144Hz</button>
+                    <button class="hud-pill danger" data-cad-scen="m47">M47 0x10</button>
+                    <button class="hud-pill danger" data-cad-scen="tamper">Tamper 0x02</button>
+                </div>
+                <div class="ctrl-row-inline">
+                    <button class="hud-pill gold" id="btn-export-png">Export PNG</button>
+                    <button class="hud-pill gold" id="btn-export-glb">Export .GLB</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="hud-side-left interactive">
+            <div class="cad-panel">
+                <div class="panel-heading">
+                    <span>CAD SCENE GRAPH (3D CLICKABLE)</span>
+                    <span style="font-size: 9px; color: var(--text-dim);">7 SUB-SYSTEMS</span>
+                </div>
+                <div class="scene-tree" id="scene-tree">
+                    <div class="scene-node" data-part="carbon_dome">
+                        <span>01. Carbon Cap &amp; Gloss Dome</span>
+                        <span class="node-tag">2x2 TWILL</span>
+                    </div>
+                    <div class="scene-node" data-part="lens_top">
+                        <span>02. Convex + Meniscus Doublet</span>
+                        <span class="node-tag">η=1.62 / 1.54</span>
+                    </div>
+                    <div class="scene-node" data-part="led_ring">
+                        <span>03. Emissive Phosphor LED Ring</span>
+                        <span class="node-tag">4500K BLOOM</span>
+                    </div>
+                    <div class="scene-node" data-part="sub_mounts">
+                        <span>04. CNC Ti-6Al-4V Sub-Mounts</span>
+                        <span class="node-tag">TI-6AL-4V</span>
+                    </div>
+                    <div class="scene-node" data-part="hex_chassis">
+                        <span>05. Hexagonal Milled Chassis</span>
+                        <span class="node-tag">6× TORX M2</span>
+                    </div>
+                    <div class="scene-node selected" data-part="cmos_sensor">
+                        <span>06. CMOS Matrix &amp; 48 Gold Pins</span>
+                        <span class="node-tag ar">IRIDESCENT AR</span>
+                    </div>
+                    <div class="scene-node" data-part="lower_housing">
+                        <span>07. Finned Housing &amp; Heat Sink</span>
+                        <span class="node-tag">ANODIZED AL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="material-card" id="part-inspector">
+                <div class="mat-title" id="insp-name">PART: 06. CMOS MATRIX &amp; 48 GOLD PINS</div>
+                <div>SURFACE: <span id="insp-surf" style="color:var(--green-ar);">Silicon Photodiode Array + Micro-Lens Grid</span></div>
+                <div>COATING: <span id="insp-coat">Dielectric Thin-Film AR (True WebGL Iridescence)</span></div>
+                <div>SHEEN: <span id="insp-sheen">Angle-Dependent Green-Violet Interference</span></div>
+                <div>INTERFACE: <span id="insp-pins">48x (8×6 Instanced) 24k Gold BGA Pins</span></div>
+            </div>
+        </div>
+
+        <div class="hud-footer">
+            <div class="slider-stack interactive">
+                <div class="slider-box">
+                    <div class="slider-label">
+                        <span>EXPLODED ASSEMBLY (Z-AXIS DISASSEMBLY)</span>
+                        <span class="val" id="lbl-explode">0.0 mm (0%)</span>
+                    </div>
+                    <input type="range" id="slider-explode" min="0" max="100" value="0">
+                </div>
+                <div class="slider-box">
+                    <div class="slider-label">
+                        <span>CAD CROSS-SECTION CUT (CLIPPING PLANE X)</span>
+                        <span class="val" id="lbl-section">OFF (FULL SOLID)</span>
+                    </div>
+                    <input type="range" id="slider-section" min="0" max="100" value="0">
+                </div>
+            </div>
+
+            <div class="camera-presets interactive" id="camera-presets">
+                <button class="hud-pill" data-preset="isometric">35° Studio Iso</button>
+                <button class="hud-pill" data-preset="cmos">Macro CMOS</button>
+                <button class="hud-pill" data-preset="lens">Optical Doublet</button>
+                <button class="hud-pill" data-preset="section">Side Cross-Section</button>
+                <button class="hud-pill" data-preset="top">Top CAD Axis</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+        import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
+
+        const PART_DATA = {
+            carbon_dome: {
+                name: "01. CARBON CAP & GLOSS DOME",
+                surf: "2x2 Twill Weave Carbon Fiber + Jet-Black Optical Lacquer",
+                coat: "Dual-Layer High-Refractive Clearcoat (Roughness 0.003)",
+                sheen: "Sharp HDR Softbox Specular Reflections",
+                pins: "Internal Bayonet Aperture Lock"
+            },
+            lens_top: {
+                name: "02. CONVEX + MENISCUS LENS DOUBLET",
+                surf: "Precision Crown Glass Doublet (η=1.62 Front / η=1.54 Rear)",
+                coat: "Physical Dispersion (Abbe Chromatic Splitting) + Transmission",
+                sheen: "Real Snell Refraction Focal Convergence onto CMOS",
+                pins: "Machined PTFE Optical Centering Seat"
+            },
+            led_ring: {
+                name: "03. EMISSIVE PHOSPHOR LED RING",
+                surf: "Ceramic 4500K SMD Ring with Phosphor Diffuser",
+                coat: "True UnrealBloom HDR Self-Illumination + Internal Point Light",
+                sheen: "Illuminates Ti-6Al-4V Sub-Mounts & Lens Rim",
+                pins: "Dual Flex-PCB Constant-Current Trace"
+            },
+            sub_mounts: {
+                name: "04. CNC TI-6AL-4V SUB-MOUNT BRACKETS",
+                surf: "Grade 5 Aerospace Titanium 4-Point Suspension",
+                coat: "Bead-Blasted Satin Metallic (Roughness 0.18)",
+                sheen: "Real Specular Catchlights from 4500K Ring Light",
+                pins: "4x M1.6 Stainless Precision Locators"
+            },
+            hex_chassis: {
+                name: "05. HEXAGONAL MILLED CNC CHASSIS",
+                surf: "CNC Unibody Chassis with Beveled Flanks & 6x M2 Hex Bolts",
+                coat: "Satin Anodized Aluminum vs Polished Bolt Chamfers",
+                sheen: "High Micro-Material Contrast Against Gloss Carbon Cap",
+                pins: "6x Stainless Socket Head Cap Screws + Alignment Dowels"
+            },
+            cmos_sensor: {
+                name: "06. CMOS MATRIX & 48 GOLD PINS",
+                surf: "Silicon Photodiode Array with Micro-Lens Concentrators",
+                coat: "Dielectric Thin-Film AR (Real r170 Physical Iridescence)",
+                sheen: "Angle-Dependent Green-Violet Spectral Phase Interference",
+                pins: "48x (8×6 Instanced Grid) 24k Gold Micro-Ball BGA Pins"
+            },
+            lower_housing: {
+                name: "07. FINNED HOUSING & HEAT SINK",
+                surf: "Hard-Anodized Alloy Core with 16 Radial Cooling Fins",
+                coat: "Thermal Dissipation Matte Anodize (Roughness 0.34)",
+                sheen: "Soft Cyclorama Falloff & Ground Pedestal Integration",
+                pins: "1/4\"-20 Optical Rail Tripod Thread"
+            }
+        };
+
+        let scene, camera, renderer, composer, bloomPass, controls;
+        let assemblyRoot, guideLinesGroup, opticalRaysGroup, sectionHelperMesh;
+        let carbonCapMesh, glossDomeMesh, frontLensMesh, rearLensMesh, ledRingMesh, ledPointLight;
+        let subMountsGroup, hexChassisMesh, cmosGroup, cmosSensorMesh, lowerHousingMesh;
+
+        const cadMaterials = [];
+        const pickableMeshes = [];
+        const clipPlane = new THREE.Plane(new THREE.Vector3(-1, 0, 0), 3.0);
+
+        let ledEnabled = true;
+        let autoOrbit = true;
+        let rayTraceEnabled = true;
+        let explodeFactor = 0.0;
+        let sectionFactor = 0.0;
+        let kernelLockoutMask = 0;
+        let kernelTepMv = 22.75;
+        let kernelBeatHz = 11.770208;
+        let kernelRegime = 'OrchOrAlphaCollapse';
+        let activeCameraAnimId = null;
+        let restoreHighlightFn = null;
+        let lastTime = performance.now();
+        let frameCount = 0;
+
+        // IEEE-754 float32 -> float16 encoder for HalfFloat HDR DataTexture
+        const _f32 = new Float32Array(1);
+        const _u32 = new Uint32Array(_f32.buffer);
+        function floatToHalf(val) {
+            _f32[0] = val;
+            const x = _u32[0];
+            const sign = (x >> 16) & 0x8000;
+            let mant = x & 0x007fffff;
+            let exp = (x >> 23) & 0xff;
+            if (exp === 0xff) return sign | 0x7c00 | (mant ? 1 : 0);
+            if (exp > 142) return sign | 0x7c00;
+            if (exp < 103) return sign;
+            if (exp < 113) {
+                mant |= 0x00800000;
+                const shift = 113 - exp;
+                return sign | ((mant >> (shift + 13)) & 0x03ff);
+            }
+            return sign | ((exp - 112) << 10) | (mant >> 13);
+        }
+
+        // True High-Dynamic-Range (HalfFloat) Studio Cyclorama IBL
+        function generateHdrStudioDome(pmremGenerator) {
+            const w = 512, h = 256;
+            const data = new Uint16Array(w * h * 4);
+
+            for (let y = 0; y < h; y++) {
+                const v = y / (h - 1);
+                const theta = (1.0 - v) * Math.PI; // 0 = zenith, PI = nadir
+                const dirY = Math.cos(theta);
+                const sinT = Math.sin(theta);
+
+                for (let x = 0; x < w; x++) {
+                    const u = x / (w - 1);
+                    const phi = u * Math.PI * 2.0;
+                    const dirX = sinT * Math.cos(phi);
+                    const dirZ = sinT * Math.sin(phi);
+
+                    // Base studio gradient
+                    const upFactor = Math.max(0, dirY * 0.5 + 0.5);
+                    let r = 0.015 + 0.045 * upFactor;
+                    let g = 0.022 + 0.055 * upFactor;
+                    let b = 0.040 + 0.085 * upFactor;
+
+                    // Overhead sharp crisp softbox (HDR 9.0 radiance)
+                    if (dirY > 0.72 && Math.abs(dirX) < 0.42 && Math.abs(dirZ) < 0.35) {
+                        r += 9.0; g += 8.6; b += 8.0;
+                    }
+                    // Left cool cyan-white strip softbox (HDR 6.5 radiance)
+                    if (dirX < -0.68 && Math.abs(dirY - 0.15) < 0.48 && Math.abs(dirZ) < 0.45) {
+                        r += 4.2; g += 6.0; b += 7.2;
+                    }
+                    // Right warm key softbox (HDR 7.5 radiance)
+                    if (dirX > 0.62 && dirZ > 0.25 && Math.abs(dirY - 0.35) < 0.42) {
+                        r += 7.5; g += 6.7; b += 5.4;
+                    }
+                    // Horizon laser cyan rim reflection
+                    if (Math.abs(dirY + 0.18) < 0.045 && dirZ < -0.3) {
+                        r += 0.2; g += 3.2; b += 3.8;
+                    }
+
+                    const idx = (y * w + x) * 4;
+                    data[idx]     = floatToHalf(r);
+                    data[idx + 1] = floatToHalf(g);
+                    data[idx + 2] = floatToHalf(b);
+                    data[idx + 3] = floatToHalf(1.0);
+                }
+            }
+
+            const hdrTex = new THREE.DataTexture(data, w, h, THREE.RGBAFormat, THREE.HalfFloatType);
+            hdrTex.mapping = THREE.EquirectangularReflectionMapping;
+            hdrTex.magFilter = THREE.LinearFilter;
+            hdrTex.minFilter = THREE.LinearFilter;
+            hdrTex.needsUpdate = true;
+
+            const envMap = pmremGenerator.fromEquirectangular(hdrTex).texture;
+            scene.environment = envMap;
+            hdrTex.dispose();
+            pmremGenerator.dispose();
+            document.getElementById('lbl-hdri').innerText = "HALF-FLOAT HDR SOFTBOX RIG";
+        }
+
+        function setupStudioEnvironment() {
+            const pmremGenerator = new THREE.PMREMGenerator(renderer);
+            pmremGenerator.compileEquirectangularShader();
+
+            if (location.protocol !== 'file:') {
+                const rgbeLoader = new RGBELoader();
+                rgbeLoader.load(
+                    '../../37_AETERNA_3D_SOVEREIGN_STUDIO/output_8k/studio_small_08_2k.hdr',
+                    (texture) => {
+                        const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+                        scene.environment = envMap;
+                        texture.dispose();
+                        pmremGenerator.dispose();
+                        document.getElementById('lbl-hdri').innerText = "2K REAL HDRI PHOTOGRAPHY";
+                    },
+                    undefined,
+                    () => generateHdrStudioDome(pmremGenerator)
+                );
+            } else {
+                generateHdrStudioDome(pmremGenerator);
+            }
+
+            const keySoftbox = new THREE.DirectionalLight(0xfff5e8, 2.6);
+            keySoftbox.position.set(4.5, 6.2, 3.8);
+            scene.add(keySoftbox);
+
+            const fillSoftbox = new THREE.DirectionalLight(0xd6ecff, 1.4);
+            fillSoftbox.position.set(-4.8, 3.2, 4.0);
+            scene.add(fillSoftbox);
+
+            const rimLight = new THREE.DirectionalLight(0x00f3ff, 1.9);
+            rimLight.position.set(0, -3.5, -5.0);
+            scene.add(rimLight);
+        }
+
+        function createCarbonFiberTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#0f1217';
+            ctx.fillRect(0, 0, 256, 256);
+
+            const size = 16;
+            for (let y = 0; y < 256; y += size) {
+                for (let x = 0; x < 256; x += size) {
+                    const even = ((x / size) + (y / size)) % 2 === 0;
+                    ctx.fillStyle = even ? '#1c2129' : '#0b0d11';
+                    ctx.fillRect(x, y, size, size);
+                    ctx.fillStyle = even ? '#2b323f' : '#151921';
+                    ctx.fillRect(x + 2, y + 2, size - 4, size * 0.45);
+                }
+            }
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            tex.wrapS = THREE.RepeatWrapping;
+            tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(8, 8);
+            return tex;
+        }
+
+        function createCMOSSensorTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#070a12';
+            ctx.fillRect(0, 0, 512, 512);
+
+            ctx.strokeStyle = 'rgba(0, 255, 170, 0.22)';
+            ctx.lineWidth = 1;
+            for (let i = 32; i <= 480; i += 8) {
+                ctx.beginPath(); ctx.moveTo(i, 32); ctx.lineTo(i, 480); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(32, i); ctx.lineTo(480, i); ctx.stroke();
+            }
+
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 6;
+            ctx.strokeRect(24, 24, 464, 464);
+
+            ctx.fillStyle = '#9bb8db';
+            ctx.font = 'bold 11px monospace';
+            ctx.fillText("AETERNA Q-CMOS 8K SENSOR // REV 5.0", 40, 18);
+            ctx.fillText("DIE 36×24mm // 48-PIN GOLD BGA INTERCONNECT", 40, 503);
+
+            const tex = new THREE.CanvasTexture(canvas);
+            tex.colorSpace = THREE.SRGBColorSpace;
+            return tex;
+        }
+
+        function registerCadMaterial(mat, baseIridescence = 0, baseIor = 1.3, baseRange = [100, 400]) {
+            mat.side = THREE.DoubleSide;
+            mat.clippingPlanes = [clipPlane];
+            mat.clipShadows = true;
+            mat.userData.baseIridescence = baseIridescence;
+            mat.userData.baseIridescenceIOR = baseIor;
+            mat.userData.baseIridescenceRange = [...baseRange];
+            cadMaterials.push(mat);
+            return mat;
+        }
+
+        function tagPickable(obj, partKey) {
+            obj.traverse((child) => {
+                if (child.isMesh) {
+                    child.userData.partKey = partKey;
+                    pickableMeshes.push(child);
+                }
+            });
+        }
+
+        function createHexagonalChassisGeometry(radius, height, chamfer) {
+            const shape = new THREE.Shape();
+            const sides = 6;
+            for (let i = 0; i < sides; i++) {
+                const angle = (i / sides) * Math.PI * 2;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) shape.moveTo(x, y);
+                else shape.lineTo(x, y);
+            }
+            shape.closePath();
+
+            // Bore optical aperture through center of hex chassis
+            const bore = new THREE.Path();
+            bore.absarc(0, 0, 1.08, 0, Math.PI * 2, true);
+            shape.holes.push(bore);
+
+            const geo = new THREE.ExtrudeGeometry(shape, {
+                depth: height,
+                bevelEnabled: true,
+                bevelSegments: 4,
+                steps: 2,
+                bevelSize: chamfer,
+                bevelThickness: chamfer
+            });
+            geo.center();
+            geo.rotateX(Math.PI / 2);
+            return geo;
+        }
+
+        function buildOpticalCADAssembly() {
+            assemblyRoot = new THREE.Group();
+            assemblyRoot.name = "AETERNA_QUANTUM_OPTICAL_SENSOR";
+            scene.add(assemblyRoot);
+
+            guideLinesGroup = new THREE.Group();
+            scene.add(guideLinesGroup);
+
+            opticalRaysGroup = new THREE.Group();
+            scene.add(opticalRaysGroup);
+
+            const carbonTex = createCarbonFiberTexture();
+            const cmosTex = createCMOSSensorTexture();
+
+            // 1. CARBON CAP APERTURE COLLAR & GLOSS DOME
+            const carbonMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0x161a20,
+                map: carbonTex,
+                roughness: 0.16,
+                metalness: 0.25,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.04,
+                name: "mat_carbon"
+            }));
+            const capShape = new THREE.Shape();
+            capShape.absarc(0, 0, 1.02, 0, Math.PI * 2, false);
+            const capAperture = new THREE.Path();
+            capAperture.absarc(0, 0, 0.66, 0, Math.PI * 2, true);
+            capShape.holes.push(capAperture);
+            const carbonGeo = new THREE.ExtrudeGeometry(capShape, {
+                depth: 0.12,
+                bevelEnabled: true,
+                bevelSegments: 3,
+                bevelSize: 0.03,
+                bevelThickness: 0.03
+            });
+            carbonGeo.center();
+            carbonGeo.rotateX(Math.PI / 2);
+            carbonCapMesh = new THREE.Mesh(carbonGeo, carbonMat);
+            carbonCapMesh.position.y = 1.54;
+
+            const glossDomeMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0x05070b,
+                metalness: 0.06,
+                roughness: 0.003,
+                transmission: 0.12,
+                ior: 1.52,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.002,
+                name: "mat_gloss_dome"
+            }));
+            glossDomeMesh = new THREE.Mesh(
+                new THREE.SphereGeometry(1.68, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.32),
+                glossDomeMat
+            );
+            glossDomeMesh.scale.y = 0.62;
+            glossDomeMesh.position.y = 0.52;
+
+            const upperDomeGroup = new THREE.Group();
+            upperDomeGroup.add(carbonCapMesh, glossDomeMesh);
+            upperDomeGroup.userData = { baseY: 0.0, explodeDir: 2.8, partKey: 'carbon_dome' };
+            tagPickable(upperDomeGroup, 'carbon_dome');
+            assemblyRoot.add(upperDomeGroup);
+
+            // 2. CONVEX + MENISCUS DOUBLET LENS (True r170 Transmission + Dispersion)
+            const lensFrontMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0xffffff,
+                metalness: 0.0,
+                roughness: 0.005,
+                transmission: 0.97,
+                ior: 1.62,
+                dispersion: 1.8,
+                thickness: 0.65,
+                attenuationColor: new THREE.Color(0xd8f3ff),
+                attenuationDistance: 4.5,
+                clearcoat: 1.0,
+                clearcoatRoughness: 0.005,
+                name: "mat_lens_front"
+            }), 0.0, 1.38, [350, 560]);
+
+            frontLensMesh = new THREE.Mesh(
+                new THREE.SphereGeometry(1.42, 64, 32, 0, Math.PI * 2, 0, Math.PI * 0.36),
+                lensFrontMat
+            );
+            frontLensMesh.scale.y = 0.52;
+            frontLensMesh.position.y = 0.50;
+            frontLensMesh.userData = { baseY: 0.50, explodeDir: 2.2, partKey: 'lens_top' };
+            tagPickable(frontLensMesh, 'lens_top');
+            assemblyRoot.add(frontLensMesh);
+
+            const lensRearMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0xf4faff,
+                metalness: 0.0,
+                roughness: 0.006,
+                transmission: 0.96,
+                ior: 1.54,
+                dispersion: 1.2,
+                thickness: 0.42,
+                attenuationColor: new THREE.Color(0xcff0ff),
+                attenuationDistance: 5.0,
+                name: "mat_lens_rear"
+            }), 0.0, 1.38, [350, 560]);
+
+            rearLensMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.10, 1.18, 0.14, 48), lensRearMat);
+            rearLensMesh.position.y = 0.72;
+            rearLensMesh.userData = { baseY: 0.72, explodeDir: 1.7, partKey: 'lens_top' };
+            tagPickable(rearLensMesh, 'lens_top');
+            assemblyRoot.add(rearLensMesh);
+
+            // 3. EMISSIVE PHOSPHOR LED RING (Light centered inside ring, not double-offset!)
+            const ledRingMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0xfff8eb,
+                emissive: 0xffeacc,
+                emissiveIntensity: 3.4,
+                roughness: 0.18,
+                name: "mat_led_ring"
+            }));
+            ledRingMesh = new THREE.Mesh(new THREE.TorusGeometry(1.36, 0.048, 20, 72), ledRingMat);
+            ledRingMesh.rotation.x = Math.PI / 2;
+            ledRingMesh.position.y = 0.52;
+            ledRingMesh.userData = { baseY: 0.52, explodeDir: 1.3, partKey: 'led_ring' };
+
+            ledPointLight = new THREE.PointLight(0xfff1d6, 3.5, 5.5, 1.5);
+            ledPointLight.position.set(0, 0, 0);
+            ledRingMesh.add(ledPointLight);
+            tagPickable(ledRingMesh, 'led_ring');
+            assemblyRoot.add(ledRingMesh);
+
+            // 4. TI-6AL-4V SUB-MOUNT BRACKETS
+            subMountsGroup = new THREE.Group();
+            const mountGeo = new THREE.BoxGeometry(0.13, 0.28, 0.34);
+            const bracketMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0x9aa6b4,
+                metalness: 1.0,
+                roughness: 0.18,
+                clearcoat: 0.35,
+                name: "mat_brackets"
+            }));
+            for (let i = 0; i < 4; i++) {
+                const angle = (i / 4) * Math.PI * 2 + Math.PI / 4;
+                const bracket = new THREE.Mesh(mountGeo, bracketMat);
+                bracket.position.set(Math.cos(angle) * 1.35, 0.40, Math.sin(angle) * 1.35);
+                bracket.rotation.y = -angle;
+                subMountsGroup.add(bracket);
+            }
+            subMountsGroup.userData = { baseY: 0.0, explodeDir: 0.9, partKey: 'sub_mounts' };
+            tagPickable(subMountsGroup, 'sub_mounts');
+            assemblyRoot.add(subMountsGroup);
+
+            // 5. HEXAGONAL MILLED CNC CHASSIS + 6 M2 TORX FLANGE BOLTS
+            const hexGeo = createHexagonalChassisGeometry(2.12, 0.54, 0.12);
+            const hexMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0x768292,
+                metalness: 1.0,
+                roughness: 0.28,
+                clearcoat: 0.16,
+                clearcoatRoughness: 0.20,
+                name: "mat_hex_chassis"
+            }));
+            hexChassisMesh = new THREE.Mesh(hexGeo, hexMat);
+            hexChassisMesh.userData = { baseY: 0.0, explodeDir: 0.0, partKey: 'hex_chassis' };
+
+            const boltGeo = new THREE.CylinderGeometry(0.065, 0.065, 0.10, 6);
+            const boltMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0xd0d9e4,
+                metalness: 1.0,
+                roughness: 0.12,
+                name: "mat_bolts"
+            }));
+            for (let i = 0; i < 6; i++) {
+                const a = (i / 6) * Math.PI * 2;
+                const bolt = new THREE.Mesh(boltGeo, boltMat);
+                bolt.position.set(Math.cos(a) * 1.72, 0.38, Math.sin(a) * 1.72);
+                hexChassisMesh.add(bolt);
+            }
+            tagPickable(hexChassisMesh, 'hex_chassis');
+            assemblyRoot.add(hexChassisMesh);
+
+            // 6. CMOS SENSOR MATRIX + TRUE 48 INSTANCED 24K GOLD BALL PINS (8x6)
+            cmosGroup = new THREE.Group();
+            const cmosMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0x0a0f18,
+                map: cmosTex,
+                metalness: 0.92,
+                roughness: 0.05,
+                iridescence: 1.0,
+                iridescenceIOR: 1.45,
+                iridescenceThicknessRange: [240, 580],
+                sheen: 0.35,
+                sheenColor: new THREE.Color(0x00ffaa),
+                clearcoat: 0.85,
+                clearcoatRoughness: 0.02,
+                name: "mat_cmos"
+            }), 1.0, 1.45, [240, 580]);
+
+            cmosSensorMesh = new THREE.Mesh(new THREE.BoxGeometry(1.42, 0.045, 1.02), cmosMat);
+            cmosSensorMesh.position.y = -0.08;
+            cmosGroup.add(cmosSensorMesh);
+
+            const pinGeo = new THREE.CylinderGeometry(0.017, 0.014, 0.13, 10);
+            const goldPinMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0xffd700,
+                metalness: 1.0,
+                roughness: 0.08,
+                name: "mat_gold_pins"
+            }));
+            const pinsInstanced = new THREE.InstancedMesh(pinGeo, goldPinMat, 48);
+            const dummy = new THREE.Object3D();
+            let pinIdx = 0;
+            for (let ix = 0; ix < 8; ix++) {
+                for (let iz = 0; iz < 6; iz++) {
+                    const px = (ix - 3.5) * 0.16;
+                    const pz = (iz - 2.5) * 0.16;
+                    dummy.position.set(px, -0.165, pz);
+                    dummy.updateMatrix();
+                    pinsInstanced.setMatrixAt(pinIdx++, dummy.matrix);
+                }
+            }
+            pinsInstanced.instanceMatrix.needsUpdate = true;
+            cmosGroup.add(pinsInstanced);
+            cmosGroup.userData = { baseY: 0.0, explodeDir: -0.6, partKey: 'cmos_sensor' };
+            tagPickable(cmosGroup, 'cmos_sensor');
+            assemblyRoot.add(cmosGroup);
+
+            // 7. LOWER HOUSING & 16 RADIAL COOLING FINS
+            const lowerMat = registerCadMaterial(new THREE.MeshPhysicalMaterial({
+                color: 0x151922,
+                metalness: 0.86,
+                roughness: 0.32,
+                name: "mat_lower_housing"
+            }));
+            lowerHousingMesh = new THREE.Mesh(new THREE.CylinderGeometry(1.86, 1.68, 0.64, 48), lowerMat);
+            lowerHousingMesh.position.y = -0.68;
+
+            const finGeo = new THREE.BoxGeometry(0.05, 0.44, 0.24);
+            for (let f = 0; f < 16; f++) {
+                const fa = (f / 16) * Math.PI * 2;
+                const fin = new THREE.Mesh(finGeo, lowerMat);
+                fin.position.set(Math.cos(fa) * 1.80, -0.02, Math.sin(fa) * 1.80);
+                fin.rotation.y = -fa + Math.PI / 2;
+                lowerHousingMesh.add(fin);
+            }
+            lowerHousingMesh.userData = { baseY: -0.68, explodeDir: -1.6, partKey: 'lower_housing' };
+            tagPickable(lowerHousingMesh, 'lower_housing');
+            assemblyRoot.add(lowerHousingMesh);
+
+            // Ambient Optical Cyclorama Pedestal Ring (non-clipping reference)
+            const floorRingGeo = new THREE.RingGeometry(2.35, 2.40, 72);
+            floorRingGeo.rotateX(-Math.PI / 2);
+            const floorRing = new THREE.Mesh(
+                floorRingGeo,
+                new THREE.MeshBasicMaterial({ color: 0x00f3ff, transparent: true, opacity: 0.18, side: THREE.DoubleSide })
+            );
+            floorRing.position.y = -1.18;
+            guideLinesGroup.add(floorRing);
+
+            // CAD Vertical Alignment Axis & Clipping Section Frame
+            const axisGeo = new THREE.BufferGeometry().setFromPoints([
+                new THREE.Vector3(0, -3.2, 0),
+                new THREE.Vector3(0, 4.4, 0)
+            ]);
+            const axisLine = new THREE.Line(
+                axisGeo,
+                new THREE.LineDashedMaterial({ color: 0x00f3ff, dashSize: 0.08, gapSize: 0.07, opacity: 0.35, transparent: true })
+            );
+            axisLine.computeLineDistances();
+            guideLinesGroup.add(axisLine);
+
+            const secFrameGeo = new THREE.EdgesGeometry(new THREE.PlaneGeometry(4.8, 5.2));
+            sectionHelperMesh = new THREE.LineSegments(
+                secFrameGeo,
+                new THREE.LineBasicMaterial({ color: 0x00ffaa, transparent: true, opacity: 0.45 })
+            );
+            sectionHelperMesh.rotation.y = Math.PI / 2;
+            sectionHelperMesh.visible = false;
+            guideLinesGroup.add(sectionHelperMesh);
+
+            rebuildOpticalRays();
+        }
+
+        // Vector Snell Refraction: I, N normalized, eta = n1 / n2
+        function refractSnell(I, N, eta) {
+            const cosI = -I.dot(N);
+            const sinT2 = eta * eta * (1.0 - cosI * cosI);
+            if (sinT2 > 1.0) return I.clone();
+            const cosT = Math.sqrt(Math.max(0.0, 1.0 - sinT2));
+            return I.clone().multiplyScalar(eta).addScaledVector(N, eta * cosI - cosT).normalize();
+        }
+
+        // Physical Multi-Spectral Snell Ray-Tracing Through Live Exploded Lens Positions
+        function rebuildOpticalRays() {
+            while (opticalRaysGroup.children.length > 0) {
+                const c = opticalRaysGroup.children.pop();
+                if (c.geometry) c.geometry.dispose();
+                if (c.material) c.material.dispose();
+            }
+            opticalRaysGroup.visible = rayTraceEnabled;
+            if (!rayTraceEnabled) return;
+
+            const frontCenterY = frontLensMesh.position.y;
+            const frontR = 1.42;
+            const frontScaleY = 0.52;
+            const rearY = rearLensMesh.position.y + 0.07;
+            const cmosY = cmosGroup.position.y - 0.056;
+            const entryY = Math.max(frontCenterY + frontR * frontScaleY + 1.1, assemblyRoot.children[0].position.y + 2.6);
+
+            const wavelengths = [
+                { color: 0xff3b5c, iorFront: 1.605, iorRear: 1.528 }, // 650nm Red
+                { color: 0x00ffaa, iorFront: 1.622, iorRear: 1.540 }, // 532nm Green
+                { color: 0x8b5cf6, iorFront: 1.652, iorRear: 1.564 }  // 445nm Violet
+            ];
+
+            const rings = [0.28, 0.56];
+            const sectors = 6;
+
+            wavelengths.forEach((wl) => {
+                const vertices = [];
+                for (const rad of rings) {
+                    for (let s = 0; s < sectors; s++) {
+                        const a = (s / sectors) * Math.PI * 2;
+                        const px = Math.cos(a) * rad;
+                        const pz = Math.sin(a) * rad;
+
+                        const dy = Math.sqrt(Math.max(0.01, frontR * frontR - rad * rad));
+                        const p0 = new THREE.Vector3(px, entryY, pz);
+                        const p1 = new THREE.Vector3(px, frontCenterY + frontScaleY * dy, pz);
+
+                        // Exact ellipsoid outward normal on convex front lens
+                        const nFront = new THREE.Vector3(px, dy / frontScaleY, pz).normalize();
+                        const dir1 = refractSnell(new THREE.Vector3(0, -1, 0), nFront, 1.0 / wl.iorFront);
+
+                        const tRear = Math.max(0.05, (rearY - p1.y) / Math.min(-0.1, dir1.y));
+                        const p2 = p1.clone().addScaledVector(dir1, tRear);
+
+                        const nRear = new THREE.Vector3(p2.x * 0.25, 1.0, p2.z * 0.25).normalize();
+                        const dir2 = refractSnell(dir1, nRear, wl.iorFront / wl.iorRear);
+                        const dirOut = refractSnell(dir2, new THREE.Vector3(0, 1, 0), wl.iorRear / 1.0);
+
+                        const tCmos = Math.max(0.02, (cmosY - p2.y) / Math.min(-0.1, dirOut.y));
+                        const p3 = p2.clone().addScaledVector(dirOut, tCmos);
+
+                        vertices.push(p0, p1, p1, p2, p2, p3);
+                    }
+                }
+                const geo = new THREE.BufferGeometry().setFromPoints(vertices);
+                const mat = new THREE.LineBasicMaterial({ color: wl.color, transparent: true, opacity: 0.62 });
+                opticalRaysGroup.add(new THREE.LineSegments(geo, mat));
+            });
+
+            // Focal Caustic Target Halo on CMOS Die
+            const causticGeo = new THREE.RingGeometry(0.03, 0.14, 32);
+            causticGeo.rotateX(-Math.PI / 2);
+            const caustic = new THREE.Mesh(
+                causticGeo,
+                new THREE.MeshBasicMaterial({ color: 0x00ffaa, transparent: true, opacity: 0.72, side: THREE.DoubleSide })
+            );
+            caustic.position.y = cmosY + 0.004;
+            opticalRaysGroup.add(caustic);
+        }
+
+        function updateExplodedView(val) {
+            explodeFactor = parseFloat(val) / 100.0;
+            const mm = (explodeFactor * 65.0).toFixed(1);
+            document.getElementById('lbl-explode').innerText = `${mm} mm (${(explodeFactor * 100).toFixed(0)}%)`;
+
+            const maxLift = 1.8;
+            const upperDomeGroup = assemblyRoot.children[0];
+            upperDomeGroup.position.y = upperDomeGroup.userData.baseY + upperDomeGroup.userData.explodeDir * explodeFactor * maxLift;
+
+            frontLensMesh.position.y = frontLensMesh.userData.baseY + frontLensMesh.userData.explodeDir * explodeFactor * maxLift;
+            rearLensMesh.position.y = rearLensMesh.userData.baseY + rearLensMesh.userData.explodeDir * explodeFactor * maxLift;
+            ledRingMesh.position.y = ledRingMesh.userData.baseY + ledRingMesh.userData.explodeDir * explodeFactor * maxLift;
+            subMountsGroup.position.y = subMountsGroup.userData.baseY + subMountsGroup.userData.explodeDir * explodeFactor * maxLift;
+            subMountsGroup.scale.setScalar(1.0 + explodeFactor * 0.25);
+
+            cmosGroup.position.y = cmosGroup.userData.baseY + cmosGroup.userData.explodeDir * explodeFactor * maxLift;
+            lowerHousingMesh.position.y = lowerHousingMesh.userData.baseY + lowerHousingMesh.userData.explodeDir * explodeFactor * maxLift;
+
+            rebuildOpticalRays();
+        }
+
+        function updateSectionCut(val) {
+            sectionFactor = parseFloat(val) / 100.0;
+            const lbl = document.getElementById('lbl-section');
+            if (sectionFactor <= 0.01) {
+                clipPlane.constant = 4.0;
+                sectionHelperMesh.visible = false;
+                lbl.innerText = "OFF (FULL SOLID)";
+            } else {
+                const cutX = 2.3 - sectionFactor * 3.8; // +2.3 .. -1.5 (0.0 at ~60%)
+                clipPlane.constant = cutX;
+                sectionHelperMesh.visible = true;
+                sectionHelperMesh.position.x = cutX;
+                lbl.innerText = `X = ${cutX.toFixed(2)} (${(sectionFactor * 100).toFixed(0)}%)`;
+            }
+        }
+
+        function setShadingMode(mode) {
+            ['btn-mode-pbr', 'btn-mode-ar', 'btn-mode-wire'].forEach(id => document.getElementById(id).classList.remove('active'));
+
+            if (mode === 'pbr') {
+                document.getElementById('btn-mode-pbr').classList.add('active');
+                cadMaterials.forEach(m => {
+                    m.wireframe = false;
+                    m.iridescence = m.userData.baseIridescence;
+                    m.iridescenceIOR = m.userData.baseIridescenceIOR;
+                    m.iridescenceThicknessRange = [...m.userData.baseIridescenceRange];
+                });
+                document.getElementById('lbl-ar').innerText = "THIN-FILM [240–580nm]";
+            } else if (mode === 'ar') {
+                document.getElementById('btn-mode-ar').classList.add('active');
+                cadMaterials.forEach(m => {
+                    m.wireframe = false;
+                    if (m.name === 'mat_cmos') {
+                        m.iridescence = 1.0;
+                        m.iridescenceIOR = 1.68;
+                        m.iridescenceThicknessRange = [180, 760];
+                    } else if (m.name === 'mat_lens_front' || m.name === 'mat_lens_rear') {
+                        m.iridescence = 0.65;
+                        m.iridescenceIOR = 1.42;
+                        m.iridescenceThicknessRange = [380, 620];
+                    }
+                });
+                document.getElementById('lbl-ar').innerText = "BOOSTED VIOLET-GREEN AR";
+            } else if (mode === 'wire') {
+                document.getElementById('btn-mode-wire').classList.add('active');
+                cadMaterials.forEach(m => { m.wireframe = true; });
+            }
+        }
+
+        function selectPart(key, pulseHighlight = true) {
+            document.querySelectorAll('.scene-node').forEach(n => {
+                n.classList.toggle('selected', n.dataset.part === key);
+            });
+            const data = PART_DATA[key];
+            if (!data) return;
+
+            document.getElementById('insp-name').innerText = `PART: ${data.name}`;
+            document.getElementById('insp-surf').innerText = data.surf;
+            document.getElementById('insp-coat').innerText = data.coat;
+            document.getElementById('insp-sheen').innerText = data.sheen;
+            document.getElementById('insp-pins').innerText = data.pins;
+
+            if (pulseHighlight && assemblyRoot) {
+                if (restoreHighlightFn) restoreHighlightFn();
+                const touched = [];
+                assemblyRoot.traverse(c => {
+                    if (c.isMesh && c.userData.partKey === key && c.material && c.material.name !== 'mat_led_ring') {
+                        if (!touched.some(t => t.mat === c.material)) {
+                            const prevEmissive = c.material.emissive.getHex();
+                            const prevInt = c.material.emissiveIntensity;
+                            c.material.emissive.setHex(0x00f3ff);
+                            c.material.emissiveIntensity = 0.45;
+                            touched.push({ mat: c.material, prevEmissive, prevInt });
+                        }
+                    }
+                });
+                const timerId = setTimeout(() => {
+                    if (restoreHighlightFn) restoreHighlightFn();
+                }, 420);
+                restoreHighlightFn = () => {
+                    clearTimeout(timerId);
+                    touched.forEach(item => {
+                        item.mat.emissive.setHex(item.prevEmissive);
+                        item.mat.emissiveIntensity = item.prevInt;
+                    });
+                    restoreHighlightFn = null;
+                };
+            }
+        }
+
+        function animateCameraTo(tx, ty, tz, lx, ly, lz) {
+            if (activeCameraAnimId !== null) cancelAnimationFrame(activeCameraAnimId);
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const endPos = new THREE.Vector3(tx, ty, tz);
+            const endTarget = new THREE.Vector3(lx, ly, lz);
+            const startTime = performance.now();
+            const duration = 780;
+
+            function step() {
+                const progress = Math.min((performance.now() - startTime) / duration, 1.0);
+                const ease = 0.5 - Math.cos(progress * Math.PI) / 2;
+                camera.position.lerpVectors(startPos, endPos, ease);
+                controls.target.lerpVectors(startTarget, endTarget, ease);
+                controls.update();
+                if (progress < 1.0) {
+                    activeCameraAnimId = requestAnimationFrame(step);
+                } else {
+                    activeCameraAnimId = null;
+                }
+            }
+            activeCameraAnimId = requestAnimationFrame(step);
+        }
+
+        function setCameraPreset(preset) {
+            if (preset === 'isometric') animateCameraTo(3.6, 2.6, 4.6, 0, 0.2, 0);
+            else if (preset === 'cmos') { animateCameraTo(0.75, 0.55, 0.85, 0, -0.08, 0); selectPart('cmos_sensor'); }
+            else if (preset === 'lens') { animateCameraTo(0.0, 2.0, 1.65, 0, 0.85, 0); selectPart('lens_top'); }
+            else if (preset === 'section') {
+                const secSlider = document.getElementById('slider-section');
+                if (parseFloat(secSlider.value) < 40) { secSlider.value = 60; updateSectionCut(60); }
+                animateCameraTo(4.4, 0.7, 0.1, 0, 0.2, 0);
+            }
+            else if (preset === 'top') animateCameraTo(0.0, 5.4, 0.02, 0, 0, 0);
+        }
+
+        function setupInteractions() {
+            const canvas = renderer.domElement;
+
+            // Cancel camera tween immediately on user drag/zoom
+            controls.addEventListener('start', () => {
+                if (activeCameraAnimId !== null) {
+                    cancelAnimationFrame(activeCameraAnimId);
+                    activeCameraAnimId = null;
+                }
+            });
+
+            // 3D Raycast Part Picking (distinguish click vs orbit drag)
+            const raycaster = new THREE.Raycaster();
+            const pointer = new THREE.Vector2();
+            let downPos = { x: 0, y: 0 };
+
+            canvas.addEventListener('pointerdown', (e) => {
+                downPos = { x: e.clientX, y: e.clientY };
+            });
+
+            canvas.addEventListener('pointerup', (e) => {
+                if (Math.hypot(e.clientX - downPos.x, e.clientY - downPos.y) > 5) return;
+                pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+                pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(pointer, camera);
+                const hits = raycaster.intersectObjects(pickableMeshes, false);
+                if (hits.length > 0 && hits[0].object.userData.partKey) {
+                    selectPart(hits[0].object.userData.partKey, true);
+                }
+            });
+
+            // Wire Sidebar Scene Tree & Buttons cleanly (no globals needed in ESM)
+            document.getElementById('scene-tree').addEventListener('click', (e) => {
+                const node = e.target.closest('.scene-node');
+                if (node && node.dataset.part) selectPart(node.dataset.part, true);
+            });
+
+            document.getElementById('camera-presets').addEventListener('click', (e) => {
+                const btn = e.target.closest('.hud-pill');
+                if (btn && btn.dataset.preset) setCameraPreset(btn.dataset.preset);
+            });
+
+            document.getElementById('btn-mode-pbr').addEventListener('click', () => setShadingMode('pbr'));
+            document.getElementById('btn-mode-ar').addEventListener('click', () => setShadingMode('ar'));
+            document.getElementById('btn-mode-wire').addEventListener('click', () => setShadingMode('wire'));
+
+            document.getElementById('btn-led').addEventListener('click', () => {
+                ledEnabled = !ledEnabled;
+                const btn = document.getElementById('btn-led');
+                btn.classList.toggle('active', ledEnabled);
+                btn.innerText = ledEnabled ? "LED Ring: 100%" : "LED Ring: OFF";
+                ledRingMesh.material.emissiveIntensity = ledEnabled ? 3.4 : 0.0;
+                ledPointLight.intensity = ledEnabled ? 3.5 : 0.0;
+            });
+
+            document.getElementById('btn-rays').addEventListener('click', () => {
+                rayTraceEnabled = !rayTraceEnabled;
+                const btn = document.getElementById('btn-rays');
+                btn.classList.toggle('active', rayTraceEnabled);
+                btn.innerText = rayTraceEnabled ? "Snell Ray-Trace: ON" : "Snell Ray-Trace: OFF";
+                rebuildOpticalRays();
+            });
+
+            document.getElementById('btn-orbit').addEventListener('click', () => {
+                autoOrbit = !autoOrbit;
+                const btn = document.getElementById('btn-orbit');
+                btn.classList.toggle('active', autoOrbit);
+                btn.innerText = autoOrbit ? "Auto-Orbit: ON" : "Auto-Orbit: OFF";
+            });
+
+            document.getElementById('slider-explode').addEventListener('input', (e) => updateExplodedView(e.target.value));
+            document.getElementById('slider-section').addEventListener('input', (e) => updateSectionCut(e.target.value));
+
+            document.getElementById('btn-export-png').addEventListener('click', () => {
+                composer.render();
+                renderer.domElement.toBlob((blob) => {
+                    if (!blob) return;
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `AETERNA_CAD_OPTICAL_SENSOR_${window.innerWidth}x${window.innerHeight}.png`;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 4000);
+                }, 'image/png');
+            });
+
+            document.getElementById('btn-export-glb').addEventListener('click', () => {
+                const exporter = new GLTFExporter();
+                exporter.parse(
+                    assemblyRoot,
+                    (result) => {
+                        const blob = new Blob([result], { type: 'model/gltf-binary' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'AETERNA_QUANTUM_OPTICAL_SENSOR.glb';
+                        a.click();
+                        setTimeout(() => URL.revokeObjectURL(url), 4000);
+                    },
+                    (err) => console.error('GLB Export Error:', err),
+                    { binary: true }
+                );
+            });
+
+            // Live Proof-Carrying Kernel SSE Bridge (port 8090 / same-origin)
+            const KERNEL_BASE = (location.protocol !== 'file:') ? '' : 'http://127.0.0.1:8090';
+            let cadEventSource = null;
+
+            function applyKernelTelemetry(d) {
+                if (!d || typeof d !== 'object') return;
+                kernelLockoutMask = d.lockout_mask || 0;
+                kernelTepMv = typeof d.tep_drive_mv === 'number' ? d.tep_drive_mv : 0.0;
+                kernelBeatHz = typeof d.entrain_beat_hz === 'number' ? d.entrain_beat_hz : 0.0;
+                kernelRegime = d.regime || 'Unknown';
+
+                const lblKernel = document.getElementById('lbl-kernel');
+                const lblTep = document.getElementById('lbl-tep');
+
+                if (kernelLockoutMask !== 0) {
+                    lblKernel.innerText = `LOCKOUT ${d.lockout_hex} (${d.lockout_reasons})`;
+                    lblKernel.style.color = '#f43f5e';
+                    lblTep.innerText = '0.00 mV (ACTUATION ZEROED)';
+                    lblTep.style.color = '#f43f5e';
+
+                    // Physical hardware interlock cutoff on LED & optical beams
+                    ledRingMesh.material.emissive.setHex(0xff1e38);
+                    ledRingMesh.material.emissiveIntensity = 1.6;
+                    ledPointLight.color.setHex(0xff1e38);
+                    ledPointLight.intensity = 1.2;
+                    opticalRaysGroup.visible = false;
+                } else {
+                    lblKernel.innerText = `SAFE ${d.lockout_hex} // #${d.tick || 0} (${d.eval_ns || 0}ns)`;
+                    lblKernel.style.color = '#00ffaa';
+                    lblTep.innerText = `${kernelTepMv.toFixed(2)} mV @ ${kernelBeatHz.toFixed(2)} Hz (${kernelRegime})`;
+                    lblTep.style.color = '#00f3ff';
+
+                    const isVagal = kernelRegime === 'VagalRescue';
+                    ledRingMesh.material.emissive.setHex(isVagal ? 0x38f2ff : 0xffeacc);
+                    ledPointLight.color.setHex(isVagal ? 0x38f2ff : 0xfff1d6);
+                    opticalRaysGroup.visible = rayTraceEnabled;
+                }
+            }
+
+            function connectCadKernel() {
+                if (cadEventSource) { cadEventSource.close(); cadEventSource = null; }
+                const btn = document.getElementById('btn-live-cad');
+                try {
+                    cadEventSource = new EventSource(`${KERNEL_BASE}/events`);
+                    btn.innerText = 'SSE: CONNECTED';
+                    cadEventSource.onmessage = (ev) => {
+                        try { applyKernelTelemetry(JSON.parse(ev.data)); } catch (_) {}
+                    };
+                    cadEventSource.onerror = () => { btn.innerText = 'KERNEL OFFLINE'; };
+                } catch (_) {
+                    btn.innerText = 'KERNEL OFFLINE';
+                }
+            }
+
+            document.getElementById('btn-live-cad').addEventListener('click', connectCadKernel);
+            document.querySelectorAll('button[data-cad-scen]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.dataset.cadScen;
+                    if (!cadEventSource) connectCadKernel();
+                    fetch(`${KERNEL_BASE}/api/scenario?mode=${encodeURIComponent(mode)}`, { method: 'POST' })
+                        .then(r => (r.ok ? r.json() : null))
+                        .then(d => { if (d) applyKernelTelemetry(d); })
+                        .catch(() => {});
+                });
+            });
+
+            if (location.protocol !== 'file:') {
+                const startCadBridge = () => {
+                    fetch(`${KERNEL_BASE}/api/state`).then(r => (r.ok ? r.json() : null)).then(d => { if (d) applyKernelTelemetry(d); }).catch(() => {});
+                    setTimeout(connectCadKernel, 450);
+                };
+                if (document.readyState === 'complete') startCadBridge();
+                else window.addEventListener('load', startCadBridge, { once: true });
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (autoOrbit && assemblyRoot && kernelLockoutMask === 0) {
+                assemblyRoot.rotation.y += 0.0014;
+                opticalRaysGroup.rotation.y = assemblyRoot.rotation.y;
+            }
+
+            // Modulate LED ring intensity dynamically at entrained beat frequency when unlocked
+            if (ledRingMesh && ledPointLight) {
+                if (kernelLockoutMask === 0) {
+                    const mod = ledEnabled ? (2.8 + 0.6 * Math.sin(performance.now() * 0.001 * Math.max(1.0, kernelBeatHz))) : 0.0;
+                    const scale = Math.max(0.25, kernelTepMv / 24.2);
+                    ledRingMesh.material.emissiveIntensity = mod * scale;
+                    ledPointLight.intensity = ledEnabled ? 3.5 * scale : 0.0;
+                }
+            }
+
+            controls.update();
+            composer.render();
+
+            frameCount++;
+            const now = performance.now();
+            if (now - lastTime >= 1000) {
+                document.getElementById('lbl-fps').innerText = ((frameCount * 1000) / (now - lastTime)).toFixed(1);
+                frameCount = 0;
+                lastTime = now;
+            }
+        }
+
+        function onWindowResize() {
+            const w = window.innerWidth;
+            const h = window.innerHeight;
+            camera.aspect = w / h;
+            camera.updateProjectionMatrix();
+            renderer.setSize(w, h);
+            composer.setSize(w, h);
+            bloomPass.setSize(w, h);
+        }
+
+        function initEngine() {
+            const canvas = document.getElementById('webgl-canvas');
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 0.08, 100);
+            camera.position.set(3.6, 2.6, 4.6);
+
+            renderer = new THREE.WebGLRenderer({
+                canvas,
+                antialias: true,
+                powerPreference: 'high-performance',
+                preserveDrawingBuffer: true
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.15;
+            renderer.outputColorSpace = THREE.SRGBColorSpace;
+            renderer.localClippingEnabled = true;
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 0.2, 0);
+            controls.maxDistance = 16;
+            controls.minDistance = 0.55;
+
+            composer = new EffectComposer(renderer);
+            composer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2.0));
+            composer.setSize(window.innerWidth, window.innerHeight);
+            composer.addPass(new RenderPass(scene, camera));
+
+            bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                0.38, // strength
+                0.45, // radius
+                1.05  // threshold (HDR emissives only)
+            );
+            composer.addPass(bloomPass);
+            composer.addPass(new OutputPass());
+
+            setupStudioEnvironment();
+            buildOpticalCADAssembly();
+            setupInteractions();
+
+            window.addEventListener('resize', onWindowResize);
+            animate();
+        }
+
+        try {
+            initEngine();
+        } catch (err) {
+            document.getElementById('offline-banner').style.display = 'flex';
+            document.getElementById('offline-msg').textContent = String(err);
+        }
+    </script>
+</body>
+</html>

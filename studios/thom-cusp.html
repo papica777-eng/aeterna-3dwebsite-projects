@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETERNA SINGULARITY // Thom Cusp Catastrophe & Sovereign Coherence (SCI = 0.2314) 3D Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- Three.js & OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #020617;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .hud-panel {
+      position: absolute;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.82);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 30px rgba(56, 189, 248, 0.08);
+      pointer-events: auto;
+    }
+    #top-hud {
+      top: 20px;
+      left: 24px;
+      padding: 16px 24px;
+      max-width: 520px;
+    }
+    #controls-hud {
+      bottom: 24px;
+      left: 24px;
+      padding: 18px 24px;
+      width: 420px;
+    }
+    #telemetry-hud {
+      top: 20px;
+      right: 24px;
+      padding: 18px 24px;
+      width: 410px;
+    }
+    #cross-section-hud {
+      bottom: 24px;
+      right: 24px;
+      padding: 16px 20px;
+      width: 410px;
+    }
+    h1 {
+      font-family: 'Cinzel', serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.08em;
+      color: #38bdf8;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    h2 {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 0.84rem;
+    }
+    .metric-label {
+      color: #94a3b8;
+    }
+    .metric-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .badge-cyan { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid #38bdf8; }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #fbbf24; }
+    .badge-rose { background: rgba(244, 63, 94, 0.2); color: #f43f5e; border: 1px solid #f43f5e; }
+
+    .control-group {
+      margin-bottom: 12px;
+    }
+    .control-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.80rem;
+      margin-bottom: 6px;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #1e293b;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #38bdf8;
+      cursor: pointer;
+      box-shadow: 0 0 8px #38bdf8;
+    }
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    button {
+      flex: 1;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 0.76rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      background: #334155;
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    button.active {
+      background: rgba(56, 189, 248, 0.25);
+      border-color: #38bdf8;
+      color: #38bdf8;
+    }
+    canvas#potential-canvas {
+      width: 100%;
+      height: 140px;
+      background: #070c18;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <div id="webgl-canvas"></div>
+
+  <!-- Top Header HUD -->
+  <div id="top-hud" class="hud-panel">
+    <h1>🔱 AETERNA SINGULARITY</h1>
+    <h2>Thom Cusp Catastrophe & Sovereign Coherence 3D Manifold</h2>
+    <div class="metric-row">
+      <span class="metric-label">Authority:</span>
+      <span class="badge badge-cyan">0x4121 (AETERNA LOGOS)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Potential Equation:</span>
+      <span class="metric-value" style="color: #34d399;">V(x; u, v) = x⁴ + ux² + vx</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Cusp Discriminant:</span>
+      <span class="metric-value" id="discriminant-val">Δ = -53.28</span>
+      <span class="badge badge-rose" id="regime-badge">BISTABLE</span>
+    </div>
+  </div>
+
+  <!-- Telemetry HUD -->
+  <div id="telemetry-hud" class="hud-panel">
+    <h2>🔱 Sovereign Coherence Telemetry</h2>
+    <div class="metric-row">
+      <span class="metric-label">Sovereign Coherence (SCI):</span>
+      <span class="metric-value" style="color: #38bdf8; font-size: 1.1rem;">0.231403</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Bio-Quantum Refresh Rate:</span>
+      <span class="metric-value" style="color: #10b981;">45.57 Hz</span>
+      <span class="badge badge-green">OPTIMAL</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Tissue Regeneration Index:</span>
+      <span class="metric-value">0.882500</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Cognitive Hyperlucidity:</span>
+      <span class="metric-value">0.805041</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Adrenergic Shunt Ŝ_NE:</span>
+      <span class="metric-value" style="color: #38bdf8;">1.00e-4 (Active)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">Riccati DRE Matrix Tr(P):</span>
+      <span class="metric-value">52.00 (Stable)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-label">System Entropy Invariant:</span>
+      <span class="metric-value" style="color: #fbbf24;">ΔS = 0.0000</span>
+      <span class="badge badge-amber">ZERO MACHINE</span>
+    </div>
+  </div>
+
+  <!-- Controls HUD -->
+  <div id="controls-hud" class="hud-panel">
+    <h2>⚙️ Catastrophe Control Plane (u, v)</h2>
+    <div class="control-group">
+      <div class="control-header">
+        <span>Splitting Factor u (Bifurcation Control):</span>
+        <span id="u-val" style="color: #38bdf8; font-family: monospace;">-2.00</span>
+      </div>
+      <input type="range" id="u-slider" min="-3.0" max="1.5" step="0.05" value="-2.0">
+    </div>
+
+    <div class="control-group">
+      <div class="control-header">
+        <span>Normal Factor v (Asymmetry / NE Drive):</span>
+        <span id="v-val" style="color: #38bdf8; font-family: monospace;">0.00</span>
+      </div>
+      <input type="range" id="v-slider" min="-2.0" max="2.0" step="0.05" value="0.0">
+    </div>
+
+    <div class="btn-group">
+      <button id="btn-riccati" class="active">🛡️ Riccati Lock</button>
+      <button id="btn-noise" class="active">🌊 SDE Noise (dW)</button>
+      <button id="btn-reset">🔄 Reset (u=-2, v=0)</button>
+    </div>
+  </div>
+
+  <!-- Cross-Section Potential Well 2D HUD -->
+  <div id="cross-section-hud" class="hud-panel">
+    <h2>⚡ Real-Time Potential Profile V(x)</h2>
+    <canvas id="potential-canvas" width="370" height="140"></canvas>
+    <div class="metric-row" style="margin-top: 8px;">
+      <span class="metric-label">Current State x:</span>
+      <span class="metric-value" id="x-state-val">-1.0000</span>
+      <span class="badge badge-cyan" id="attractor-state-badge">ATTRACTOR A</span>
+    </div>
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. THREE.JS 3D SCENE SETUP
+    // ─────────────────────────────────────────────────────────────────────────
+    const container = document.getElementById('webgl-canvas');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x020617);
+    scene.fog = new THREE.FogExp2(0x020617, 0.035);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(-8, 9, 12);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxPolarAngle = Math.PI / 2 + 0.15;
+
+    // Ambient & Directional Lighting
+    const ambientLight = new THREE.AmbientLight(0x0f172a, 1.8);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0x38bdf8, 2.2);
+    dirLight1.position.set(10, 20, 15);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x10b981, 1.4);
+    dirLight2.position.set(-15, -10, -10);
+    scene.add(dirLight2);
+
+    // Grid Floor
+    const grid = new THREE.GridHelper(24, 48, 0x1e293b, 0x0f172a);
+    grid.position.y = -3.5;
+    scene.add(grid);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. THOM CUSP CATASTROPHE SURFACE GEOMETRY
+    // ─────────────────────────────────────────────────────────────────────────
+    // Equilibrium surface: 4x³ + 2ux + v = 0 => v = -4x³ - 2ux
+    const uRes = 60;
+    const xRes = 100;
+    const geom = new THREE.BufferGeometry();
+    const positions = [];
+    const colors = [];
+    const indices = [];
+
+    const uMin = -3.0, uMax = 1.5;
+    const xMin = -1.6, xMax = 1.6;
+
+    for (let i = 0; i <= uRes; i++) {
+      const u = uMin + (uMax - uMin) * (i / uRes);
+      for (let j = 0; j <= xRes; j++) {
+        const x = xMin + (xMax - xMin) * (j / xRes);
+        const v = -4.0 * Math.pow(x, 3) - 2.0 * u * x;
+
+        positions.push(u * 2.0, x * 2.5, v * 1.2);
+
+        // Color based on stability (Hessian d²V/dx² = 12x² + 2u)
+        const hessian = 12.0 * x * x + 2.0 * u;
+        if (hessian > 0.05) {
+          // Stable attractor (cyan/blue)
+          colors.push(0.06, 0.71, 0.97);
+        } else if (hessian < -0.05) {
+          // Unstable separatrix sheet (rose/red)
+          colors.push(0.96, 0.25, 0.37);
+        } else {
+          // Cusp threshold (amber)
+          colors.push(0.98, 0.75, 0.14);
+        }
+      }
+    }
+
+    for (let i = 0; i < uRes; i++) {
+      for (let j = 0; j < xRes; j++) {
+        const a = i * (xRes + 1) + j;
+        const b = a + 1;
+        const c = (i + 1) * (xRes + 1) + j;
+        const d = c + 1;
+        indices.push(a, b, c);
+        indices.push(b, d, c);
+      }
+    }
+
+    geom.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    geom.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    geom.setIndex(indices);
+    geom.computeVertexNormals();
+
+    const mat = new THREE.MeshStandardMaterial({
+      vertexColors: true,
+      side: THREE.DoubleSide,
+      roughness: 0.3,
+      metalness: 0.2,
+      wireframe: false,
+      transparent: true,
+      opacity: 0.88
+    });
+    const surfaceMesh = new THREE.Mesh(geom, mat);
+    scene.add(surfaceMesh);
+
+    // Current operating point 3D sphere marker
+    const sphereGeom = new THREE.SphereGeometry(0.22, 32, 32);
+    const sphereMat = new THREE.MeshStandardMaterial({
+      color: 0xfbbf24,
+      emissive: 0xfbbf24,
+      emissiveIntensity: 0.8,
+      roughness: 0.2
+    });
+    const stateSphere = new THREE.Mesh(sphereGeom, sphereMat);
+    scene.add(stateSphere);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. PHYSICAL SIMULATION & STATE VARIABLES
+    // ─────────────────────────────────────────────────────────────────────────
+    let currentU = -2.0;
+    let currentV = 0.0;
+    let currentStateX = -1.0;
+    let riccatiActive = true;
+    let noiseActive = true;
+
+    const uSlider = document.getElementById('u-slider');
+    const vSlider = document.getElementById('v-slider');
+    const uValSpan = document.getElementById('u-val');
+    const vValSpan = document.getElementById('v-val');
+    const discValSpan = document.getElementById('discriminant-val');
+    const regimeBadge = document.getElementById('regime-badge');
+    const xStateSpan = document.getElementById('x-state-val');
+    const attractorStateBadge = document.getElementById('attractor-state-badge');
+
+    uSlider.addEventListener('input', (e) => {
+      currentU = parseFloat(e.target.value);
+      uValSpan.innerText = currentU.toFixed(2);
+      updateRegime();
+    });
+
+    vSlider.addEventListener('input', (e) => {
+      currentV = parseFloat(e.target.value);
+      vValSpan.innerText = currentV.toFixed(2);
+      updateRegime();
+    });
+
+    document.getElementById('btn-riccati').addEventListener('click', function() {
+      riccatiActive = !riccatiActive;
+      this.classList.toggle('active', riccatiActive);
+    });
+
+    document.getElementById('btn-noise').addEventListener('click', function() {
+      noiseActive = !noiseActive;
+      this.classList.toggle('active', noiseActive);
+    });
+
+    document.getElementById('btn-reset').addEventListener('click', () => {
+      currentU = -2.0;
+      currentV = 0.0;
+      currentStateX = -1.0;
+      uSlider.value = currentU;
+      vSlider.value = currentV;
+      uValSpan.innerText = currentU.toFixed(2);
+      vValSpan.innerText = currentV.toFixed(2);
+      updateRegime();
+    });
+
+    function updateRegime() {
+      // Delta = 8u³ + 27v²
+      const delta = 8.0 * Math.pow(currentU, 3) + 27.0 * Math.pow(currentV, 2);
+      discValSpan.innerText = `Δ = ${delta.toFixed(2)}`;
+      if (delta < -0.05) {
+        regimeBadge.className = 'badge badge-rose';
+        regimeBadge.innerText = 'BISTABLE';
+      } else if (Math.abs(delta) <= 0.05) {
+        regimeBadge.className = 'badge badge-amber';
+        regimeBadge.innerText = 'CUSP BOUNDARY';
+      } else {
+        regimeBadge.className = 'badge badge-green';
+        regimeBadge.innerText = 'MONOSTABLE';
+      }
+    }
+    updateRegime();
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. 2D CANVAS POTENTIAL DRAWING & SDE EVOLUTION
+    // ─────────────────────────────────────────────────────────────────────────
+    const potCanvas = document.getElementById('potential-canvas');
+    const ctx = potCanvas.getContext('2d');
+
+    function simulateStep(dt) {
+      // Gradient: dV/dx = 4x³ + 2ux + v
+      const grad = 4.0 * Math.pow(currentStateX, 3) + 2.0 * currentU * currentStateX + currentV;
+
+      let uRiccati = 0.0;
+      if (riccatiActive) {
+        // Pull towards optimal regenerative attractor (x ≈ -1.0)
+        uRiccati = - 2.5 * (currentStateX - (-1.0));
+      }
+
+      let dW = 0.0;
+      if (noiseActive) {
+        // Box-Muller normal noise
+        const r1 = Math.random();
+        const r2 = Math.random();
+        dW = Math.sqrt(-2.0 * Math.log(r1 + 1e-12)) * Math.cos(2.0 * Math.PI * r2) * Math.sqrt(dt) * 0.25;
+      }
+
+      currentStateX += (-grad + uRiccati) * dt + dW;
+      currentStateX = Math.max(-1.55, Math.min(1.55, currentStateX));
+
+      // Update 3D sphere marker
+      stateSphere.position.set(currentU * 2.0, currentStateX * 2.5, currentV * 1.2);
+      xStateSpan.innerText = currentStateX.toFixed(4);
+
+      if (currentStateX < -0.2) {
+        attractorStateBadge.className = 'badge badge-cyan';
+        attractorStateBadge.innerText = 'ATTRACTOR A (REST)';
+      } else if (currentStateX > 0.2) {
+        attractorStateBadge.className = 'badge badge-amber';
+        attractorStateBadge.innerText = 'ATTRACTOR B (AROUSAL)';
+      } else {
+        attractorStateBadge.className = 'badge badge-rose';
+        attractorStateBadge.innerText = 'SEPARATRIX CLIFF';
+      }
+    }
+
+    function drawPotentialCurve() {
+      ctx.clearRect(0, 0, potCanvas.width, potCanvas.height);
+
+      // Coordinate transforms
+      const w = potCanvas.width;
+      const h = potCanvas.height;
+      const xRange = [-1.6, 1.6];
+      const vRange = [-1.8, 3.2];
+
+      const toCanvasX = (x) => ((x - xRange[0]) / (xRange[1] - xRange[0])) * w;
+      const toCanvasY = (v) => h - ((v - vRange[0]) / (vRange[1] - vRange[0])) * h;
+
+      // Draw grid
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(toCanvasX(0), 0); ctx.lineTo(toCanvasX(0), h);
+      ctx.moveTo(0, toCanvasY(0)); ctx.lineTo(w, toCanvasY(0));
+      ctx.stroke();
+
+      // Draw curve V(x) = x⁴ + ux² + vx
+      ctx.beginPath();
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.5;
+
+      const steps = 120;
+      for (let i = 0; i <= steps; i++) {
+        const x = xRange[0] + (xRange[1] - xRange[0]) * (i / steps);
+        const v = Math.pow(x, 4) + currentU * Math.pow(x, 2) + currentV * x;
+        const cx = toCanvasX(x);
+        const cy = toCanvasY(v);
+        if (i === 0) ctx.moveTo(cx, cy);
+        else ctx.lineTo(cx, cy);
+      }
+      ctx.stroke();
+
+      // Draw current state ball on curve
+      const stateV = Math.pow(currentStateX, 4) + currentU * Math.pow(currentStateX, 2) + currentV * currentStateX;
+      const ballCX = toCanvasX(currentStateX);
+      const ballCY = toCanvasY(stateV);
+
+      ctx.beginPath();
+      ctx.arc(ballCX, ballCY, 7, 0, Math.PI * 2);
+      ctx.fillStyle = '#fbbf24';
+      ctx.shadowColor = '#fbbf24';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 5. ANIMATION LOOP
+    // ─────────────────────────────────────────────────────────────────────────
+    let lastTime = performance.now();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) / 1000.0, 0.05);
+      lastTime = now;
+
+      simulateStep(dt);
+      drawPotentialCurve();
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

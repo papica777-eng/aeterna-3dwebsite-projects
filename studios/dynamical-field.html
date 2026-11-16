@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETERNA // Quantum Particle Vector Field & Biomarker Core</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@300;400;500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Three.js + OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+
+  <style>
+    :root {
+      --bg-void: #010408;
+      --bg-hud: rgba(6, 11, 24, 0.85);
+      --border-hud: rgba(56, 189, 248, 0.16);
+      --border-glow: rgba(56, 189, 248, 0.50);
+      --neon-cyan: #38bdf8;
+      --neon-emerald: #10b981;
+      --neon-amber: #fbbf24;
+      --neon-rose: #f43f5e;
+      --neon-purple: #c084fc;
+      --text-main: #f0f6fc;
+      --text-muted: #8b949e;
+      --text-dim: #484f58;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Cybernetic Bar */
+    header {
+      height: 56px;
+      background: rgba(1, 4, 8, 0.94);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-hud);
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 50;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.9), 0 0 20px rgba(56, 189, 248, 0.08);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 900;
+      font-size: 1.12rem;
+      letter-spacing: 0.14em;
+      background: linear-gradient(135deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .badge-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.74rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(1.4); }
+    }
+
+    .badge-cyan { background: rgba(56, 189, 248, 0.12); color: var(--neon-cyan); border: 1px solid rgba(56, 189, 248, 0.35); }
+    .badge-rose { background: rgba(244, 63, 94, 0.12); color: var(--neon-rose); border: 1px solid rgba(244, 63, 94, 0.35); }
+    .badge-amber { background: rgba(251, 191, 36, 0.12); color: var(--neon-amber); border: 1px solid rgba(251, 191, 36, 0.35); }
+    .badge-green { background: rgba(16, 185, 129, 0.12); color: var(--neon-emerald); border: 1px solid rgba(16, 185, 129, 0.35); }
+
+    /* Workspace */
+    #workspace {
+      flex: 1;
+      position: relative;
+      display: grid;
+      grid-template-columns: 360px 1fr 440px;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+    }
+
+    #webgl-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* HUD Panels */
+    .hud-panel {
+      z-index: 10;
+      background: var(--bg-hud);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid var(--border-hud);
+      border-radius: 16px;
+      padding: 18px 20px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), inset 0 0 20px rgba(56, 189, 248, 0.03);
+      margin: 14px;
+      overflow-y: auto;
+      max-height: calc(100vh - 84px);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .hud-panel::-webkit-scrollbar { width: 3px; }
+    .hud-panel::-webkit-scrollbar-thumb { background: var(--border-hud); border-radius: 3px; }
+
+    .panel-header {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.80rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-hud);
+      padding-bottom: 8px;
+    }
+
+    .control-row {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .control-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.80rem;
+    }
+
+    .control-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      color: var(--neon-cyan);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      height: 5px;
+      background: #10192c;
+      border-radius: 3px;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      box-shadow: 0 0 12px var(--neon-cyan);
+      transition: transform 0.1s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.3);
+    }
+
+    /* Preset Grid */
+    .preset-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .preset-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-hud);
+      color: var(--text-muted);
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+      background: rgba(56, 189, 248, 0.08);
+      border-color: var(--border-glow);
+      color: var(--text-main);
+    }
+
+    .preset-btn.active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--neon-cyan);
+      color: var(--neon-cyan);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+    }
+
+    /* Holographic Card Container */
+    .holo-card {
+      background: rgba(2, 6, 16, 0.90);
+      border: 1px solid var(--border-hud);
+      border-radius: 12px;
+      padding: 12px 14px;
+      position: relative;
+      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .holo-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+
+    .holo-title {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+    }
+
+    .holo-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    canvas.ecg-canvas {
+      width: 100%;
+      height: 60px;
+      display: block;
+      border-radius: 6px;
+    }
+
+    /* 2D Clean Double-Well HUD Window */
+    #section-canvas-2d {
+      width: 100%;
+      height: 180px;
+      background: #01040a;
+      border-radius: 8px;
+      border: 1px solid var(--border-hud);
+      display: block;
+    }
+
+    /* 2D Pad */
+    #pad-canvas {
+      width: 100%;
+      height: 100px;
+      background: #01040a;
+      border-radius: 8px;
+      border: 1px solid var(--border-hud);
+      display: block;
+      cursor: crosshair;
+    }
+
+    /* Camera mode floating controls */
+    #camera-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex;
+      gap: 8px;
+      background: var(--bg-hud);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-hud);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.85);
+    }
+
+    .cam-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 5px 12px;
+      font-size: 0.74rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 9999px;
+      transition: all 0.2s;
+    }
+
+    .cam-btn:hover {
+      color: var(--neon-cyan);
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .cam-btn.active {
+      background: rgba(56, 189, 248, 0.2);
+      color: var(--neon-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Cybernetic Header -->
+  <header>
+    <div class="brand-group">
+      <div class="brand-title">🔱 AETERNA // QUANTUM VECTOR FLUX STUDIO</div>
+      <div class="badge-pill badge-cyan">
+        <span class="pulse-dot"></span>
+        <span>6,000 Particle Stream | Bio-Quantum Core (SCI = 0.2314)</span>
+      </div>
+    </div>
+    
+    <div class="brand-group">
+      <div id="formula-latex" style="font-size: 0.90rem;"></div>
+      <div class="badge-pill badge-amber" id="regime-tag">BISTABLE ATTRACTOR LOCK</div>
+    </div>
+  </header>
+
+  <!-- Workspace Layout -->
+  <div id="workspace">
+    
+    <!-- Left Panel: Stress Gradient & Vector Flux Knobs -->
+    <div class="hud-panel" style="grid-column: 1;">
+      <div class="panel-header">
+        <span>Контролна равнина (u, v)</span>
+        <span style="font-size: 0.70rem; color: var(--neon-cyan);">Bifurcation Set</span>
+      </div>
+
+      <!-- 2D Pad -->
+      <div class="control-row">
+        <div class="control-meta">
+          <span>Бифуркационен пад (Δ = 8u³ + 27v²):</span>
+        </div>
+        <canvas id="pad-canvas" width="320" height="100"></canvas>
+      </div>
+
+      <!-- Splitting Factor u -->
+      <div class="control-row">
+        <div class="control-meta">
+          <span>Разцепващ фактор u (Splitting Control):</span>
+          <span class="control-val" id="u-display">-2.000</span>
+        </div>
+        <input type="range" id="slider-u" min="-3.0" max="1.5" step="0.01" value="-2.0">
+      </div>
+
+      <!-- Normal Factor v -->
+      <div class="control-row">
+        <div class="control-meta">
+          <span>Нормален фактор v (Asymmetry / Стрес):</span>
+          <span class="control-val" id="v-display">0.000</span>
+        </div>
+        <input type="range" id="slider-v" min="-2.0" max="2.0" step="0.01" value="0.0">
+      </div>
+
+      <!-- Presets -->
+      <div class="panel-header" style="margin-top: 4px;">
+        <span>Канонични състояния</span>
+      </div>
+      <div class="preset-grid">
+        <button class="preset-btn active" onclick="setPreset(-2.0, 0.0)">
+          <div style="font-weight: 700; color: var(--neon-cyan);">Симетричен лок</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted);">u = -2.0, v = 0.0</div>
+        </button>
+        <button class="preset-btn" onclick="setPreset(-2.0, 0.85)">
+          <div style="font-weight: 700; color: var(--neon-rose);">Катастрофичен скок</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted);">u = -2.0, v = +0.85</div>
+        </button>
+        <button class="preset-btn" onclick="setPreset(0.0, 0.0)">
+          <div style="font-weight: 700; color: var(--neon-amber);">Cusp сингулярност</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted);">u = 0.0, v = 0.0</div>
+        </button>
+        <button class="preset-btn" onclick="setPreset(1.2, 0.0)">
+          <div style="font-weight: 700; color: var(--neon-emerald);">Моностабилен кладенец</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted);">u = +1.2, v = 0.0</div>
+        </button>
+      </div>
+
+      <!-- Particle Speed & Density -->
+      <div class="control-row" style="margin-top: 4px;">
+        <div class="control-meta">
+          <span>Скорост на лазерния поток (Particle Flux):</span>
+          <span class="control-val" id="flux-display">1.00x</span>
+        </div>
+        <input type="range" id="slider-flux" min="0.2" max="3.0" step="0.1" value="1.0">
+      </div>
+
+      <!-- Controls -->
+      <div class="preset-grid" style="margin-top: 6px;">
+        <button class="preset-btn active" id="btn-riccati-toggle" onclick="toggleRiccati()">
+          <div style="font-weight: 700;">🛡️ Riccati LQR</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted);">Стабилизация</div>
+        </button>
+        <button class="preset-btn" onclick="perturbSystem()">
+          <div style="font-weight: 700;">⚡ Импулсен шок</div>
+          <div style="font-size: 0.65rem; color: var(--text-muted);">δx = +0.85</div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Center 3D Space (No Mesh! Pure Vector Particle Stream + Bio-Quantum Core) -->
+    <div id="webgl-container"></div>
+
+    <!-- Right Panel: Holographic HUD & Large Clean 2D Double-Well Window -->
+    <div class="hud-panel" style="grid-column: 3;">
+      <div class="panel-header">
+        <span>Чисто 2D Динамично сечение V(x)</span>
+        <span style="font-size: 0.70rem; color: var(--neon-amber);">Double-Well Track</span>
+      </div>
+
+      <!-- Large Clean 2D Potential Window -->
+      <div class="holo-card" style="padding: 10px;">
+        <canvas id="section-canvas-2d" width="380" height="180"></canvas>
+        <div style="display: flex; justify-content: space-between; font-size: 0.76rem; margin-top: 8px; font-family: 'JetBrains Mono';">
+          <span style="color: var(--text-muted);">Падина A: <strong style="color: var(--neon-cyan);" id="pot-mina">-1.000</strong></span>
+          <span style="color: var(--text-muted);">Сепаратриса: <strong style="color: var(--neon-rose);" id="pot-sep">0.000</strong></span>
+          <span style="color: var(--text-muted);">Падина B: <strong style="color: var(--neon-amber);" id="pot-minb">+1.000</strong></span>
+        </div>
+      </div>
+
+      <div class="panel-header" style="margin-top: 4px;">
+        <span>Холографски монитори</span>
+        <span style="font-size: 0.70rem; color: var(--neon-emerald);">45.57 Hz Wave</span>
+      </div>
+
+      <!-- Holographic Wave 1: Tissue Regeneration ECG -->
+      <div class="holo-card">
+        <div class="holo-header">
+          <span class="holo-title">Тъканна регенерация (HPA Axis)</span>
+          <span class="holo-val" style="color: var(--neon-emerald);">0.8825</span>
+        </div>
+        <canvas id="ecg-canvas-1" class="ecg-canvas"></canvas>
+      </div>
+
+      <!-- Holographic Wave 2: Cognitive Hyperlucidity Wave -->
+      <div class="holo-card">
+        <div class="holo-header">
+          <span class="holo-title">Когнитивна хиперлуцидност (144 Hz)</span>
+          <span class="holo-val" style="color: var(--neon-purple);">0.8050</span>
+        </div>
+        <canvas id="ecg-canvas-2" class="ecg-canvas"></canvas>
+      </div>
+
+      <!-- Status Footer -->
+      <div style="display: flex; justify-content: space-between; font-size: 0.80rem; padding: 6px 10px; background: rgba(56, 189, 248, 0.06); border-radius: 8px; border: 1px solid var(--border-hud);">
+        <span style="color: var(--text-muted);">Суверенен индекс (SCI):</span>
+        <span style="font-family: 'JetBrains Mono'; font-weight: 700; color: var(--neon-cyan);">0.231403 (Locked)</span>
+      </div>
+    </div>
+
+    <!-- Floating Camera View Buttons -->
+    <div id="camera-controls">
+      <button class="cam-btn active" onclick="setCameraMode('iso')">Изометричен</button>
+      <button class="cam-btn" onclick="setCameraMode('top')">Поглед отгоре</button>
+      <button class="cam-btn" onclick="setCameraMode('side')">Страничен поток</button>
+    </div>
+
+  </div>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────────────────
+    // 1. GLOBAL STATE & KA-TEX
+    // ─────────────────────────────────────────────────────────────────────────
+    const state = {
+      u: -2.0,
+      v: 0.0,
+      x: -1.0,
+      v_dot: 0.0,
+      gamma: 0.35,
+      noise: 0.15,
+      fluxSpeed: 1.0,
+      riccati: true,
+      sci: 0.231403,
+      time: 0.0
+    };
+
+    katex.render("V(x; u, v) = x^4 + ux^2 + vx", document.getElementById('formula-latex'), {
+      throwOnError: false
+    });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 2. THREE.JS IMMERSIVE VECTOR PARTICLE STREAM & BIO-QUANTUM CORE
+    // ─────────────────────────────────────────────────────────────────────────
+    const container = document.getElementById('webgl-container');
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x010408);
+    scene.fog = new THREE.FogExp2(0x010408, 0.020);
+
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(-12, 11, 18);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.4;
+    container.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 50;
+    controls.minDistance = 4;
+
+    // Advanced Lighting
+    const ambientLight = new THREE.AmbientLight(0x0a1428, 2.8);
+    scene.add(ambientLight);
+
+    const coreLight = new THREE.PointLight(0x38bdf8, 6.0, 45);
+    coreLight.position.set(0, 0, 0);
+    scene.add(coreLight);
+
+    // Subtle Deep Grid Floor
+    const grid = new THREE.GridHelper(40, 80, 0x16233d, 0x060c18);
+    grid.position.y = -5.0;
+    scene.add(grid);
+
+    // Custom Glowing Particle Texture
+    function createGlowTexture() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
+      grad.addColorStop(0.2, 'rgba(56, 189, 248, 0.95)');
+      grad.addColorStop(0.5, 'rgba(56, 189, 248, 0.30)');
+      grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(canvas);
+    }
+    const glowTex = createGlowTexture();
+
+    // ── 1. Dynamic Vector Field (6,000 Streaming Laser Particles) ───────────
+    const NUM_STREAM_PARTICLES = 6000;
+    const streamGeom = new THREE.BufferGeometry();
+    const streamPositions = new Float32Array(NUM_STREAM_PARTICLES * 3);
+    const streamColors = new Float32Array(NUM_STREAM_PARTICLES * 3);
+    const streamParticles = [];
+
+    for (let i = 0; i < NUM_STREAM_PARTICLES; i++) {
+      const pX = -18.0 + Math.random() * 36.0;
+      const pY = -4.0 + Math.random() * 8.0;
+      const pZ = -14.0 + Math.random() * 28.0;
+
+      streamParticles.push({
+        x: pX,
+        y: pY,
+        z: pZ,
+        vx: 0,
+        vy: 0,
+        vz: 0,
+        life: Math.random() * 160 + 40
+      });
+
+      streamPositions[i * 3] = pX;
+      streamPositions[i * 3 + 1] = pY;
+      streamPositions[i * 3 + 2] = pZ;
+
+      streamColors[i * 3] = 0.22;
+      streamColors[i * 3 + 1] = 0.74;
+      streamColors[i * 3 + 2] = 0.98;
+    }
+
+    streamGeom.setAttribute('position', new THREE.BufferAttribute(streamPositions, 3));
+    streamGeom.setAttribute('color', new THREE.BufferAttribute(streamColors, 3));
+
+    const streamMat = new THREE.PointsMaterial({
+      size: 0.28,
+      vertexColors: true,
+      map: glowTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false
+    });
+    const streamField = new THREE.Points(streamGeom, streamMat);
+    scene.add(streamField);
+
+    // ── 2. Central Bio-Quantum Core (1,400 Particle Morphing Orb) ────────────
+    const NUM_CORE_POINTS = 1400;
+    const coreGeom = new THREE.BufferGeometry();
+    const corePositions = new Float32Array(NUM_CORE_POINTS * 3);
+    const coreColors = new Float32Array(NUM_CORE_POINTS * 3);
+    const coreBasePoints = [];
+
+    // Fibonacci Sphere Distribution
+    const phi = Math.PI * (3.0 - Math.sqrt(5.0)); // Golden ratio angle
+    for (let i = 0; i < NUM_CORE_POINTS; i++) {
+      const y = 1.0 - (i / (NUM_CORE_POINTS - 1)) * 2.0; // [-1, 1]
+      const radiusAtY = Math.sqrt(1.0 - y * y);
+      const theta = phi * i;
+
+      const x = Math.cos(theta) * radiusAtY;
+      const z = Math.sin(theta) * radiusAtY;
+
+      coreBasePoints.push({ x, y, z, baseR: 1.4 });
+
+      corePositions[i * 3] = x * 1.4;
+      corePositions[i * 3 + 1] = y * 1.4;
+      corePositions[i * 3 + 2] = z * 1.4;
+
+      coreColors[i * 3] = 0.22;
+      coreColors[i * 3 + 1] = 0.74;
+      coreColors[i * 3 + 2] = 0.98;
+    }
+
+    coreGeom.setAttribute('position', new THREE.BufferAttribute(corePositions, 3));
+    coreGeom.setAttribute('color', new THREE.BufferAttribute(coreColors, 3));
+
+    const coreMat = new THREE.PointsMaterial({
+      size: 0.36,
+      vertexColors: true,
+      map: glowTex,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false
+    });
+    const coreParticleSphere = new THREE.Points(coreGeom, coreMat);
+    scene.add(coreParticleSphere);
+
+    // Inner Glowing Solid Orb
+    const innerOrbGeom = new THREE.SphereGeometry(0.70, 32, 32);
+    const innerOrbMat = new THREE.MeshStandardMaterial({
+      color: 0x38bdf8,
+      emissive: 0x38bdf8,
+      emissiveIntensity: 1.4,
+      roughness: 0.1
+    });
+    const innerOrb = new THREE.Mesh(innerOrbGeom, innerOrbMat);
+    scene.add(innerOrb);
+
+    // Concentric Quantum Rings
+    const ringGeom = new THREE.RingGeometry(1.6, 1.72, 64);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, side: THREE.DoubleSide, transparent: true, opacity: 0.5, blending: THREE.AdditiveBlending });
+    const ring1 = new THREE.Mesh(ringGeom, ringMat);
+    ring1.rotation.x = Math.PI / 2;
+    scene.add(ring1);
+
+    const ring2 = new THREE.Mesh(ringGeom, ringMat.clone());
+    ring2.rotation.y = Math.PI / 3;
+    scene.add(ring2);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 3. RK4 PHYSICS & DYNAMIC MORPHING LOGIC
+    // ─────────────────────────────────────────────────────────────────────────
+    function getGradient(x, u, v) {
+      return 4.0 * Math.pow(x, 3) + 2.0 * u * x + v;
+    }
+
+    function rk4Physics(dt) {
+      state.time += dt;
+      const u = state.u;
+      const v = state.v;
+      const gamma = state.gamma;
+
+      const f = (x, v_dot) => {
+        const grad = getGradient(x, u, v);
+        const uCtrl = state.riccati ? -2.8 * (x - (-1.0)) : 0.0;
+        return -gamma * v_dot - grad + uCtrl;
+      };
+
+      const x0 = state.x;
+      const v0 = state.v_dot;
+
+      const k1_x = v0;
+      const k1_v = f(x0, v0);
+
+      const k2_x = v0 + 0.5 * dt * k1_v;
+      const k2_v = f(x0 + 0.5 * dt * k1_x, v0 + 0.5 * dt * k1_v);
+
+      const k3_x = v0 + 0.5 * dt * k2_v;
+      const k3_v = f(x0 + 0.5 * dt * k2_x, v0 + 0.5 * dt * k2_v);
+
+      const k4_x = v0 + dt * k3_v;
+      const k4_v = f(x0 + dt * k3_x, v0 + dt * k3_v);
+
+      state.x += (dt / 6.0) * (k1_x + 2 * k2_x + 2 * k3_x + k4_x);
+      state.v_dot += (dt / 6.0) * (k1_v + 2 * k2_v + 2 * k3_v + k4_v);
+
+      if (state.noise > 0) {
+        state.x += (Math.random() - 0.5) * 2.0 * Math.sqrt(dt) * state.noise;
+      }
+      state.x = Math.max(-1.58, Math.min(1.58, state.x));
+
+      // ── Stream Particle Advection (Fluid Gradient Flux across the screen) ───
+      const gradForce = -getGradient(state.x, state.u, state.v); // Directional flux
+      const sPos = streamGeom.attributes.position.array;
+      const sCol = streamGeom.attributes.color.array;
+      const flux = state.fluxSpeed;
+
+      for (let i = 0; i < NUM_STREAM_PARTICLES; i++) {
+        const p = streamParticles[i];
+        
+        // Fluid flow: drift horizontally along X/Z driven by gradForce
+        p.vx = gradForce * 0.045 * flux + (Math.sin(state.time * 2.0 + p.z * 0.3) * 0.02);
+        p.vz = Math.cos(state.time * 1.5 + p.x * 0.3) * 0.03 * flux;
+        p.vy = Math.sin(p.x * 0.5 + state.time) * 0.01;
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.z += p.vz;
+        p.life -= 1;
+
+        sPos[i * 3] = p.x;
+        sPos[i * 3 + 1] = p.y;
+        sPos[i * 3 + 2] = p.z;
+
+        // Color based on force intensity
+        const intensity = Math.min(1.0, Math.abs(gradForce) * 0.4);
+        sCol[i * 3] = 0.22 + intensity * 0.70;
+        sCol[i * 3 + 1] = 0.74 - intensity * 0.40;
+        sCol[i * 3 + 2] = 0.98 - intensity * 0.60;
+
+        // Recycle out-of-bounds particles
+        if (p.life <= 0 || p.x > 18.0 || p.x < -18.0 || p.z > 14.0 || p.z < -14.0) {
+          p.x = gradForce > 0 ? -18.0 + Math.random() * 4.0 : 18.0 - Math.random() * 4.0;
+          p.y = -4.0 + Math.random() * 8.0;
+          p.z = -14.0 + Math.random() * 28.0;
+          p.life = 100 + Math.random() * 80;
+        }
+      }
+      streamGeom.attributes.position.needsUpdate = true;
+      streamGeom.attributes.color.needsUpdate = true;
+
+      // ── Morphing Central Bio-Quantum Core (The Core) ────────────────────────
+      // Calculate distance to separatrix (x = 0 for symmetric or middle root)
+      const hessian = 12.0 * state.x * state.x + 2.0 * state.u;
+      const isNearSeparatrix = hessian < 0.15 || Math.abs(state.x) < 0.30;
+      const stressRatio = isNearSeparatrix ? Math.min(1.0, (0.35 - Math.abs(state.x)) / 0.35 + 0.3) : 0.0;
+
+      const cPos = coreGeom.attributes.position.array;
+      const cCol = coreGeom.attributes.color.array;
+
+      for (let i = 0; i < NUM_CORE_POINTS; i++) {
+        const bp = coreBasePoints[i];
+        
+        // Asymmetric wobble deformation & quantum glitch if near separatrix
+        let wobble = 0.0;
+        if (stressRatio > 0.05) {
+          // Glitch / turbulent asymmetry
+          wobble = Math.sin(5.0 * bp.x + state.time * 8.0) * Math.cos(4.0 * bp.y + state.time * 6.0) * (0.35 * stressRatio);
+          if (Math.random() < 0.08 * stressRatio) {
+            wobble += (Math.random() - 0.5) * 0.45; // Quantum glitch jitter
+          }
+        } else {
+          // Pure harmonic breathing based on SCI = 0.2314
+          wobble = Math.sin(state.time * 4.5) * 0.08 * (state.sci / 0.2314);
+        }
+
+        const r = bp.baseR * (1.0 + wobble);
+        cPos[i * 3] = bp.x * r;
+        cPos[i * 3 + 1] = bp.y * r;
+        cPos[i * 3 + 2] = bp.z * r;
+
+        // Color transition: Deep Neon Cyan (0.22, 0.74, 0.98) -> Fiery Warning Red (0.96, 0.25, 0.37)
+        cCol[i * 3] = 0.22 * (1.0 - stressRatio) + 0.96 * stressRatio;
+        cCol[i * 3 + 1] = 0.74 * (1.0 - stressRatio) + 0.25 * stressRatio;
+        cCol[i * 3 + 2] = 0.98 * (1.0 - stressRatio) + 0.37 * stressRatio;
+      }
+      coreGeom.attributes.position.needsUpdate = true;
+      coreGeom.attributes.color.needsUpdate = true;
+
+      // Rotate and color rings
+      ring1.rotation.z += 0.02;
+      ring2.rotation.x += 0.015;
+      const coreColor = isNearSeparatrix ? new THREE.Color(0xf43f5e) : new THREE.Color(0x38bdf8);
+      innerOrbMat.color.copy(coreColor);
+      innerOrbMat.emissive.copy(coreColor);
+      coreLight.color.copy(coreColor);
+      ringMat.color.copy(coreColor);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 4. HOLOGRAPHIC WAVE MONITORS
+    // ─────────────────────────────────────────────────────────────────────────
+    const ecg1 = document.getElementById('ecg-canvas-1');
+    const ctx1 = ecg1.getContext('2d');
+
+    const ecg2 = document.getElementById('ecg-canvas-2');
+    const ctx2 = ecg2.getContext('2d');
+
+    let ecgPhase1 = 0;
+    let ecgPhase2 = 0;
+    const waveHistory1 = new Array(120).fill(0);
+    const waveHistory2 = new Array(120).fill(0);
+
+    function drawHolographicWaves() {
+      // 1. Tissue Regeneration ECG Pulse (0.8825)
+      ecg1.width = ecg1.clientWidth * 2;
+      ecg1.height = ecg1.clientHeight * 2;
+      const w1 = ecg1.width, h1 = ecg1.height;
+      ctx1.clearRect(0, 0, w1, h1);
+
+      ecgPhase1 += 0.08;
+      const p1 = ecgPhase1 % (2 * Math.PI);
+      let spike = 0;
+      if (p1 > 1.8 && p1 < 2.2) spike = Math.sin((p1 - 1.8) * Math.PI / 0.4) * 0.85;
+      else spike = Math.sin(p1 * 3.0) * 0.12;
+
+      waveHistory1.push(spike * 0.8825);
+      if (waveHistory1.length > 120) waveHistory1.shift();
+
+      ctx1.strokeStyle = '#10b981';
+      ctx1.lineWidth = 2.5;
+      ctx1.shadowColor = '#10b981';
+      ctx1.shadowBlur = 10;
+      ctx1.beginPath();
+      for (let i = 0; i < waveHistory1.length; i++) {
+        const x = (i / 120) * w1;
+        const y = h1 / 2 - waveHistory1[i] * (h1 * 0.45);
+        if (i === 0) ctx1.moveTo(x, y);
+        else ctx1.lineTo(x, y);
+      }
+      ctx1.stroke();
+      ctx1.shadowBlur = 0;
+
+      // 2. Cognitive Hyperlucidity (0.8050)
+      ecg2.width = ecg2.clientWidth * 2;
+      ecg2.height = ecg2.clientHeight * 2;
+      const w2 = ecg2.width, h2 = ecg2.height;
+      ctx2.clearRect(0, 0, w2, h2);
+
+      ecgPhase2 += 0.14;
+      const synth2 = 0.5 * Math.sin(ecgPhase2 * 2.2) + 0.3 * Math.sin(ecgPhase2 * 4.4) + 0.2 * Math.sin(ecgPhase2 * 8.8);
+      waveHistory2.push(synth2 * 0.8050);
+      if (waveHistory2.length > 120) waveHistory2.shift();
+
+      ctx2.strokeStyle = '#c084fc';
+      ctx2.lineWidth = 2.5;
+      ctx2.shadowColor = '#c084fc';
+      ctx2.shadowBlur = 10;
+      ctx2.beginPath();
+      for (let i = 0; i < waveHistory2.length; i++) {
+        const x = (i / 120) * w2;
+        const y = h2 / 2 - waveHistory2[i] * (h2 * 0.42);
+        if (i === 0) ctx2.moveTo(x, y);
+        else ctx2.lineTo(x, y);
+      }
+      ctx2.stroke();
+      ctx2.shadowBlur = 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 5. LARGE CLEAN 2D DOUBLE-WELL POTENTIAL HUD WINDOW
+    // ─────────────────────────────────────────────────────────────────────────
+    const sCanvas = document.getElementById('section-canvas-2d');
+    const sCtx = sCanvas.getContext('2d');
+
+    const padCanvas = document.getElementById('pad-canvas');
+    const padCtx = padCanvas.getContext('2d');
+
+    function drawClean2DDoubleWell() {
+      sCanvas.width = sCanvas.clientWidth * 2;
+      sCanvas.height = sCanvas.clientHeight * 2;
+      const sw = sCanvas.width, sh = sCanvas.height;
+
+      sCtx.clearRect(0, 0, sw, sh);
+
+      // Coordinate System: x in [-1.6, 1.6], V in [-1.6, 2.4]
+      const xMin = -1.6, xMax = 1.6;
+      const vMin = -1.6, vMax = 2.4;
+      const toX = (x) => ((x - xMin) / (xMax - xMin)) * sw;
+      const toY = (v) => sh - ((v - vMin) / (vMax - vMin)) * sh;
+
+      // Coordinate Grid Lines
+      sCtx.strokeStyle = '#10192c';
+      sCtx.lineWidth = 1.5;
+      sCtx.beginPath();
+      sCtx.moveTo(0, toY(0)); sCtx.lineTo(sw, toY(0));
+      sCtx.moveTo(toX(0), 0); sCtx.lineTo(toX(0), sh);
+      sCtx.stroke();
+
+      // Potential Curve V(x) = x⁴ + ux² + vx with glowing gradient fill
+      sCtx.beginPath();
+      for (let i = 0; i <= sw; i += 2) {
+        const x = xMin + (xMax - xMin) * (i / sw);
+        const v = Math.pow(x, 4) + state.u * Math.pow(x, 2) + state.v * x;
+        const cy = toY(v);
+        if (i === 0) sCtx.moveTo(i, cy);
+        else sCtx.lineTo(i, cy);
+      }
+      sCtx.strokeStyle = '#38bdf8';
+      sCtx.lineWidth = 3.5;
+      sCtx.shadowColor = '#38bdf8';
+      sCtx.shadowBlur = 14;
+      sCtx.stroke();
+      sCtx.shadowBlur = 0;
+
+      // Draw Laser Beacon of Current State x(t)
+      const curV = Math.pow(state.x, 4) + state.u * Math.pow(state.x, 2) + state.v * state.x;
+      const bx = toX(state.x);
+      const by = toY(curV);
+
+      // Vertical Laser Guide
+      sCtx.strokeStyle = 'rgba(251, 191, 36, 0.4)';
+      sCtx.lineWidth = 1.5;
+      sCtx.setLineDash([4, 4]);
+      sCtx.beginPath();
+      sCtx.moveTo(bx, 0); sCtx.lineTo(bx, sh);
+      sCtx.stroke();
+      sCtx.setLineDash([]);
+
+      // Laser State Marker (Glowing Diamond / Circle)
+      sCtx.beginPath();
+      sCtx.arc(bx, by, 9, 0, Math.PI * 2);
+      sCtx.fillStyle = '#fbbf24';
+      sCtx.shadowColor = '#fbbf24';
+      sCtx.shadowBlur = 18;
+      sCtx.fill();
+      sCtx.shadowBlur = 0;
+
+      // Minima and Separatrix readouts
+      if (state.u < 0) {
+        const xA = -Math.sqrt(-state.u / 2.0);
+        const xB = Math.sqrt(-state.u / 2.0);
+        document.getElementById('pot-mina').innerText = xA.toFixed(3);
+        document.getElementById('pot-minb').innerText = xB.toFixed(3);
+        document.getElementById('pot-sep').innerText = "0.000 (КРИТИЧЕН)";
+      } else {
+        document.getElementById('pot-mina').innerText = "0.000";
+        document.getElementById('pot-minb').innerText = "N/A";
+        document.getElementById('pot-sep').innerText = "N/A";
+      }
+
+      // ── 2D Parameter Pad ───────────────────────────────────────────────────
+      padCanvas.width = padCanvas.clientWidth * 2;
+      padCanvas.height = padCanvas.clientHeight * 2;
+      const pw = padCanvas.width, ph = padCanvas.height;
+
+      padCtx.clearRect(0, 0, pw, ph);
+
+      // Cusp curve Δ = 0 => v = ± sqrt(-8u³/27)
+      padCtx.beginPath();
+      padCtx.strokeStyle = '#fbbf24';
+      padCtx.lineWidth = 2.5;
+      for (let u = -3.0; u <= 0.0; u += 0.02) {
+        const vP = Math.sqrt(-8.0 * Math.pow(u, 3) / 27.0);
+        const cx = ((u + 3.0) / 4.5) * pw;
+        const cy = ph / 2 - (vP / 2.0) * (ph / 2);
+        if (u === -3.0) padCtx.moveTo(cx, cy);
+        else padCtx.lineTo(cx, cy);
+      }
+      for (let u = 0.0; u >= -3.0; u -= 0.02) {
+        const vN = -Math.sqrt(-8.0 * Math.pow(u, 3) / 27.0);
+        const cx = ((u + 3.0) / 4.5) * pw;
+        const cy = ph / 2 - (vN / 2.0) * (ph / 2);
+        padCtx.lineTo(cx, cy);
+      }
+      padCtx.fillStyle = 'rgba(56, 189, 248, 0.12)';
+      padCtx.fill();
+      padCtx.stroke();
+
+      // Current (u, v) point
+      const curUX = ((state.u + 3.0) / 4.5) * pw;
+      const curVY = ph / 2 - (state.v / 2.0) * (ph / 2);
+      padCtx.beginPath();
+      padCtx.arc(curUX, curVY, 8, 0, Math.PI * 2);
+      padCtx.fillStyle = '#38bdf8';
+      padCtx.shadowColor = '#38bdf8';
+      padCtx.shadowBlur = 12;
+      padCtx.fill();
+      padCtx.shadowBlur = 0;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 6. CONTROLS & LISTENERS
+    // ─────────────────────────────────────────────────────────────────────────
+    document.getElementById('slider-u').addEventListener('input', (e) => {
+      state.u = parseFloat(e.target.value);
+      updateTelemetry();
+    });
+
+    document.getElementById('slider-v').addEventListener('input', (e) => {
+      state.v = parseFloat(e.target.value);
+      updateTelemetry();
+    });
+
+    document.getElementById('slider-flux').addEventListener('input', (e) => {
+      state.fluxSpeed = parseFloat(e.target.value);
+      document.getElementById('flux-display').innerText = `${state.fluxSpeed.toFixed(1)}x`;
+    });
+
+    function setPreset(u, v) {
+      state.u = u;
+      state.v = v;
+      document.getElementById('slider-u').value = u;
+      document.getElementById('slider-v').value = v;
+
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      event.currentTarget.classList.add('active');
+      updateTelemetry();
+    }
+
+    function toggleRiccati() {
+      state.riccati = !state.riccati;
+      document.getElementById('btn-riccati-toggle').classList.toggle('active', state.riccati);
+    }
+
+    function perturbSystem() {
+      state.x += 0.85;
+      state.v_dot += 1.4;
+    }
+
+    function setCameraMode(mode) {
+      document.querySelectorAll('.cam-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (mode === 'iso') camera.position.set(-12, 11, 18);
+      else if (mode === 'top') camera.position.set(0, 26, 0);
+      else if (mode === 'side') camera.position.set(24, 2, 0);
+      controls.target.set(0, 0, 0);
+    }
+
+    function updateTelemetry() {
+      document.getElementById('u-display').innerText = state.u.toFixed(3);
+      document.getElementById('v-display').innerText = state.v.toFixed(3);
+
+      const delta = 8.0 * Math.pow(state.u, 3) + 27.0 * Math.pow(state.v, 2);
+      const tag = document.getElementById('regime-tag');
+      if (delta < -0.05) {
+        tag.className = 'badge-pill badge-amber';
+        tag.innerText = 'BISTABLE ATTRACTOR LOCK (Δ < 0)';
+      } else if (Math.abs(delta) <= 0.05) {
+        tag.className = 'badge-pill badge-rose';
+        tag.innerText = 'CUSP BIFURCATION (Δ = 0)';
+      } else {
+        tag.className = 'badge-pill badge-green';
+        tag.innerText = 'MONOSTABLE WELL (Δ > 0)';
+      }
+    }
+
+    // Pad Drag
+    const pad = document.getElementById('pad-canvas');
+    let isDraggingPad = false;
+    function handlePad(e) {
+      const rect = pad.getBoundingClientRect();
+      const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+      const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+      const px = Math.max(0, Math.min(rect.width, clientX - rect.left)) / rect.width;
+      const py = Math.max(0, Math.min(rect.height, clientY - rect.top)) / rect.height;
+
+      state.u = -3.0 + px * 4.5;
+      state.v = 2.0 - py * 4.0;
+      document.getElementById('slider-u').value = state.u;
+      document.getElementById('slider-v').value = state.v;
+      updateTelemetry();
+    }
+    pad.addEventListener('mousedown', (e) => { isDraggingPad = true; handlePad(e); });
+    window.addEventListener('mousemove', (e) => { if (isDraggingPad) handlePad(e); });
+    window.addEventListener('mouseup', () => { isDraggingPad = false; });
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // 7. MAIN 60 FPS ANIMATION LOOP
+    // ─────────────────────────────────────────────────────────────────────────
+    let lastTime = performance.now();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const now = performance.now();
+      const dt = Math.min((now - lastTime) / 1000.0, 0.04);
+      lastTime = now;
+
+      rk4Physics(dt);
+      drawHolographicWaves();
+      drawClean2DDoubleWell();
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+
+    updateTelemetry();
+    animate();
+  </script>
+</body>
+</html>

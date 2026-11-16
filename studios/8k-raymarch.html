@@ -1,0 +1,1749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>AETERNA // 8K DCI QUANTUM MANIFOLD &amp; KINTSUGI STUDIO</title>
+  <meta name="description" content="AETERNA Multi-Pass WebGL2 HDR Raymarcher: Anamorphic Bloom, FXAA, 4x RGSS Tiled 8K PNG Export, and 5 Sovereign Manifolds">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=JetBrains+Mono:wght@400;600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #010204;
+      color: #e2e8f0;
+      font-family: 'Rajdhani', system-ui, -apple-system, sans-serif;
+    }
+    #canvas-container {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+      touch-action: none;
+    }
+    canvas:active {
+      cursor: grabbing;
+    }
+    .hud-layer {
+      position: absolute;
+      inset: 0;
+      z-index: 10;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 26px;
+    }
+    .hud-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hud-card {
+      background: rgba(3, 7, 18, 0.86);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 215, 0, 0.36);
+      border-radius: 8px;
+      padding: 14px 20px;
+      box-shadow: 0 12px 42px rgba(0, 0, 0, 0.85), 0 0 28px rgba(255, 215, 0, 0.12);
+      pointer-events: auto;
+    }
+    .brand-title {
+      font-family: 'Cinzel', Georgia, serif;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1.5px;
+      background: linear-gradient(135deg, #ffd700, #ffffff, #00f3ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 9px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 9px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+    }
+    .badge-gold { background: rgba(255, 215, 0, 0.16); color: #ffd700; border: 1px solid rgba(255, 215, 0, 0.45); }
+    .badge-cyan { background: rgba(0, 243, 255, 0.15); color: #00f3ff; border: 1px solid rgba(0, 243, 255, 0.45); }
+    .badge-green { background: rgba(16, 185, 129, 0.16); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.45); }
+
+    .manifold-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .manifold-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+    .manifold-btn:hover {
+      border-color: #00f3ff;
+      color: #ffffff;
+    }
+    .manifold-btn.active {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(0, 243, 255, 0.22));
+      border-color: #ffd700;
+      color: #ffd700;
+      box-shadow: 0 0 14px rgba(255, 215, 0, 0.3);
+    }
+
+    .telemetry-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 18px;
+      margin-top: 10px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+    }
+    .telemetry-item span.label { color: #64748b; font-size: 9px; letter-spacing: 0.9px; display: block; }
+    .telemetry-item span.value { color: #ffd700; font-weight: 700; display: block; }
+
+    .hud-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .controls-panel {
+      min-width: 470px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .control-row {
+      display: grid;
+      grid-template-columns: 195px 1fr 52px;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.5px;
+    }
+    .control-val {
+      text-align: right;
+      color: #00f3ff;
+      font-weight: 700;
+    }
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 4px;
+      background: #1e293b;
+      outline: none;
+      accent-color: #ffd700;
+      border-radius: 2px;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #ffd700;
+      box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+      cursor: pointer;
+    }
+    .actions-card {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .btn-action {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.24), rgba(0, 243, 255, 0.2));
+      border: 1px solid #ffd700;
+      color: #ffffff;
+      padding: 9px 14px;
+      border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-action:hover:not(:disabled) {
+      background: linear-gradient(135deg, rgba(255, 215, 0, 0.45), rgba(0, 243, 255, 0.35));
+      box-shadow: 0 0 18px rgba(255, 215, 0, 0.55);
+    }
+    .btn-action:disabled {
+      opacity: 0.55;
+      cursor: wait;
+    }
+    .btn-cyan {
+      border-color: #00f3ff;
+      color: #00f3ff;
+    }
+    .btn-green {
+      border-color: #10b981;
+      color: #10b981;
+    }
+    .progress-bar-wrap {
+      width: 100%;
+      height: 4px;
+      background: #0f172a;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+      display: none;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd700, #00f3ff);
+      transition: width 0.08s linear;
+    }
+    .hint-strip {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+    @media (max-width: 900px) {
+      .controls-panel { min-width: 100%; }
+      .control-row { grid-template-columns: 140px 1fr 48px; font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="canvas-container">
+    <canvas id="raymarch-canvas"></canvas>
+  </div>
+
+  <input type="file" id="pcc-file-input" accept=".json" style="display:none">
+
+  <div class="hud-layer">
+    <div class="hud-header">
+      <div class="hud-card" style="max-width: 600px;">
+        <div class="brand-title">
+          <span>🔱 AETERNA</span> MULTI-PASS HDR RAYMARCH STUDIO
+        </div>
+        <p style="font-size: 11px; color: #94a3b8; margin-top: 3px;">
+          Cook-Torrance GGX // 1-Bounce Raytraced Reflections // Separable Anamorphic Bloom // FXAA
+        </p>
+        <div class="badge-row">
+          <span class="badge badge-gold">AUTHORITY: DIMITAR PRODROMOV</span>
+          <span class="badge badge-cyan" id="badge-pipeline">HDR RGBA16F + BLOOM + FXAA</span>
+          <span class="badge badge-green" id="badge-entropy">ΔS = 0.000000</span>
+          <span class="badge badge-cyan" id="badge-orch">ORCH-OR: 11.7702 Hz</span>
+          <span class="badge badge-gold" id="badge-kernel-lock">KERNEL: STANDALONE (0x00)</span>
+        </div>
+        <div class="manifold-bar" id="manifold-bar">
+          <button class="manifold-btn active" data-manifold="0">01. KINTSUGI TORUS</button>
+          <button class="manifold-btn" data-manifold="1">02. HODGE (p,p) KNOT</button>
+          <button class="manifold-btn" data-manifold="2">03. SU(3) MASS GAP</button>
+          <button class="manifold-btn" data-manifold="3">04. ORCH-OR HELIX</button>
+          <button class="manifold-btn" data-manifold="4">05. KINTSUGI DNA</button>
+        </div>
+        <div class="manifold-bar" id="kernel-scenario-bar">
+          <button class="manifold-btn" data-scen="nominal">LIVE: ORCH-OR</button>
+          <button class="manifold-btn" data-scen="vagal">LIVE: VAGAL 144Hz</button>
+          <button class="manifold-btn" data-scen="m47">INJECT: M47 (0x10)</button>
+          <button class="manifold-btn" data-scen="tamper">INJECT: TAMPER (0x02)</button>
+        </div>
+      </div>
+
+      <div class="hud-card" style="min-width: 320px;">
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #ffd700; font-weight: 700;">
+            WEBGL2 TELEMETRY
+          </span>
+          <span id="fps-counter" style="font-family: 'JetBrains Mono', monospace; color: #10b981; font-weight: 800;">
+            --.- FPS
+          </span>
+        </div>
+        <div class="telemetry-grid">
+          <div class="telemetry-item">
+            <span class="label">FRAME TIME</span>
+            <span id="frame-time" class="value">--.-- ms</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="label">LIVE VIEWPORT</span>
+            <span id="viewport-res" class="value">-- x --</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="label">KERNEL LATENCY</span>
+            <span id="kernel-ns" class="value">464.10 ns/tick</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="label">ACTUATION TEP</span>
+            <span id="kernel-tep" class="value">22.75 mV (SAFE)</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="label">REGIME / CARRIER</span>
+            <span id="kernel-regime" class="value">OrchOr / 266.99 Hz</span>
+          </div>
+          <div class="telemetry-item">
+            <span class="label">EXPORT TARGET</span>
+            <span id="export-target" class="value">7680×4320 (4× RGSS)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hud-footer">
+      <div class="hud-card controls-panel">
+        <div class="control-row">
+          <span>GOLD VEIN DENSITY</span>
+          <input type="range" id="param-veins" min="0.02" max="0.14" step="0.005" value="0.075">
+          <span class="control-val" id="val-veins">0.075</span>
+        </div>
+        <div class="control-row">
+          <span>GOLD RELIEF HEIGHT</span>
+          <input type="range" id="param-relief" min="0.0" max="0.04" step="0.002" value="0.014">
+          <span class="control-val" id="val-relief">0.014</span>
+        </div>
+        <div class="control-row">
+          <span>LIGHTBOX &amp; BLOOM</span>
+          <input type="range" id="param-power" min="1.0" max="6.0" step="0.1" value="3.5">
+          <span class="control-val" id="val-power">3.50</span>
+        </div>
+        <div class="control-row">
+          <span>EXPOSURE CALIBRATION</span>
+          <input type="range" id="param-exp" min="0.2" max="1.2" step="0.02" value="0.54">
+          <span class="control-val" id="val-exp">0.54</span>
+        </div>
+        <div class="hint-strip">
+          DRAG CANVAS: ORBIT &nbsp;|&nbsp; WHEEL / PINCH: ZOOM &nbsp;|&nbsp; DOUBLE-CLICK: TOGGLE AUTO-SPIN
+        </div>
+      </div>
+
+      <div class="hud-card actions-card" style="max-width: 560px;">
+        <button class="btn-action" id="btn-reset">RESET STUDIO</button>
+        <button class="btn-action btn-green" id="btn-thermal">THERMAL GUARD: 30 FPS</button>
+        <button class="btn-action btn-green" id="btn-live-conn">CONNECT KERNEL (:8090)</button>
+        <button class="btn-action" id="btn-audio">AUDIO: OFF</button>
+        <button class="btn-action btn-green" id="btn-pcc">LOAD AUDIT JSON</button>
+        <button class="btn-action btn-cyan" id="btn-snap-live">LIVE PNG</button>
+        <button class="btn-action btn-cyan" id="btn-capture-8k">CAPTURE 8K PNG (4×4)</button>
+        <div class="progress-bar-wrap" id="export-progress-wrap">
+          <div class="progress-bar-fill" id="export-progress-fill"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      const canvas = document.getElementById('raymarch-canvas');
+      const urlParams = new URLSearchParams(location.search);
+      const isSnapshotMode = urlParams.get('snapshot') === '1' || urlParams.get('static') === '1';
+
+      const gl = canvas.getContext('webgl2', {
+        powerPreference: 'default',
+        alpha: false,
+        antialias: false,
+        preserveDrawingBuffer: true
+      });
+
+      if (!gl) {
+        alert('WebGL2 is not supported on this browser or GPU.');
+        return;
+      }
+
+      const dbgInfo = gl.getExtension('WEBGL_debug_renderer_info');
+      const rawRenderer = dbgInfo ? String(gl.getParameter(dbgInfo.UNMASKED_RENDERER_WEBGL) || '') : '';
+      const isSoftwareRenderer = /swiftshader|llvmpipe|software|microsoft basic/i.test(rawRenderer);
+
+      const hasColorBufferFloat = !!gl.getExtension('EXT_color_buffer_float');
+      const HDR_INTERNAL_FORMAT = hasColorBufferFloat ? gl.RGBA16F : gl.RGBA8;
+      const HDR_PIXEL_TYPE = hasColorBufferFloat ? gl.HALF_FLOAT : gl.UNSIGNED_BYTE;
+      const HDR_ENCODE_SCALE = hasColorBufferFloat ? 1.0 : 0.16;
+
+      document.getElementById('badge-pipeline').textContent = (hasColorBufferFloat
+        ? 'HDR RGBA16F + BLOOM + FXAA'
+        : 'RGBA8 FALLBACK + BLOOM + FXAA') + (isSoftwareRenderer ? ' [SW-THERMAL SAFE]' : '');
+
+      const vsQuad = `#version 300 es
+        in vec2 aPosition;
+        out vec2 vUv;
+        void main() {
+          vUv = aPosition * 0.5 + 0.5;
+          gl_Position = vec4(aPosition, 0.0, 1.0);
+        }
+      `;
+
+      const fsScene = `#version 300 es
+        precision highp float;
+        in vec2 vUv;
+        out vec4 fragColor;
+
+        uniform vec2 uFullResolution;
+        uniform vec2 uTileOrigin;
+        uniform float uTime;
+        uniform float uYaw;
+        uniform float uPitch;
+        uniform float uCamDist;
+        uniform float uVeins;
+        uniform float uRelief;
+        uniform float uPower;
+        uniform int uManifold;
+        uniform float uPulseHz;
+        uniform float uHdrEncode;
+        uniform int uLockoutMask;
+        uniform float uTepNorm;
+        uniform vec2 uJitter;
+
+        const float PI = 3.14159265359;
+
+        mat2 rot2(float a) {
+          float c = cos(a), s = sin(a);
+          return mat2(c, -s, s, c);
+        }
+
+        float smin(float a, float b, float k) {
+          float h = clamp(0.5 + 0.5 * (b - a) / max(k, 1e-5), 0.0, 1.0);
+          return mix(b, a, h) - k * h * (1.0 - h);
+        }
+
+        float sdBox(vec3 p, vec3 b) {
+          vec3 q = abs(p) - b;
+          return length(max(q, 0.0)) + min(max(q.x, max(q.y, q.z)), 0.0);
+        }
+
+        float sdCapsule(vec3 p, vec3 a, vec3 b, float r) {
+          vec3 pa = p - a, ba = b - a;
+          float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1e-6), 0.0, 1.0);
+          return length(pa - ba * h) - r;
+        }
+
+        float getKintsugiMask(vec3 p) {
+          vec3 q = p * 3.6;
+          float v1 = abs(sin(q.x * 1.6 + sin(q.y * 1.8)) * cos(q.z * 1.6));
+          float v2 = abs(sin((q.x + q.z) * 2.2) * cos((q.y - q.x) * 2.0));
+          float v3 = abs(cos(q.y * 2.5 + q.x) * sin(q.z * 2.5 - q.y));
+          float vein = min(v1, min(v2, v3));
+          return clamp((uVeins - vein) / 0.007, 0.0, 1.0);
+        }
+
+        vec3 hash33(vec3 p) {
+          p = vec3(dot(p, vec3(127.1, 311.7, 74.7)),
+                   dot(p, vec3(269.5, 183.3, 246.1)),
+                   dot(p, vec3(113.5, 271.9, 124.6)));
+          return fract(sin(p) * 43758.5453123);
+        }
+
+        // Voronoi F2 - F1 cellular seam mask locked onto local DNA coordinates
+        float getDnaVoronoiMask(vec3 p) {
+          vec3 q = p * 2.85;
+          vec3 i = floor(q), f = fract(q);
+          float f1 = 8.0, f2 = 8.0;
+          for (int z = -1; z <= 1; z++)
+          for (int y = -1; y <= 1; y++)
+          for (int x = -1; x <= 1; x++) {
+            vec3 g = vec3(float(x), float(y), float(z));
+            vec3 r = g + hash33(i + g) - f;
+            float d = dot(r, r);
+            if (d < f1) { f2 = f1; f1 = d; } else if (d < f2) { f2 = d; }
+          }
+          float edge = sqrt(f2) - sqrt(f1);
+          float width = clamp(uVeins * 0.95, 0.015, 0.14);
+          return 1.0 - smoothstep(width * 0.25, width, edge);
+        }
+
+        vec3 dnaLocal(vec3 wp) {
+          vec3 q = wp - vec3(0.0, 0.08, 0.0);
+          q.xy *= rot2(-0.42);
+          q.xz *= rot2(uTime * 0.28);
+          return q;
+        }
+
+        // Multi-scale crystalline fracture / Voronoi facet height for photorealistic glass-ice DNA
+        float getDnaCrystalHeight(vec3 p) {
+          vec3 q = p * 4.2;
+          float f1 = abs(sin(q.x * 1.9 + cos(q.y * 2.1)) * cos(q.z * 1.9 + sin(q.x * 1.4)));
+          float f2 = abs(sin((q.x + q.z) * 3.7) * sin((q.y - q.z) * 3.5));
+          float f3 = abs(cos(q.x * 7.5 + q.y * 6.2) * sin(q.z * 7.8 - q.x * 5.1));
+          return f1 * 0.55 + f2 * 0.30 + f3 * 0.15;
+        }
+
+        float sdOctahedron(vec3 p, float s) {
+          p = abs(p);
+          return (p.x + p.y + p.z - s) * 0.57735027;
+        }
+
+        float sdHelixStrand(vec3 p, float ph, float hr, float hc, float tube) {
+          float r = length(p.xz);
+          float a = atan(p.z, p.x);
+          float per = 2.0 * PI * hc;
+          float dy = p.y - hc * (a + ph);
+          dy = mod(dy + 0.5 * per, per) - 0.5 * per;
+          float k = hr / sqrt(hr * hr + hc * hc);
+          return length(vec2(r - hr, dy * k)) - tube;
+        }
+
+        // Returns vec2(signedDistance, materialId)
+        // matId: 0 = Obsidian/Crystal, 1 = 24k Gold Kintsugi, 2 = Warm/Cyan Base Pair, 3 = Studio Floor, 4 = Magenta/Violet Base Pair, 5 = Crystal Polyhedron
+        vec2 mapSdf(vec3 p) {
+          float floorD = p.y + 1.82;
+          vec2 res = vec2(floorD, 3.0);
+          float resPulse = sin(uTime * clamp(uPulseHz, 0.5, 45.0) * 0.25);
+          if (uLockoutMask != 0) {
+            resPulse = sin(uTime * 22.0) * 0.25;
+          }
+          float pulse = resPulse;
+
+          if (uManifold == 0) {
+            // 01. KINTSUGI OBSIDIAN & 24K GOLD TORUS
+            float R = 2.25;
+            float r = 0.68 + 0.045 * pulse;
+            vec2 q = vec2(length(p.xz) - R, p.y);
+            float goldMask = getKintsugiMask(p);
+            float dTorus = length(q) - r - goldMask * uRelief;
+            // Inner floating harmonic ring
+            vec3 pr = p;
+            pr.xy *= rot2(uTime * 0.4);
+            pr.yz *= rot2(0.52);
+            float dInner = length(vec2(length(pr.xz) - 1.05, pr.y)) - 0.075;
+            if (dTorus < res.x) res = vec2(dTorus, goldMask > 0.35 ? 1.0 : 0.0);
+            if (dInner < res.x) res = vec2(dInner, 1.0);
+          } else if (uManifold == 1) {
+            // 02. HODGE (p,p) SYMPLECTIC KNOT
+            vec3 q = p;
+            q.xz *= rot2(uTime * 0.22);
+            float angle = atan(q.z, q.x);
+            float rad = length(q.xz) - 1.95;
+            vec2 kp = vec2(rad, q.y);
+            kp *= rot2(angle * 2.5);
+            float tubeA = length(kp - vec2(0.45, 0.0)) - (0.28 + 0.02 * pulse);
+            float tubeB = length(kp + vec2(0.45, 0.0)) - (0.28 - 0.02 * pulse);
+            float dKnot = smin(tubeA, tubeB, 0.14);
+            float goldMask = getKintsugiMask(q * 1.15);
+            dKnot -= goldMask * uRelief * 0.9;
+            float core = length(q) - (0.58 + 0.04 * pulse);
+            if (dKnot < res.x) res = vec2(dKnot, goldMask > 0.3 ? 1.0 : 0.0);
+            if (core < res.x) res = vec2(core, 2.0);
+          } else if (uManifold == 2) {
+            // 03. SU(3) YANG-MILLS LATTICE PLAQUETTES (Mass Gap Core)
+            vec3 q = p;
+            q.xz *= rot2(uTime * 0.18);
+            q.xy *= rot2(0.32);
+            float frame = 1e6;
+            float s = 1.32;
+            vec3 ap = abs(q);
+            float beamX = sdBox(ap - vec3(0.0, s, s), vec3(s, 0.09, 0.09));
+            float beamY = sdBox(ap - vec3(s, 0.0, s), vec3(0.09, s, 0.09));
+            float beamZ = sdBox(ap - vec3(s, s, 0.0), vec3(0.09, 0.09, s));
+            frame = min(beamX, min(beamY, beamZ));
+            float goldMask = getKintsugiMask(q * 1.4);
+            frame -= goldMask * uRelief * 0.6;
+            // Octahedral Yang-Mills Gap Core
+            float dCore = (ap.x + ap.y + ap.z - (1.05 + 0.07 * pulse)) * 0.57735;
+            if (frame < res.x) res = vec2(frame, goldMask > 0.35 ? 1.0 : 0.0);
+            if (dCore < res.x) res = vec2(dCore, 2.0);
+          } else if (uManifold == 3) {
+            // 04. ORCH-OR 11.77 Hz MICROTUBULE HELIX RESONATOR
+            vec3 q = p;
+            q.xz *= rot2(uTime * 0.35);
+            float twist = q.y * 2.2;
+            vec2 h1 = q.xz - vec2(cos(twist), sin(twist)) * 1.28;
+            vec2 h2 = q.xz + vec2(cos(twist), sin(twist)) * 1.28;
+            float boundY = max(abs(q.y) - 1.45, 0.0);
+            float strand1 = length(vec3(h1.x, boundY, h1.y)) - 0.24;
+            float strand2 = length(vec3(h2.x, boundY, h2.y)) - 0.24;
+            float strands = min(strand1, strand2);
+            float goldMask = getKintsugiMask(q);
+            strands -= goldMask * uRelief * 0.7;
+            // Rungs spaced along Y
+            float ry = mod(q.y + 0.4, 0.8) - 0.4;
+            float rung = 1e6;
+            if (abs(q.y) < 1.35) {
+              vec3 endA = vec3(cos(twist) * 1.22, 0.0, sin(twist) * 1.22);
+              rung = sdCapsule(vec3(q.x, ry, q.z), -endA, endA, 0.055 + 0.015 * pulse);
+            }
+            if (strands < res.x) res = vec2(strands, goldMask > 0.35 ? 1.0 : 0.0);
+            if (rung < res.x) res = vec2(rung, 2.0);
+          } else {
+            // 05. PHOTOREALISTIC CRYSTALLINE & KINTSUGI DNA DOUBLE HELIX (GPU-Bounded & Zero Voronoi in SDF)
+            vec3 q = dnaLocal(p);
+            float boundHull = max(length(q.xz) - 1.38, abs(q.y) - 1.88);
+            float hr = 0.86;
+            float hc = 0.44;
+            float tube = 0.132;
+            float rsp = 0.34;
+            float rr = 0.036 + 0.005 * pulse;
+            float halfH = 1.68;
+
+            // Fast bounding-volume cull: skip heavy helix/base-pair evals in empty background rays
+            if (boundHull > 0.24) {
+              float dBound = boundHull * 0.85 + 0.08;
+              if (dBound < res.x) res = vec2(dBound, 0.0);
+            } else {
+              vec3 qClamped = vec3(q.x, clamp(q.y, -halfH, halfH), q.z);
+              float yExcess = max(abs(q.y) - halfH, 0.0);
+
+              float s1 = sdHelixStrand(qClamped, 0.0, hr, hc, tube);
+              float s2 = sdHelixStrand(qClamped, PI, hr, hc, tube);
+              float strands = sqrt(max(min(s1, s2), 0.0) * max(min(s1, s2), 0.0) + yExcess * yExcess);
+              if (min(s1, s2) < 0.0 && yExcess == 0.0) strands = min(s1, s2);
+
+              float crys = getDnaCrystalHeight(q);
+              // Sharp sculpted ice/quartz facets + subtle backbone groove
+              strands = (strands + (crys - 0.5) * 0.028) * 0.78;
+
+              // Phosphate-sugar crystal nodes + detailed bipartite nucleotide rungs
+              float bestRung = 1e6;
+              float side = 1.0;
+              float nodeD = 1e6;
+              float yc = floor(q.y / rsp + 0.5);
+              for (int j = -1; j <= 1; j++) {
+                float id = yc + float(j);
+                float yi = id * rsp;
+                if (abs(yi) > halfH - 0.12) continue;
+                float ang = yi / hc;
+                vec3 dir = vec3(cos(ang), 0.0, sin(ang));
+                vec3 ctr = vec3(0.0, yi, 0.0);
+                vec3 pA = ctr - dir * hr;
+                vec3 pB = ctr + dir * hr;
+                nodeD = min(nodeD, min(length(q - pA), length(q - pB)) - (tube * 1.16 + (crys - 0.5) * 0.022));
+                float ds = sdCapsule(q, pA + dir * 0.08, pB - dir * 0.08, rr + (crys - 0.5) * 0.007);
+                float bridge = length(q - ctr) - rr * 1.62;
+                float collarA = length(q - (ctr - dir * 0.24)) - rr * 1.38;
+                float collarB = length(q - (ctr + dir * 0.24)) - rr * 1.38;
+                ds = smin(ds, min(bridge, min(collarA, collarB)), 0.024);
+                if (ds < bestRung) {
+                  bestRung = ds;
+                  side = dot(q - ctr, dir) > 0.0 ? 1.0 : -1.0;
+                }
+              }
+              strands = smin(strands, nodeD * 0.85, 0.042);
+
+              // Delicate outer biophotonic filament helix trimmed neatly inside sculpted ends
+              float orb1 = sdHelixStrand(vec3(q.x, clamp(q.y, -halfH * 0.86, halfH * 0.86), q.z), 0.7, hr * 1.24, hc * 1.35, 0.011);
+              float orbD = sqrt(max(orb1, 0.0) * max(orb1, 0.0) + yExcess * yExcess);
+              if (orb1 < 0.0 && yExcess == 0.0) orbD = orb1;
+
+              if (strands < res.x) res = vec2(strands, 0.0);
+              if (bestRung < res.x) res = vec2(bestRung, side > 0.0 ? 2.0 : 4.0);
+              if (orbD * 0.85 < res.x) res = vec2(orbD * 0.85, 1.0);
+            }
+
+            // Floating faceted crystal octahedra orbiting outside core hull (skipped far away)
+            if (length(p - vec3(0.0, 0.2, 0.0)) < 2.8) {
+              float polyD = 1e6;
+              for (int k = 0; k < 3; k++) {
+                float fk = float(k);
+                float oa = uTime * 0.16 + fk * 2.0944;
+                vec3 oc = vec3(cos(oa) * (1.78 + 0.25 * sin(fk * 2.1)), -0.85 + fk * 0.92, sin(oa) * (1.68 + 0.22 * cos(fk * 1.7)));
+                vec3 op = p - oc;
+                op.xz *= rot2(uTime * 0.42 + fk);
+                op.xy *= rot2(uTime * 0.29 - fk);
+                polyD = min(polyD, sdOctahedron(op, 0.135 + 0.025 * mod(fk, 2.0)));
+              }
+              if (polyD < res.x) res = vec2(polyD, 5.0);
+            }
+          }
+
+          return res;
+        }
+
+        // Symmetric 4-tap tetrahedral normal (zero forward bias)
+        vec3 calcNormal(vec3 p) {
+          const float e = 0.0009;
+          const vec2 k = vec2(1.0, -1.0);
+          return normalize(
+            k.xyy * mapSdf(p + k.xyy * e).x +
+            k.yyx * mapSdf(p + k.yyx * e).x +
+            k.yxy * mapSdf(p + k.yxy * e).x +
+            k.xxx * mapSdf(p + k.xxx * e).x
+          );
+        }
+
+        float calcAO(vec3 pos, vec3 nor) {
+          float occ = 0.0;
+          float sca = 1.0;
+          int steps = (uManifold == 4) ? 2 : 4;
+          for (int i = 0; i < 4; i++) {
+            if (i >= steps) break;
+            float h = 0.03 + 0.16 * float(i);
+            float d = mapSdf(pos + h * nor).x;
+            occ += (h - d) * sca;
+            sca *= 0.72;
+          }
+          return clamp(1.0 - 2.1 * occ, 0.12, 1.0);
+        }
+
+        float distributionGGX(float nDotH, float roughness) {
+          float a = roughness * roughness;
+          float a2 = a * a;
+          float nDotH2 = nDotH * nDotH;
+          float denom = (nDotH2 * (a2 - 1.0) + 1.0);
+          return a2 / (PI * denom * denom + 1e-6);
+        }
+
+        float geometrySchlickGGX(float nDotV, float roughness) {
+          float r = roughness + 1.0;
+          float k = (r * r) / 8.0;
+          return nDotV / (nDotV * (1.0 - k) + k + 1e-6);
+        }
+
+        float geometrySmith(float nDotV, float nDotL, float roughness) {
+          return geometrySchlickGGX(nDotV, roughness) * geometrySchlickGGX(nDotL, roughness);
+        }
+
+        vec3 fresnelSchlick(float cosTheta, vec3 F0) {
+          return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
+        }
+
+        vec3 sampleStudioRig(vec3 r) {
+          vec3 kDir = normalize(vec3(0.577, 0.707, 0.408));
+          float kDot = max(dot(r, kDir), 0.0);
+          float kPanel = clamp((kDot - 0.935) / 0.014, 0.0, 1.0) * 6.0;
+          float kRing = smoothstep(0.015, 0.0, abs(kDot - 0.80)) * 2.4;
+
+          vec3 fDir = normalize(vec3(-0.707, 0.300, 0.638));
+          float fDot = max(dot(r, fDir), 0.0);
+          float fPanel = clamp((fDot - 0.915) / 0.020, 0.0, 1.0) * 3.2;
+
+          vec3 rDir = normalize(vec3(0.0, -0.58, -0.81));
+          float rDot = max(dot(r, rDir), 0.0);
+          float rStrip = clamp((rDot - 0.885) / 0.018, 0.0, 1.0) * 5.8;
+
+          float ambY = clamp(r.y * 0.5 + 0.5, 0.0, 1.0);
+          vec3 ambient = mix(vec3(0.005, 0.008, 0.015), vec3(0.018, 0.025, 0.044), ambY);
+
+          return ambient + vec3(1.0, 0.92, 0.78) * (kPanel + kRing)
+                         + vec3(0.74, 0.88, 1.0) * fPanel
+                         + vec3(0.0, 0.96, 1.0) * rStrip;
+        }
+
+        vec3 traceRay(vec2 fullFrag) {
+          vec2 uv = (fullFrag / uFullResolution) * 2.0 - 1.0;
+          uv.x *= uFullResolution.x / uFullResolution.y;
+
+          vec3 camPos = vec3(
+            uCamDist * cos(uPitch) * sin(uYaw),
+            uCamDist * sin(uPitch),
+            uCamDist * cos(uPitch) * cos(uYaw)
+          );
+
+          vec3 target = vec3(0.0, -0.18, 0.0);
+          vec3 forward = normalize(target - camPos);
+          vec3 right = normalize(cross(vec3(0.0, 1.0, 0.0), forward));
+          vec3 up = cross(forward, right);
+          vec3 rayDir = normalize(forward * 1.85 + right * uv.x + up * uv.y);
+
+          float depth = 0.6;
+          bool hit = false;
+          vec3 hitPos = vec3(0.0);
+          float matId = 0.0;
+          vec3 dnaVolGlow = vec3(0.0);
+
+          int maxSteps = (uManifold == 4) ? 74 : 96;
+          for (int i = 0; i < 96; i++) {
+            if (i >= maxSteps) break;
+            hitPos = camPos + rayDir * depth;
+            vec2 res = mapSdf(hitPos);
+            if (uManifold == 4 && dot(hitPos.xz, hitPos.xz) < 3.6 && abs(hitPos.y) < 2.35) {
+              // Bounded volumetric biophotonic scatter near the DNA spine only
+              float radGlow = exp(-dot(hitPos.xz, hitPos.xz) * 1.45) * exp(-max(abs(hitPos.y) - 1.55, 0.0) * 2.0);
+              float corePhase = 0.5 + 0.5 * sin(hitPos.y * 2.1 + uTime * 1.2);
+              vec3 scatterCol = mix(vec3(1.0, 0.52, 0.14), vec3(0.95, 0.22, 0.85), corePhase);
+              dnaVolGlow += scatterCol * radGlow * 0.015;
+            }
+            if (res.x < 0.0011) {
+              hit = true;
+              matId = res.y;
+              break;
+            }
+            depth += res.x * (uManifold == 4 ? 0.84 : 0.78);
+            if (depth > 21.0) break;
+          }
+
+          if (!hit) {
+            float bgGrad = clamp(rayDir.y * 0.5 + 0.5, 0.0, 1.0);
+            vec3 missCol = mix(vec3(0.004, 0.007, 0.014), vec3(0.012, 0.020, 0.036), bgGrad);
+            if (uManifold == 4) {
+              // Subtle 3D biophotonic stardust motes in background rays
+              vec3 sp = fract(rayDir * 38.0 + vec3(0.0, uTime * 0.03, 0.0)) - 0.5;
+              float mote = smoothstep(0.095, 0.01, length(sp));
+              missCol += dnaVolGlow * 1.85 + vec3(0.95, 0.76, 0.42) * mote * 0.20;
+            }
+            return missCol;
+          }
+
+          vec3 N = calcNormal(hitPos);
+          float crystalFacet = 0.5;
+          if (uManifold == 4 && matId < 2.5) {
+            // High-frequency crystalline ice micro-facet bump on DNA glass/quartz
+            vec3 lq = dnaLocal(hitPos);
+            float eB = 0.012;
+            float c0 = getDnaCrystalHeight(lq);
+            crystalFacet = c0;
+            vec3 gradC = vec3(
+              getDnaCrystalHeight(lq + vec3(eB, 0.0, 0.0)) - c0,
+              getDnaCrystalHeight(lq + vec3(0.0, eB, 0.0)) - c0,
+              getDnaCrystalHeight(lq + vec3(0.0, 0.0, eB)) - c0
+            ) / eB;
+            N = normalize(N + gradC * 0.14);
+          }
+          vec3 V = -rayDir;
+          float nDotV = max(dot(N, V), 1e-4);
+          vec3 R = reflect(-V, N);
+          float ao = calcAO(hitPos, N);
+
+          // 1-Bounce Self Reflection (10 steps for DNA / 14 steps otherwise)
+          float sDepth = 0.035;
+          bool selfHit = false;
+          vec3 sPos = vec3(0.0);
+          float sMat = 0.0;
+          int reflSteps = (uManifold == 4) ? 10 : 14;
+          for (int s = 0; s < 14; s++) {
+            if (s >= reflSteps) break;
+            sPos = hitPos + R * sDepth;
+            vec2 sRes = mapSdf(sPos);
+            if (sRes.x < 0.0045) {
+              selfHit = true;
+              sMat = sRes.y;
+              break;
+            }
+            sDepth += sRes.x * 0.88;
+            if (sDepth > 4.6) break;
+          }
+
+          vec3 reflectedRadiance;
+          if (selfHit) {
+            float occ = clamp(sDepth / 3.0, 0.25, 1.0);
+            if (uLockoutMask != 0) {
+              reflectedRadiance = vec3(2.4, 0.12, 0.18) * occ;
+            } else if (sMat > 3.5) {
+              reflectedRadiance = vec3(3.1, 0.35, 1.85) * occ * (0.4 + 0.6 * uTepNorm);
+            } else if (sMat > 1.5 && sMat < 2.5) {
+              reflectedRadiance = vec3(0.0, 2.8, 3.4) * occ * (0.4 + 0.6 * uTepNorm);
+            } else if (sMat > 0.5 && sMat < 1.5) {
+              reflectedRadiance = vec3(1.0, 0.78, 0.28) * 2.5 * occ;
+            } else {
+              reflectedRadiance = (uManifold == 4) ? vec3(0.18, 0.36, 0.55) * occ : vec3(0.05, 0.08, 0.14) * occ;
+            }
+          } else {
+            reflectedRadiance = sampleStudioRig(R);
+          }
+
+          vec3 hdrColor = vec3(0.0);
+
+          if (matId > 2.5 && matId < 3.5) {
+            // 3.0: Dark Obsidian Studio Cyclorama Floor with subtle metric grid
+            float distFade = exp(-length(hitPos.xz) * 0.18);
+            vec2 g = abs(fract(hitPos.xz * 0.5 - 0.5) - 0.5) / max(abs(hitPos.xz * 0.004) + 0.025, 0.025);
+            float gridLine = 1.0 - min(min(g.x, g.y), 1.0);
+            vec3 F = fresnelSchlick(nDotV, vec3(0.05));
+            hdrColor = reflectedRadiance * F * 1.15 * distFade * ao;
+            vec3 gridCol = (uLockoutMask != 0) ? vec3(0.75, 0.08, 0.12) : vec3(0.0, 0.45, 0.55);
+            hdrColor += gridCol * gridLine * 0.24 * distFade;
+            hdrColor += vec3(0.004, 0.007, 0.012) * ao;
+          } else if (matId > 4.5) {
+            // 5.0: Floating Faceted Crystal Polyhedra (Refractive Quartz / Obsidian Diamond)
+            vec3 L = normalize(vec3(0.577, 0.707, 0.408));
+            float nDotL = max(dot(N, L), 0.0);
+            vec3 H = normalize(V + L);
+            float D = distributionGGX(max(dot(N, H), 0.0), 0.012);
+            float G = geometrySmith(nDotV, nDotL, 0.012);
+            vec3 F = fresnelSchlick(max(dot(V, H), 0.0), vec3(0.16, 0.20, 0.26));
+            vec3 spec = (D * G * F) / max(4.0 * nDotV * nDotL, 0.04);
+            float rim = pow(clamp(1.0 - nDotV, 0.0, 1.0), 2.5);
+            hdrColor = spec * nDotL * uPower * 1.4
+                     + reflectedRadiance * fresnelSchlick(nDotV, vec3(0.18, 0.24, 0.30)) * 2.2
+                     + vec3(0.35, 0.75, 1.0) * rim * 0.65;
+          } else {
+            vec3 lq = dnaLocal(hitPos);
+            // Voronoi 3x3x3 seam mask evaluated ONCE at hit instead of 96x in mapSdf
+            float goldMask = (uManifold == 4) ? getDnaVoronoiMask(lq) : getKintsugiMask(hitPos);
+            bool isPlasmaCyan = (matId > 1.5 && matId < 2.5);
+            bool isPlasmaMagenta = (matId > 3.5 && matId < 4.5);
+            bool isPlasma = isPlasmaCyan || isPlasmaMagenta;
+            bool isGold = (matId > 0.5 && matId < 1.5) || (uManifold == 4 && !isPlasma && goldMask > 0.36);
+
+            float activeRough = isPlasma ? 0.045 : mix(uManifold == 4 ? 0.012 : 0.004, 0.020, isGold ? 1.0 : goldMask);
+            vec3 veinTone = (uLockoutMask != 0) ? vec3(1.00, 0.15, 0.18) : vec3(1.00, 0.78, 0.28);
+            // Photorealistic Crystal DNA shifts smoothly across Incandescent Gold-Amber, Ice-Cyan, and Biophotonic Magenta
+            float heightGrad = (uManifold == 4) ? (0.5 + 0.5 * sin(lq.y * 1.7 + uTime * 0.6)) : 0.0;
+            vec3 cyanOrGold = (uManifold == 4) ? mix(vec3(0.16, 0.92, 1.0), vec3(1.0, 0.58, 0.12), heightGrad) : vec3(0.08, 0.95, 1.0);
+            vec3 basePlasma = isPlasmaMagenta ? mix(vec3(1.00, 0.18, 0.68), vec3(1.00, 0.48, 0.18), heightGrad * 0.65) : cyanOrGold;
+            vec3 plasmaTone = (uLockoutMask != 0) ? vec3(1.0, 0.12, 0.22) : basePlasma;
+
+            vec3 crystalTint = (uManifold == 4) ? mix(vec3(0.06, 0.14, 0.24), vec3(0.24, 0.52, 0.85), smoothstep(0.25, 0.85, crystalFacet)) : vec3(0.0);
+            vec3 F0 = isGold ? veinTone : (isPlasma ? plasmaTone : mix(uManifold == 4 ? vec3(0.14, 0.20, 0.28) : vec3(0.045), veinTone, goldMask));
+            vec3 albedo = isGold ? veinTone * 0.94 : (isPlasma ? plasmaTone * 0.25 : crystalTint);
+
+            vec3 L = normalize(vec3(0.577, 0.707, 0.408));
+            float nDotL = max(dot(N, L), 0.0);
+            vec3 H = normalize(V + L);
+            float nDotH = max(dot(N, H), 0.0);
+            float vDotH = max(dot(V, H), 0.0);
+
+            float D = distributionGGX(nDotH, activeRough);
+            float G = geometrySmith(nDotV, nDotL, activeRough);
+            vec3 F = fresnelSchlick(vDotH, F0);
+            vec3 spec = (D * G * F) / max(4.0 * nDotV * nDotL, 0.04);
+
+            vec3 directLight = spec * nDotL * uPower * (uManifold == 4 ? 1.55 : 1.0);
+            vec3 iblLight = reflectedRadiance * fresnelSchlick(nDotV, F0) * (uManifold == 4 ? 2.45 : 1.85);
+            vec3 diffuseLight = albedo * nDotL * (uManifold == 4 ? 0.58 : 0.42);
+
+            float rim = pow(clamp(1.0 - nDotV, 0.0, 1.0), uManifold == 4 ? 2.75 : 4.8);
+            vec3 rimColor = (uLockoutMask != 0) ? vec3(1.2, 0.12, 0.22)
+                          : (uManifold == 4 ? mix(vec3(0.42, 0.92, 1.35), vec3(1.18, 0.45, 0.86), heightGrad) : vec3(0.12, 0.78, 1.25));
+            vec3 dispersion = rim * rimColor;
+
+            // Internal ice subsurface biophotonic transmission (amber/magenta inner core glow refracting through crystal)
+            vec3 sss = vec3(0.0);
+            if (uManifold == 4 && !isPlasma) {
+              float innerFacing = clamp(dot(N, normalize(-vec3(lq.x, 0.0, lq.z) + vec3(1e-4))), 0.0, 1.0);
+              vec3 sssTone = mix(vec3(1.0, 0.52, 0.15), vec3(0.98, 0.22, 0.78), heightGrad);
+              sss = sssTone * (0.25 + 0.75 * innerFacing) * (0.35 + 0.65 * crystalFacet) * 0.72 * (uPower / 3.5);
+            }
+
+            hdrColor = (directLight + iblLight + diffuseLight) * ao + dispersion + sss;
+            if (isPlasma) {
+              float glow = (1.15 + 0.95 * uTepNorm) + 0.45 * sin(uTime * clamp(uPulseHz, 1.0, 45.0) * 0.25);
+              hdrColor += plasmaTone * glow * (uPower / 3.2);
+            }
+          }
+
+          if (uManifold == 4) {
+            hdrColor += dnaVolGlow;
+          }
+
+          return hdrColor;
+        }
+
+        void main() {
+          vec3 hdr = traceRay(gl_FragCoord.xy + uTileOrigin + uJitter);
+          fragColor = vec4(hdr * uHdrEncode, 1.0);
+        }
+      `;
+
+      const fsBloomExtract = `#version 300 es
+        precision highp float;
+        in vec2 vUv;
+        out vec4 fragColor;
+        uniform sampler2D uSceneTex;
+        uniform float uHdrDecode;
+        uniform float uThreshold;
+        void main() {
+          vec3 c = texture(uSceneTex, vUv).rgb * uHdrDecode;
+          float lum = dot(c, vec3(0.2126, 0.7152, 0.0722));
+          float soft = max(lum - uThreshold, 0.0);
+          vec3 bloom = (lum > 1e-4) ? c * (soft / lum) : vec3(0.0);
+          fragColor = vec4(bloom * (1.0 / max(uHdrDecode, 1.0)), 1.0);
+        }
+      `;
+
+      const fsBlur = `#version 300 es
+        precision highp float;
+        in vec2 vUv;
+        out vec4 fragColor;
+        uniform sampler2D uTex;
+        uniform vec2 uDir;
+        const float w0 = 0.2270270270;
+        const float w1 = 0.1945945946;
+        const float w2 = 0.1216216216;
+        const float w3 = 0.0540540541;
+        const float w4 = 0.0162162162;
+        void main() {
+          vec3 res = texture(uTex, vUv).rgb * w0;
+          res += texture(uTex, vUv + uDir * 1.0).rgb * w1;
+          res += texture(uTex, vUv - uDir * 1.0).rgb * w1;
+          res += texture(uTex, vUv + uDir * 2.0).rgb * w2;
+          res += texture(uTex, vUv - uDir * 2.0).rgb * w2;
+          res += texture(uTex, vUv + uDir * 3.0).rgb * w3;
+          res += texture(uTex, vUv - uDir * 3.0).rgb * w3;
+          res += texture(uTex, vUv + uDir * 4.0).rgb * w4;
+          res += texture(uTex, vUv - uDir * 4.0).rgb * w4;
+          fragColor = vec4(res, 1.0);
+        }
+      `;
+
+      const fsComposite = `#version 300 es
+        precision highp float;
+        in vec2 vUv;
+        out vec4 fragColor;
+
+        uniform sampler2D uSceneTex;
+        uniform sampler2D uBloomTex;
+        uniform vec2 uTexelSize;
+        uniform vec2 uFullResolution;
+        uniform vec2 uTileOrigin;
+        uniform float uHdrDecode;
+        uniform float uExp;
+        uniform float uBloomStrength;
+
+        vec3 acesFilmic(vec3 x) {
+          return clamp((x * (2.51 * x + 0.03)) / (x * (2.43 * x + 0.59) + 0.14), 0.0, 1.0);
+        }
+
+        vec3 toneMapSample(vec2 uv) {
+          vec3 hdr = texture(uSceneTex, uv).rgb * uHdrDecode;
+          vec3 bloom = texture(uBloomTex, uv).rgb * uHdrDecode;
+          hdr += bloom * uBloomStrength;
+
+          // Global vignette computed across full frame (tile-seam-free)
+          vec2 fullUv = (gl_FragCoord.xy + uTileOrigin) / uFullResolution * 2.0 - 1.0;
+          float vignette = 1.0 - dot(fullUv, fullUv) * 0.06;
+          hdr *= clamp(vignette, 0.72, 1.0);
+
+          return pow(acesFilmic(hdr * uExp), vec3(1.0 / 2.2));
+        }
+
+        void main() {
+          // Edge-aware FXAA on tonemapped color
+          vec3 rgbM  = toneMapSample(vUv);
+          vec3 rgbNW = toneMapSample(vUv + vec2(-1.0, -1.0) * uTexelSize);
+          vec3 rgbNE = toneMapSample(vUv + vec2( 1.0, -1.0) * uTexelSize);
+          vec3 rgbSW = toneMapSample(vUv + vec2(-1.0,  1.0) * uTexelSize);
+          vec3 rgbSE = toneMapSample(vUv + vec2( 1.0,  1.0) * uTexelSize);
+
+          const vec3 luma = vec3(0.299, 0.587, 0.114);
+          float lM  = dot(rgbM,  luma);
+          float lNW = dot(rgbNW, luma);
+          float lNE = dot(rgbNE, luma);
+          float lSW = dot(rgbSW, luma);
+          float lSE = dot(rgbSE, luma);
+
+          float lMin = min(lM, min(min(lNW, lNE), min(lSW, lSE)));
+          float lMax = max(lM, max(max(lNW, lNE), max(lSW, lSE)));
+
+          vec2 dir = vec2(-((lNW + lNE) - (lSW + lSE)), ((lNW + lSW) - (lNE + lSE)));
+          float dirReduce = max((lNW + lNE + lSW + lSE) * 0.03125, 1.0 / 128.0);
+          float rcpDirMin = 1.0 / (min(abs(dir.x), abs(dir.y)) + dirReduce);
+          dir = clamp(dir * rcpDirMin, vec2(-8.0), vec2(8.0)) * uTexelSize;
+
+          vec3 rgbA = 0.5 * (toneMapSample(vUv + dir * (1.0 / 3.0 - 0.5)) + toneMapSample(vUv + dir * (2.0 / 3.0 - 0.5)));
+          vec3 rgbB = rgbA * 0.5 + 0.25 * (toneMapSample(vUv + dir * -0.5) + toneMapSample(vUv + dir * 0.5));
+          float lB = dot(rgbB, luma);
+
+          vec3 finalCol = (lB < lMin || lB > lMax) ? rgbA : rgbB;
+          fragColor = vec4(finalCol, 1.0);
+        }
+      `;
+
+      function compileShader(type, source) {
+        const sh = gl.createShader(type);
+        gl.shaderSource(sh, source);
+        gl.compileShader(sh);
+        if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+          throw new Error(gl.getShaderInfoLog(sh) || 'Shader compilation failed');
+        }
+        return sh;
+      }
+
+      function buildProgram(vsSrc, fsSrc) {
+        const prog = gl.createProgram();
+        gl.attachShader(prog, compileShader(gl.VERTEX_SHADER, vsSrc));
+        gl.attachShader(prog, compileShader(gl.FRAGMENT_SHADER, fsSrc));
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+          throw new Error(gl.getProgramInfoLog(prog) || 'Program link failed');
+        }
+        return prog;
+      }
+
+      const progScene = buildProgram(vsQuad, fsScene);
+      const progBloomExtract = buildProgram(vsQuad, fsBloomExtract);
+      const progBlur = buildProgram(vsQuad, fsBlur);
+      const progComposite = buildProgram(vsQuad, fsComposite);
+
+      const vao = gl.createVertexArray();
+      gl.bindVertexArray(vao);
+      const quadBuf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, -1, 1, 1, -1, 1, 1]), gl.STATIC_DRAW);
+      gl.enableVertexAttribArray(0);
+      gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
+
+      function getUniforms(prog, names) {
+        const out = {};
+        names.forEach(n => { out[n] = gl.getUniformLocation(prog, n); });
+        return out;
+      }
+
+      const uScene = getUniforms(progScene, [
+        'uFullResolution', 'uTileOrigin', 'uTime', 'uYaw', 'uPitch', 'uCamDist',
+        'uVeins', 'uRelief', 'uPower', 'uManifold', 'uPulseHz', 'uHdrEncode',
+        'uJitter', 'uLockoutMask', 'uTepNorm'
+      ]);
+      const uExtract = getUniforms(progBloomExtract, ['uSceneTex', 'uHdrDecode', 'uThreshold']);
+      const uBlur = getUniforms(progBlur, ['uTex', 'uDir']);
+      const uComp = getUniforms(progComposite, [
+        'uSceneTex', 'uBloomTex', 'uTexelSize', 'uFullResolution', 'uTileOrigin',
+        'uHdrDecode', 'uExp', 'uBloomStrength'
+      ]);
+
+      function createFbo(w, h) {
+        const tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texImage2D(gl.TEXTURE_2D, 0, HDR_INTERNAL_FORMAT, w, h, 0, gl.RGBA, HDR_PIXEL_TYPE, null);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        const fbo = gl.createFramebuffer();
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fbo);
+        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+        return { fbo, tex, w, h };
+      }
+
+      let fboScene = null, fboBloomA = null, fboBloomB = null;
+
+      function ensureFboSize(w, h) {
+        const bw = Math.max(2, Math.floor(w / 2));
+        const bh = Math.max(2, Math.floor(h / 2));
+        if (fboScene && fboScene.w === w && fboScene.h === h) return;
+        [fboScene, fboBloomA, fboBloomB].forEach(f => {
+          if (f) { gl.deleteFramebuffer(f.fbo); gl.deleteTexture(f.tex); }
+        });
+        fboScene = createFbo(w, h);
+        fboBloomA = createFbo(bw, bh);
+        fboBloomB = createFbo(bw, bh);
+      }
+
+      // State & Cached DOM Controls
+      const state = {
+        yaw: 0.65,
+        pitch: 0.42,
+        targetYaw: 0.65,
+        targetPitch: 0.42,
+        camDist: 6.2,
+        targetCamDist: 6.2,
+        autoSpin: true,
+        manifold: 0,
+        pulseHz: 11.770208,
+        carrierHz: 266.9918,
+        tepMv: 22.75,
+        lockoutMask: 0,
+        veins: 0.075,
+        relief: 0.014,
+        power: 3.5,
+        exp: 0.54,
+        capturing: false
+      };
+
+      const el = {
+        veins: document.getElementById('param-veins'),
+        relief: document.getElementById('param-relief'),
+        power: document.getElementById('param-power'),
+        exp: document.getElementById('param-exp'),
+        vVeins: document.getElementById('val-veins'),
+        vRelief: document.getElementById('val-relief'),
+        vPower: document.getElementById('val-power'),
+        vExp: document.getElementById('val-exp'),
+        fps: document.getElementById('fps-counter'),
+        frameTime: document.getElementById('frame-time'),
+        viewportRes: document.getElementById('viewport-res'),
+        kernelNs: document.getElementById('kernel-ns'),
+        kernelTep: document.getElementById('kernel-tep'),
+        kernelRegime: document.getElementById('kernel-regime'),
+        badgeEntropy: document.getElementById('badge-entropy'),
+        badgeOrch: document.getElementById('badge-orch'),
+        badgeLock: document.getElementById('badge-kernel-lock'),
+        btn8k: document.getElementById('btn-capture-8k'),
+        progWrap: document.getElementById('export-progress-wrap'),
+        progFill: document.getElementById('export-progress-fill'),
+        pccInput: document.getElementById('pcc-file-input')
+      };
+
+      function syncSliders() {
+        state.veins = parseFloat(el.veins.value);
+        state.relief = parseFloat(el.relief.value);
+        state.power = parseFloat(el.power.value);
+        state.exp = parseFloat(el.exp.value);
+        el.vVeins.textContent = state.veins.toFixed(3);
+        el.vRelief.textContent = state.relief.toFixed(3);
+        el.vPower.textContent = state.power.toFixed(2);
+        el.vExp.textContent = state.exp.toFixed(2);
+      }
+
+      [el.veins, el.relief, el.power, el.exp].forEach(inp => inp.addEventListener('input', syncSliders));
+      syncSliders();
+
+      document.getElementById('manifold-bar').addEventListener('click', (e) => {
+        const btn = e.target.closest('.manifold-btn');
+        if (!btn) return;
+        document.querySelectorAll('#manifold-bar .manifold-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.manifold = Math.max(0, Math.min(4, parseInt(btn.dataset.manifold, 10) || 0));
+      });
+
+      const qManifold = parseInt(new URLSearchParams(location.search).get('manifold') || '', 10);
+      if (!Number.isNaN(qManifold) && qManifold >= 0 && qManifold <= 4) {
+        state.manifold = qManifold;
+        document.querySelectorAll('#manifold-bar .manifold-btn').forEach(b => {
+          b.classList.toggle('active', parseInt(b.dataset.manifold, 10) === qManifold);
+        });
+      }
+
+      // Canvas-only mouse + touch + wheel camera controls
+      let isDragging = false;
+      let activePinchDist = null;
+
+      canvas.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        state.autoSpin = false;
+        e.preventDefault();
+      });
+      window.addEventListener('mouseup', () => { isDragging = false; });
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        state.targetYaw += e.movementX * 0.006;
+        state.targetPitch = Math.max(-0.45, Math.min(1.25, state.targetPitch + e.movementY * 0.005));
+      });
+      canvas.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        state.targetCamDist = Math.max(3.2, Math.min(12.5, state.targetCamDist + e.deltaY * 0.004));
+      }, { passive: false });
+      canvas.addEventListener('dblclick', () => { state.autoSpin = !state.autoSpin; });
+
+      let lastTouch = null;
+      canvas.addEventListener('touchstart', (e) => {
+        state.autoSpin = false;
+        if (e.touches.length === 1) {
+          lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        } else if (e.touches.length === 2) {
+          activePinchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+        }
+      }, { passive: true });
+      canvas.addEventListener('touchmove', (e) => {
+        if (e.touches.length === 1 && lastTouch) {
+          const dx = e.touches[0].clientX - lastTouch.x;
+          const dy = e.touches[0].clientY - lastTouch.y;
+          state.targetYaw += dx * 0.007;
+          state.targetPitch = Math.max(-0.45, Math.min(1.25, state.targetPitch + dy * 0.006));
+          lastTouch = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        } else if (e.touches.length === 2 && activePinchDist !== null) {
+          const dist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+          );
+          state.targetCamDist = Math.max(3.2, Math.min(12.5, state.targetCamDist - (dist - activePinchDist) * 0.02));
+          activePinchDist = dist;
+        }
+      }, { passive: true });
+      canvas.addEventListener('touchend', () => { lastTouch = null; activePinchDist = null; });
+
+      const thermalState = {
+        mode: isSnapshotMode ? 'snapshot' : (isSoftwareRenderer ? 'sw-safe' : 'safe'),
+        targetFps: isSnapshotMode ? 2 : (isSoftwareRenderer ? 8 : 30),
+        adaptiveScale: isSoftwareRenderer ? 0.58 : (isSnapshotMode ? 0.85 : 1.0),
+        paused: false,
+        slowStreak: 0,
+        lastDrawMs: 0,
+        lastInteractionMs: performance.now(),
+        rafId: null,
+        renderedTotal: 0
+      };
+
+      const btnThermal = document.getElementById('btn-thermal');
+      function updateThermalBtn() {
+        if (!btnThermal) return;
+        if (thermalState.paused) {
+          btnThermal.textContent = 'THERMAL: PAUSED (0%)';
+          btnThermal.classList.remove('btn-green');
+        } else if (isSoftwareRenderer) {
+          btnThermal.textContent = `SW-THERMAL SAFE: ${thermalState.targetFps} FPS`;
+          btnThermal.classList.add('btn-green');
+        } else {
+          btnThermal.textContent = thermalState.targetFps >= 60 ? 'THERMAL GUARD: 60 FPS' : 'THERMAL GUARD: 30 FPS';
+          btnThermal.classList.add('btn-green');
+        }
+      }
+      updateThermalBtn();
+
+      function wakeRender() {
+        thermalState.lastInteractionMs = performance.now();
+        if (!thermalState.paused && !document.hidden && thermalState.rafId === null) {
+          thermalState.rafId = requestAnimationFrame(animate);
+        }
+      }
+
+      if (btnThermal) {
+        btnThermal.addEventListener('click', () => {
+          if (thermalState.paused) {
+            thermalState.paused = false;
+            thermalState.targetFps = isSoftwareRenderer ? 8 : 30;
+          } else if (thermalState.targetFps < 55 && !isSoftwareRenderer) {
+            thermalState.targetFps = 60;
+          } else {
+            thermalState.paused = true;
+          }
+          updateThermalBtn();
+          wakeRender();
+        });
+      }
+
+      function resize() {
+        if (state.capturing) return;
+        const baseDpr = Math.min(window.devicePixelRatio || 1, 1.5);
+        const effDpr = Math.max(0.5, baseDpr * thermalState.adaptiveScale);
+        const w = Math.max(320, Math.floor(window.innerWidth * effDpr));
+        const h = Math.max(240, Math.floor(window.innerHeight * effDpr));
+        canvas.width = w;
+        canvas.height = h;
+        ensureFboSize(w, h);
+        el.viewportRes.textContent = `${w} × ${h} (${effDpr.toFixed(2)}×)`;
+        wakeRender();
+      }
+      window.addEventListener('resize', resize);
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) wakeRender();
+      });
+      ['mousedown', 'wheel', 'touchstart'].forEach(evt => canvas.addEventListener(evt, wakeRender, { passive: true }));
+      window.addEventListener('mousemove', () => { if (isDragging) wakeRender(); });
+      document.getElementById('manifold-bar').addEventListener('click', wakeRender);
+      [el.veins, el.relief, el.power, el.exp].forEach(inp => inp.addEventListener('input', wakeRender));
+      resize();
+
+      function renderPipelineFrame(renderW, renderH, fullW, fullH, tileOriginX, tileOriginY, timeSec, ssaaSamples) {
+        ensureFboSize(renderW, renderH);
+        const hdrDecode = 1.0 / HDR_ENCODE_SCALE;
+
+        // Pass 1: HDR Raymarch Scene
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboScene.fbo);
+        gl.viewport(0, 0, fboScene.w, fboScene.h);
+        gl.useProgram(progScene);
+        gl.uniform2f(uScene.uFullResolution, fullW, fullH);
+        gl.uniform2f(uScene.uTileOrigin, tileOriginX, tileOriginY);
+        gl.uniform1f(uScene.uTime, timeSec);
+        gl.uniform1f(uScene.uYaw, state.yaw);
+        gl.uniform1f(uScene.uPitch, state.pitch);
+        gl.uniform1f(uScene.uCamDist, state.camDist);
+        gl.uniform1f(uScene.uVeins, state.veins);
+        gl.uniform1f(uScene.uRelief, state.relief);
+        gl.uniform1f(uScene.uPower, state.power);
+        gl.uniform1i(uScene.uManifold, state.manifold);
+        gl.uniform1f(uScene.uPulseHz, state.pulseHz);
+        gl.uniform1f(uScene.uHdrEncode, HDR_ENCODE_SCALE);
+        gl.uniform1i(uScene.uLockoutMask, state.lockoutMask);
+        gl.uniform1f(uScene.uTepNorm, Math.min(1.0, Math.max(0.0, state.tepMv / 25.0)));
+        if (ssaaSamples === 4) {
+          const rgss = [
+            [-0.125, -0.375],
+            [0.375, -0.125],
+            [-0.375, 0.125],
+            [0.125, 0.375]
+          ];
+          gl.clearColor(0.0, 0.0, 0.0, 1.0);
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          gl.enable(gl.BLEND);
+          gl.blendColor(0.0, 0.0, 0.0, 0.25);
+          gl.blendFuncSeparate(gl.CONSTANT_ALPHA, gl.ONE, gl.ZERO, gl.ONE);
+          for (let s = 0; s < 4; s++) {
+            gl.uniform2f(uScene.uJitter, rgss[s][0], rgss[s][1]);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+          }
+          gl.disable(gl.BLEND);
+        } else {
+          gl.disable(gl.BLEND);
+          gl.uniform2f(uScene.uJitter, 0.0, 0.0);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+
+        // Pass 2: Extract High-Luminance Glow -> BloomA
+        gl.bindFramebuffer(gl.FRAMEBUFFER, fboBloomA.fbo);
+        gl.viewport(0, 0, fboBloomA.w, fboBloomA.h);
+        gl.useProgram(progBloomExtract);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, fboScene.tex);
+        gl.uniform1i(uExtract.uSceneTex, 0);
+        gl.uniform1f(uExtract.uHdrDecode, hdrDecode);
+        gl.uniform1f(uExtract.uThreshold, 1.35);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        // Pass 3 & 4: Two-Iteration Anamorphic Separable Blur (wider horizontal flare)
+        const blurScale = Math.max(1.0, fullH / 1080.0);
+        gl.useProgram(progBlur);
+        for (let pass = 0; pass < 2; pass++) {
+          const stepH = (pass === 0 ? 1.8 : 3.2) * blurScale;
+          const stepV = (pass === 0 ? 1.0 : 1.8) * blurScale;
+
+          gl.bindFramebuffer(gl.FRAMEBUFFER, fboBloomB.fbo);
+          gl.activeTexture(gl.TEXTURE0);
+          gl.bindTexture(gl.TEXTURE_2D, fboBloomA.tex);
+          gl.uniform1i(uBlur.uTex, 0);
+          gl.uniform2f(uBlur.uDir, stepH / fboBloomA.w, 0.0);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+          gl.bindFramebuffer(gl.FRAMEBUFFER, fboBloomA.fbo);
+          gl.bindTexture(gl.TEXTURE_2D, fboBloomB.tex);
+          gl.uniform2f(uBlur.uDir, 0.0, stepV / fboBloomA.h);
+          gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
+
+        // Pass 5: Composite + ACES Filmic + Gamma + FXAA to Default Framebuffer
+        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+        gl.viewport(0, 0, renderW, renderH);
+        gl.useProgram(progComposite);
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, fboScene.tex);
+        gl.uniform1i(uComp.uSceneTex, 0);
+        gl.activeTexture(gl.TEXTURE1);
+        gl.bindTexture(gl.TEXTURE_2D, fboBloomA.tex);
+        gl.uniform1i(uComp.uBloomTex, 1);
+        gl.uniform2f(uComp.uTexelSize, 1.0 / renderW, 1.0 / renderH);
+        gl.uniform2f(uComp.uFullResolution, fullW, fullH);
+        gl.uniform2f(uComp.uTileOrigin, tileOriginX, tileOriginY);
+        gl.uniform1f(uComp.uHdrDecode, hdrDecode);
+        gl.uniform1f(uComp.uExp, state.exp);
+        gl.uniform1f(uComp.uBloomStrength, 0.22 * (state.power / 3.5));
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        if (isSnapshotMode) gl.flush();
+      }
+
+      let frameCount = 0;
+      let lastFpsTime = performance.now();
+      let currentTimeSec = 0;
+
+      function animate(nowMs) {
+        thermalState.rafId = null;
+        if (document.hidden || thermalState.paused) {
+          el.fps.textContent = 'IDLE (0% GPU)';
+          return;
+        }
+
+        if (!state.capturing) {
+          const minInterval = 1000 / Math.max(1, thermalState.targetFps);
+          if (thermalState.renderedTotal > 0 && (nowMs - thermalState.lastDrawMs) < minInterval) {
+            thermalState.rafId = requestAnimationFrame(animate);
+            return;
+          }
+
+          // Auto-freeze on software CPU renderer when idle > 1.8s (skip freeze during ?snapshot=1 capture)
+          const idleMs = nowMs - thermalState.lastInteractionMs;
+          if ((!isSnapshotMode && isSoftwareRenderer && thermalState.renderedTotal >= 4 && idleMs > 1800) ||
+              (!isSnapshotMode && !state.autoSpin && !isDragging && thermalState.renderedTotal >= 4 && idleMs > 2200)) {
+            el.fps.textContent = 'THERMAL IDLE (0%)';
+            return;
+          }
+
+          const tStart = performance.now();
+          thermalState.lastDrawMs = nowMs;
+          currentTimeSec = isSnapshotMode ? 1.45 : (nowMs * 0.001);
+          if (state.autoSpin && !isDragging && !isSnapshotMode) {
+            state.targetYaw += 0.0045;
+          }
+          state.yaw += (state.targetYaw - state.yaw) * (isSnapshotMode ? 1.0 : 0.16);
+          state.pitch += (state.targetPitch - state.pitch) * (isSnapshotMode ? 1.0 : 0.16);
+          state.camDist += (state.targetCamDist - state.camDist) * (isSnapshotMode ? 1.0 : 0.16);
+
+          renderPipelineFrame(canvas.width, canvas.height, canvas.width, canvas.height, 0, 0, currentTimeSec, 1);
+          const drawCost = performance.now() - tStart;
+          thermalState.renderedTotal++;
+
+          // Automatic resolution governor if GPU/CPU frame cost exceeds budget
+          if (!isSnapshotMode && drawCost > 32.0 && thermalState.adaptiveScale > 0.62) {
+            thermalState.slowStreak++;
+            if (thermalState.slowStreak >= 4) {
+              thermalState.adaptiveScale = Math.max(0.60, Number((thermalState.adaptiveScale - 0.12).toFixed(2)));
+              thermalState.slowStreak = 0;
+              resize();
+            }
+          } else {
+            thermalState.slowStreak = 0;
+          }
+
+          frameCount++;
+          const elapsed = nowMs - lastFpsTime;
+          if (frameCount >= 8 || isSnapshotMode || isSoftwareRenderer) {
+            if (elapsed > 0) {
+              el.fps.textContent = `${((frameCount * 1000) / Math.max(elapsed, 1)).toFixed(1)} FPS`;
+              el.frameTime.textContent = `${drawCost.toFixed(1)} ms`;
+            } else {
+              el.frameTime.textContent = `${drawCost.toFixed(1)} ms`;
+            }
+            if (frameCount >= 8) {
+              frameCount = 0;
+              lastFpsTime = nowMs;
+            }
+          }
+        }
+        thermalState.rafId = requestAnimationFrame(animate);
+      }
+      wakeRender();
+
+      // Interactive Actions
+      document.getElementById('btn-reset').addEventListener('click', () => {
+        el.veins.value = 0.075;
+        el.relief.value = 0.014;
+        el.power.value = 3.5;
+        el.exp.value = 0.54;
+        syncSliders();
+        state.targetYaw = 0.65;
+        state.targetPitch = 0.42;
+        state.targetCamDist = 6.2;
+        state.autoSpin = true;
+      });
+
+      document.getElementById('btn-snap-live').addEventListener('click', () => {
+        renderPipelineFrame(canvas.width, canvas.height, canvas.width, canvas.height, 0, 0, currentTimeSec, 4);
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `AETERNA_MANIFOLD_${canvas.width}x${canvas.height}.png`;
+          a.click();
+          setTimeout(() => URL.revokeObjectURL(url), 4000);
+        }, 'image/png');
+      });
+
+      // Genuine Seamless Tiled 7680x4320 (8K DCI) Snapshot with Apron Overlap & 4x RGSS
+      el.btn8k.addEventListener('click', async () => {
+        if (state.capturing) return;
+        state.capturing = true;
+        el.btn8k.disabled = true;
+        el.progWrap.style.display = 'block';
+        el.progFill.style.width = '0%';
+
+        const fullW = 7680, fullH = 4320;
+        const cols = 4, rows = 4;
+        const tileW = fullW / cols;  // 1920
+        const tileH = fullH / rows;  // 1080
+        const apron = 64;
+        const renderW = tileW + apron * 2; // 2048
+        const renderH = tileH + apron * 2; // 1208
+        const frozenTime = currentTimeSec;
+
+        const outCanvas = document.createElement('canvas');
+        outCanvas.width = fullW;
+        outCanvas.height = fullH;
+        const ctx = outCanvas.getContext('2d');
+
+        try {
+          canvas.width = renderW;
+          canvas.height = renderH;
+
+          let done = 0;
+          const total = cols * rows;
+
+          for (let ty = 0; ty < rows; ty++) {
+            for (let tx = 0; tx < cols; tx++) {
+              const originX = tx * tileW - apron;
+              const originY = ty * tileH - apron;
+
+              renderPipelineFrame(renderW, renderH, fullW, fullH, originX, originY, frozenTime, 4);
+              gl.finish();
+
+              const destX = tx * tileW;
+              const destY = (rows - 1 - ty) * tileH;
+              ctx.drawImage(canvas, apron, apron, tileW, tileH, destX, destY, tileW, tileH);
+
+              done++;
+              const pct = Math.round((done / total) * 100);
+              el.btn8k.textContent = `RENDERING 8K (${done}/${total})...`;
+              el.progFill.style.width = `${pct}%`;
+
+              await new Promise(r => requestAnimationFrame(r));
+            }
+          }
+
+          el.btn8k.textContent = 'ENCODING 8K PNG...';
+          await new Promise((resolve) => {
+            outCanvas.toBlob((blob) => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `AETERNA_8K_7680x4320_MANIFOLD_${state.manifold}.png`;
+                a.click();
+                setTimeout(() => URL.revokeObjectURL(url), 10000);
+              }
+              resolve();
+            }, 'image/png');
+          });
+        } finally {
+          outCanvas.width = 1;
+          outCanvas.height = 1;
+          state.capturing = false;
+          resize();
+          el.btn8k.disabled = false;
+          el.btn8k.textContent = 'CAPTURE 8K PNG (4×4)';
+          el.progWrap.style.display = 'none';
+        }
+      });
+
+      // Live PCC Kernel Audit JSON Loader + Live HTTP/SSE Kernel Stream + Safe Web Audio Synth
+      const KERNEL_BASE = (location.protocol !== 'file:') ? '' : 'http://127.0.0.1:8090';
+      let liveEventSource = null;
+      let audioCtx = null, oscLeft = null, oscRight = null, gainNode = null, audioOn = false;
+
+      function updateAudioSynth() {
+        if (!audioOn || !audioCtx || !gainNode || !oscLeft || !oscRight) return;
+        const now = audioCtx.currentTime;
+        if (state.lockoutMask !== 0 || state.carrierHz <= 1.0) {
+          gainNode.gain.setTargetAtTime(0.0, now, 0.02);
+        } else {
+          oscLeft.frequency.setTargetAtTime(state.carrierHz, now, 0.04);
+          oscRight.frequency.setTargetAtTime(state.carrierHz + state.pulseHz, now, 0.04);
+          gainNode.gain.setTargetAtTime(0.035, now, 0.04);
+        }
+      }
+
+      document.getElementById('btn-audio').addEventListener('click', () => {
+        audioOn = !audioOn;
+        const btn = document.getElementById('btn-audio');
+        if (audioOn && !audioCtx) {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          audioCtx = new AC();
+          gainNode = audioCtx.createGain();
+          gainNode.gain.value = 0.0;
+          const merger = audioCtx.createChannelMerger(2);
+          oscLeft = audioCtx.createOscillator();
+          oscRight = audioCtx.createOscillator();
+          oscLeft.frequency.value = state.carrierHz || 266.99;
+          oscRight.frequency.value = (state.carrierHz || 266.99) + (state.pulseHz || 11.77);
+          oscLeft.connect(merger, 0, 0);
+          oscRight.connect(merger, 0, 1);
+          merger.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          oscLeft.start();
+          oscRight.start();
+        }
+        if (audioCtx && audioCtx.state === 'suspended' && audioOn) audioCtx.resume();
+        if (!audioOn && gainNode && audioCtx) {
+          gainNode.gain.setTargetAtTime(0.0, audioCtx.currentTime, 0.02);
+        }
+        btn.textContent = audioOn ? 'AUDIO: LIVE SYNTH' : 'AUDIO: OFF';
+        btn.classList.toggle('btn-green', audioOn);
+        updateAudioSynth();
+      });
+
+      function applyPccAudit(data) {
+        if (!data || typeof data !== 'object') return;
+        if (typeof data.nominal_orch_or_hz === 'number') {
+          state.pulseHz = data.nominal_orch_or_hz;
+          el.badgeOrch.textContent = `ORCH-OR: ${data.nominal_orch_or_hz.toFixed(6)} Hz`;
+        }
+        if (typeof data.entrain_beat_hz === 'number') {
+          state.pulseHz = data.entrain_beat_hz > 0 ? data.entrain_beat_hz : 1.0;
+          el.badgeOrch.textContent = `BEAT: ${data.entrain_beat_hz.toFixed(4)} Hz`;
+        }
+        if (typeof data.carrier_hz === 'number') {
+          state.carrierHz = data.carrier_hz;
+        }
+        if (typeof data.tep_drive_mv === 'number') {
+          state.tepMv = data.tep_drive_mv;
+        }
+        if (typeof data.lockout_mask === 'number') {
+          state.lockoutMask = data.lockout_mask;
+          el.badgeLock.textContent = data.lockout_mask === 0
+            ? `LIVE: SAFE (${data.lockout_hex || '0x00'})`
+            : `LOCKOUT ${data.lockout_hex}: ${data.lockout_reasons || 'BLOCKED'}`;
+          el.badgeLock.style.borderColor = data.lockout_mask === 0 ? 'rgba(16,185,129,0.7)' : '#f43f5e';
+          el.badgeLock.style.color = data.lockout_mask === 0 ? '#10b981' : '#f43f5e';
+        }
+        if (typeof data.regime === 'string') {
+          el.kernelRegime.textContent = `${data.regime} / ${(state.carrierHz || 0).toFixed(1)} Hz`;
+          el.kernelTep.textContent = `${(state.tepMv || 0).toFixed(2)} mV (${state.lockoutMask === 0 ? 'SAFE' : 'ZEROED'})`;
+        }
+        if (typeof data.entropy_delta_s === 'number') {
+          el.badgeEntropy.textContent = `ΔS = ${data.entropy_delta_s.toFixed(6)}`;
+        }
+        if (typeof data.eval_ns === 'number') {
+          el.kernelNs.textContent = `${data.eval_ns} ns (LIVE TICK #${data.tick || 0})`;
+        } else if (typeof data.ns_per_verified_tick === 'number') {
+          el.kernelNs.textContent = `${data.ns_per_verified_tick.toFixed(2)} ns/tick`;
+        }
+        updateAudioSynth();
+      }
+
+      function connectLiveKernel() {
+        if (liveEventSource) {
+          liveEventSource.close();
+          liveEventSource = null;
+        }
+        const btn = document.getElementById('btn-live-conn');
+        try {
+          liveEventSource = new EventSource(`${KERNEL_BASE}/events`);
+          btn.textContent = 'LIVE SSE: CONNECTED';
+          liveEventSource.onmessage = (ev) => {
+            try { applyPccAudit(JSON.parse(ev.data)); } catch (_) {}
+          };
+          liveEventSource.onerror = () => {
+            btn.textContent = 'KERNEL OFFLINE (RETRY)';
+          };
+        } catch (_) {
+          btn.textContent = 'KERNEL OFFLINE';
+        }
+      }
+
+      document.getElementById('btn-live-conn').addEventListener('click', connectLiveKernel);
+      document.getElementById('kernel-scenario-bar').addEventListener('click', (e) => {
+        const btn = e.target.closest('button[data-scen]');
+        if (!btn) return;
+        const mode = btn.dataset.scen;
+        if (!liveEventSource) connectLiveKernel();
+        fetch(`${KERNEL_BASE}/api/scenario?mode=${encodeURIComponent(mode)}`, { method: 'POST' })
+          .then(r => (r.ok ? r.json() : null))
+          .then(d => { if (d) applyPccAudit(d); })
+          .catch(() => {});
+      });
+
+      document.getElementById('btn-pcc').addEventListener('click', () => el.pccInput.click());
+      el.pccInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        try {
+          applyPccAudit(JSON.parse(await file.text()));
+        } catch (err) {
+          console.error('Invalid PCC audit JSON:', err);
+        }
+      });
+
+      if (location.protocol !== 'file:') {
+        const startBridge = () => {
+          fetch(`${KERNEL_BASE}/api/state`).then(r => (r.ok ? r.json() : null)).then(d => { if (d) applyPccAudit(d); }).catch(() => {});
+          setTimeout(connectLiveKernel, 120);
+        };
+        if (document.readyState === 'complete') startBridge();
+        else window.addEventListener('load', startBridge, { once: true });
+      }
+    })();
+  </script>
+</body>
+</html>

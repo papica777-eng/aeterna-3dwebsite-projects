@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETERNA SINGULARITY // 3D WebGL2 Spectral & Wilson Plaquette Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;900&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <!-- Three.js & OrbitControls via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #020617;
+      color: #f8fafc;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+    #webgl-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+    .hud-panel {
+      position: absolute;
+      z-index: 10;
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(245, 158, 11, 0.08);
+      pointer-events: auto;
+    }
+    #top-hud {
+      top: 20px;
+      left: 24px;
+      padding: 16px 24px;
+      max-width: 480px;
+    }
+    #controls-hud {
+      bottom: 24px;
+      left: 24px;
+      padding: 16px 22px;
+      width: 380px;
+    }
+    #telemetry-hud {
+      top: 20px;
+      right: 24px;
+      padding: 18px 24px;
+      width: 360px;
+    }
+    #view-mode-bar {
+      bottom: 24px;
+      right: 24px;
+      padding: 10px 14px;
+      display: flex;
+      gap: 10px;
+    }
+    .badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .badge-gold { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .badge-cyan { background: rgba(6, 182, 212, 0.15); color: #38bdf8; border: 1px solid rgba(6, 182, 212, 0.4); }
+    .badge-emerald { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.4); }
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #10b981;
+      animation: pulseAnim 1.4s infinite;
+    }
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.3; transform: scale(0.7); }
+    }
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      padding: 5px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .metric-name { color: #94a3b8; }
+    .metric-val { color: #f8fafc; font-weight: 700; }
+    .val-gold { color: #f59e0b; }
+    .val-cyan { color: #06b6d4; }
+    .val-green { color: #10b981; }
+    .btn-mode {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(30, 41, 59, 0.8);
+      color: #94a3b8;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-mode:hover, .btn-mode.active {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(6, 182, 212, 0.25));
+      color: #ffffff;
+      border-color: #f59e0b;
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.3);
+    }
+    .slider-container { margin-top: 10px; }
+    .slider-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      color: #cbd5e1;
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+    input[type=range] {
+      width: 100%;
+      accent-color: #f59e0b;
+      cursor: pointer;
+      background: #1e293b;
+      height: 4px;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="webgl-canvas"></canvas>
+
+  <!-- Top Title & Identity Overlay -->
+  <div id="top-hud" class="hud-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+      <h1 style="font-family: 'Cinzel', serif; font-weight: 900; font-size: 16px; letter-spacing: 1px; color: #f8fafc; display: flex; align-items: center; gap: 8px;">
+        <span style="color: #f59e0b;">AETERNA</span> QUANTUM DYNAMICS
+      </h1>
+      <span class="badge badge-emerald">
+        <span class="pulse-dot"></span> LIVE WEBGL2
+      </span>
+    </div>
+    <p style="font-size: 11px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">
+      Dual Resonator Visualization: <b>Hilbert-Pólya Spectral Operator</b> $\hat{H}$ & <b>SU(3) Wilson Plaquette Gauge Lattice</b> $\mathrm{Tr}(U_p)$.
+    </p>
+    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+      <span class="badge badge-gold">AUTHORITY: DIMITAR PRODROMOV</span>
+      <span class="badge badge-cyan">PORT: 8080 LOCAL</span>
+      <span class="badge badge-emerald">ENTROPY: 0.0000</span>
+    </div>
+  </div>
+
+  <!-- Real-Time Telemetry HUD (Right) -->
+  <div id="telemetry-hud" class="hud-panel">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px;">
+      <span style="font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 11px; color: #38bdf8; letter-spacing: 0.5px;">
+        QUANTUM TELEMETRY STREAM
+      </span>
+      <i data-lucide="activity" style="width: 14px; height: 14px; color: #38bdf8;"></i>
+    </div>
+    
+    <div class="metric-row">
+      <span class="metric-name">Hilbert Operator Eigenvalues (E_n):</span>
+      <span class="metric-val val-gold" id="val-eigenvalues">14.134, 21.022, 25.010...</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">GUE Spectral Rigidity Δ₃(L):</span>
+      <span class="metric-val val-cyan" id="val-rigidity">1/π² ln(L) + const</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">SU(3) Plaquette Average ⟨W_p⟩:</span>
+      <span class="metric-val val-green" id="val-plaquette">0.58742 (β=6.0)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">Yang-Mills Mass Gap Δm:</span>
+      <span class="metric-val val-gold" id="val-massgap">77.71 MeV (Strict > 0)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">Resonance Frequency ω₀:</span>
+      <span class="metric-val val-cyan">16,180 Hz (0x3F34)</span>
+    </div>
+    <div class="metric-row">
+      <span class="metric-name">Render Frame Rate:</span>
+      <span class="metric-val val-green" id="val-fps">60.0 FPS</span>
+    </div>
+  </div>
+
+  <!-- Real-Time Parameters Control Panel (Bottom-Left) -->
+  <div id="controls-hud" class="hud-panel">
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; color: #fbbf24; margin-bottom: 8px;">
+      REAL-TIME FIELD OSCILLATOR CONTROLS
+    </div>
+
+    <div class="slider-container">
+      <div class="slider-label">
+        <span>SU(3) Coupling (β):</span>
+        <span id="label-beta">6.00</span>
+      </div>
+      <input type="range" id="slider-beta" min="4.0" max="8.0" step="0.05" value="6.0">
+    </div>
+
+    <div class="slider-container">
+      <div class="slider-label">
+        <span>Hilbert-Pólya Energy Scale (ħω):</span>
+        <span id="label-energy">1.618</span>
+      </div>
+      <input type="range" id="slider-energy" min="0.5" max="3.5" step="0.01" value="1.618">
+    </div>
+
+    <div class="slider-container">
+      <div class="slider-label">
+        <span>Plaquette Lattice Rotation Speed:</span>
+        <span id="label-speed">1.0x</span>
+      </div>
+      <input type="range" id="slider-speed" min="0.1" max="4.0" step="0.1" value="1.0">
+    </div>
+  </div>
+
+  <!-- Switch View Modes (Bottom-Right) -->
+  <div id="view-mode-bar" class="hud-panel">
+    <button class="btn-mode active" id="btn-dual" onclick="setViewMode('dual')">
+      <i data-lucide="layers" style="width: 14px; height: 14px;"></i> Dual Quantum Resonance
+    </button>
+    <button class="btn-mode" id="btn-hilbert" onclick="setViewMode('hilbert')">
+      <i data-lucide="orbit" style="width: 14px; height: 14px;"></i> Hilbert-Pólya Zeros
+    </button>
+    <button class="btn-mode" id="btn-lattice" onclick="setViewMode('lattice')">
+      <i data-lucide="grid" style="width: 14px; height: 14px;"></i> SU(3) Plaquette Lattice
+    </button>
+  </div>
+
+  <script>
+    lucide.createIcons();
+
+    // Scene Setup
+    const canvas = document.getElementById('webgl-canvas');
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x020617, 1);
+
+    const scene = new THREE.Scene();
+    scene.fog = new THREE.FogExp2(0x020617, 0.015);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.set(0, 15, 38);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.maxDistance = 80;
+    controls.minDistance = 5;
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0x38bdf8, 0.6);
+    scene.add(ambientLight);
+
+    const dirLight1 = new THREE.DirectionalLight(0xf59e0b, 1.5);
+    dirLight1.position.set(20, 40, 20);
+    scene.add(dirLight1);
+
+    const dirLight2 = new THREE.DirectionalLight(0x06b6d4, 1.2);
+    dirLight2.position.set(-20, -20, -20);
+    scene.add(dirLight2);
+
+    // ==========================================
+    // 1. HILBERT-PÓLYA SPECTRAL HELIX & PARTICLES
+    // ==========================================
+    const spectralGroup = new THREE.Group();
+    scene.add(spectralGroup);
+
+    // Riemann nontrivial zeros (first 10 imaginary parts)
+    const riemannZeros = [14.1347, 21.0220, 25.0108, 30.4248, 32.9350, 37.5861, 40.9187, 43.3270, 48.0051, 49.7738];
+
+    // Create spectral eigenvalue rings and pulsing energy waves
+    const rings = [];
+    riemannZeros.forEach((t, index) => {
+      const radius = 2.0 + index * 1.3;
+      const geom = new THREE.TorusGeometry(radius, 0.06, 16, 100);
+      const mat = new THREE.MeshStandardMaterial({
+        color: index % 2 === 0 ? 0xf59e0b : 0x06b6d4,
+        emissive: index % 2 === 0 ? 0xd97706 : 0x0891b2,
+        emissiveIntensity: 0.8,
+        roughness: 0.2,
+        metalness: 0.8
+      });
+      const torus = new THREE.Mesh(geom, mat);
+      torus.rotation.x = Math.PI / 2;
+      torus.position.y = (t - 30) * 0.4;
+      torus.userData = { baseRadius: radius, baseT: t, phase: index * 0.4 };
+      spectralGroup.add(torus);
+      rings.push(torus);
+    });
+
+    // Particle Cloud along the critical line (Re(s) = 1/2)
+    const particleCount = 2000;
+    const particleGeom = new THREE.BufferGeometry();
+    const particlePositions = new Float32Array(particleCount * 3);
+    const particleColors = new Float32Array(particleCount * 3);
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random() * 16 + 1.5;
+      const y = (Math.random() - 0.5) * 30;
+      particlePositions[i * 3] = Math.cos(angle) * r;
+      particlePositions[i * 3 + 1] = y;
+      particlePositions[i * 3 + 2] = Math.sin(angle) * r;
+
+      // Color gradient: Gold to Cyan
+      const tCol = Math.random();
+      particleColors[i * 3] = 0.96 * tCol + 0.02 * (1 - tCol);
+      particleColors[i * 3 + 1] = 0.62 * tCol + 0.71 * (1 - tCol);
+      particleColors[i * 3 + 2] = 0.07 * tCol + 0.83 * (1 - tCol);
+    }
+
+    particleGeom.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    particleGeom.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+
+    const particleMat = new THREE.PointsMaterial({
+      size: 0.18,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85,
+      blending: THREE.AdditiveBlending
+    });
+    const spectralParticles = new THREE.Points(particleGeom, particleMat);
+    spectralGroup.add(spectralParticles);
+
+    // Central Critical Line Bar
+    const criticalLineGeom = new THREE.CylinderGeometry(0.12, 0.12, 34, 16);
+    const criticalLineMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      emissive: 0x38bdf8,
+      emissiveIntensity: 1.0
+    });
+    const criticalLine = new THREE.Mesh(criticalLineGeom, criticalLineMat);
+    spectralGroup.add(criticalLine);
+
+    // ==========================================
+    // 2. SU(3) WILSON PLAQUETTE LATTICE (GAUGE)
+    // ==========================================
+    const latticeGroup = new THREE.Group();
+    scene.add(latticeGroup);
+
+    const latticeSize = 4; // 4x4x4 spatial lattice
+    const spacing = 3.2;
+    const offset = ((latticeSize - 1) * spacing) / 2;
+    const plaquetteMeshes = [];
+
+    // Lattice Links & Plaquette Tiles
+    for (let x = 0; x < latticeSize; x++) {
+      for (let y = 0; y < latticeSize; y++) {
+        for (let z = 0; z < latticeSize; z++) {
+          const posX = x * spacing - offset;
+          const posY = y * spacing - offset;
+          const posZ = z * spacing - offset;
+
+          // Plaquette Square Tile (Wilson Action Tr(U_p))
+          if (x < latticeSize - 1 && y < latticeSize - 1) {
+            const pGeom = new THREE.PlaneGeometry(spacing * 0.75, spacing * 0.75);
+            const pMat = new THREE.MeshStandardMaterial({
+              color: 0x10b981,
+              emissive: 0x047857,
+              emissiveIntensity: 0.4,
+              roughness: 0.3,
+              metalness: 0.7,
+              side: THREE.DoubleSide,
+              transparent: true,
+              opacity: 0.65
+            });
+            const plaquette = new THREE.Mesh(pGeom, pMat);
+            plaquette.position.set(posX + spacing / 2, posY + spacing / 2, posZ);
+            plaquette.userData = { x, y, z, phase: (x + y + z) * 0.5 };
+            latticeGroup.add(plaquette);
+            plaquetteMeshes.push(plaquette);
+          }
+
+          // Node Sphere
+          const nodeGeom = new THREE.SphereGeometry(0.22, 12, 12);
+          const nodeMat = new THREE.MeshStandardMaterial({
+            color: 0xf59e0b,
+            emissive: 0xd97706,
+            emissiveIntensity: 0.6
+          });
+          const node = new THREE.Mesh(nodeGeom, nodeMat);
+          node.position.set(posX, posY, posZ);
+          latticeGroup.add(node);
+        }
+      }
+    }
+
+    // Offset positions for dual mode
+    spectralGroup.position.set(-14, 0, 0);
+    latticeGroup.position.set(14, 0, 0);
+
+    // View Mode Handling
+    let currentMode = 'dual';
+    window.setViewMode = function(mode) {
+      currentMode = mode;
+      document.querySelectorAll('.btn-mode').forEach(b => b.classList.remove('active'));
+      document.getElementById('btn-' + mode).classList.add('active');
+
+      if (mode === 'dual') {
+        spectralGroup.visible = true;
+        latticeGroup.visible = true;
+        spectralGroup.position.set(-14, 0, 0);
+        latticeGroup.position.set(14, 0, 0);
+        camera.position.set(0, 15, 42);
+      } else if (mode === 'hilbert') {
+        spectralGroup.visible = true;
+        latticeGroup.visible = false;
+        spectralGroup.position.set(0, 0, 0);
+        camera.position.set(0, 10, 32);
+      } else if (mode === 'lattice') {
+        spectralGroup.visible = false;
+        latticeGroup.visible = true;
+        latticeGroup.position.set(0, 0, 0);
+        camera.position.set(0, 12, 34);
+      }
+    };
+
+    // Real-Time Controls Binding
+    const sliderBeta = document.getElementById('slider-beta');
+    const labelBeta = document.getElementById('label-beta');
+    const sliderEnergy = document.getElementById('slider-energy');
+    const labelEnergy = document.getElementById('label-energy');
+    const sliderSpeed = document.getElementById('slider-speed');
+    const labelSpeed = document.getElementById('label-speed');
+
+    sliderBeta.addEventListener('input', (e) => {
+      labelBeta.textContent = parseFloat(e.target.value).toFixed(2);
+      const beta = parseFloat(e.target.value);
+      const plaqVal = 1.0 - (1.0 / beta) * 2.45;
+      document.getElementById('val-plaquette').textContent = plaqVal.toFixed(5) + ` (β=${beta.toFixed(2)})`;
+    });
+
+    sliderEnergy.addEventListener('input', (e) => {
+      labelEnergy.textContent = parseFloat(e.target.value).toFixed(3);
+    });
+
+    sliderSpeed.addEventListener('input', (e) => {
+      labelSpeed.textContent = parseFloat(e.target.value).toFixed(1) + 'x';
+    });
+
+    // Animation Loop
+    let clock = new THREE.Clock();
+    let frameCount = 0;
+    let lastFpsTime = performance.now();
+
+    function animate() {
+      requestAnimationFrame(animate);
+
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+      const speedMult = parseFloat(sliderSpeed.value);
+      const energyMult = parseFloat(sliderEnergy.value);
+
+      // FPS update
+      frameCount++;
+      const now = performance.now();
+      if (now - lastFpsTime >= 500) {
+        const fps = (frameCount * 1000) / (now - lastFpsTime);
+        document.getElementById('val-fps').textContent = fps.toFixed(1) + ' FPS';
+        frameCount = 0;
+        lastFpsTime = now;
+      }
+
+      // Rotate groups
+      if (spectralGroup.visible) {
+        spectralGroup.rotation.y += delta * 0.25 * speedMult;
+        // Pulse spectral rings
+        rings.forEach(ring => {
+          const osc = Math.sin(time * 2.5 * energyMult + ring.userData.phase);
+          ring.scale.set(1 + osc * 0.08, 1 + osc * 0.08, 1 + osc * 0.08);
+          ring.material.emissiveIntensity = 0.5 + Math.abs(osc) * 0.7;
+        });
+        // Rotate particle cloud
+        spectralParticles.rotation.y += delta * 0.15 * speedMult;
+      }
+
+      if (latticeGroup.visible) {
+        latticeGroup.rotation.y += delta * 0.2 * speedMult;
+        latticeGroup.rotation.x += delta * 0.1 * speedMult;
+        // Oscillate Wilson Plaquettes
+        plaquetteMeshes.forEach(p => {
+          const pulse = Math.sin(time * 3.0 * speedMult + p.userData.phase);
+          p.material.opacity = 0.45 + pulse * 0.35;
+          p.material.emissiveIntensity = 0.3 + Math.abs(pulse) * 0.6;
+        });
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    // Window Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

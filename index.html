@@ -62,6 +62,14 @@
       display: block; z-index: 1; cursor: grab; touch-action: none;
     }
     #cosmosCanvas:active { cursor: grabbing; }
+    #vortexOverlayCanvas {
+      position: fixed; inset: 0; width: 100vw; height: 100vh;
+      display: block; z-index: 2; pointer-events: none;
+      mix-blend-mode: screen; opacity: 0.40;
+      transition: opacity 0.45s ease;
+    }
+    body.vortex-max #vortexOverlayCanvas { opacity: 0.84; mix-blend-mode: lighten; }
+    body.vortex-off #vortexOverlayCanvas { opacity: 0; visibility: hidden; }
 
     /* 2D Astronomical Labels & Compass Layer */
     #hudOverlayLayer {
@@ -395,7 +403,7 @@
       flex: 1; background: #04060b; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 0;
     }
     #liveSiteIframe {
-      width: 100%; height: 100%; border: none; background: #fff; transition: width 0.3s ease, border-radius 0.3s ease;
+      width: 100%; height: 100%; border: none; background: #04060b; transition: width 0.3s ease, border-radius 0.3s ease;
     }
     #liveSiteIframe.mobile-mode {
       width: 390px; height: 94%; border-radius: 28px; border: 8px solid #1e293b; box-shadow: 0 20px 60px rgba(0,0,0,0.85);
@@ -463,6 +471,9 @@
   <!-- 3D Three.js Planetary Observatory Canvas -->
   <canvas id="cosmosCanvas"></canvas>
 
+  <!-- Live Millennium 8K Procedural Liquid Gold Vortex Shader Layer -->
+  <canvas id="vortexOverlayCanvas"></canvas>
+
   <!-- Floating Dynamic Star/Planet Labels & Horizon Compass Layer -->
   <div id="hudOverlayLayer"></div>
 
@@ -503,7 +514,7 @@
     <div class="drawer-header">
       <div class="drawer-title-row">
         <h2>AETERNA WEBSITES UNIVERSE</h2>
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--emerald);">9 SYSTEMS</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--emerald);">15 SYSTEMS</span>
       </div>
       <div class="drawer-sub">Select a Website Planet to fly there, test it live &amp; claim for your brand.</div>
     </div>
@@ -526,6 +537,7 @@
       <button type="button" class="chip-filter" data-cat="sports">Fitness &amp; MMA</button>
       <button type="button" class="chip-filter" data-cat="clinic">Clinics &amp; Legal</button>
       <button type="button" class="chip-filter" data-cat="luxury">3D &amp; Real Estate</button>
+      <button type="button" class="chip-filter" data-cat="labs">🛸 8K &amp; 3D Engines</button>
     </div>
 
     <!-- Planet Selector List -->
@@ -625,6 +637,10 @@
     <button type="button" class="dock-btn" id="btnResetCamera" title="Reset Camera to Galaxy Overview">
       <span class="dock-icon">🔭</span>
       <span class="dock-lbl">Reset</span>
+    </button>
+    <button type="button" class="dock-btn active" id="togVortex" title="Cycle 8K Liquid Gold Vortex Shader Overlay (Cosmic / Full 8K / Off)">
+      <span class="dock-icon">🌀</span>
+      <span class="dock-lbl" id="lblVortex">Vortex: On</span>
     </button>
     <button type="button" class="dock-btn" id="btnZenMode" title="Hide UI for Pure 3D Universe">
       <span class="dock-icon">⛶</span>
@@ -779,8 +795,9 @@
     </div>
   </div>
 
-  <!-- Three.js r128 Engine -->
+  <!-- Three.js r128 Engine + Millennium 8K Liquid Vortex GPU Shader -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="./engines/aeterna_liquid_vortex.js"></script>
 
   <script>
   (function() {
@@ -987,6 +1004,138 @@
           "3D Spatial WebGL Sandboxes & Liquid Gold Shaders",
           "Bilateral NDA & Permanent Intellectual Property Transfer"
         ]
+      },
+      {
+        id: "millennium-vortex",
+        name: "Nova Vortex // 8K Liquid Gold Shader",
+        shortName: "Procedural 8K Gold Vortex",
+        niche: "Luxury Interactive Backgrounds, Flagship Brand Portals",
+        cat: "labs",
+        azDeg: 46, altDeg: 46, color: 0xfbbf24, hex: "#fbbf24", glow: 0xfef08a, radius: 1.42, hasRing: true,
+        heroImg: "./textures/cosmos_vortex.webp",
+        speed: "60 FPS",
+        priceLabel: "$4,900 Spatial Shader",
+        priceSub: "Native Per-Pixel WebGL GPU Engine (No Video)",
+        url: "./studios/liquid-vortex.html",
+        externalUrl: "./studios/liquid-vortex.html",
+        isCustomizable: false,
+        desc: "Millennium Studio Engine (37_AETERNA_3D_SOVEREIGN_STUDIO): renders liquid 24K gold and black-lacquer spiral ribbons, ACES filmic bokeh spheres, and scroll-reactive stardust mathematically on every pixel.",
+        features: [
+          "Resolution-Independent GPU Fragment Shader (1080p / 4K / 8K)",
+          "Cursor Parallax & Scroll-Driven Spiral Twist API",
+          "Zero Video File Downloads (~12 KB Total Engine Payload)",
+          "Also Active Live on This Cosmos via Bottom Dock 🌀 Vortex"
+        ]
+      },
+      {
+        id: "millennium-8k-raymarch",
+        name: "Kintsugi Prime // 8K HDR Raymarcher",
+        shortName: "8K HDR Multi-Pass Studio",
+        niche: "Jewellery, Architecture, Spatial Flagship Showcases",
+        cat: "labs",
+        azDeg: 118, altDeg: 48, color: 0xf59e0b, hex: "#f59e0b", glow: 0xfde047, radius: 1.52, hasRing: true,
+        heroImg: "./textures/cosmos_vulcan.webp",
+        speed: "WebGL2 HDR",
+        priceLabel: "$4,900 – $8,900",
+        priceSub: "5 SDF Manifolds + 7680×4320 PNG Exporter",
+        url: "./studios/8k-raymarch.html",
+        externalUrl: "./studios/8k-raymarch.html",
+        isCustomizable: false,
+        desc: "Full WebGL2 RGBA16F HDR raymarching engine featuring Cook-Torrance GGX shading, 1-bounce reflections, separable anamorphic bloom, FXAA, and native 4×4 RGSS tiled 8K PNG export.",
+        features: [
+          "5 Live Switchable SDF Geometries (Kintsugi Torus, Knot, SU(3), Helix, Crystal DNA)",
+          "Real-Time Gold Vein Density, Relief Height & Exposure Sliders",
+          "True 7680×4320 (8K DCI) Client-Side Tiled PNG Export",
+          "Optional Live Rust Kernel Telemetry Hook (:8090)"
+        ]
+      },
+      {
+        id: "millennium-cad-studio",
+        name: "Orion CAD // Exploded Thin-Film 3D",
+        shortName: "3D Optical & CAD Studio",
+        niche: "Manufacturing, Aerospace, Biotech Hardware Configurators",
+        cat: "labs",
+        azDeg: 184, altDeg: 44, color: 0x38bdf8, hex: "#38bdf8", glow: 0x7dd3fc, radius: 1.44, hasRing: false,
+        heroImg: "./textures/cosmos_juno.webp",
+        speed: "Three r170",
+        priceLabel: "$4,900 Spatial CAD",
+        priceSub: "Snell Dispersion, Section Cut & GLB Export",
+        url: "./studios/cad-studio.html",
+        externalUrl: "./studios/cad-studio.html",
+        isCustomizable: false,
+        desc: "Real-time Three.js r170 exploded-assembly CAD configurator with thin-film optical iridescence, Snell refractive dispersion, cross-section slicing, UnrealBloom, and binary GLB export.",
+        features: [
+          "Interactive Exploded CMOS & Optical Sensor Assembly",
+          "Real-Time Section Cut Slicing & Physical Iridescence",
+          "One-Click Binary .GLB 3D Mesh & 4K Snapshot Export",
+          "Embeddable Directly Into Product E-Commerce Pages"
+        ]
+      },
+      {
+        id: "millennium-particle-field",
+        name: "Pulsar Vector // 3D Particle Dynamics",
+        shortName: "Quantum Particle Vector Field",
+        niche: "FinTech, SaaS Telemetry, AI Startups, Interactive Heroes",
+        cat: "labs",
+        azDeg: 252, altDeg: 46, color: 0xf43f5e, hex: "#f43f5e", glow: 0xfda4af, radius: 1.36, hasRing: false,
+        heroImg: "./textures/cosmos_crimson.webp",
+        speed: "0.35s",
+        priceLabel: "$2,800 Pro Interactive",
+        priceSub: "Three.js GPU Vector Field + Live KaTeX HUD",
+        url: "./studios/dynamical-field.html",
+        externalUrl: "./studios/dynamical-field.html",
+        isCustomizable: false,
+        desc: "Real-time WebGL particle flow field and dynamical phase-space visualizer from the Millennium engine suite — engineered for SaaS dashboards, interactive hero canvases, and live telemetry.",
+        features: [
+          "Real-Time GPU Vector Attractor & Particle Trajectories",
+          "Interactive Parameter Controls & Orbit Inspection",
+          "Integrated KaTeX Mathematical Overlay Panel",
+          "Zero Server Overhead — Pure Client-Side WebGL"
+        ]
+      },
+      {
+        id: "millennium-spectral-wilson",
+        name: "Wilsonian Halo // 3D Spectral Lattice",
+        shortName: "Spectral & Lattice Visualizer",
+        niche: "Deep-Tech R&D, Cybersecurity, Data Platforms",
+        cat: "labs",
+        azDeg: 315, altDeg: 50, color: 0xa855f7, hex: "#a855f7", glow: 0xd8b4fe, radius: 1.40, hasRing: true,
+        heroImg: "./textures/cosmos_night_earth.webp",
+        speed: "0.30s",
+        priceLabel: "$2,800 Pro 3D Dashboard",
+        priceSub: "WebGL2 3D Spectral Matrix & Topology HUD",
+        url: "./studios/spectral-wilson.html",
+        externalUrl: "./studios/spectral-wilson.html",
+        isCustomizable: false,
+        desc: "Live 3D WebGL2 Wilson Plaquette and eigenvalue spectrum explorer ported straight from AETERNA Millennium visualizations — ideal for analytical dashboards and enterprise R&D portals.",
+        features: [
+          "Interactive 3D Eigenvalue & Plaquette Manifold Mesh",
+          "Dark Glassmorphic Telemetry HUD Overlay",
+          "Responsive Camera Orbit & Live Mode Switching",
+          "Ready for Live API / SSE / WebSocket Telemetry Feeds"
+        ]
+      },
+      {
+        id: "millennium-thom-cusp",
+        name: "Catastrophe Cusp // 3D Coherence Engine",
+        shortName: "Thom Cusp 3D Explorer",
+        niche: "Quant Finance, Biotech SaaS, Complex Systems Analytics",
+        cat: "labs",
+        azDeg: 86, altDeg: 58, color: 0x10b981, hex: "#10b981", glow: 0x6ee7b7, radius: 1.34, hasRing: false,
+        heroImg: "./textures/cosmos_sunrise.webp",
+        speed: "0.28s",
+        priceLabel: "$2,800 Analytics WebApp",
+        priceSub: "Interactive 3D Catastrophe Surface Simulator",
+        url: "./studios/thom-cusp.html",
+        externalUrl: "./studios/thom-cusp.html",
+        isCustomizable: false,
+        desc: "Interactive 3D Thom Cusp catastrophe surface and Sovereign Coherence (SCI = 0.2314) explorer rendered smoothly in Three.js for high-stakes scientific and SaaS data visualization.",
+        features: [
+          "Real-Time 3D Bifurcation Manifold & Control Trajectory",
+          "Zero-Bloat Single-File Deployment Architecture (20 KB)",
+          "Full OrbitControls Inspection & Custom Color Grading",
+          "Deployable as Standalone Micro-App or Embedded Widget"
+        ]
       }
     ];
 
@@ -1000,7 +1149,14 @@
       ["themis-legal", "vance-luxury-estate"],
       ["vance-luxury-estate", "aeterna-flagship"],
       ["vulcan-trades", "aeterna-flagship"],
-      ["anchialo-ecommerce", "aeterna-flagship"]
+      ["anchialo-ecommerce", "aeterna-flagship"],
+      ["aeterna-flagship", "millennium-vortex"],
+      ["millennium-vortex", "millennium-thom-cusp"],
+      ["millennium-thom-cusp", "millennium-8k-raymarch"],
+      ["millennium-8k-raymarch", "millennium-cad-studio"],
+      ["millennium-cad-studio", "millennium-particle-field"],
+      ["millennium-particle-field", "millennium-spectral-wilson"],
+      ["millennium-spectral-wilson", "aeterna-flagship"]
     ];
 
     // =========================================================================
@@ -1019,6 +1175,8 @@
     let showGrid = true;
     let showHorizon = true;
     let showLabels = true;
+    let vortexMode = "on"; // "on" | "max" | "off"
+    let vortexCtrl = null;
 
     const SPHERE_RADIUS = 58;
 
@@ -1237,7 +1395,13 @@
         "helios-clinic": { surface: "./textures/4k_venus.webp", tint: 0xe0f2fe, atmo: 0x7dd3fc, rough: 0.6, metal: 0.05 },
         "themis-legal": { surface: "./textures/4k_saturn.webp", ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xc5a34e, rough: 0.7, metal: 0.05 },
         "vance-luxury-estate": { surface: "./textures/4k_mercury.webp", tint: 0xd8b4fe, atmo: 0xa855f7, rough: 0.5, metal: 0.35, cage: true },
-        "aeterna-flagship": { surface: "./textures/4k_sun.webp", atmo: 0xfde047, emissive: true }
+        "aeterna-flagship": { surface: "./textures/4k_sun.webp", atmo: 0xfde047, emissive: true },
+        "millennium-vortex": { surface: "./textures/4k_sun.webp", tint: 0xfbbf24, ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xfbbf24, rough: 0.25, metal: 0.65, cage: true },
+        "millennium-8k-raymarch": { surface: "./textures/4k_venus.webp", tint: 0xf59e0b, ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xfde047, rough: 0.3, metal: 0.55, cage: true },
+        "millennium-cad-studio": { surface: "./textures/2k_neptune.webp", tint: 0x7dd3fc, atmo: 0x38bdf8, rough: 0.25, metal: 0.5, cage: true },
+        "millennium-particle-field": { surface: "./textures/4k_mars.webp", tint: 0xfda4af, atmo: 0xf43f5e, rough: 0.6, metal: 0.15 },
+        "millennium-spectral-wilson": { surface: "./textures/2k_uranus.webp", tint: 0xd8b4fe, ringTex: "./textures/saturn_ring_alpha.png", atmo: 0xa855f7, rough: 0.4, metal: 0.4, cage: true },
+        "millennium-thom-cusp": { surface: "./textures/4k_jupiter.webp", tint: 0x6ee7b7, atmo: 0x10b981, rough: 0.45, metal: 0.25 }
       };
 
       const moonTex = texLoader.load("./textures/4k_moon.webp");
@@ -1540,6 +1704,12 @@
 
       const fullUrl = buildHydratedUrl(p);
       document.getElementById("btnInspExternal").href = fullUrl;
+      if (vortexCtrl) {
+        vortexCtrl.setTarget({
+          center: [0.5 + Math.sin(deg2rad(p.azDeg)) * 0.12, 0.5 + (p.altDeg - 30) * 0.003],
+          zoom: p.cat === "labs" ? 1.15 : 0.98
+        });
+      }
       document.getElementById("planetInspector").classList.add("open");
       if (window.innerWidth < 900 && flyTo) {
         document.getElementById("sideDrawer").classList.add("collapsed");
@@ -1553,6 +1723,8 @@
     // Global helper callable from inside demo iframes!
     window.openPlanetConfigurator = function(mode) {
       document.getElementById("modalPreview").classList.remove("open");
+      document.getElementById("liveSiteIframe").src = "about:blank";
+      syncVortexLayer(false);
       document.getElementById("modalConfig").classList.add("open");
     };
 
@@ -1562,6 +1734,7 @@
       const url = buildHydratedUrl(p);
       document.getElementById("modalPreviewUrl").textContent = url.startsWith("http") ? url : "https://paas.website/" + url.replace("./", "");
       document.getElementById("btnModalOpenTab").href = url;
+      syncVortexLayer(true);
       document.getElementById("liveSiteIframe").src = url;
       document.getElementById("modalPreview").classList.add("open");
     });
@@ -1569,6 +1742,7 @@
     document.getElementById("btnClosePreviewModal").addEventListener("click", () => {
       document.getElementById("modalPreview").classList.remove("open");
       document.getElementById("liveSiteIframe").src = "about:blank";
+      syncVortexLayer(false);
     });
     document.getElementById("btnModeDesktop").addEventListener("click", function() {
       this.classList.add("active");
@@ -1675,6 +1849,43 @@
       targetAlt = 22; targetFov = 58; isFlying = true; autoOrbit = true;
       document.getElementById("togAutoOrbit").classList.add("active");
     });
+    // =========================================================================
+    // 8B. MILLENNIUM 8K LIQUID GOLD VORTEX OVERLAY CONTROLLER
+    // =========================================================================
+    const vortexCanvasEl = document.getElementById("vortexOverlayCanvas");
+
+    function syncVortexLayer(suspendForModal = false) {
+      const btn = document.getElementById("togVortex");
+      const lbl = document.getElementById("lblVortex");
+      document.body.classList.toggle("vortex-max", !suspendForModal && vortexMode === "max");
+      document.body.classList.toggle("vortex-off", suspendForModal || vortexMode === "off");
+      if (btn) btn.classList.toggle("active", vortexMode !== "off");
+      if (lbl) lbl.textContent = vortexMode === "max" ? "Vortex: 8K" : (vortexMode === "on" ? "Vortex: On" : "Vortex: Off");
+
+      const shouldRun = !suspendForModal && vortexMode !== "off" && vortexCanvasEl && window.AeternaLiquidVortex;
+      if (shouldRun && !vortexCtrl) {
+        try {
+          vortexCtrl = window.AeternaLiquidVortex.mount(vortexCanvasEl, {
+            center: [0.5, 0.5],
+            zoom: vortexMode === "max" ? 1.12 : 0.96,
+            maxDpr: 1.5
+          });
+        } catch (err) {
+          vortexCtrl = null;
+        }
+      } else if (shouldRun && vortexCtrl) {
+        vortexCtrl.setTarget({ zoom: vortexMode === "max" ? 1.12 : 0.96 });
+      } else if (!shouldRun && vortexCtrl) {
+        vortexCtrl.destroy();
+        vortexCtrl = null;
+      }
+    }
+
+    document.getElementById("togVortex").addEventListener("click", () => {
+      vortexMode = vortexMode === "on" ? "max" : (vortexMode === "max" ? "off" : "on");
+      syncVortexLayer(false);
+    });
+
     document.getElementById("btnZenMode").addEventListener("click", () => {
       document.getElementById("sideDrawer").classList.add("collapsed");
       document.getElementById("planetInspector").classList.remove("open");
@@ -1789,6 +2000,7 @@
         });
 
         if (vortexPlane) vortexPlane.rotateZ(0.0008);
+        if (vortexCtrl) vortexCtrl.setScroll(camAz * 14);
 
         renderer.render(scene, camera);
 
@@ -1870,6 +2082,7 @@
 
     // Boot Observatory
     init3DUniverse();
+    syncVortexLayer(false);
     initHudMarkers();
     renderCatalog();
     recalcModular();

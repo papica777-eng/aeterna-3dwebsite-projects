@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AETERNA Studio // Liquid Vortex Preview</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #050506; overflow: hidden; }
+  canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  .hud { position: fixed; left: 16px; bottom: 12px; font: 11px/1.4 monospace; color: rgba(230,210,160,.55); }
+</style>
+</head>
+<body>
+<canvas id="v"></canvas>
+<div class="hud" id="hud"></div>
+<script src="../engines/aeterna_liquid_vortex.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const cx = parseFloat(q.get('cx') || '0.5'), cy = parseFloat(q.get('cy') || '0.5');
+  const v = AeternaLiquidVortex.mount(document.getElementById('v'), { center: [cx, cy], zoom: parseFloat(q.get('zoom') || '1'), preserve: true });
+  let scrollAccum = 0;
+  window.addEventListener('wheel', (e) => { scrollAccum += e.deltaY; if (v) v.setScroll(scrollAccum); }, { passive: true });
+  setInterval(() => { const c = document.getElementById('v'); document.getElementById('hud').textContent = 'AETERNA LIQUID GOLD VORTEX // ' + c.width + 'x' + c.height + ' @ DPR ' + (v ? v.getScale().toFixed(2) : '1.0') + ' (MOVE CURSOR OR SCROLL TO TWIST)'; }, 500);
+</script>
+</body>
+</html>
+
