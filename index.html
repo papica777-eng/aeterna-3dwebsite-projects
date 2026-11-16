@@ -276,8 +276,26 @@
       from { opacity: 0; transform: translateX(18px); }
       to { opacity: 1; transform: translateX(0); }
     }
+    .insp-hero-banner {
+      position: relative; width: 100%; height: 152px; overflow: hidden;
+      background: #03050a; flex-shrink: 0; border-bottom: 1px solid var(--border);
+    }
+    .insp-hero-banner img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .insp-hero-banner::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(5,7,12,0.1) 20%, rgba(9, 13, 21, 0.98) 100%);
+    }
+    .insp-close-floating {
+      position: absolute; top: 10px; right: 12px; z-index: 5;
+      background: rgba(6, 9, 15, 0.72); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; width: 30px; height: 30px; border-radius: 50%; cursor: pointer;
+      font-size: 16px; backdrop-filter: blur(8px);
+    }
+    .insp-close-floating:hover { border-color: var(--gold); color: var(--gold-bright); }
     .insp-head {
-      padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
+      padding: 12px 20px 14px; border-bottom: 1px solid var(--border);
       display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
     }
     .insp-eyebrow { font-family: var(--font-mono); font-size: 10px; color: var(--gold); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 4px; }
@@ -521,12 +539,15 @@
 
   <!-- ════════ FLOATING PLANET INSPECTOR CARD (RIGHT) ════════ -->
   <section id="planetInspector">
+    <div class="insp-hero-banner">
+      <img id="inspHeroImg" src="./textures/cosmos_vulcan.webp" alt="Planet Architectural Backdrop">
+      <button type="button" class="insp-close-floating" id="btnCloseInspector">&times;</button>
+    </div>
     <div class="insp-head">
       <div>
         <div class="insp-eyebrow" id="inspEyebrow">CONSTELLATION // SYSTEM</div>
         <h3 class="insp-title" id="inspTitle">Planet Name</h3>
       </div>
-      <button type="button" class="btn-insp-close" id="btnCloseInspector">&times;</button>
     </div>
 
     <div class="insp-body">
@@ -776,6 +797,7 @@
         niche: "Plumbers, Electricians, Roofers, Builders, Glaziers",
         cat: "trades",
         azDeg: 25, altDeg: 18, color: 0xf59e0b, hex: "#f59e0b", glow: 0xfbbf24, radius: 1.45, hasRing: false,
+        heroImg: "./textures/cosmos_vulcan.webp",
         speed: "0.3s",
         priceLabel: "$495 Base Launchpad",
         priceSub: "+ Optional SEO & Calculator Add-ons",
@@ -797,6 +819,7 @@
         niche: "Artisan Cafés, Restaurants, Wine Bars, Boutiques",
         cat: "hospitality",
         azDeg: 68, altDeg: 26, color: 0x63b292, hex: "#63b292", glow: 0xd4f23b, radius: 1.35, hasRing: false,
+        heroImg: "./textures/cosmos_sunrise.webp",
         speed: "0.4s",
         priceLabel: "$495 Base Launchpad",
         priceSub: "Warm Cream & Sage Editorial Edition",
@@ -818,6 +841,7 @@
         niche: "Retail Brands, Wellness, Cosmetics, Apothecary",
         cat: "ecommerce",
         azDeg: 112, altDeg: 22, color: 0x10b981, hex: "#10b981", glow: 0x34d399, radius: 1.65, hasRing: true,
+        heroImg: "./textures/cosmos_night_earth.webp",
         speed: "0.35s",
         priceLabel: "$8,900 Turnkey Store",
         priceSub: "0% Shopify Fees Forever (Live Client Site)",
@@ -839,6 +863,7 @@
         niche: "Combat Academies, Gyms, Online Coaching Portals",
         cat: "sports",
         azDeg: 158, altDeg: 32, color: 0xef4444, hex: "#ef4444", glow: 0xfca5a5, radius: 1.55, hasRing: false,
+        heroImg: "./textures/cosmos_crimson.webp",
         speed: "0.4s",
         priceLabel: "$4,900 Portal Build",
         priceSub: "40-Lesson Encrypted Vault (Live Site)",
@@ -860,6 +885,7 @@
         niche: "Martial Arts Clubs, Streetwear, Fitness Studios",
         cat: "sports",
         azDeg: 200, altDeg: 16, color: 0x06b6d4, hex: "#06b6d4", glow: 0x67e8f9, radius: 1.38, hasRing: false,
+        heroImg: "./textures/cosmos_juno.webp",
         speed: "0.38s",
         priceLabel: "$4,900 Spatial Portal",
         priceSub: "Hosted Live on paas.website/immersion-mma",
@@ -881,6 +907,7 @@
         niche: "Dental Practices, Cosmetic Clinics, Hair & Spa",
         cat: "clinic",
         azDeg: 245, altDeg: 28, color: 0x38bdf8, hex: "#38bdf8", glow: 0xbae6fd, radius: 1.4, hasRing: true,
+        heroImg: "./textures/cosmos_sunrise.webp",
         speed: "0.32s",
         priceLabel: "$495 Base Launchpad",
         priceSub: "or $1,500 Express Multi-Page Practice",
@@ -902,6 +929,7 @@
         niche: "Lawyers, Financial Advisors, Tax & Civic Portals",
         cat: "clinic",
         azDeg: 290, altDeg: 20, color: 0xc5a34e, hex: "#c5a34e", glow: 0xfef08a, radius: 1.48, hasRing: true,
+        heroImg: "./textures/cosmos_juno.webp",
         speed: "0.25s",
         priceLabel: "$1,500 – $2,800",
         priceSub: "Client-Side Zero-Leakage Architecture",
@@ -923,6 +951,7 @@
         niche: "Luxury Property, Developers, Family Offices, Supercar Dealers",
         cat: "luxury",
         azDeg: 332, altDeg: 34, color: 0xa855f7, hex: "#a855f7", glow: 0xe9d5ff, radius: 1.5, hasRing: false,
+        heroImg: "./textures/cosmos_night_earth.webp",
         speed: "0.45s",
         priceLabel: "$4,900 Spatial Luxury",
         priceSub: "Interactive 3D WebGL Portfolio",
@@ -944,6 +973,7 @@
         niche: "All Custom Flagships, 3D Shaders, Enterprise Commissions",
         cat: "luxury",
         azDeg: 0, altDeg: 52, color: 0xfde047, hex: "#fde047", glow: 0xffffff, radius: 1.9, hasRing: true,
+        heroImg: "./textures/cosmos_vortex.webp",
         speed: "0.3s",
         priceLabel: "$1,500 – $8,900",
         priceSub: "Full 4-Step Engineering & IP Transfer",
@@ -1013,7 +1043,7 @@
 
     let renderer, scene, camera;
     let planetMeshes = {};
-    let constellationGroup, gridGroup, horizonGroup, starField;
+    let constellationGroup, gridGroup, horizonGroup, starField, vortexPlane;
     let clock = typeof THREE !== "undefined" ? new THREE.Clock() : null;
 
     function init3DUniverse() {
@@ -1076,28 +1106,46 @@
       skyDome.rotation.x = 0.28;
       scene.add(skyDome);
 
-      // A2. NASA JWST Carina Nebula Deep-Sky Cloud Backdrop (subtle translucent radial fade)
+      // A2. Deep-Space JWST Carina Nebula & Architect's Spinning Spiral Vortex Portal
       const carinaTex = texLoader.load("./textures/jwst_carina.webp");
-      const carinaMat = new THREE.ShaderMaterial({
-        uniforms: { uMap: { value: carinaTex } },
-        vertexShader: `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
-        fragmentShader: `
-          uniform sampler2D uMap;
-          varying vec2 vUv;
-          void main() {
-            vec2 c = vUv - 0.5;
-            float radial = smoothstep(0.5, 0.14, length(c));
-            vec4 tex = texture2D(uMap, vUv);
-            gl_FragColor = vec4(tex.rgb * 0.72, radial * 0.52);
-          }
-        `,
-        transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
-      });
-      const carinaPlane = new THREE.Mesh(new THREE.PlaneGeometry(110, 68), carinaMat);
+      const vortexTex = texLoader.load("./textures/cosmos_vortex.webp");
+      const nebulaVert = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
+      const nebulaFrag = `
+        uniform sampler2D uMap;
+        uniform float uStrength;
+        varying vec2 vUv;
+        void main() {
+          vec2 c = vUv - 0.5;
+          float radial = smoothstep(0.49, 0.14, length(c));
+          vec4 tex = texture2D(uMap, vUv);
+          gl_FragColor = vec4(tex.rgb * uStrength, radial * 0.65);
+        }
+      `;
+      const carinaPlane = new THREE.Mesh(
+        new THREE.PlaneGeometry(115, 72),
+        new THREE.ShaderMaterial({
+          uniforms: { uMap: { value: carinaTex }, uStrength: { value: 0.72 } },
+          vertexShader: nebulaVert, fragmentShader: nebulaFrag,
+          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+        })
+      );
       const carinaPos = sphToVec3(220, 24, 175);
       carinaPlane.position.set(carinaPos.x, carinaPos.y, carinaPos.z);
       carinaPlane.lookAt(0, 0, 0);
       scene.add(carinaPlane);
+
+      vortexPlane = new THREE.Mesh(
+        new THREE.PlaneGeometry(92, 92),
+        new THREE.ShaderMaterial({
+          uniforms: { uMap: { value: vortexTex }, uStrength: { value: 0.85 } },
+          vertexShader: nebulaVert, fragmentShader: nebulaFrag,
+          transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide
+        })
+      );
+      const vPos = sphToVec3(12, 46, 160);
+      vortexPlane.position.set(vPos.x, vPos.y, vPos.z);
+      vortexPlane.lookAt(0, 0, 0);
+      scene.add(vortexPlane);
 
       // A3. Parallax Foreground Starfield (2,600 crisp stars for parallax depth over 8K sky)
       const starGeo = new THREE.BufferGeometry();
@@ -1383,7 +1431,7 @@
         const card = document.createElement("div");
         card.className = "planet-item" + (p.id === selectedPlanetId ? " selected" : "");
         card.innerHTML = `
-          <div class="orb-thumb" style="background:radial-gradient(circle at 30% 30%, ${p.hex}, #090d16 90%);"></div>
+          <div class="orb-thumb" style="background-image:url('${p.heroImg}');background-size:cover;background-position:center;border:1px solid ${p.hex};box-shadow:inset -5px -5px 10px rgba(0,0,0,0.75), 0 0 12px ${p.hex}55;"></div>
           <div class="planet-meta">
             <div class="planet-name">${p.shortName}</div>
             <div class="planet-niche">${p.niche}</div>
@@ -1478,6 +1526,7 @@
       Object.keys(labelEls).forEach(k => labelEls[k].classList.toggle("active", k === id));
 
       // Hydrate Right Planet Inspector Panel
+      if (p.heroImg) document.getElementById("inspHeroImg").src = p.heroImg;
       document.getElementById("inspEyebrow").textContent = `${p.cat.toUpperCase()} GALAXY // AZM ${p.azDeg}° ALT +${p.altDeg}°`;
       document.getElementById("inspTitle").textContent = p.name;
       document.getElementById("inspDesc").textContent = p.desc;
@@ -1738,6 +1787,8 @@
           const rad = g.userData.planet.radius * 1.85;
           m.position.set(Math.cos(elapsed * 0.7 + idx) * rad, Math.sin(elapsed * 0.5) * 0.4, Math.sin(elapsed * 0.7 + idx) * rad);
         });
+
+        if (vortexPlane) vortexPlane.rotateZ(0.0008);
 
         renderer.render(scene, camera);
 
