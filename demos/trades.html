@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Vulcan Trades // 24/7 Emergency &amp; Architectural Flagship</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #060708;
+      --surface: #0c0d10;
+      --card: rgba(14, 15, 18, 0.82);
+      --gold: #c5a34e;
+      --gold-light: #e6decb;
+      --gold-glow: rgba(197, 163, 78, 0.35);
+      --gold-border: rgba(197, 163, 78, 0.42);
+      --ivory: #f7f5f0;
+      --muted: #8e9297;
+      --border: rgba(255, 255, 255, 0.08);
+      --serif: "Cormorant Garamond", Georgia, serif;
+      --display: "Cinzel", Georgia, serif;
+      --sans: "Plus Jakarta Sans", sans-serif;
+      --mono: "Space Mono", monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ivory);
+      font-family: var(--sans);
+      line-height: 1.6;
+      overflow-x: hidden;
+      padding-top: 68px;
+      -webkit-font-smoothing: antialiased;
+    }
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 76px 76px;
+      mask-image: radial-gradient(circle at 60% 35%, #000 40%, transparent 88%);
+      -webkit-mask-image: radial-gradient(circle at 60% 35%, #000 40%, transparent 88%);
+    }
+    .claim-ribbon {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      background: rgba(6, 7, 8, 0.94); backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--gold-border);
+      padding: 10px 28px; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;
+    }
+    .ribbon-l { display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .ribbon-l b { color: var(--gold); letter-spacing: 1px; }
+    .ribbon-r { display: flex; align-items: center; gap: 12px; }
+    .ribbon-price { font-family: var(--display); font-size: 16px; font-weight: 700; color: var(--gold); }
+    .btn-gold {
+      background: var(--gold); color: #060708; font-weight: 800; font-size: 11px;
+      letter-spacing: 1.5px; text-transform: uppercase; padding: 9px 18px; border-radius: 3px;
+      border: none; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .btn-gold:hover { background: #d8b868; box-shadow: 0 0 24px var(--gold-glow); transform: translateY(-1px); }
+    .btn-outline {
+      background: transparent; border: 1px solid var(--gold-border); color: var(--gold);
+      font-weight: 700; font-size: 11px; letter-spacing: 1.4px; text-transform: uppercase;
+      padding: 9px 18px; border-radius: 3px; cursor: pointer; text-decoration: none; transition: all 0.2s;
+    }
+    .btn-outline:hover { background: rgba(197,163,78,0.12); }
+
+    .wrap { position: relative; z-index: 2; max-width: 1260px; margin: 0 auto; padding: 0 32px; }
+    header.nav {
+      display: flex; justify-content: space-between; align-items: center; padding: 26px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; }
+    .brand-mark { color: var(--gold); font-size: 18px; }
+    .brand-name { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; }
+    .brand-sub { font-family: var(--mono); font-size: 10px; color: var(--muted); }
+
+    .hero {
+      padding: 64px 0 48px; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 48px; align-items: center;
+    }
+    .eyebrow {
+      display: inline-block; font-family: var(--mono); font-size: 10.5px; letter-spacing: 2px;
+      color: var(--gold); border: 1px solid var(--gold-border); background: rgba(197,163,78,0.08);
+      padding: 5px 14px; border-radius: 2px; margin-bottom: 20px; text-transform: uppercase;
+    }
+    h1 {
+      font-family: var(--serif); font-size: clamp(40px, 5vw, 68px); font-weight: 500;
+      line-height: 1.05; text-transform: uppercase; color: #fff; margin-bottom: 20px;
+    }
+    h1 em { color: var(--gold); font-style: italic; }
+    .hero p { color: var(--muted); font-size: 15.5px; max-width: 520px; margin-bottom: 28px; }
+    .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+    .terminal-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 30px;
+      backdrop-filter: blur(20px); box-shadow: 0 30px 70px rgba(0,0,0,0.7);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .terminal-card:hover { border-color: var(--gold-border); }
+    .term-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; margin-bottom: 18px; border-bottom: 1px solid var(--border);
+    }
+    .term-title { font-family: var(--display); font-size: 13px; letter-spacing: 2px; color: #fff; }
+    .term-live { font-family: var(--mono); font-size: 10px; color: #10b981; }
+    .fg { margin-bottom: 14px; }
+    .fg label { display: block; font-family: var(--mono); font-size: 10px; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; }
+    .fg input, .fg select {
+      width: 100%; background: var(--surface); border: 1px solid var(--border); color: var(--ivory);
+      padding: 10px 12px; border-radius: 3px; font-family: var(--sans); font-size: 13px; outline: none;
+    }
+    .fg input:focus { border-color: var(--gold); }
+
+    .metrics {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 32px 0 60px;
+    }
+    .m-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 4px; padding: 22px;
+      transition: border-color 0.2s;
+    }
+    .m-card:hover { border-color: var(--gold-border); }
+    .m-val { font-family: var(--mono); font-size: 24px; font-weight: 700; color: var(--gold); margin-bottom: 4px; }
+    .m-lbl { font-family: var(--display); font-size: 11px; letter-spacing: 1.5px; color: #fff; margin-bottom: 4px; }
+    .m-txt { font-size: 12px; color: var(--muted); }
+
+    .calc-box {
+      background: var(--surface); border: 1px solid var(--gold-border); border-radius: 6px;
+      padding: 32px; margin-bottom: 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 32px; align-items: center;
+    }
+    .calc-box h2 { font-family: var(--serif); font-size: 32px; font-weight: 500; color: #fff; margin-bottom: 10px; }
+    .calc-box p { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+    .calc-readout {
+      background: rgba(6,7,8,0.8); border: 1px solid var(--border); border-radius: 4px; padding: 20px;
+      font-family: var(--mono); font-size: 12px;
+    }
+    .calc-price { font-size: 28px; color: var(--gold); font-weight: 700; margin: 6px 0; }
+
+    footer {
+      border-top: 1px solid var(--border); padding: 30px 0 50px; display: flex; justify-content: space-between;
+      flex-wrap: wrap; gap: 16px; font-size: 12px; color: var(--muted);
+    }
+
+    @media (max-width: 960px) {
+      .hero, .calc-box { grid-template-columns: 1fr; }
+      .metrics { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .metrics { grid-template-columns: 1fr; }
+      body { padding-top: 104px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="claim-ribbon">
+    <div class="ribbon-l">
+      <span>▲ PLANET VULCAN TEMPLATE</span>
+      <span>&bull;</span>
+      <span>LIVE HYDRATED FOR: <b id="ribbonBiz">YOUR TRADE BUSINESS</b></span>
+    </div>
+    <div class="ribbon-r">
+      <span class="ribbon-price">$495 AUD BASE</span>
+      <button type="button" class="btn-gold" onclick="window.parent && window.parent.openPlanetConfigurator ? window.parent.openPlanetConfigurator('trades') : alert('Contact AETERNA at +359 884 638 640 / dimitar@aeterna.website to claim this website for $495 AUD.')">Configure Add-ons &amp; Claim</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <header class="nav">
+      <div class="brand">
+        <span class="brand-mark">▲</span>
+        <div>
+          <div class="brand-name" id="brandTitle">VULCAN TRADES &amp; DISPATCH</div>
+          <div class="brand-sub" id="brandMeta">LICENSED MASTER CONTRACTORS &bull; <span id="cityBadge">MELBOURNE, VIC</span></div>
+        </div>
+      </div>
+      <a href="tel:0394192831" class="btn-outline" id="navPhone">📞 <span id="navPhoneTxt">03 9419 2831</span></a>
+    </header>
+
+    <section class="hero">
+      <div>
+        <span class="eyebrow">24/7 EMERGENCY &amp; ARCHITECTURAL SYSTEMS</span>
+        <h1>Precision Engineering For <em><span id="heroCity">Melbourne</span></em> Properties.</h1>
+        <p>Rapid-response repairs, commercial strata maintenance, and compliance-certified installations. Guaranteed punctual arrival and upfront fixed pricing with zero hidden callout traps.</p>
+        <div class="cta-row">
+          <a href="tel:0394192831" class="btn-gold" id="heroCall">⚡ Immediate 24/7 Dispatch</a>
+          <a href="#estimator" class="btn-outline">🧮 Instant Job Estimator</a>
+        </div>
+      </div>
+
+      <div class="terminal-card" id="tiltCard">
+        <div class="term-head">
+          <span class="term-title">PRIORITY DISPATCH CONSOLE</span>
+          <span class="term-live">● ON STANDBY</span>
+        </div>
+        <form onsubmit="event.preventDefault(); document.getElementById('dispatchConfirm').style.display='block';">
+          <div class="fg"><label>Client / Strata Manager</label><input type="text" placeholder="e.g. Sarah Jenkins" required></div>
+          <div class="fg"><label>Direct Phone</label><input type="tel" placeholder="e.g. 0411 222 333" required></div>
+          <div class="fg"><label>Property Suburb</label><input type="text" id="formSuburb" value="Melbourne, VIC"></div>
+          <div class="fg">
+            <label>Urgency Scope</label>
+            <select>
+              <option>Emergency Make-Safe (&lt; 45 min arrival)</option>
+              <option>Architectural Commercial Quote</option>
+              <option>Preventative Maintenance &amp; Audit</option>
+            </select>
+          </div>
+          <button type="submit" class="btn-gold" style="width:100%;justify-content:center;padding:12px;">Transmit Brief to Crew &rarr;</button>
+          <div id="dispatchConfirm" style="display:none;margin-top:10px;font-family:var(--mono);font-size:11px;color:#10b981;">✓ Brief dispatched directly to crew mobile via SMS gateway.</div>
+        </form>
+      </div>
+    </section>
+
+    <section class="metrics">
+      <div class="m-card"><div class="m-val">&lt; 42 min</div><div class="m-lbl">METRO DISPATCH</div><div class="m-txt">GPS-routed service vehicles ready across inner and outer suburbs.</div></div>
+      <div class="m-card"><div class="m-val">100%</div><div class="m-lbl">STATUTORY LICENSED</div><div class="m-txt">Full public liability insurance and signed Australian Standards certificates.</div></div>
+      <div class="m-card"><div class="m-val">5.0 ★</div><div class="m-lbl">GOOGLE AUTHORITY</div><div class="m-txt">Verified track record across residential homeowners and body corporates.</div></div>
+      <div class="m-card"><div class="m-val">FIXED</div><div class="m-lbl">TRANSPARENT QUOTES</div><div class="m-txt">Exact scope confirmation prior to commencing any work on site.</div></div>
+    </section>
+
+    <section class="calc-box" id="estimator">
+      <div>
+        <span class="eyebrow">OPTIONAL ADD-ON DEMO (+$450)</span>
+        <h2>Interactive Pre-Qualification Estimator</h2>
+        <p>Eliminate 12+ hours of phone tag per week. Customers specify job scope and area right on your website before calling.</p>
+        <div class="fg">
+          <label>Estimated Project Area / Units: <strong id="areaLbl" style="color:var(--gold)">35 m² / Standard Job</strong></label>
+          <input type="range" id="areaRange" min="10" max="200" step="5" value="35" style="accent-color:var(--gold);padding:0;">
+        </div>
+      </div>
+      <div class="calc-readout">
+        <div style="color:var(--muted);">ESTIMATED COMMERCIAL SCOPE:</div>
+        <div class="calc-price" id="estPrice">$1,645 AUD</div>
+        <div style="color:#10b981;">✓ Includes Materials, Labour &amp; Compliance Certificate</div>
+      </div>
+    </section>
+
+    <footer>
+      <div><strong id="footerTitle" style="color:#fff;">VULCAN TRADES &amp; DISPATCH</strong> &bull; Serving <span id="footerCity">Melbourne, VIC</span></div>
+      <div style="font-family:var(--mono);color:var(--gold);">ENGINEERED BY AETERNA // PAAS.WEBSITE</div>
+    </footer>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const biz = params.get('business')?.trim();
+    const city = params.get('city')?.trim();
+    const phone = params.get('phone')?.trim();
+
+    if (biz) {
+      document.title = biz + ' // Official Web Flagship';
+      document.getElementById('ribbonBiz').textContent = biz.toUpperCase();
+      document.getElementById('brandTitle').textContent = biz.toUpperCase();
+      document.getElementById('footerTitle').textContent = biz.toUpperCase();
+    }
+    if (city) {
+      document.getElementById('cityBadge').textContent = city.toUpperCase();
+      document.getElementById('heroCity').textContent = city;
+      document.getElementById('formSuburb').value = city;
+      document.getElementById('footerCity').textContent = city;
+    }
+    if (phone) {
+      document.getElementById('navPhoneTxt').textContent = phone;
+      const cleanTel = phone.replace(/\s+/g, '');
+      document.getElementById('navPhone').href = 'tel:' + cleanTel;
+      document.getElementById('heroCall').href = 'tel:' + cleanTel;
+    }
+
+    const range = document.getElementById('areaRange');
+    range.addEventListener('input', () => {
+      const v = parseInt(range.value, 10);
+      document.getElementById('areaLbl').textContent = v + ' m² / Scope Units';
+      document.getElementById('estPrice').textContent = '$' + (v * 47).toLocaleString('en-US') + ' AUD';
+    });
+
+    const card = document.getElementById('tiltCard');
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5;
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `perspective(1000px) rotateX(${(-py * 5).toFixed(2)}deg) rotateY(${(px * 6).toFixed(2)}deg)`;
+    });
+    card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+  </script>
+</body>
+</html>
