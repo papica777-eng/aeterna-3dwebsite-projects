@@ -1,0 +1,95 @@
+---
+---
+<!-- COMMAND-K GLOBAL OMNIBOX MODAL -->
+<div class="modal-backdrop" id="cmdBackdrop" aria-hidden="true">
+  <div class="cmd-dialog" role="dialog" aria-modal="true" aria-label="Глобално търсене СИГМА 3.0">
+    <div class="cmd-input-row">
+      <input id="cmdInput" type="search" placeholder="Търси сред 571 лица, 4 344 институции, 17 428 фирми/ДЗЗД, 28 области…" autocomplete="off" />
+      <button type="button" class="close-btn" id="cmdCloseBtn" aria-label="Затвори">&times;</button>
+    </div>
+    <div class="cmd-results" id="cmdResults">
+      <div class="muted" style="padding:18px;text-align:center;">Започнете да пишете име, ЕИК, община, област или ДЗЗД (напр. <code>Бургас</code>, <code>103267194</code>, <code>Гаргов</code>, <code>АПИ</code>)…</div>
+    </div>
+  </div>
+</div>
+
+<!-- LIVE REAL-TIME CONTRACT FORENSIC INSPECTOR MODAL -->
+<div class="modal-backdrop" id="contractModalBackdrop" aria-hidden="true">
+  <div class="contract-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="contractModalTitle">
+    <div class="drawer-header">
+      <div>
+        <div class="kpi-label">ЖИВА CORS ПРОВЕРКА · SIGMA.MIDT.BG/CONTRACTS/*.JSON</div>
+        <h2 id="contractModalTitle" style="font-size:18px;">Зареждане на договор…</h2>
+      </div>
+      <button type="button" class="close-btn" id="contractModalClose" aria-label="Затвори">&times;</button>
+    </div>
+    <div class="drawer-body" id="contractModalBody"></div>
+  </div>
+</div>
+
+<!-- OFFICIAL LEGAL SIGNAL / AUDIT BRIEF GENERATOR MODAL -->
+<div class="modal-backdrop" id="signalModalBackdrop" aria-hidden="true">
+  <div class="contract-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="signalModalTitle">
+    <div class="drawer-header">
+      <div>
+        <div class="kpi-label">ГЕНЕРАТОР НА ОФИЦИАЛНА ОДИТНА СПРАВКА / СИГНАЛ (АДФИ · КПК / БИВША КПКОНПИ · СМЕТНА ПАЛАТА · EPPO)</div>
+        <h2 id="signalModalTitle" style="font-size:18px;">Одитна справка</h2>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button type="button" class="btn" id="signalCopyBtn">Копирай</button>
+        <button type="button" class="btn btn-dark" id="signalDownloadBtn">Изтегли .md</button>
+        <button type="button" class="btn" id="signalPrintBtn">Печат / PDF</button>
+        <button type="button" class="close-btn" id="signalModalClose" aria-label="Затвори">&times;</button>
+      </div>
+    </div>
+    <div class="drawer-body">
+      <pre class="signal-pre" id="signalModalText"></pre>
+    </div>
+  </div>
+</div>
+
+<!-- TOP 50 CONCENTRATION HIERARCHY MODAL -->
+<div class="hof-modal-backdrop" id="hofModalBackdrop" aria-hidden="true">
+  <div class="hof-modal-dialog" id="hofModal" role="dialog" aria-modal="true" aria-labelledby="hofModalTitle">
+    <section class="hof-shell" style="margin-bottom:0;">
+      <div class="hof-inner">
+        <button type="button" class="hof-modal-close" id="hofCloseBtn" aria-label="Затвори">&times; Затвори</button>
+        <div class="hof-header">
+          <span class="hof-kicker">СИГМА 3.0 · Йерархия по обем и риск · Топ 50 по официални данни</span>
+          <h2 class="hof-title" id="hofModalTitle">ЙЕРАРХИЧЕН ПРОФИЛ НА КОНЦЕНТРАЦИЯТА (ТОП 50)</h2>
+          <p class="hof-subtitle">
+            Топ 50 лица във властта с най-големи обеми обществени поръчки по публичните регистри на <strong>СИГМА (МИДТ)</strong>, <strong>ЦАИС ЕОП</strong>, <strong>Сметната палата</strong> и скритите <strong>ДЗЗД консорциуми</strong>. Кликнете върху плочка за пълното досие.
+          </p>
+          <div class="hof-controls" id="hofControls">
+            <button class="hof-mode-btn active" data-hof-mode="combined">Общ обем (СИГМА + ДЗЗД)</button>
+            <button class="hof-mode-btn" data-hof-mode="own">От собствената институция (Топ 50)</button>
+            <button class="hof-mode-btn" data-hof-mode="period">В периода на мандата (€)</button>
+            <button class="hof-mode-btn" data-hof-mode="dzzd">Скрити ДЗЗД консорциуми (€)</button>
+            <button class="hof-mode-btn" data-hof-mode="risk">СИГМА 3.0 Риск индекс</button>
+          </div>
+        </div>
+        <div class="hof-pyramid" id="hofPyramid">
+          <div class="loading" style="color:#94a3b8;">Изграждане на йерархията Топ 50…</div>
+        </div>
+        <div class="hof-footer">
+          <span id="hofSummaryText">Общ обем на Топ 50 в йерархията: зареждане…</span>
+          <span>Източник: СИГМА (МИДТ / АОП) и Сметна палата (CC-BY 4.0) · Официално декларирани и регистрови данни.</span>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- UNIVERSAL SLIDE-OVER DOSSIER DRAWER (Officials, Authorities & Companies) -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<aside class="drawer" id="dossierDrawer" aria-hidden="true">
+  <div class="drawer-header">
+    <div>
+      <div class="kpi-label" id="drawerCircle">—</div>
+      <h2 id="drawerName">—</h2>
+      <div class="badges" id="drawerBadges"></div>
+    </div>
+    <button class="close-btn" id="drawerClose" aria-label="Затвори">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawerBody"></div>
+</aside>

@@ -1,0 +1,132 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 7: CARTEL LAB, BENFORD'S LAW, PARETO GINI & HHI MONOPOLIES -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-cartels">
+  <div class="editorial-note note-crimson">
+    <div>
+      <strong>Криминалистична лаборатория на СИГМА 3.0 FINALITY (липсваща в СИГМА 2.0):</strong>
+      Автоматичен анализ на <strong>3 427 ДЗЗД консорциума</strong> за повтарящи се съвместни оферти (Co-Bidding Картелна Матрица),
+      математически одит по <strong>Закона на Бенфорд (Nigrini MAD / &chi;&sup2;)</strong>, <strong>Парето / Джини хиперконцентрация</strong>,
+      <strong>33 споделени политически компании</strong> и <strong>Топ 20 HHI монополи</strong>.
+    </div>
+  </div>
+
+  <div class="kpi-grid" id="cartelKpiGrid"></div>
+
+  <!-- Benford's Law + Pareto / Gini Lorentz Curves -->
+  <div class="two-col" style="margin-bottom:18px;">
+    <article class="panel-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;">Закон на Бенфорд (Първа цифра 1–9)</h3>
+        <span class="meta-date" id="benfordVerdictBadge">Nigrini тест</span>
+      </div>
+      <p class="chart-caption">Сравнение между теоретичната крива на Бенфорд и реалните суми на всички 4 344 възложители и 17 428 фирми. Възложителите показват гранично отклонение (MAD 0,0122, пик при цифри 3–4).</p>
+      <div id="benfordChartHost"></div>
+    </article>
+
+    <article class="panel-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;">Крива на Лоренц и Парето хиперконцентрация</h3>
+        <span class="meta-date">Gini 0,906 / 0,945</span>
+      </div>
+      <p class="chart-caption">Топ 1% от фирмите (~174 компании) прибират <strong>48,33%</strong> от всички €53,22 млрд. Топ 10% концентрират <strong>86,50%</strong> от целия пазар.</p>
+      <div id="paretoChartHost"></div>
+    </article>
+  </div>
+
+  <!-- Co-Bidding Cartel Pairs + Super-Consortium Shadow Hubs -->
+  <div class="two-col" style="margin-bottom:18px;">
+    <article class="panel-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;">Матрица на съвместните оферти (Топ 60 ДЗЗД двойки)</h3>
+        <input id="cartelPairSearch" class="search-input" style="max-width:220px;flex:0 1 220px;padding:5px 9px;" type="search" placeholder="Търси фирма…" />
+      </div>
+      <p class="chart-caption">Компании, които многократно се обединяват заедно в ДЗЗД консорциуми за обществени поръчки.</p>
+      <div class="table-wrap" style="border:none;max-height:520px;overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>Двойка компании (ЕИК)</th>
+              <th class="num">Общи ДЗЗД</th>
+              <th class="num">Съвместна сума (€)</th>
+            </tr>
+          </thead>
+          <tbody id="cartelPairsTbody"></tbody>
+        </table>
+      </div>
+    </article>
+
+    <article class="panel-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;">Сенчести ДЗЗД хъбове (Множител Консорциум / Директни)</h3>
+        <span class="meta-date">Топ 40 хъба</span>
+      </div>
+      <p class="chart-caption">Фирми, които печелят многократно повече пари скрити в консорциуми, отколкото под собствения си ЕИК.</p>
+      <div class="table-wrap" style="border:none;max-height:520px;overflow-y:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>№</th>
+              <th>Компания (ЕИК)</th>
+              <th class="num">Директно (€)</th>
+              <th class="num">Чрез ДЗЗД (€)</th>
+              <th class="num">Множ.</th>
+            </tr>
+          </thead>
+          <tbody id="consortiumHubsTbody"></tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+
+  <!-- Shared Political Companies + Institutional Clusters -->
+  <div class="two-col" style="margin-bottom:18px;">
+    <div class="panel-box">
+      <h3>33 споделени дружества (2+ длъжностни лица в 1 компания)</h3>
+      <div id="sharedCompaniesBox" style="max-height:380px;overflow-y:auto;"></div>
+    </div>
+    <div class="panel-box">
+      <h3>Топ 20 двойки: Възложител &rarr; Изпълнител (по брой договори)</h3>
+      <div class="table-wrap" style="border:none;max-height:380px;overflow-y:auto;">
+        <table>
+          <thead><tr><th>№</th><th>Възложител / Изпълнител</th><th class="num">Дог.</th><th class="num">Стойност (€)</th></tr></thead>
+          <tbody id="topPairsTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- HHI / Single-Offer / Direct Award Top 20 -->
+  <div class="three-col">
+    <div class="panel-box">
+      <h3>Топ 20 по концентрация (HHI)</h3>
+      <div class="table-wrap" style="border:none;max-height:420px;overflow-y:auto;">
+        <table>
+          <thead><tr><th>№</th><th>Институция</th><th class="num">HHI</th><th class="num">€</th></tr></thead>
+          <tbody id="concentrationTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel-box">
+      <h3>Топ 20 по дял 1 оферта</h3>
+      <div class="table-wrap" style="border:none;max-height:420px;overflow-y:auto;">
+        <table>
+          <thead><tr><th>№</th><th>Институция</th><th class="num">Дял</th><th class="num">€</th></tr></thead>
+          <tbody id="singleOfferTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="panel-box">
+      <h3>Топ 20 неконкурентни</h3>
+      <div class="table-wrap" style="border:none;max-height:420px;overflow-y:auto;">
+        <table>
+          <thead><tr><th>№</th><th>Институция</th><th class="num">Дял</th><th class="num">€</th></tr></thead>
+          <tbody id="directAwardTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>

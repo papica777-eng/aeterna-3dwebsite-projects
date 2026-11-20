@@ -1,0 +1,56 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 8: COMPLETE NATIONAL AUTHORITIES EXPLORER (4,344) -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-authorities">
+  <div class="controls-card">
+    <div class="search-row">
+      <input id="authSearchInput" class="search-input" type="search" placeholder="Търсене сред всички 4 344 възложители по име, ЕИК, град…" />
+      <select id="authRegionSelect" class="select-ctrl"><option value="">Всички 28 области</option></select>
+      <select id="authTypeSelect" class="select-ctrl">
+        <option value="">Всички типове</option>
+        <option value="община">Общини</option>
+        <option value="министерство">Министерства</option>
+        <option value="агенция">Агенции</option>
+        <option value="болница">Болници</option>
+        <option value="държавна компания">Държавни компании</option>
+        <option value="образование">Образование</option>
+        <option value="друго">Други</option>
+      </select>
+      <select id="authSortSelect" class="select-ctrl">
+        <option value="spent">Сортирай: Разход (€)</option>
+        <option value="risk">Сортирай: Риск индекс 3.0</option>
+        <option value="contracts">Сортирай: Брой договори</option>
+        <option value="linked">Сортирай: Свързани лица</option>
+        <option value="avg">Сортирай: Среден договор (€)</option>
+      </select>
+    </div>
+    <div class="pill-row" id="authQuickPills">
+      <button class="pill active" data-auth-flag="all">Всички 4 344</button>
+      <button class="pill" data-auth-flag="linked">Със свързани лица (СИГМА)</button>
+      <button class="pill" data-auth-flag="own">Със самовъзлагане</button>
+      <button class="pill" data-auth-flag="risk">Висок риск (&ge;40)</button>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Възложител (ЕИК)</th>
+          <th>Тип / Област</th>
+          <th class="num">Изразходвано (€)</th>
+          <th class="num">Договори / Фирми</th>
+          <th class="num">Среден дог.</th>
+          <th class="num">Риск / Връзки</th>
+        </tr>
+      </thead>
+      <tbody id="authoritiesTbody">
+        <tr><td colspan="7" class="loading">Натиснете раздела за зареждане на пълния регистър (4 344 възложители)…</td></tr>
+      </tbody>
+    </table>
+    <div class="pager" id="authPagerBar"></div>
+  </div>
+</section>

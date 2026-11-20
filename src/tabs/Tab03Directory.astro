@@ -1,0 +1,51 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 3: DIRECTORY OF ALL 571 CONNECTED OFFICIALS -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-directory">
+  <div class="controls-card">
+    <div class="search-row">
+      <input id="searchInput" class="search-input" type="search" placeholder="Търсене по име, дружество, ЕИК, община, област, министерство, роднина или възложител…" />
+      <select id="sortSelect" class="select-ctrl" aria-label="Подреждане">
+        <option value="period">Подреди: Стойност в периода (€)</option>
+        <option value="combined">Подреди: Общо СИГМА + ДЗЗД (€)</option>
+        <option value="risk">Подреди: СИГМА 3.0 Риск индекс (0–100)</option>
+        <option value="total">Подреди: Обща стойност СИГМА (€)</option>
+        <option value="contracts">Подреди: Брой договори</option>
+        <option value="own">Подреди: Първо самовъзлагане</option>
+        <option value="name">Подреди: По азбучен ред (А–Я)</option>
+      </select>
+      <select id="scopeSelect" class="select-ctrl" aria-label="Обхват роли">
+        <option value="all">Всички 571 лица (вкл. съвети)</option>
+        <option value="core512">Основни 512 (собственост / упр.)</option>
+      </select>
+      <select id="pageSizeSelect" class="select-ctrl" aria-label="Редове">
+        <option value="50">50 реда</option>
+        <option value="100" selected>100 реда</option>
+        <option value="999">Всички 571</option>
+      </select>
+    </div>
+    <div class="pill-row" id="filterPills"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>№</th>
+          <th>Длъжностно лице и институция</th>
+          <th>Свързани дружества (ЕИК)</th>
+          <th>Сектор и признаци</th>
+          <th class="num">В периода (€)</th>
+          <th class="num">СИГМА + ДЗЗД (€)</th>
+          <th class="num">Риск 3.0</th>
+        </tr>
+      </thead>
+      <tbody id="officialsTbody">
+        <tr><td colspan="7" class="loading">Зареждане на регистъра…</td></tr>
+      </tbody>
+    </table>
+    <div class="pager" id="pagerBar"></div>
+  </div>
+</section>

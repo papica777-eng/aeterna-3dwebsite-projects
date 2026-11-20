@@ -1,0 +1,56 @@
+---
+import j6Raw from '../../../docs/data/sigma3_judicial_6.json';
+
+const em: any = (j6Raw as any).entityMatching || {};
+const ms: Record<string, number> = em.matchStats || {};
+const totalMatches = Object.values(ms).reduce((a: number, v: any) => a + Number(v || 0), 0);
+const m1: any = (j6Raw as any).module1_collusiveLitigation || {};
+const m2: any = (j6Raw as any).module2_impunityIndex || {};
+const m3: any = (j6Raw as any).module3_legalExpertGraph || {};
+const m4: any = (j6Raw as any).module4_kzkVas || {};
+const m5: any = (j6Raw as any).module5_insolvencyPhoenix || {};
+const m6: any = (j6Raw as any).module6_criminalEppo || {};
+const kzkIng: any = m4.ingestedCounts || {};
+const fmtInt = (n: any) => Number(n || 0).toLocaleString('bg-BG');
+const fmtEurB = (n: any) => '€' + (Number(n || 0) / 1e9).toFixed(2).replace('.', ',') + ' млрд.';
+---
+<!-- =================================================================== -->
+<!-- TAB 6: 6 JUDICIAL x PROCUREMENT ENGINES (AOP x COURTS / ADFI / KZK) -->
+<!-- =================================================================== -->
+<section class="tab-panel judicial-radar-scope" id="tab-judicial6">
+  <div class="editorial-note" id="j6EntityMatchingBox" style="display:block;">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
+      <div>
+        <strong>Слой за автоматични съвпадения (Entity Matching Layer &amp; Zero-False-Positive Lock):</strong>
+        Входящият поток от <strong>{fmtInt(em.incomingRecordsScanned)} живи контролни/съдебни акта</strong> + <strong>206 907 договора</strong> се филтрира автоматично по <strong>{fmtInt(em.authoritiesUniverse)} възложители</strong>, <strong>{fmtInt(em.companiesUniverse)} фирми/ДЗЗД</strong> и <strong>{fmtInt(em.contractsUnpUniverse)} УНП</strong>
+        &rarr; <strong>{fmtInt(totalMatches)} точни съвпадения</strong> · <strong>{fmtInt(em.authoritiesWithJudicialBoost)} институции</strong> и <strong>{fmtInt(em.companiesWithJudicialScore)} фирми</strong> с изчислен Съдебен риск компонент (0–100).
+        <div style="font-size:11.5px;margin-top:4px;color:var(--ink-secondary);">
+          <strong>Активни Zero-False-Positive филтри:</strong> (1) 0 дела на Прокуратурата по чл. 155 ТЗ (<code>121817309*</code>); (2) Географско заключване по дирекции <code>ДИД1-СФ</code>..<code>ДИД7-РС</code> и съдебен район за едноименни училища, ДГ, читалища, МБАЛ и ВиК; (3) Строго разделяне на <code>EXACT_EIK</code> от регионални актуализации по чл. 17, ал. 7 ЗДФИ; (4) Структурирани адвокати от <code>/Case/SidesLoadData</code> и 0 ЕГН по ЗЗЛД.
+        </div>
+      </div>
+      <button type="button" class="btn btn-dark" id="btnJumpJudicialGraph">Отвори 9-възловия граф (Дела + Адвокати + Вещи лица) &rarr;</button>
+    </div>
+  </div>
+  <div class="kpi-grid" id="j6TopKpiGrid" style="margin-bottom:14px;">
+    <div class="kpi-card"><div class="kpi-label">1. Търговски дела (ЕИСС) &amp; ЗОП</div><div class="kpi-val">{fmtInt((m1.liveEissCommercialDisputes || []).length)} ТД / {fmtInt(m1.litigationLinkedContractsCount)} дог.</div><div class="kpi-sub">Живи ТД/ВТД дела с диспозитив</div></div>
+    <div class="kpi-card emphasis"><div class="kpi-label">2. АДФИ + КАНД/АНД (ЕИСС)</div><div class="kpi-val" style="color:var(--crimson);">{fmtInt(m2.updatedArt17Count)} чл.17(7) · {(m2.liveEissAndKandCases || []).length} дела</div><div class="kpi-sub">{fmtInt(m2.totalReports)} докл. АДФИ · Потвърдени vs Отменени НП</div></div>
+    <div class="kpi-card"><div class="kpi-label">3. Адвокати и Вещи лица</div><div class="kpi-val">{fmtInt(m3.lawFirmsCount)} кант. / {(m3.eissExtractedLawyers || []).length} юристи</div><div class="kpi-sub">{fmtInt((m3.adfiRegisteredExperts || {}).totalExperts)} АДФИ експерти</div></div>
+    <div class="kpi-card emphasis"><div class="kpi-label">4. КЗК &amp; ВАС IV отд. (ЕИСС)</div><div class="kpi-val">{(m4.liveVasFinalActs || []).length} акта ВАС</div><div class="kpi-sub">{kzkIng.prelimGranted || 0} допуснати предв. изп. · {kzkIng.decisionsOverturned || 0} отм. в КЗК</div></div>
+    <div class="kpi-card"><div class="kpi-label">5. Несъстоятелност / Феникс</div><div class="kpi-val">{fmtInt(m5.burnoutFirmsCount)} burnout</div><div class="kpi-sub">{m5.distressedOrPledgedCount} със запори/залози ТР · {m5.phoenixChainsCount} вериги</div></div>
+    <div class="kpi-card"><div class="kpi-label">6. ЕС Средства / EPPO Радар</div><div class="kpi-val">{fmtEurB(m6.euFundedTotalEur)}</div><div class="kpi-sub">{m6.euSingleOfferSharePct}% с 1 оф. · {fmtInt(m6.eppoHighRiskCount)} EPPO тригера</div></div>
+  </div>
+  <div class="controls-card">
+    <div class="search-row">
+      <input id="j6SearchInput" class="search-input" type="search" placeholder="Търси по възложител, фирма, ЕИК, КЗК дело, УНП, адвокатска кантора или АДФИ доклад…" />
+    </div>
+    <div class="pill-row" id="j6SubTabs">
+      <button class="pill active" data-j6-sub="collusive">1. Търговски спорове и спогодби (ЕИСС)</button>
+      <button class="pill" data-j6-sub="impunity">2. Индекс на безнаказаността (АДФИ 2 229)</button>
+      <button class="pill" data-j6-sub="legal">3. Мрежа адвокати и вещи лица</button>
+      <button class="pill" data-j6-sub="kzk">4. Предварително изпълнение (КЗК / ВАС)</button>
+      <button class="pill" data-j6-sub="phoenix">5. Несъстоятелност и „Феникс“ фирми</button>
+      <button class="pill" data-j6-sub="eppo">6. ЗМИП и EPPO рисков профил</button>
+    </div>
+  </div>
+  <div id="j6BodyHost"><div class="loading">Натиснете раздела за зареждане на съдебния радар…</div></div>
+</section>

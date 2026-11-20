@@ -1,0 +1,49 @@
+---
+import f7Raw from '../../../docs/data/sigma3_forensics_7.json';
+
+const annexInflationEur = Number((f7Raw as any).engine1_annexInflation?.totalInflationEur || 1290789382.76);
+const annexTotalLabel = '+€' + (annexInflationEur / 1e9).toFixed(2).replace('.', ',') + ' млрд.';
+---
+<!-- =================================================================== -->
+<!-- TAB 11: SIGMA 3.0 ORACLE — LIVE BULGARIAN AI COPILOT (QANTUM NLU) -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-oracle">
+  <div class="oracle-shell">
+    <div class="oracle-head">
+      <div>
+        <div class="hero-kicker" style="margin-bottom:4px;">СИГМА 3.0 ORACLE · СЕМАНТИЧЕН NLU &amp; 13-РАДАРЕН RAG ДВИГАТЕЛ (0 × HTTP 503)</div>
+        <h2 style="font-family:var(--font-serif);margin:0 0 4px;font-size:22px;">Интелигентен одиторски AI агент (свободен български език, шльокавица и размито търсене)</h2>
+        <p class="muted" style="margin:0;font-size:12.5px;">
+          Разбира свободен разговорен език, правописни грешки, латиница (шльокавица), синоними, съкращения (<code>АПИ</code>, <code>НКЖИ</code>, <code>АЕЦ</code>, <code>СО</code>) и контекстни въпроси („а какви дела има там?“, „дай сигнал за него“). Изпълнява 360° кръстосан синтез през всички 206 907 договора, 22 343 субекта, 7-те криминалистични радара и живите съдебни актове от ЕПЕП/ВАС/АДФИ/КЗК.
+        </p>
+      </div>
+      <button class="btn" id="oracleClearBtn" type="button">Изчисти чата</button>
+    </div>
+
+    <div class="oracle-prompts" id="oraclePrompts">
+      <button class="city-chip" data-oracle-q="Кажи ми всичко за Бургас — поръчки, АДФИ проверки, КЗК и съдебни дела">360° досие: Бургас (Поръчки + Съд + АДФИ)</button>
+      <button class="city-chip" data-oracle-q="Какви дела в съда, анекси и жалби в КЗК има за АПИ?">360° одит: АПИ (Съд + Анекси + КЗК)</button>
+      <button class="city-chip" data-oracle-q="Кои кметове и общинари си възлагат поръчки сами на себе си?">Кметове със самовъзлагане</button>
+      <button class="city-chip" data-oracle-q="Покажи отменените наказателни постановления на АДФИ в съда и причините">Отменени глоби на АДФИ в съда (КАНД)</button>
+      <button class="city-chip" data-oracle-q="Какви са окончателните решения на ВАС по жалби срещу КЗК?">Решения на ВАС IV отд. по ЗОП</button>
+      <button class="city-chip" data-oracle-q="Покажи реалните търговски дела между възложители и фирми в ЕПЕП">Търговски спорове Възложител ↔ Фирма</button>
+      <button class="city-chip" data-oracle-q="Кои са топ 10 лица със скрити ДЗЗД консорциуми?">Скрити ДЗЗД (+€1,92 млрд.)</button>
+      <button class="city-chip" data-oracle-q="Покажи новите политици от XML декларациите извън СИГМА 2.0">Нови лица от XML (Сметна палата)</button>
+      <button class="city-chip" data-oracle-q="Кои фирми имат запори в Търговския регистър или са Феникс вериги?">Запори в ТР и „Феникс“ фирми</button>
+      <button class="city-chip" data-oracle-q="Кои договори имат най-голямо оскъпяване чрез анекси?">Анекси и оскъпяване ({annexTotalLabel})</button>
+      <button class="city-chip" data-oracle-q="Покажи новосъздадените и кухи фирми без история">„Кухи“ фирми (ТР)</button>
+      <button class="city-chip" data-oracle-q="Кои институции правят разделяне под прага (Salami Slicing)?">Разделяне под прага (Salami)</button>
+      <button class="city-chip" data-oracle-q="Кои партийни медии и дарители от ЕРИК печелят поръчки?">Дарения ЕРИК &amp; Медии</button>
+      <button class="city-chip" data-oracle-q="Покажи адвокатските кантори, юристите от ЕПЕП и вещите лица">Адвокати и Вещи лица</button>
+      <button class="city-chip" data-oracle-q="Сравни област Варна и област Пловдив">Сравни Варна и Пловдив</button>
+      <button class="city-chip" data-oracle-q="kaji mi za glavbolgarstroi i patinjenering">Пример на шльокавица (латиница)</button>
+    </div>
+
+    <div class="oracle-messages" id="oracleMessages" aria-live="polite"></div>
+
+    <form class="oracle-form" id="oracleForm">
+      <input id="oracleInput" class="search-input" type="text" placeholder="Пишете свободно (на кирилица или шльокавица, дори с грешки): напр. „kakvi dela i adfi ima za varna“, „провери Главболгарстрой“, „кой краде от асфалт и строителство“, „а за него дай сигнал“…" autocomplete="off" />
+      <button class="btn btn-dark" type="submit">Изпълни заявка &rarr;</button>
+    </form>
+  </div>
+</section>

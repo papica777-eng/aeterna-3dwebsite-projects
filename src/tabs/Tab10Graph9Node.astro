@@ -1,0 +1,79 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 10: MULTI-HOP NETWORK GRAPH 3.0 + SHORTEST-PATH FINDER -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-graph">
+  <div class="controls-card" style="margin-bottom:14px;">
+    <div class="search-row" style="margin-bottom:6px;">
+      <strong style="font-size:12.5px;white-space:nowrap;">Търсачка на скрити връзки (BFS):</strong>
+      <input id="pathFromInput" class="search-input" style="flex:1 1 200px;" placeholder="Начало: политик, фирма, ЕИК или институция…" />
+      <span class="muted">&harr;</span>
+      <input id="pathToInput" class="search-input" style="flex:1 1 200px;" placeholder="Цел: политик, фирма, ЕИК или институция…" />
+      <button class="btn btn-dark" id="btnFindPath" type="button">Намери път</button>
+      <button class="btn" id="btnPathDemo" type="button" title="Примерна верига">Демо верига</button>
+    </div>
+    <div id="pathResultBox" class="path-result-box" style="display:none;"></div>
+  </div>
+
+  <div class="graph-shell" id="graphShell">
+    <aside class="graph-sidebar">
+      <div>
+        <label class="kpi-label" for="graphPresetSelect" style="display:block;margin-bottom:6px;">Срез по кръг на свързаност</label>
+        <select id="graphPresetSelect" class="select-ctrl" style="width:100%;">
+          <option value="own">От собствената институция (53 лица)</option>
+          <option value="judicial_full">Пълен 9-възлов граф (АОП × Дела × Адвокати × Вещи лица)</option>
+          <option value="judicial_kzk">Съдебен и КЗК/АДФИ граф (Дела + Страни)</option>
+          <option value="legal_expert">Мрежа адвокати и вещи лица (Legal &amp; Expert Graph)</option>
+          <option value="dzzd">Скрити ДЗЗД консорциуми (Топ 35)</option>
+          <option value="cartels">Картелни ДЗЗД двойки (Топ 40)</option>
+          <option value="parliament">Народно събрание — депутати (57 лица)</option>
+          <option value="central">Министерства, агенции и служби (ДАНС, ДАТО)</option>
+          <option value="shared">Споделени дружества (2+ лица в 1 фирма)</option>
+          <option value="registry">Вписани роли по Търговския регистър</option>
+          <option value="top35">Топ 35 по стойност в периода</option>
+          <option value="burgas">Област Бургас и Черноморие</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="kpi-label" for="graphInstSelect" style="display:block;margin-bottom:6px;">Филтър по конкретна институция</label>
+        <select id="graphInstSelect" class="select-ctrl" style="width:100%;">
+          <option value="">Всички институции</option>
+        </select>
+      </div>
+
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn" id="btnRelayout" style="flex:1;justify-content:center;">Преподреди</button>
+        <button class="btn" id="btnResetZoom" style="flex:1;justify-content:center;">Центрирай</button>
+        <button class="btn" id="btnExportGraphPng" style="flex:1;justify-content:center;">PNG</button>
+      </div>
+
+      <div id="graphStatsBox" class="contract-row" style="margin:0;">Зареждане на графа…</div>
+
+      <div>
+        <div class="kpi-label" style="margin-bottom:6px;">Възли в текущия срез (клик за профил)</div>
+        <ul class="cluster-people" id="graphNodeList"></ul>
+      </div>
+    </aside>
+
+    <div class="graph-canvas-wrap">
+      <canvas id="networkCanvas"></canvas>
+      <div class="graph-tooltip" id="graphTooltip">
+        <strong>Мрежов граф 3.0 (9 типа възли)</strong><br/>
+        <span class="muted">Посочете възел за осветяване. Влачете възли, скрол за мащаб. Кликнете върху лице, фирма, дело, адвокат или вещо лице за детайли.</span>
+      </div>
+      <div class="graph-legend">
+        <span><i class="legend-dot" style="background:#b91c1c;"></i>Собств. инст.</span>
+        <span><i class="legend-dot" style="background:#e11d48;"></i>Длъжн. лице</span>
+        <span><i class="legend-dot" style="background:#b45309;"></i>Фирма (ЕИК)</span>
+        <span><i class="legend-dot" style="background:#1e3a8a;"></i>Институция</span>
+        <span><i class="legend-dot" style="background:#6b21a8;"></i>Роднина (ТР)</span>
+        <span><i class="legend-dot" style="background:#0d9488;"></i>ДЗЗД</span>
+        <span><i class="legend-diamond" style="background:#4f46e5;"></i>Съдебно дело / КЗК / АДФИ</span>
+        <span><i class="legend-square" style="background:#0284c7;"></i>Адвокат / Кантора</span>
+        <span><i class="legend-tri"></i>Вещо лице / Надзор</span>
+      </div>
+    </div>
+  </div>
+</section>

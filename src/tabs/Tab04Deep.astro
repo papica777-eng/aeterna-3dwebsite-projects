@@ -1,0 +1,74 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 4: BEYOND SIGMA 2.0 (HIDDEN DZZD, XML TABLES & MEGA-CONSORTIA) -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-deep">
+  <div class="editorial-note note-plum">
+    <div>
+      <strong>Трите структурни слепи петна на СИГМА 2.0, решени в СИГМА 3.0 FINALITY:</strong>
+      (1) <strong>Консорциуми (ДЗЗД) без ЕИК</strong> — +€1,92 млрд. договори на 76 длъжностни лица;
+      (2) <strong>Скрити XML таблици (Сметна палата)</strong> — частни заеми (Табл. 7), акции в АД (Табл. 9), промени по чл. 35;
+      (3) <strong>Разбити мега-консорциуми (&ge;€25 млн.)</strong> с реални собственици, управители, ЗМИП бенефициенти и холдинги-майки от живия Търговски регистър.
+    </div>
+    <a class="btn" href="data/SIGMA_DEEP_LINKS_BEYOND.csv" download>Изтегли CSV (Дълбоки връзки)</a>
+  </div>
+
+  <div class="kpi-grid" id="deepKpiGrid"></div>
+
+  <div class="panel-box" style="margin-bottom:20px;">
+    <div class="chart-head" style="margin-bottom:6px;">
+      <h3 style="margin:0;border:none;padding:0;">1. Скрити поръчки през консорциуми (ДЗЗД без ЕИК) на лица от СИГМА</h3>
+      <input id="deepConsSearch" class="search-input" style="max-width:340px;flex:0 1 340px;padding:6px 10px;" type="search" placeholder="Търси политик, фирма или ДЗЗД…" />
+    </div>
+    <p class="chart-caption">Длъжностни лица, чиито свързани фирми печелят в обединения (<code>kind=consortium</code>) без ЕИК. Клик за пълното досие.</p>
+    <div class="table-wrap" style="border:none;">
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Длъжностно лице и институция</th>
+            <th>Свързана фирма (ЕИК)</th>
+            <th class="num">В СИГМА (€)</th>
+            <th class="num">Скрито в ДЗЗД (€)</th>
+            <th>Най-големи консорциуми (ДЗЗД)</th>
+          </tr>
+        </thead>
+        <tbody id="deepConsTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel-box" style="margin-bottom:20px;">
+    <div class="chart-head" style="margin-bottom:8px;">
+      <h3 style="margin:0;border:none;padding:0;">2. Нови връзки от 3 035 XML декларации (Сметна палата 2025–2026 г.)</h3>
+      <div class="pill-row" id="deepTierPills">
+        <button class="pill active" data-deep-tier="missed">Всички пропуснати от СИГМА</button>
+        <button class="pill" data-deep-tier="private">Частни заеми и управление</button>
+        <button class="pill" data-deep-tier="stock">Акции в топ изпълнители (Табл. 9)</button>
+      </div>
+    </div>
+    <p class="chart-caption">Всяка връзка е верифицирана по правна форма, ЕИК/седалище по ТР и сочи директно към оригиналния XML файл в <code>register.cacbg.bg</code>.</p>
+    <div class="table-wrap" style="border:none;">
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Политик / Длъжност</th>
+            <th>Тип скрита връзка и цитат от XML</th>
+            <th>Фирма изпълнител (ЕИК)</th>
+            <th class="num">Поръчки на фирмата (€)</th>
+            <th>Доказателство</th>
+          </tr>
+        </thead>
+        <tbody id="deepXmlTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel-box">
+    <h3>3. Разбити мега-консорциуми (ДЗЗД &ge; €25 млн.) — участници и реални собственици по ТР</h3>
+    <p class="chart-caption">Най-големите инфраструктурни и енергийни обединения, разбити на съставни дружества с управители, собственици, ЗМИП бенефициенти и холдинги-майки.</p>
+    <div class="clusters-grid" id="megaConsortiaGrid"></div>
+  </div>
+</section>

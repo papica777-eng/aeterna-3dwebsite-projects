@@ -196,8 +196,11 @@
   function renderHeader() {
     const mm = state.macro && state.macro.meta;
     const t = mm ? mm.totals : { contracts: 206907, valueEur: 53224934606, authorities: 4344, bidders: 17428 };
-    const refreshed = (mm && mm.refreshedAt) || (state.meta && state.meta.refreshedAt) || '2026-04-18';
-    const asOf = (mm && mm.asOf) || (state.meta && state.meta.asOf) || '2026-04-18';
+    const j6Date = (state.judicial6 && state.judicial6.generatedAtUtc) ? String(state.judicial6.generatedAtUtc).slice(0, 10) : '';
+    const f7Date = (state.forensics7 && state.forensics7.generatedAtUtc) ? String(state.forensics7.generatedAtUtc).slice(0, 10) : '';
+    const latestDate = [j6Date, f7Date, (mm && mm.asOf) || '', (state.meta && state.meta.asOf) || '', '2026-11-20'].filter(Boolean).sort().pop();
+    const refreshed = latestDate || '2026-11-20';
+    const asOf = latestDate || '2026-11-20';
     document.getElementById('syncSubtitle').textContent =
       `Жив масив sigma.midt.bg + Сметна палата + ТР + ЕПЕП/АДФИ/КЗК · Обновено: ${refreshed} · ${fmtInt(t.contracts)} дог. · ${fmtInt(t.authorities)} инст. · ${fmtInt(t.bidders)} фирми`;
     document.getElementById('asOfChip').textContent = `Данни към: ${asOf}`;

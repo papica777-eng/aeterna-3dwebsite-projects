@@ -1,0 +1,112 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 1: MACRO COMMAND DASHBOARD -->
+<!-- =================================================================== -->
+<section class="tab-panel active" id="tab-dashboard">
+  <!-- 83-Month Time Series + Annual Breakdown -->
+  <div class="panel-box" style="margin-bottom:18px;">
+    <div class="chart-head">
+      <div>
+        <h2 class="chart-title">Динамика на обществените поръчки в България (2020–2026 г.)</h2>
+        <p class="chart-caption" style="margin-bottom:0;" id="trendsCaption">83 месечни периода от ЦАИС ЕОП · Общо €53,22 млрд. · Рекорден месец: февруари 2026 г. (€2,65 млрд.)</p>
+      </div>
+      <div class="pill-row" id="trendModePills">
+        <button class="pill active" data-trend-mode="months">Месечен пулс (83 мес.)</button>
+        <button class="pill" data-trend-mode="years">Годишен сравнителен (7 г.)</button>
+      </div>
+    </div>
+    <div id="trendChartHost" class="trend-chart-host"></div>
+    <div class="trend-years-strip" id="trendYearsStrip"></div>
+  </div>
+
+  <!-- Interactive Top 20 Sankey Money Flows + CPV Sectors -->
+  <div class="two-col-wide" style="margin-bottom:18px;">
+    <article class="panel-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;">Парични потоци: Топ 20 двойки Институция &rarr; Изпълнител</h3>
+        <span class="meta-date">Посочи поток · Клик за детайли</span>
+      </div>
+      <p class="chart-caption">Интерактивна Sankey диаграма по живите данни от <code>flows.data</code>. Червено-виолетовите ленти маркират консорциуми (ДЗЗД).</p>
+      <div class="sankey-wrap" id="sankeyHost"></div>
+      <div class="sankey-readout" id="sankeyReadout">Посочете поток или институция, за да видите точната сума и брой договори.</div>
+    </article>
+
+    <article class="panel-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;">CPV сектори и дял на ДЗЗД консорциумите</h3>
+        <span class="meta-date">17 428 изпълнители</span>
+      </div>
+      <p class="chart-caption">В строителството (CPV 45, €21,24 млрд.) близо 40% (€8,31 млрд.) минават през ДЗЗД обединения, невидими при директно ЕИК обвързване.</p>
+      <div id="cpvSectorsHost"></div>
+    </article>
+  </div>
+
+  <!-- 2x2 Classic Citizen Charts (Sector Funding, 571 Donut, Top 10, Competition Gauges) -->
+  <section class="charts-grid" aria-label="Ключови диаграми">
+    <article class="chart-card">
+      <div class="chart-head">
+        <h2 class="chart-title">Къде отиват парите на свързаните лица в мандата</h2>
+        <span class="meta-date">Клик за филтър</span>
+      </div>
+      <p class="chart-caption">77,2% от стойността в декларирания период минават през общини и общински съвети.</p>
+      <div id="chartSectorBars"></div>
+    </article>
+
+    <article class="chart-card">
+      <div class="chart-head">
+        <h2 class="chart-title">Профил на риска на всички 571 лица</h2>
+        <span class="meta-date">Клик върху сегмент</span>
+      </div>
+      <p class="chart-caption">Разпределение по директен конфликт със собствената институция, мандатни договори и членове на съвети.</p>
+      <div id="chartDonutWrap" class="donut-layout"></div>
+    </article>
+
+    <article class="chart-card">
+      <div class="chart-head">
+        <h2 class="chart-title">Топ 10 най-големи случая в периода на мандата</h2>
+        <span class="meta-date">Клик за досие</span>
+      </div>
+      <p class="chart-caption">Червените ленти отбелязват лица, чиито фирми печелят от собствената им институция.</p>
+      <div id="chartTop10Bars"></div>
+    </article>
+
+    <article class="chart-card">
+      <div class="chart-head">
+        <h2 class="chart-title">Национална конкуренция и единични оферти</h2>
+        <span class="meta-date">Национален срез · АОП</span>
+      </div>
+      <p class="chart-caption">Дял на поръчките с 1 оферта и неконкурентните процедури върху 206 907 договора.</p>
+      <div id="chartCompetitionGauge"></div>
+    </article>
+  </section>
+
+  <!-- Live Single-Offer Mega-Contracts Feed with Direct Live JSON Inspection -->
+  <div class="panel-box">
+    <div class="chart-head">
+      <div>
+        <h3 style="margin:0;border:none;padding:0;">Жива криминалистична емисия: Мега-договори с 1 оферта</h3>
+        <p class="chart-caption" style="margin-bottom:0;">Кликнете <strong>„Провери JSON на живо“</strong> за директна CORS заявка към <code>sigma.midt.bg/contracts/&#123;id&#125;.json</code> (анекси, оферти, CPV кохорта, обособени позиции).</p>
+      </div>
+      <div class="pill-row" id="liveContractsPills">
+        <button class="pill active" data-lc-mode="top">Топ 10 най-големи с 1 оферта</button>
+        <button class="pill" data-lc-mode="recent">10 най-нови (ноември 2026)</button>
+      </div>
+    </div>
+    <div class="table-wrap" style="border:none;margin-top:10px;">
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Дата / УНП</th>
+            <th>Предмет на поръчката и възложител</th>
+            <th>Изпълнител</th>
+            <th class="num">Стойност (€)</th>
+            <th>Жива проверка</th>
+          </tr>
+        </thead>
+        <tbody id="liveSingleOfferTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>

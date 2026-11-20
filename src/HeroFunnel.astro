@@ -1,0 +1,119 @@
+---
+import j6Raw from '../../docs/data/sigma3_judicial_6.json';
+
+interface Props {
+  asOf?: string;
+}
+const defaultAsOf = String((j6Raw as any).generatedAtUtc || '2026-11-20').slice(0, 10);
+const { asOf = defaultAsOf } = Astro.props;
+---
+<!-- EXECUTIVE SOVEREIGN HERO -->
+<section class="hero">
+  <div class="hero-grid">
+    <div>
+      <div class="hero-kicker">СИГМА 3.0 FINALITY · Предложение за национален стандарт към МИДТ · CC-BY 4.0</div>
+      <h1>Пълен криминалистичен рентген на <em>€53,22 млрд.</em> обществени поръчки в България</h1>
+      <p class="hero-lead">
+        Единна платформа от ново поколение над данните на <strong>АОП / ЦАИС ЕОП</strong>, <strong>Сметната палата</strong> и <strong>Търговския регистър</strong>:
+        всички <strong>206 907 договора</strong>, <strong>4 344 възложители</strong>, <strong>17 428 фирми и ДЗЗД</strong>, <strong>571 свързани лица</strong>,
+        <strong>+€1,92 млрд. скрити консорциуми</strong>, картелна матрица, Закон на Бенфорд, 28-областен атлас и жив AI асистент без 503 грешки.
+      </p>
+
+      <div class="hero-search-box">
+        <label class="hero-search-label" for="heroSearchInput">Глобална проверка по град, област, институция, фирма, ЕИК, политик или ДЗЗД:</label>
+        <div class="hero-search-row">
+          <input id="heroSearchInput" type="search" placeholder="Напр. Бургас, Благоевград, Хасково, 103267194, АПИ, Софарма, ДАНС…" />
+          <button class="btn btn-dark" id="heroSearchBtn" type="button">Анализирай</button>
+          <button class="btn btn-oracle-solid" id="heroAskOracleBtn" type="button">Питай AI</button>
+        </div>
+        <div class="quick-cities">
+          <span>Бърз достъп:</span>
+          <button class="city-chip" data-quick="Благоевград">Благоевград</button>
+          <button class="city-chip" data-quick="Хасково">Хасково</button>
+          <button class="city-chip" data-quick="Бургас">Бургас</button>
+          <button class="city-chip" data-quick="Варна">Варна</button>
+          <button class="city-chip" data-quick="Пловдив">Пловдив</button>
+          <button class="city-chip" data-quick="Стара Загора">Стара Загора</button>
+          <button class="city-chip" data-quick="Народно събрание">Депутати (57)</button>
+          <button class="city-chip" data-quick="ДАНС">ДАНС / ДАТО</button>
+          <button class="city-chip chip-accent" data-jump-tab="atlas">Карта 28 области</button>
+          <button class="city-chip chip-accent" data-jump-tab="forensics7">7 Кримин. радара</button>
+          <button class="city-chip chip-accent" data-jump-tab="judicial6">Съдебен радар (АДФИ/КЗК)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6-STAGE FORENSIC FUNNEL -->
+    <div class="funnel-box">
+      <div class="funnel-head">
+        <h2 class="funnel-title">Национална фуния на риска (клик за срез)</h2>
+        <span class="meta-date" id="asOfChip">Данни към: {asOf}</span>
+      </div>
+      <div class="funnel-step" data-jump-tab="authorities">
+        <div>
+          <div class="funnel-step-lbl">1. Всички обществени поръчки (2020–2026)</div>
+          <div class="funnel-step-sub" id="f1Sub">206 907 договора · 4 344 възложители · 17 428 фирми</div>
+        </div>
+        <div class="funnel-step-num" id="f1Val">€53,22 млрд.</div>
+      </div>
+      <div class="funnel-step warn" data-jump-tab="cartels">
+        <div>
+          <div class="funnel-step-lbl">2. Поръчки с 1 оферта / Пряко договаряне</div>
+          <div class="funnel-step-sub" id="f2Sub">40,7% с 1 оферта · €5,92 млрд. неконкурентни</div>
+        </div>
+        <div class="funnel-step-num" id="f2Val">€18,50 млрд.</div>
+      </div>
+      <div class="funnel-step" data-jump-filter="all">
+        <div>
+          <div class="funnel-step-lbl">3. Свързани лица във властта (СИГМА)</div>
+          <div class="funnel-step-sub">€180,8 млн. в мандата · €2,225 млрд. общо</div>
+        </div>
+        <div class="funnel-step-num">571 лица</div>
+      </div>
+      <div class="funnel-step danger" data-jump-filter="own">
+        <div>
+          <div class="funnel-step-lbl">4. Самовъзлагане (От собствената институция)</div>
+          <div class="funnel-step-sub">Фирмата печели от институцията на длъжностното лице</div>
+        </div>
+        <div class="funnel-step-num">53 лица</div>
+      </div>
+      <div class="funnel-step plum" data-jump-tab="deep">
+        <div>
+          <div class="funnel-step-lbl">5. Отвъд СИГМА 2.0: Скрити ДЗЗД + XML</div>
+          <div class="funnel-step-sub" id="heroDeepSub">338 скрити ДЗЗД на 76 лица + 16 нови политици</div>
+        </div>
+        <div class="funnel-step-num" id="heroDeepNum">+€1,92 млрд.</div>
+      </div>
+      <div class="funnel-step navy" data-jump-tab="cartels">
+        <div>
+          <div class="funnel-step-lbl">6. Картелен и статистически радар (3.0)</div>
+          <div class="funnel-step-sub" id="heroCartelSub">60 ДЗЗД двойки · Топ 1% държат 48,3% (Gini 0,91)</div>
+        </div>
+        <div class="funnel-step-num" id="heroCartelNum">MAD 0,0122</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PUBLIC AUDIT SESSION COUNTER + TOP 50 CONCENTRATION HIERARCHY TRIGGER -->
+<div class="hof-trigger-wrap">
+  <div class="truth-counter" id="truthCounter" aria-live="polite">
+    <span class="truth-live-dot" aria-hidden="true"></span>
+    <div class="truth-counter-text">
+      <span class="truth-counter-label">ПУБЛИЧНИ ОДИТНИ СЕСИИ И ИНСПЕКЦИИ</span>
+      <span class="truth-counter-sub">Верифицирани прегледи на националния регистър</span>
+    </div>
+    <span class="truth-counter-num" id="visitorCountVal">1 420</span>
+  </div>
+
+  <button type="button" class="hof-trigger" id="hofOpenBtn" aria-haspopup="dialog" aria-controls="hofModal">
+    <span class="hof-trigger-inner">
+      <span class="hof-trigger-left">
+        <span class="hof-trigger-badge">ТОП 50 · КОНЦЕНТРАЦИЯ</span>
+        <span class="hof-trigger-label">ЙЕРАРХИЯ ПО ФИНАНСОВ ОБЕМ И РИСК</span>
+      </span>
+      <span class="hof-trigger-meta" id="hofTriggerTeaser">Топ 50 по официални данни на СИГМА 2.0 и скрити ДЗЗД консорциуми</span>
+      <span class="hof-trigger-cta">ОТВОРИ &rarr;</span>
+    </span>
+  </button>
+</div>

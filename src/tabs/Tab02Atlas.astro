@@ -1,0 +1,62 @@
+---
+---
+<!-- =================================================================== -->
+<!-- TAB 2: 28-OBLAST INTERACTIVE CARTOGRAPHIC RISK ATLAS -->
+<!-- =================================================================== -->
+<section class="tab-panel" id="tab-atlas">
+  <div class="editorial-note">
+    <div>
+      <strong>Интерактивен 28-областен атлас (GISCO NUTS 2021 + ЦАИС ЕОП + Сметна палата + ДЗЗД):</strong>
+      За разлика от СИГМА 2.0, която визуализира единствено общите разходи по области, <strong>СИГМА 3.0 FINALITY</strong> наслагва върху всяка област свързаните длъжностни лица, случаите на самовъзлагане, скритите ДЗЗД обеми и съставен индекс на риска.
+    </div>
+    <div class="pill-row" id="atlasMetricPills">
+      <button class="pill active" data-atlas-metric="valueEur">Общи разходи (€)</button>
+      <button class="pill" data-atlas-metric="riskScore">Риск индекс (0–100)</button>
+      <button class="pill" data-atlas-metric="ownHits">Самовъзлагане</button>
+      <button class="pill" data-atlas-metric="officialCount">Свързани лица</button>
+      <button class="pill" data-atlas-metric="hiddenDzzdEur">Скрити ДЗЗД (€)</button>
+    </div>
+  </div>
+
+  <div class="atlas-shell">
+    <div class="panel-box atlas-map-box">
+      <div class="chart-head">
+        <h3 style="margin:0;border:none;padding:0;" id="atlasMapTitle">Карта на България — Общи разходи по области</h3>
+        <span class="meta-date">Кликнете върху област за досие</span>
+      </div>
+      <div id="bulgariaSvgHost" class="bulgaria-svg-host"></div>
+      <div class="atlas-legend" id="atlasLegend"></div>
+      <div class="muted" style="font-size:11px;margin-top:8px;">Геометрия: GISCO NUTS 2021 © EuroGeographics · Данни: АОП / СИГМА 2.0 (CC-BY 4.0)</div>
+    </div>
+
+    <aside class="panel-box atlas-detail-box" id="atlasDetailBox">
+      <div class="loading">Изберете област от картата…</div>
+    </aside>
+  </div>
+
+  <div class="panel-box" style="margin-top:18px;">
+    <div class="chart-head">
+      <h3 style="margin:0;border:none;padding:0;">Пълна сравнителна таблица на всички 28 области</h3>
+      <span class="meta-date">Клик върху ред за фокус на картата</span>
+    </div>
+    <div class="table-wrap" style="border:none;">
+      <table>
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Област (NUTS-3)</th>
+            <th>Макрорегион</th>
+            <th class="num">Обществени поръчки (€)</th>
+            <th class="num">Договори</th>
+            <th class="num">Възложители</th>
+            <th class="num">Свързани лица</th>
+            <th class="num">Собств. инст.</th>
+            <th class="num">Скрити ДЗЗД (€)</th>
+            <th class="num">Риск</th>
+          </tr>
+        </thead>
+        <tbody id="atlasTableTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
