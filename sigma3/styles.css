@@ -477,15 +477,15 @@ code {
   content: "";
   position: absolute;
   top: 50%;
-  right: -2%;
-  width: 580px;
-  height: 580px;
+  right: 2%;
+  width: 520px;
+  height: 520px;
   transform: translateY(-50%);
-  background: url("./logo-icon.png") no-repeat center center/contain;
+  background: url("/logo-icon.png") no-repeat center center/contain;
   opacity: 0.14;
   filter: drop-shadow(0 8px 24px rgba(15, 23, 42, 0.14));
-  -webkit-mask-image: radial-gradient(circle at center, rgb(0, 0, 0) 35%, rgba(0, 0, 0, 0) 72%);
-  mask-image: radial-gradient(circle at center, rgb(0, 0, 0) 35%, rgba(0, 0, 0, 0) 72%);
+  -webkit-mask-image: radial-gradient(circle, black 40%, transparent 75%);
+  mask-image: radial-gradient(circle, black 40%, transparent 75%);
   pointer-events: none;
   z-index: 0;
 }
