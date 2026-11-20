@@ -506,20 +506,11 @@ code {
 .hero-emblem-visual {
   width: 100%;
   aspect-ratio: 880/816;
-  background-image: url("./hero-emblem-light.jpg?v=20261120h");
+  background-image: url("./hero-emblem.png?v=20261120j");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
-  mix-blend-mode: multiply;
-}
-
-[data-theme=dark] .hero-emblem-visual,
-.dark .hero-emblem-visual {
-  aspect-ratio: 976/800;
-  background-image: url("./hero-emblem-dark.jpg?v=20261120i");
-  mix-blend-mode: screen;
-  -webkit-mask-image: none;
-  mask-image: none;
+  filter: drop-shadow(0 14px 20px rgba(23, 21, 17, 0.14));
 }
 
 @media (max-width: 960px) {
