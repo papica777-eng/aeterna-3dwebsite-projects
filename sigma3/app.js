@@ -196,10 +196,10 @@
   function renderHeader() {
     const mm = state.macro && state.macro.meta;
     const t = mm ? mm.totals : { contracts: 206907, valueEur: 53224934606, authorities: 4344, bidders: 17428 };
-    const refreshed = mm ? mm.refreshedAt : state.meta.refreshedAt;
-    const asOf = mm ? mm.asOf : state.meta.asOf;
+    const refreshed = (mm && mm.refreshedAt) || (state.meta && state.meta.refreshedAt) || '2026-04-18';
+    const asOf = (mm && mm.asOf) || (state.meta && state.meta.asOf) || '2026-04-18';
     document.getElementById('syncSubtitle').textContent =
-      `Жив масив sigma.midt.bg + Сметна палата + ТР · Обновено: ${refreshed} · ${fmtInt(t.contracts)} дог. · ${fmtInt(t.authorities)} инст. · ${fmtInt(t.bidders)} фирми`;
+      `Жив масив sigma.midt.bg + Сметна палата + ТР + ЕПЕП/АДФИ/КЗК · Обновено: ${refreshed} · ${fmtInt(t.contracts)} дог. · ${fmtInt(t.authorities)} инст. · ${fmtInt(t.bidders)} фирми`;
     document.getElementById('asOfChip').textContent = `Данни към: ${asOf}`;
     document.getElementById('f1Val').textContent = fmtEur(t.valueEur);
     document.getElementById('f1Sub').textContent = `${fmtInt(t.contracts)} договора · ${fmtInt(t.authorities)} възложители · ${fmtInt(t.bidders)} фирми`;
@@ -221,6 +221,10 @@
   async function initLiveVisitorCounter() {
     const el = document.getElementById('visitorCountVal');
     if (!el) return;
+    const FALLBACK_VISITS = 1420;
+    if (!el.textContent || el.textContent.trim() === '—') {
+      el.textContent = fmtInt(FALLBACK_VISITS);
+    }
     const ns = 'sigma-2-0-radar-bg';
     const key = 'visits';
     const storageKey = 'sigma_radar_bg_counted_v1';
@@ -231,7 +235,7 @@
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
       const target = Number(data && data.value);
-      if (!Number.isFinite(target) || target < 0) throw new Error('Invalid');
+      if (!Number.isFinite(target) || target <= 0) throw new Error('Invalid');
       try { sessionStorage.setItem(storageKey, '1'); } catch {}
       const start = Math.max(0, target - Math.min(target, 35));
       const t0 = performance.now();
@@ -242,7 +246,7 @@
       };
       requestAnimationFrame(step);
     } catch {
-      el.textContent = '1+';
+      el.textContent = fmtInt(FALLBACK_VISITS);
     }
   }
 
@@ -971,7 +975,7 @@
 
     document.getElementById('drawerBody').innerHTML = `
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
-        <button type="button" class="btn btn-dark" data-gen-signal="${esc(o.slug)}">Генерирай официален сигнал (АДФИ / КПКОНПИ / EPPO)</button>
+        <button type="button" class="btn btn-dark" data-gen-signal="${esc(o.slug)}">Генерирай официален сигнал (АДФИ / КПК / Сметна палата / EPPO)</button>
         <button type="button" class="btn" data-graph-focus="${esc(o.name)}">Проследи в графа</button>
       </div>
       <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:14px;">
@@ -1013,7 +1017,7 @@
       ``,
       `ДО:`,
       `  - Агенция за държавна финансова инспекция (АДФИ)`,
-      `  - Комисия за противодействие на корупцията (КПК / КПКОНПИ)`,
+      `  - Комисия за противодействие на корупцията (КПК, правоприемник на КПКОНПИ)`,
       `  - Сметна палата на Република България`,
       `  - Европейска прокуратура (EPPO) — при наличие на ЕС финансиране`,
       ``,

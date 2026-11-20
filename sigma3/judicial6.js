@@ -4,7 +4,7 @@
   const api = () => window.SIGMA3;
   let j6Data = null;
   let j6Loading = null;
-  let activeSub = 'impunity';
+  let activeSub = 'collusive';
   let kzkView = 'vas';
   let art17View = 'all';
   let j6Wired = false;
@@ -101,9 +101,12 @@
     box.innerHTML = `
       <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap;margin-bottom:10px;">
         <div>
-          <strong>Слой за автоматични съвпадения (Entity Matching Layer):</strong>
+          <strong>Слой за автоматични съвпадения (Entity Matching Layer &amp; Zero-False-Positive Lock):</strong>
           Входящият поток от <strong>${fmtInt(em.incomingRecordsScanned)} живи контролни/съдебни акта</strong> + <strong>206 907 договора</strong> се филтрира автоматично по <strong>${fmtInt(em.authoritiesUniverse)} възложители</strong>, <strong>${fmtInt(em.companiesUniverse)} фирми/ДЗЗД</strong> и <strong>${fmtInt(em.contractsUnpUniverse)} УНП</strong>
           &rarr; <strong>${fmtInt(totalMatches)} точни съвпадения</strong> · <strong>${fmtInt(em.authoritiesWithJudicialBoost)} институции</strong> и <strong>${fmtInt(em.companiesWithJudicialScore)} фирми</strong> с изчислен Съдебен риск компонент (0–100).
+          <div style="font-size:11.5px;margin-top:4px;color:var(--ink-secondary);">
+            <strong>Активни Zero-False-Positive филтри:</strong> (1) 0 дела на Прокуратурата по чл. 155 ТЗ (<code>121817309*</code>); (2) Географско заключване по дирекции <code>ДИД1-СФ</code>..<code>ДИД7-РС</code> и съдебен район за едноименни училища, ДГ, читалища, МБАЛ и ВиК; (3) Строго разделяне на <code>EXACT_EIK</code> от регионални актуализации по чл. 17, ал. 7 ЗДФИ; (4) Структурирани адвокати от <code>/Case/SidesLoadData</code> и 0 ЕГН по ЗЗЛД.
+          </div>
         </div>
         <button type="button" class="btn btn-dark" id="btnJumpJudicialGraph">Отвори 9-възловия граф (Дела + Адвокати + Вещи лица) &rarr;</button>
       </div>
@@ -800,7 +803,7 @@
     host.innerHTML = `
       <div class="editorial-note note-plum">
         <div>
-          <strong>6. Криминален, ЗМИП и EPPO профил (Регламент (ЕС) 2017/1939 &amp; чл. 54 ЗОП):</strong>
+          <strong>6. ЗМИП и EPPO рисков профил (Регламент (ЕС) 2017/1939 &amp; чл. 54 ЗОП):</strong>
           В ЦАИС ЕОП са отчетени <strong>${fmtInt(m6.euFundedContractsTotal)} договора с европейско финансиране</strong> на стойност <strong>${fmtEur(m6.euFundedTotalEur)}</strong>, от които <strong>${m6.euSingleOfferSharePct}% (${fmtEur(m6.euSingleOfferEur)})</strong> са възложени с <strong>1 оферта</strong>.
           Открити са <strong>${fmtInt(m6.eppoHighRiskCount)} високорискови ЕС договора (&ge;€1 млн. с 1 оферта / пряко договаряне)</strong> за <strong>${fmtEur(m6.eppoHighRiskEur)}</strong>, попадащи в материалния праг за одит на Европейската прокуратура (EPPO).
           <br/><span class="muted" style="font-size:11.5px;">${esc(sc.disclaimer)}</span>

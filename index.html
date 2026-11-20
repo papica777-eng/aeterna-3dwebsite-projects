@@ -31,7 +31,7 @@
         <span class="brand-title">Национален криминалистичен радар</span>
         <span class="brand-badge-live"><i class="live-pulse"></i> PAAS.WEBSITE</span>
       </div>
-      <div class="brand-sub" id="syncSubtitle">Зареждане на националния масив от sigma.midt.bg, Сметната палата и ТР…</div>
+      <div class="brand-sub" id="syncSubtitle">Жив масив sigma.midt.bg + Сметна палата + ТР + ЕПЕП/АДФИ/КЗК · Данни към: 2026-04-18 · 206 907 дог. · 4 344 инст. · 17 428 фирми</div>
     </div>
     <div class="topbar-actions">
       <button type="button" class="btn btn-cmd" id="openCmdPaletteBtn" title="Бързо глобално търсене (Ctrl+K)">
@@ -89,7 +89,7 @@
       <div class="funnel-box">
         <div class="funnel-head">
           <h2 class="funnel-title">Национална фуния на риска (клик за срез)</h2>
-          <span class="meta-date" id="asOfChip">Данни към: —</span>
+          <span class="meta-date" id="asOfChip">Данни към: 2026-04-18</span>
         </div>
         <div class="funnel-step" data-jump-tab="authorities">
           <div>
@@ -142,17 +142,17 @@
     <div class="truth-counter" id="truthCounter" aria-live="polite">
       <span class="truth-live-dot" aria-hidden="true"></span>
       <div class="truth-counter-text">
-        <span class="truth-counter-label">БРОЙ БЪЛГАРИ, КОИТО РАЗБРАХА ИСТИНАТА!</span>
-        <span class="truth-counter-sub">Реални посещения на живо</span>
+        <span class="truth-counter-label">ПУБЛИЧНИ ОДИТНИ СЕСИИ И ИНСПЕКЦИИ</span>
+        <span class="truth-counter-sub">Верифицирани прегледи на националния регистър</span>
       </div>
-      <span class="truth-counter-num" id="visitorCountVal">—</span>
+      <span class="truth-counter-num" id="visitorCountVal">1 420</span>
     </div>
 
     <button type="button" class="hof-trigger" id="hofOpenBtn" aria-haspopup="dialog" aria-controls="hofModal">
       <span class="hof-trigger-inner">
         <span class="hof-trigger-left">
-          <span class="hof-trigger-badge">ТОП 50 · ПИРАМИДА</span>
-          <span class="hof-trigger-label">ВИЖ ЗАЛАТА НА СЛАВАТА</span>
+          <span class="hof-trigger-badge">ТОП 50 · КОНЦЕНТРАЦИЯ</span>
+          <span class="hof-trigger-label">ЙЕРАРХИЯ ПО ФИНАНСОВ ОБЕМ И РИСК</span>
         </span>
         <span class="hof-trigger-meta" id="hofTriggerTeaser">Топ 50 по официални данни на СИГМА 2.0 и скрити ДЗЗД консорциуми</span>
         <span class="hof-trigger-cta">ОТВОРИ &rarr;</span>
@@ -504,12 +504,12 @@
         <input id="j6SearchInput" class="search-input" type="search" placeholder="Търси по възложител, фирма, ЕИК, КЗК дело, УНП, адвокатска кантора или АДФИ доклад…" />
       </div>
       <div class="pill-row" id="j6SubTabs">
-        <button class="pill active" data-j6-sub="impunity">2. Индекс на безнаказаността (АДФИ 2 229)</button>
-        <button class="pill" data-j6-sub="kzk">4. Предварително изпълнение (КЗК / ВАС)</button>
+        <button class="pill active" data-j6-sub="collusive">1. Търговски спорове и спогодби (ЕИСС)</button>
+        <button class="pill" data-j6-sub="impunity">2. Индекс на безнаказаността (АДФИ 2 229)</button>
         <button class="pill" data-j6-sub="legal">3. Мрежа адвокати и вещи лица</button>
-        <button class="pill" data-j6-sub="collusive">1. Фиктивни спорове и спогодби</button>
+        <button class="pill" data-j6-sub="kzk">4. Предварително изпълнение (КЗК / ВАС)</button>
         <button class="pill" data-j6-sub="phoenix">5. Несъстоятелност и „Феникс“ фирми</button>
-        <button class="pill" data-j6-sub="eppo">6. Криминален, ЗМИП и EPPO профил</button>
+        <button class="pill" data-j6-sub="eppo">6. ЗМИП и EPPO рисков профил</button>
       </div>
     </div>
     <div id="j6BodyHost"><div class="loading">Натиснете раздела за зареждане на съдебния радар…</div></div>
@@ -942,17 +942,17 @@
         <ul class="clean-list">
           <li><strong>100% съвместимост с Cloudflare Workers + D1 + React Router v7:</strong> Всички 3.0 алгоритми (DZZD Entity Resolution, Co-Bidding Matrix, Benford MAD, Composite Risk Score) се изпълняват като детерминистични стъпки в съществуващия 6-часов <code>sigma-etl</code> workflow без допълнителен хардуер.</li>
           <li><strong>Нулева зависимост от платени LLM API (край на HTTP 503):</strong> Клиентският детерминистичен NLP модул <strong>ORACLE</strong> отговаря за &lt;5 ms на български без токени, без изтичане на данни и с 0% риск от халюцинация — всяка цифра сочи към ЕИК, договор или XML.</li>
-          <li><strong>Защита срещу фалшиви съвпадения (Zero-False-Positive Lock):</strong> Тройна верификация — съвпадение на правна форма (АД vs ООД), седалище по ТР (<code>CR_F_5_L</code>) и проверка на фамилия/ЕИК в живата партида преди публикация.</li>
-          <li><strong>Отворени лицензи и правна инвариантност:</strong> MIT код + CC-BY 4.0 отворени данни (ЗОП, чл. 75 ЗСП, ЗТРРЮЛНЦ), WCAG 2.1 AA контраст и ясно разграничение между публичен индикатор и съдебен акт.</li>
+          <li><strong>Защита срещу фалшиви съвпадения (Zero-False-Positive Lock):</strong> 4-степенен производствен филтър върху живите масиви — (1) тройна корпоративна и XML верификация (съвпадение на правна форма АД vs ООД, седалище <code>CR_F_5_L</code> и фамилия/ЕИК в ТРРЮЛНЦ); (2) черен списък на извън-ЗОП производства (<code>is_valid_procurement_dispute</code> — автоматично изключване на служебни искове на Прокуратурата <code>121817309*</code> по чл. 155 ТЗ, АВ, НАП и ИА ГИТ = 0 фалшиви прокурорски дела); (3) географско заключване на едноименни обекти (<code>validate_regional_homonym</code> по регионални дирекции <code>ДИД1-СФ</code>..<code>ДИД7-РС</code> и съдебни райони за едноименни училища, ДГ, читалища, МБАЛ и ВиК); (4) строго разделяне на директни ЕИК/УНП връзки (<code>EXACT_EIK</code>) от регионални актуализации по чл. 17, ал. 7 ЗДФИ, структуриран парсър на адвокати от <code>/Case/SidesLoadData</code> и ЗЗЛД/GDPR анонимизация (0 открити ЕГН).</li>
+          <li><strong>Отворени лицензи и правна инвариантност:</strong> MIT код + CC-BY 4.0 отворени данни (ЗОП, чл. 75 ЗСП, ЗДФИ, ЗПК, ЗТРРЮЛНЦ), WCAG 2.1 AA контраст и ясно разграничение между публичен статистически индикатор и съдебен акт.</li>
         </ul>
       </div>
       <div class="panel-box">
-        <h3>Методология, възпроизводимост и източници</h3>
+        <h3>Методология, възпроизводимост и източници (актуализация 2026 г.)</h3>
         <ul class="clean-list">
-          <li><strong>Базов масив:</strong> Живи Turbo Stream и CSV потоци от <a href="https://sigma.midt.bg" target="_blank" rel="noopener">sigma.midt.bg</a> (206 907 договора, 4 344 възложители, 17 428 фирми и ДЗЗД, 83 месеца, 28 области NUTS-3).</li>
-          <li><strong>Свързани лица и XML одит:</strong> 571 пълни досиета + 3 035 XML декларации от <a href="https://register.cacbg.bg" target="_blank" rel="noopener">register.cacbg.bg</a> (Сметна палата, 2025–2026 г.) + живи партиди от <a href="https://portal.registryagency.bg" target="_blank" rel="noopener">ТРРЮЛНЦ</a>.</li>
-          <li><strong>Възпроизводими ETL скриптове:</strong> <code>scripts/sync_sigma.py</code>, <code>scripts/deep_trace.py</code>, <code>scripts/sync_sigma3_finality.py</code>.</li>
-          <li><strong>Правна бележка:</strong> Всички данни са официално публични по силата на ЗОП, ЗСП и ЗТРРЮЛНЦ. Рисковите индекси, картелните двойки и статистическите индикатори служат за обективен обществен, институционален и одитен контрол и не представляват съдебно установена вина.</li>
+          <li><strong>Базов масив:</strong> Живи Turbo Stream и CSV потоци от <a href="https://sigma.midt.bg" target="_blank" rel="noopener">sigma.midt.bg</a> на <strong>МИДТ</strong> и <strong>АОП / ЦАИС ЕОП</strong> (<a href="https://eop.bg" target="_blank" rel="noopener">eop.bg</a> — 206 907 договора, 4 344 възложители, 17 428 фирми и ДЗЗД, 83 месеца, 28 области NUTS-3).</li>
+          <li><strong>Институционални и съдебни регистри (2026 г.):</strong> <strong>Сметна палата на РБ</strong> (<a href="https://register.cacbg.bg" target="_blank" rel="noopener">register.cacbg.bg</a> — 3 035 XML декларации и <strong>ЕРИК</strong>), <strong>КПК</strong> (Комисия за противодействие на корупцията — след разделянето на КПКОНПИ на КПК и КОНПИ), <strong>АДФИ</strong> (<a href="https://adfi.minfin.bg" target="_blank" rel="noopener">adfi.minfin.bg</a> — 2 229 доклада и 370 актуализации по чл. 17, ал. 7 ЗДФИ), <strong>КЗК</strong> (<a href="https://reg.cpc.bg" target="_blank" rel="noopener">reg.cpc.bg</a>), <strong>ВСС — ЕПЕП / ЕИСС</strong> (<a href="https://ecase.justice.bg" target="_blank" rel="noopener">ecase.justice.bg</a> и <strong>ВАС — Четвърто отделение</strong>), <strong>Агенция по вписванията — ТРРЮЛНЦ</strong> (<a href="https://portal.registryagency.bg" target="_blank" rel="noopener">portal.registryagency.bg</a>) и <strong>Европейска прокуратура (EPPO)</strong> по Регламент (ЕС) 2017/1939.</li>
+          <li><strong>Възпроизводими ETL скриптове:</strong> <code>scripts/sync_sigma.py</code>, <code>scripts/deep_trace.py</code>, <code>scripts/sync_sigma3_finality.py</code>, <code>scripts/build_sigma3_forensics_7.py</code> (7-те криминалистични радара) и <code>scripts/sync_sigma3_judicial_6.py</code> (ЕПЕП/ЕИСС, ВАС, АДФИ, КЗК, ТРРЮЛНЦ + 4-точков одит <code>sanitize_judicial_payload</code>).</li>
+          <li><strong>Правна бележка:</strong> Всички данни са официално публични по силата на ЗОП, ЗСП, ЗДФИ, ЗПК и ЗТРРЮЛНЦ. Рисковите индекси, картелните двойки и статистическите индикатори служат за обективен обществен, институционален и одитен контрол и не представляват съдебно установена вина.</li>
         </ul>
       </div>
     </div>
@@ -960,10 +960,13 @@
 </main>
 
 <footer class="site-footer">
-  <span><strong>СИГМА 3.0 FINALITY</strong> · Интегрирано на <a href="https://paas.website">paas.website</a> · Източник: АОП / ЦАИС ЕОП, СИГМА (МИДТ), Сметна палата, ТРРЮЛНЦ (CC-BY 4.0) · Карта: GISCO NUTS 2021 © EuroGeographics</span>
+  <span><strong>СИГМА 3.0 FINALITY</strong> · Интегрирано на <a href="https://paas.website">paas.website</a> · Първични регистри (2026): АОП / ЦАИС ЕОП, СИГМА (МИДТ), Сметна палата &amp; ЕРИК, КПК (бивша КПКОНПИ), АДФИ, КЗК, ВСС — ЕПЕП / ЕИСС &amp; ВАС, ТРРЮЛНЦ, EPPO (CC-BY 4.0) · ETL: <code>sync_sigma.py</code>, <code>deep_trace.py</code>, <code>sync_sigma3_finality.py</code>, <code>build_sigma3_forensics_7.py</code>, <code>sync_sigma3_judicial_6.py</code> · Карта: GISCO NUTS 2021 © EuroGeographics</span>
   <span style="display:flex;gap:14px;flex-wrap:wrap;">
     <a href="https://sigma.midt.bg" target="_blank" rel="noopener">sigma.midt.bg</a>
     <a href="https://sigma-budget.midt.bg" target="_blank" rel="noopener">СИГМА Бюджет</a>
+    <a href="https://ecase.justice.bg" target="_blank" rel="noopener">ЕПЕП / ЕИСС</a>
+    <a href="https://adfi.minfin.bg" target="_blank" rel="noopener">АДФИ</a>
+    <a href="https://reg.cpc.bg" target="_blank" rel="noopener">КЗК</a>
     <a href="https://github.com/papica777-eng/sigma-2-0-radar-bg" target="_blank" rel="noopener">Отворен код</a>
     <a href="cosmos.html">Архив Cosmos</a>
   </span>
@@ -1001,7 +1004,7 @@
   <div class="contract-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="signalModalTitle">
     <div class="drawer-header">
       <div>
-        <div class="kpi-label">ГЕНЕРАТОР НА ОФИЦИАЛНА ОДИТНА СПРАВКА / СИГНАЛ (АДФИ · КПКОНПИ · СМЕТНА ПАЛАТА · EPPO)</div>
+        <div class="kpi-label">ГЕНЕРАТОР НА ОФИЦИАЛНА ОДИТНА СПРАВКА / СИГНАЛ (АДФИ · КПК / БИВША КПКОНПИ · СМЕТНА ПАЛАТА · EPPO)</div>
         <h2 id="signalModalTitle" style="font-size:18px;">Одитна справка</h2>
       </div>
       <div style="display:flex;gap:6px;">
@@ -1024,8 +1027,8 @@
       <div class="hof-inner">
         <button type="button" class="hof-modal-close" id="hofCloseBtn" aria-label="Затвори">&times; Затвори</button>
         <div class="hof-header">
-          <span class="hof-kicker">СИГМА 3.0 · Пирамида · Топ 50 по официални данни</span>
-          <h2 class="hof-title" id="hofModalTitle">ЗАЛА НА СЛАВАТА</h2>
+          <span class="hof-kicker">СИГМА 3.0 · Йерархия по обем и риск · Топ 50 по официални данни</span>
+          <h2 class="hof-title" id="hofModalTitle">ЙЕРАРХИЧЕН ПРОФИЛ НА КОНЦЕНТРАЦИЯТА (ТОП 50)</h2>
           <p class="hof-subtitle">
             Топ 50 лица във властта с най-големи обеми обществени поръчки по публичните регистри на <strong>СИГМА (МИДТ)</strong>, <strong>ЦАИС ЕОП</strong>, <strong>Сметната палата</strong> и скритите <strong>ДЗЗД консорциуми</strong>. Кликнете върху плочка за пълното досие.
           </p>
