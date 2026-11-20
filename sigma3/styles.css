@@ -494,33 +494,32 @@ code {
 
 .hero-emblem-stage {
   flex: 0 0 auto;
-  width: clamp(300px, 31vw, 440px);
+  width: clamp(340px, 34vw, 490px);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   user-select: none;
-  margin: -18px -10px -18px 0;
+  margin: -10px 0;
 }
 
 .hero-emblem-visual {
   width: 100%;
-  aspect-ratio: 1/1;
-  background-image: url("./hero-emblem-light.jpg");
+  aspect-ratio: 880/816;
+  background-image: url("./hero-emblem-light.jpg?v=20261120h");
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
   mix-blend-mode: multiply;
-  filter: contrast(1.04) saturate(1.06);
-  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
-  mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
 }
 
 [data-theme=dark] .hero-emblem-visual,
 .dark .hero-emblem-visual {
-  background-image: url("./hero-emblem-dark.jpg");
+  aspect-ratio: 1/1;
+  background-image: url("./hero-emblem-dark.jpg?v=20261120h");
   mix-blend-mode: lighten;
-  filter: none;
+  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
+  mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
 }
 
 @media (max-width: 960px) {
