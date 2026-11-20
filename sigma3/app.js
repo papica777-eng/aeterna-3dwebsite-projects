@@ -93,7 +93,11 @@
 
   function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach((b) => b.classList.toggle('active', b.dataset.tab === tabId));
-    document.querySelectorAll('.tab-panel').forEach((p) => p.classList.toggle('active', p.id === 'tab-' + tabId));
+    document.querySelectorAll('.tab-panel').forEach((p) => {
+      const isActive = p.id === 'tab-' + tabId;
+      p.classList.toggle('active', isActive);
+      p.hidden = !isActive;
+    });
     if (tabId === 'graph' && !state.graph.nodes.length && window.SIGMA3_MOD) {
       window.SIGMA3_MOD.buildGraphData(document.getElementById('graphPresetSelect').value);
     }
@@ -464,7 +468,7 @@
         <td><strong style="font-size:12.5px;">${esc(c.bidderName)}</strong></td>
         <td class="num" style="font-weight:700;color:var(--crimson);">${fmtEur(c.valueEur)}</td>
         <td style="white-space:nowrap;">
-          <button type="button" class="btn btn-oracle" style="padding:4px 9px;font-size:11.5px;" data-inspect-contract="${esc(c.id)}">Провери JSON ↗</button>
+          <button type="button" class="btn btn-oracle" style="padding:4px 9px;font-size:11.5px;" data-inspect-contract="${esc(c.id)}">Удостовери на живо ↗</button>
         </td>
       </tr>`).join('');
   }

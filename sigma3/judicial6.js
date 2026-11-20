@@ -145,7 +145,7 @@
       <div class="kpi-card emphasis"><div class="kpi-label">2. АДФИ + КАНД/АНД (ЕИСС)</div><div class="kpi-val" style="color:var(--crimson);">${fmtInt(m2.updatedArt17Count)} чл.17(7) · ${eissAdfiCnt} дела</div><div class="kpi-sub">${fmtInt(m2.totalReports)} докл. АДФИ · Потвърдени vs Отменени НП</div></div>
       <div class="kpi-card"><div class="kpi-label">3. Адвокати и Вещи лица</div><div class="kpi-val">${fmtInt(m3.lawFirmsCount)} кант. / ${eissLawCnt} юристи</div><div class="kpi-sub">${fmtEur(m3.lawFirmsTotalEur)} · ${fmtInt((m3.adfiRegisteredExperts || {}).totalExperts)} АДФИ експерти</div></div>
       <div class="kpi-card emphasis"><div class="kpi-label">4. КЗК &amp; ВАС IV отд. (ЕИСС)</div><div class="kpi-val">${eissVasCnt} акта ВАС</div><div class="kpi-sub">${kzkIng.prelimGranted || 0} допуснати предв. изп. · ${kzkIng.decisionsOverturned || 0} отм. в КЗК</div></div>
-      <div class="kpi-card"><div class="kpi-label">5. Несъстоятелност / Феникс</div><div class="kpi-val">${fmtInt(m5.burnoutFirmsCount)} burnout</div><div class="kpi-sub">${m5.distressedOrPledgedCount} със запори/залози ТР · ${m5.phoenixChainsCount} вериги</div></div>
+      <div class="kpi-card"><div class="kpi-label">5. Несъстоятелност / Феникс</div><div class="kpi-val">${fmtInt(m5.burnoutFirmsCount)} в срив</div><div class="kpi-sub">${m5.distressedOrPledgedCount} със запори/залози ТР · ${m5.phoenixChainsCount} вериги</div></div>
       <div class="kpi-card"><div class="kpi-label">6. ЕС Средства / EPPO Радар</div><div class="kpi-val">${fmtEur(m6.euFundedTotalEur)}</div><div class="kpi-sub">${m6.euSingleOfferSharePct}% с 1 оф. · ${fmtInt(m6.eppoHighRiskCount)} EPPO тригера</div></div>`;
   }
 
@@ -728,7 +728,7 @@
     host.innerHTML = `
       <div class="editorial-note note-crimson">
         <div>
-          <strong>5. Несъстоятелност, запори и „Феникс“ фирми (Търговски регистър <code>CR_F_26_L</code> / <code>CR_F_28_L</code> + Burnout радар):</strong>
+          <strong>5. Несъстоятелност, запори и „Феникс“ фирми (Търговски регистър — запори, особени залози и ликвидационен/дългов срив):</strong>
           Проверява живите партиди в Търговския регистър за <strong>несъстоятелност, ликвидация, запори на дружествени дялове (ЧСИ / НАП)</strong> и <strong>особени залози</strong>, и проследява <strong>${fmtInt(m5.burnoutFirmsCount)} компании</strong>, спечелили <strong>${fmtEur(m5.burnoutTotal2020_2023Eur)}</strong> през 2020–2023 г. и внезапно спрели до €0 през 2024–2026 г. (класически профил на „изгаряне“ и прехвърляне към нова фирма).
         </div>
       </div>
@@ -748,7 +748,7 @@
                 <div class="badges" style="margin-top:0;">
                   ${d.distraintCount > 0 ? `<span class="tag tag-crimson">${d.distraintCount} запора (CR_F_26_L)</span>` : ''}
                   ${d.pledgeCount > 0 ? `<span class="tag tag-ochre">${d.pledgeCount} особени залога</span>` : ''}
-                  ${d.isBurnout ? '<span class="tag tag-plum">BURNOUT 2024–26</span>' : ''}
+                  ${d.isBurnout ? '<span class="tag tag-plum">СРИВ 2024–26</span>' : ''}
                 </div>
                 ${(d.distraintDetails || d.pledgeDetails || []).slice(0, 1).map((t) => `<div class="inst-line">${esc(t.slice(0, 110))}…</div>`).join('')}
               </td>
@@ -774,7 +774,7 @@
       </div>
 
       <div class="panel-box">
-        <h3>Топ ${burn.length} „Burnout“ изпълнители (&ge;€1,5 млн. през 2020–2023 г. &rarr; €0 през 2024–2026 г.)</h3>
+        <h3>Топ ${burn.length} дружества в ликвидационен/дългов срив (&ge;€1,5 млн. през 2020–2023 г. &rarr; €0 през 2024–2026 г.)</h3>
         <div class="table-wrap" style="border:none;max-height:420px;overflow-y:auto;"><table>
           <thead><tr><th>№</th><th>Компания (ЕИК) и последен договор</th><th class="num">2020–2023 (€)</th><th class="num">2024–2026</th><th>Статус ТР</th><th>Проверка</th></tr></thead>
           <tbody>${burn.map((b, i) => `<tr>

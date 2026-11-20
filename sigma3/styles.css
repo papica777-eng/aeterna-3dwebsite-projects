@@ -2654,19 +2654,120 @@ tbody td {
   vertical-align: middle;
 }
 
-/* Print / PDF Export Styling */
+/* Official Ministerial 1-2 Page Print / PDF Export Styling */
+.print-executive-header {
+  display: none;
+}
+
 @media print {
-  .topbar, .tabs, .hof-trigger-wrap, .hero-search-box, .btn, .site-footer {
+  @page {
+    size: A4 portrait;
+    margin: 12mm 14mm;
+  }
+  html, body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-size: 11px !important;
+    line-height: 1.38 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .topbar,
+  .info-subbar,
+  .hero,
+  .tabs,
+  .hof-trigger-wrap,
+  .hero-search-box,
+  .btn,
+  .site-footer,
+  .modal-backdrop,
+  .drawer-backdrop,
+  .drawer,
+  .tab-panel:not(.active) {
     display: none !important;
   }
-  body {
-    background: #fff !important;
-    color: #000 !important;
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
   }
-  .panel-box, .hero {
-    border: 1px solid #ccc !important;
-    box-shadow: none !important;
+  .print-executive-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+    border-bottom: 2px solid #111111;
+  }
+  .print-exec-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .print-exec-kicker {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: #ac1b18;
+    font-weight: 700;
+  }
+  .print-exec-title {
+    font-family: var(--font-serif);
+    font-size: 18px !important;
+    margin: 2px 0 3px !important;
+    color: #111111 !important;
+  }
+  .print-exec-meta {
+    font-family: var(--font-mono);
+    font-size: 9.5px;
+    color: #444444;
+  }
+  .print-exec-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-family: var(--font-mono);
+    font-size: 8.5px;
+    color: #111111;
+  }
+  .proposal-hero {
+    background: #ffffff !important;
+    border: 1px solid #cccccc !important;
+    border-left: 3px solid #ac1b18 !important;
+    padding: 10px 12px !important;
+    margin-bottom: 10px !important;
+  }
+  .kpi-grid {
+    border-top: 1.5px solid #111111 !important;
+    border-bottom: 1.5px solid #111111 !important;
+    margin-bottom: 12px !important;
+  }
+  .kpi-card {
+    padding: 8px 10px !important;
+  }
+  .kpi-val {
+    font-size: 16px !important;
+    margin: 3px 0 !important;
+  }
+  .panel-box {
+    background: #ffffff !important;
+    border: 0 !important;
+    border-top: 1px solid #111111 !important;
+    padding: 8px 0 !important;
+    margin-bottom: 10px !important;
     break-inside: avoid;
+  }
+  table {
+    font-size: 9.5px !important;
+  }
+  thead th, tbody td {
+    padding: 4px 6px 4px 0 !important;
+  }
+  .two-col {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
   }
 }
 :root {
