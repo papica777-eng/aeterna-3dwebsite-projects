@@ -794,23 +794,579 @@
   }
 
   // =========================================================================
-  // TAB 9: SIGMA 3.0 ORACLE — LIVE ZERO-503 BULGARIAN AI COPILOT
+  // TAB 9: SIGMA 3.0 ORACLE — HYBRID NLU, FUZZY ENTITY RESOLVER & 13-RADAR RAG
   // =========================================================================
   let oracleInitialized = false;
+  const oracleContext = {
+    lastOfficial: null,
+    lastAuthority: null,
+    lastCompany: null,
+    lastOblast: null,
+    lastIntents: [],
+    history: [],
+  };
+
+  // 1. Bidirectional Shlyokavitsa / Latin-to-Cyrillic & Acronym Normalizer
+  const ACRONYM_ALIASES = {
+    'апи': 'агенция пътна инфраструктура',
+    'api': 'агенция пътна инфраструктура',
+    'нкжи': 'национална компания железопътна инфраструктура',
+    'nkji': 'национална компания железопътна инфраструктура',
+    'nkzhi': 'национална компания железопътна инфраструктура',
+    'аец': 'аец козлодуй',
+    'aec': 'аец козлодуй',
+    'aets': 'аец козлодуй',
+    'бдж': 'бдж пътнически превози',
+    'bdj': 'бдж пътнически превози',
+    'bdz': 'бдж пътнически превози',
+    'есо': 'електроенергиен системен оператор',
+    'eso': 'електроенергиен системен оператор',
+    'со': 'столична община',
+    'мвр': 'министерство на вътрешните работи',
+    'mvr': 'министерство на вътрешните работи',
+    'мз': 'министерство на здравеопазването',
+    'мррб': 'министерство на регионалното развитие и благоустройството',
+    'mrrb': 'министерство на регионалното развитие и благоустройството',
+    'мон': 'министерство на образованието и науката',
+    'мп': 'министерство на правосъдието',
+    'мф': 'министерство на финансите',
+    'гбс': 'главболгарстрой',
+    'gbs': 'главболгарстрой',
+    'дппи': 'пристанищна инфраструктура',
+  };
+
+  function latinToCyrillicBg(str) {
+    let s = String(str || '').toLowerCase();
+    // Preserve numbers & punctuation, convert multi-char Bulgarian shlyokavitsa clusters first
+    const multi = [
+      ['sht', 'щ'], ['6t', 'щ'], ['sh', 'ш'], ['zh', 'ж'], ['ch', 'ч'],
+      ['ts', 'ц'], ['tz', 'ц'], ['yu', 'ю'], ['iu', 'ю'], ['ya', 'я'],
+      ['ia', 'я'], ['yo', 'йо'], ['io', 'йо'], ['dj', 'дж'], ['dz', 'дз'],
+    ];
+    for (const [lat, cyr] of multi) s = s.split(lat).join(cyr);
+    // Replace '4' and '6' only when adjacent to letters (shlyokavitsa for ч / ш)
+    s = s.replace(/(?<=[a-zа-я])4|4(?=[a-zа-я])/g, 'ч').replace(/(?<=[a-zа-я])6|6(?=[a-zа-я])/g, 'ш');
+    const single = {
+      a: 'а', b: 'б', v: 'в', w: 'в', g: 'г', d: 'д', e: 'е', j: 'ж', z: 'з',
+      i: 'и', y: 'й', k: 'к', l: 'л', m: 'м', n: 'н', o: 'о', p: 'п', r: 'р',
+      s: 'с', t: 'т', u: 'у', f: 'ф', h: 'х', c: 'ц', q: 'я', x: 'кс',
+    };
+    return s.replace(/[a-z]/g, (ch) => single[ch] || ch);
+  }
+
+  // 2. Bulgarian Morphological Stemmer & Trigram / Levenshtein Fuzzy Similarity
+  function stemBg(word) {
+    let w = String(word || '').toLowerCase().replace(/[^а-яa-z0-9]/g, '');
+    if (w.length <= 3) return w;
+    const suffixes = [
+      'ията', 'ието', 'овете', 'ените', 'аните', 'ската', 'ското', 'ските',
+      'ите', 'ата', 'ята', 'ове', 'ища', 'ия', 'ие', 'ски', 'ска', 'ско',
+      'ен', 'на', 'но', 'ни', 'ът', 'ят', 'та', 'то', 'те', 'а', 'я', 'и', 'о', 'е',
+    ];
+    for (const suf of suffixes) {
+      if (w.length - suf.length >= 3 && w.endsWith(suf)) {
+        return w.slice(0, w.length - suf.length);
+      }
+    }
+    return w;
+  }
+
+  function trigramSim(a, b) {
+    const s1 = String(a || '').toLowerCase().trim();
+    const s2 = String(b || '').toLowerCase().trim();
+    if (!s1 || !s2) return 0;
+    if (s1 === s2) return 1;
+    if (s1.includes(s2) || s2.includes(s1)) {
+      const ratio = Math.min(s1.length, s2.length) / Math.max(s1.length, s2.length);
+      return Math.max(0.82, ratio);
+    }
+    if (s1.length < 3 || s2.length < 3) return 0;
+    const p1 = ` ${s1} `, p2 = ` ${s2} `;
+    const g1 = new Set(), g2 = new Set();
+    for (let i = 0; i <= p1.length - 3; i++) g1.add(p1.slice(i, i + 3));
+    for (let i = 0; i <= p2.length - 3; i++) g2.add(p2.slice(i, i + 3));
+    let inter = 0;
+    g1.forEach((g) => { if (g2.has(g)) inter++; });
+    return (2 * inter) / (g1.size + g2.size);
+  }
+
+  function editDistanceBounded(a, b, maxDist = 2) {
+    if (Math.abs(a.length - b.length) > maxDist) return maxDist + 1;
+    const dp = Array.from({ length: a.length + 1 }, (_, i) => i);
+    for (let j = 1; j <= b.length; j++) {
+      let prev = dp[0];
+      dp[0] = j;
+      let minRow = dp[0];
+      for (let i = 1; i <= a.length; i++) {
+        const tmp = dp[i];
+        dp[i] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[i], dp[i - 1]);
+        prev = tmp;
+        if (dp[i] < minRow) minRow = dp[i];
+      }
+      if (minRow > maxDist) return maxDist + 1;
+    }
+    return dp[a.length];
+  }
+
+  function tokenFuzzyMatchScore(queryToken, targetText) {
+    const qt = queryToken.toLowerCase();
+    const tt = String(targetText || '').toLowerCase();
+    if (!qt || !tt) return 0;
+    if (tt.includes(qt)) return 1.0;
+    const qStem = stemBg(qt);
+    if (qStem.length >= 3 && tt.includes(qStem)) return 0.92;
+    if (qt.length < 4) return 0;
+    const targetWords = tt.split(/[^а-яa-z0-9]+/).filter((w) => w.length >= 4);
+    let best = 0;
+    for (const tw of targetWords) {
+      if (tw.startsWith(qStem) || qStem.startsWith(stemBg(tw))) {
+        best = Math.max(best, 0.88);
+        continue;
+      }
+      const dist = editDistanceBounded(qt, tw, qt.length >= 7 ? 2 : 1);
+      if (dist <= (qt.length >= 7 ? 2 : 1)) {
+        best = Math.max(best, 1 - dist / Math.max(qt.length, tw.length));
+      } else {
+        const tri = trigramSim(qt, tw);
+        if (tri > best) best = tri;
+      }
+    }
+    return best;
+  }
+
+  const STOP_WORDS = new Set([
+    'кажи', 'ми', 'за', 'покажи', 'провери', 'какво', 'какви', 'какъв', 'каква', 'има', 'имат',
+    'са', 'е', 'в', 'във', 'на', 'от', 'до', 'по', 'със', 'с', 'или', 'и', 'а', 'но', 'че',
+    'кой', 'кои', 'коя', 'кое', 'колко', 'къде', 'кога', 'как', 'защо', 'всички', 'всичко',
+    'дай', 'ми', 'информация', 'данни', 'справка', 'одит', 'моля', 'те', 'искам', 'да', 'видя',
+    'разкажи', 'намери', 'потърси', 'извади', 'списък', 'таблица', 'относно', 'около', 'при',
+    'между', 'след', 'преди', 'над', 'под', 'най', 'много', 'малко', 'големи', 'голям', 'голяма',
+    'ли', 'се', 'си', 'му', 'й', 'им', 'ги', 'го', 'я', 'това', 'тази', 'този', 'тези', 'там',
+    'тук', 'него', 'нея', 'тях', 'фирма', 'фирми', 'фирмата', 'фирмите', 'компания', 'компании',
+    'институция', 'институции', 'възложител', 'възложители', 'изпълнител', 'изпълнители',
+    'поръчка', 'поръчки', 'поръчките', 'договор', 'договори', 'договорите', 'обществени',
+    'обществена', 'пари', 'сума', 'суми', 'евро', 'лева', 'милиона', 'милиарда', 'българия',
+  ]);
+
+  // 3. Semantic Intent Taxonomy (22 Intents with Colloquial, Slang & Morphological Triggers)
+  const INTENT_DEFS = [
+    {
+      id: 'COMPARE',
+      label: 'Сравнителен одит',
+      triggers: ['сравни', 'сравнение', 'разлика', 'срещу', 'съпостави', 'vs', 'или между'],
+      weight: 3.0,
+    },
+    {
+      id: 'SIGNAL',
+      label: 'Генератор на официален сигнал',
+      triggers: ['сигнал', 'доклад до', 'жалба до', 'генерирай сигнал', 'официална справка', 'изпрати до кпк', 'експорт на сигнал'],
+      weight: 3.2,
+    },
+    {
+      id: 'SELF_DEALING',
+      label: 'Самовъзлагане и конфликт на интереси',
+      triggers: ['самовъзлаг', 'собствената инст', 'собствена общин', 'сам на себе', 'конфликт на интерес', 'кмет печели', 'кметове с фирми', 'общинари с фирми', 'свои фирми', 'роднински фирми'],
+      weight: 2.5,
+    },
+    {
+      id: 'HIDDEN_DZZD',
+      label: 'Скрити ДЗЗД консорциуми',
+      triggers: ['дззд', 'консорциум', 'обединени', 'скрити фирми', 'без еик', 'мега-консорциум', 'скрити поръчки', 'зад консорциум'],
+      weight: 2.4,
+    },
+    {
+      id: 'XML_DECLARATIONS',
+      label: 'XML декларации (Сметна палата)',
+      triggers: ['xml', 'декларац', 'сметна палата', 'пропуснати от сигма', 'нови политиц', 'извън сигма', 'частни заеми', 'акции в ад', 'таблица 9', 'таблица 7', 'чл. 35'],
+      weight: 2.4,
+    },
+    {
+      id: 'JUDICIAL_TD',
+      label: 'Търговски спорове в съда (ЕПЕП ТД/ВТД)',
+      triggers: ['търговски дел', 'търговски спор', 'съдебни спор', 'дела в съда', 'съди ', 'осъден', 'неустойк', 'неизпълнени', 'спогодб', 'арбитраж', 'призрачно изпълнение', 'фиктивни спор', 'втд', 'окръжен съд'],
+      weight: 2.6,
+    },
+    {
+      id: 'JUDICIAL_ADFI',
+      label: 'АДФИ ревизии, чл. 17(7) и КАНД/АНД глоби',
+      triggers: ['адфи', 'финансова инспекция', 'инспекц', 'ревизи', 'безнаказаност', 'наказателно постановление', 'наказателни постановления', 'глоб', 'санкци', 'ауан', 'канд', 'анд ', 'отменено нп', 'отменени глоби', 'чл. 17', 'маловажен случай', 'чл. 28 занн', 'дид1', 'дид2', 'дид3', 'дид4', 'дид5', 'дид6', 'дид7'],
+      weight: 2.7,
+    },
+    {
+      id: 'JUDICIAL_KZK_VAS',
+      label: 'КЗК жалби и окончателни актове на ВАС',
+      triggers: ['кзк', 'комисия за защита на конкуренцията', 'вас', 'върховен административен', 'предварително изпълнение', 'чл. 205', 'обжалван', 'жалб', 'блокаж', 'спряна поръчка', 'отменено решение', 'четвърто отделение'],
+      weight: 2.7,
+    },
+    {
+      id: 'JUDICIAL_LAWYERS',
+      label: 'Адвокати, юрисконсулти и вещи лица',
+      triggers: ['адвокат', 'юрист', 'юрисконсулт', 'кантор', 'правни услуг', 'вещ', 'вещи лица', 'експерт', 'строителен надзор', 'консултант'],
+      weight: 2.5,
+    },
+    {
+      id: 'JUDICIAL_PHOENIX',
+      label: 'Несъстоятелност, запори в ТР и Феникс фирми',
+      triggers: ['несъстоятелн', 'фалит', 'фалирал', 'ликвидац', 'запор', 'залоз', 'особен залог', 'чси', 'дългов', 'феникс', 'burnout', 'изгаряне', 'спряла фирма', 'прехвърляне на фирма'],
+      weight: 2.6,
+    },
+    {
+      id: 'JUDICIAL_EPPO',
+      label: 'Европейска прокуратура (EPPO), ЕС средства и ЗМИП',
+      triggers: ['eppo', 'еппо', 'европрокуратур', 'кьовеши', 'европейска прокуратура', 'ес средства', 'еврофонд', 'европейски пари', 'европроекти', 'змип', 'действителен собственик', 'офшор', 'чуждестранна майка'],
+      weight: 2.6,
+    },
+    {
+      id: 'FORENSIC_ANNEX',
+      label: 'Анекси и пост-договорно оскъпяване',
+      triggers: ['анекс', 'оскъп', 'инфлац', 'увеличена цена', 'допълнително споразумение', 'допълнителни споразумения', 'чл. 116', 'дъмпинг'],
+      weight: 2.5,
+    },
+    {
+      id: 'FORENSIC_SHELL',
+      label: 'Кухи и новосъздадени фирми-фантоми',
+      triggers: ['кух', 'фантом', 'новосъздаден', 'нова фирма', 'нови фирми', 'вчерашна фирма', '2 лв', 'минимален капитал', 'без история', 'shell'],
+      weight: 2.5,
+    },
+    {
+      id: 'FORENSIC_SALAMI',
+      label: 'Разделяне под прага (Salami Slicing)',
+      triggers: ['salami', 'салами', 'разделяне', 'раздробяване', 'нацепване', 'под прага', 'заобикаляне на търга', 'чл. 20', 'чл. 21'],
+      weight: 2.5,
+    },
+    {
+      id: 'FORENSIC_POLITICS_MEDIA',
+      label: 'Политически дарения (ЕРИК) и медийни договори',
+      triggers: ['дарен', 'дарител', 'ерик', 'парти', 'предизбор', 'спонсор', 'меди', 'телевизи', 'вестни', 'пиар', 'pr агенц', 'реклам'],
+      weight: 2.5,
+    },
+    {
+      id: 'FORENSIC_TIME',
+      label: 'Времеви аномалии (Петък / Ноември–Декември)',
+      triggers: ['петък', 'декември', 'ноември', 'края на годината', 'колед', 'бюджетен дъмпинг', 'времеви аномалии', 'последния момент'],
+      weight: 2.4,
+    },
+    {
+      id: 'FORENSIC_CARTEL',
+      label: 'Картелна ротация, съвместни оферти и общ адрес',
+      triggers: ['картел', 'ротац', 'редуване', 'общ адрес', 'един и същ адрес', 'двойки фирми', 'съвместни оферти', 'co-bidding', 'сговаряне'],
+      weight: 2.5,
+    },
+    {
+      id: 'FORENSIC_NLP',
+      label: 'NLP „Шити“ поръчки и ограничителни критерии',
+      triggers: ['шит', 'нагласен', 'спецификац', 'марк', 'дискриминац', 'ограничител', 'чл. 49', 'технически критерии', 'nlp'],
+      weight: 2.5,
+    },
+    {
+      id: 'SINGLE_OFFER_HHI',
+      label: 'Единични оферти (1 оферта), пряко договаряне и HHI монопол',
+      triggers: ['1 оферта', 'една оферта', 'единствен участник', 'без конкуренция', 'без търг', 'пряко договаряне', 'директно възлагане', 'hhi', 'монопол', 'концентрация'],
+      weight: 2.3,
+    },
+    {
+      id: 'BENFORD_PARETO',
+      label: 'Математически одит (Закон на Бенфорд и Парето/Джини)',
+      triggers: ['бенфорд', 'benford', 'парето', 'pareto', 'джини', 'gini', 'лоренц', 'математически', 'статистически', 'първа цифра', 'топ 1%'],
+      weight: 2.4,
+    },
+    {
+      id: 'SECTOR_CIRCLE',
+      label: 'Секторен срез (Общини, Депутати, Министерства, Служби, Болници)',
+      triggers: ['кмет', 'общински съвет', 'депутат', 'народно събрание', 'парламент', 'министерств', 'министър', 'данс', 'дато', 'служби за сигурност', 'болниц', 'мбал', 'здравеопазване'],
+      weight: 1.9,
+    },
+    {
+      id: 'HIGH_RISK_OVERVIEW',
+      label: 'Топ рисков профил и корупционни индикатори',
+      triggers: ['крад', 'далавер', 'корупц', 'схем', 'злоупотреб', 'нарушен', 'съмнител', 'рисков', 'червени флагове', 'топ 10', 'топ 50', 'класация', 'пирамида', 'кой води', 'най-много пари'],
+      weight: 1.8,
+    },
+  ];
+
+  function analyzeNaturalQuery(qRaw) {
+    const rawTrim = String(qRaw || '').trim();
+    const hasLatin = /[a-zA-Z]/.test(rawTrim);
+    const cyrQuery = latinToCyrillicBg(rawTrim);
+    const combinedLower = `${rawTrim.toLowerCase()} ${cyrQuery}`;
+
+    // Expand acronym aliases
+    const rawTokens = cyrQuery.split(/[^а-яa-z0-9-]+/).filter(Boolean);
+    const expandedPhrases = [];
+    rawTokens.forEach((tk) => {
+      if (ACRONYM_ALIASES[tk]) expandedPhrases.push(ACRONYM_ALIASES[tk]);
+    });
+    const fullNorm = `${cyrQuery} ${expandedPhrases.join(' ')}`.trim();
+    const contentTokens = rawTokens.filter((t) => t.length >= 2 && !STOP_WORDS.has(t));
+    const stems = contentTokens.map(stemBg);
+
+    // Detect follow-up / pronoun reference to previous turn
+    const isFollowUp = /\b(него|нея|тях|негов|нейн|техн|там|тази|този|тези|същия|същата|първия|втория|третия)\b/.test(cyrQuery)
+      || (/^(а |и |още |дай |покажи |какви |колко )/.test(cyrQuery) && contentTokens.length <= 3);
+
+    // Score intents
+    const matchedIntents = [];
+    for (const def of INTENT_DEFS) {
+      let score = 0;
+      const hits = [];
+      for (const trig of def.triggers) {
+        if (combinedLower.includes(trig) || fullNorm.includes(trig)) {
+          score += def.weight;
+          hits.push(trig);
+        } else {
+          const trigStem = stemBg(trig);
+          if (trigStem.length >= 4 && stems.some((st) => st === trigStem || tokenFuzzyMatchScore(trigStem, st) >= 0.86)) {
+            score += def.weight * 0.8;
+            hits.push(trig);
+          }
+        }
+      }
+      if (score > 0) matchedIntents.push({ id: def.id, label: def.label, score, hits });
+    }
+    matchedIntents.sort((a, b) => b.score - a.score);
+
+    return {
+      raw: rawTrim,
+      hasLatin,
+      cyrQuery,
+      fullNorm,
+      rawTokens,
+      contentTokens,
+      stems,
+      isFollowUp,
+      intents: matchedIntents,
+    };
+  }
+
+  function resolveEntitiesFuzzy(nlu, state, auths, comps, j6, f7) {
+    const { cyrQuery, fullNorm, contentTokens, isFollowUp } = nlu;
+    const result = {
+      eiks: [],
+      unps: [],
+      oblasts: [],
+      officials: [],
+      authorities: [],
+      companies: [],
+      courtCases: [],
+      fromContext: false,
+    };
+
+    // 1. Exact EIK (9 or 13 digits) & UNP patterns
+    const eikMatches = cyrQuery.match(/\b(\d{9}|\d{13})\b/g);
+    if (eikMatches) result.eiks = [...new Set(eikMatches)];
+    const unpMatches = nlu.raw.match(/\b(\d{4}-\d{5,7}|\d{5}-\d{4}-\d{4})\b/g);
+    if (unpMatches) result.unps = [...new Set(unpMatches)];
+
+    // 2. Oblasts (28 NUTS-3 regions)
+    const oblastsList = (state.macro && state.macro.mapGeo && state.macro.mapGeo.oblasts) || [];
+    for (const ob of oblastsList) {
+      const cleanOb = ob.name.replace(' (столица)', '').toLowerCase();
+      if (fullNorm.includes(cleanOb)) {
+        result.oblasts.push({ item: ob, score: 1.0 });
+      } else {
+        for (const tk of contentTokens) {
+          if (tk.length >= 5) {
+            const sim = tokenFuzzyMatchScore(tk, cleanOb);
+            if (sim >= 0.82) {
+              result.oblasts.push({ item: ob, score: sim });
+              break;
+            }
+          }
+        }
+      }
+    }
+    result.oblasts.sort((a, b) => b.score - a.score);
+
+    // Filter out tokens that are pure intent keywords so we don't fuzzy-match "адфи" or "съд" as a company name
+    const intentWords = new Set();
+    INTENT_DEFS.forEach((d) => d.triggers.forEach((t) => t.split(/\s+/).forEach((w) => { if (w.length >= 3) intentWords.add(stemBg(w)); })));
+    const entityCandidateTokens = contentTokens.filter((tk) => {
+      if (/^\d+$/.test(tk)) return true;
+      const st = stemBg(tk);
+      return !intentWords.has(st) || ACRONYM_ALIASES[tk] !== undefined;
+    });
+
+    // Expand acronym tokens for entity matching
+    const searchTokens = [...entityCandidateTokens];
+    contentTokens.forEach((tk) => {
+      if (ACRONYM_ALIASES[tk]) {
+        ACRONYM_ALIASES[tk].split(/\s+/).forEach((w) => { if (w.length >= 3) searchTokens.push(w); });
+      }
+    });
+
+    // 3. Match Officials (571)
+    if (result.eiks.length || searchTokens.length) {
+      for (const o of state.officials) {
+        let sc = 0;
+        if (result.eiks.some((e) => o.companies.some((c) => c.eik === e))) sc = 1.0;
+        const nameLow = o.name.toLowerCase();
+        const nameParts = nameLow.split(/\s+/);
+        let matchedParts = 0;
+        for (const tk of searchTokens) {
+          if (tk.length < 4) continue;
+          if (nameParts.some((np) => np === tk || (tk.length >= 5 && tokenFuzzyMatchScore(tk, np) >= 0.84))) {
+            matchedParts++;
+          }
+        }
+        if (matchedParts >= 2) sc = Math.max(sc, 0.98);
+        else if (matchedParts === 1) {
+          // Check if it's a distinctive surname (last part of name)
+          const lastPart = nameParts[nameParts.length - 1];
+          if (searchTokens.some((tk) => tk.length >= 5 && tokenFuzzyMatchScore(tk, lastPart) >= 0.86)) {
+            sc = Math.max(sc, 0.87);
+          }
+        }
+        if (sc >= 0.85) result.officials.push({ item: o, score: sc });
+      }
+      result.officials.sort((a, b) => b.score - a.score || b.item.combinedEur - a.item.combinedEur);
+    }
+
+    // 4. Match Authorities (4,344)
+    if (result.eiks.length || searchTokens.length) {
+      const genericAuthWords = new Set(['община', 'област', 'министерство', 'агенция', 'дирекция', 'училище', 'болница', 'мбал', 'университет']);
+      const specificAuthTokens = searchTokens.filter((t) => !genericAuthWords.has(t) && t.length >= 3);
+      for (const a of auths) {
+        let sc = 0;
+        if (result.eiks.includes(a.eik)) sc = 1.0;
+        else if (specificAuthTokens.length) {
+          const aLow = a.name.toLowerCase();
+          // Direct phrase check for expanded acronyms
+          for (const tk of contentTokens) {
+            if (ACRONYM_ALIASES[tk] && aLow.includes(ACRONYM_ALIASES[tk])) {
+              sc = 0.99;
+              break;
+            }
+          }
+          if (sc < 0.99) {
+            let hitCount = 0;
+            let bestSim = 0;
+            for (const tk of specificAuthTokens) {
+              const sim = tokenFuzzyMatchScore(tk, aLow);
+              if (sim >= 0.83) {
+                hitCount++;
+                bestSim = Math.max(bestSim, sim);
+              }
+            }
+            if (hitCount > 0) {
+              sc = bestSim * (0.7 + 0.3 * (hitCount / specificAuthTokens.length));
+              // Boost primary municipality or national agency
+              if (aLow.startsWith('община ') && hitCount >= 1) sc += 0.06;
+            }
+          }
+        }
+        if (sc >= 0.78) result.authorities.push({ item: a, score: Math.min(1, sc) });
+      }
+      result.authorities.sort((a, b) => b.score - a.score || b.item.spentEur - a.item.spentEur);
+    }
+
+    // 5. Match Companies & DZZD (17,428)
+    if (result.eiks.length || searchTokens.length) {
+      const genericCompWords = new Set(['еоод', 'оод', 'еад', 'дззд', 'консорциум', 'обединение', 'груп', 'холдинг', 'инженеринг', 'строй', 'българия']);
+      const specificCompTokens = searchTokens.filter((t) => !genericCompWords.has(t) && t.length >= 4);
+      // Do not match a pure city name as a company unless the query doesn't match an oblast or explicitly mentions фирма/еоод/аД
+      const oblastNames = new Set(result.oblasts.map((o) => o.item.name.replace(' (столица)', '').toLowerCase()));
+      const nonCityCompTokens = specificCompTokens.filter((t) => !oblastNames.has(t));
+
+      for (const c of comps) {
+        let sc = 0;
+        if (result.eiks.includes(c.eik)) sc = 1.0;
+        else if (nonCityCompTokens.length) {
+          const cLow = c.name.toLowerCase();
+          let hitCount = 0;
+          let bestSim = 0;
+          for (const tk of nonCityCompTokens) {
+            const sim = tokenFuzzyMatchScore(tk, cLow);
+            if (sim >= 0.84) {
+              hitCount++;
+              bestSim = Math.max(bestSim, sim);
+            }
+          }
+          if (hitCount > 0) {
+            sc = bestSim * (0.72 + 0.28 * (hitCount / nonCityCompTokens.length));
+          }
+        }
+        if (sc >= 0.80) result.companies.push({ item: c, score: Math.min(1, sc) });
+      }
+      result.companies.sort((a, b) => b.score - a.score || (b.item.wonEur + b.item.consortiumEur) - (a.item.wonEur + a.item.consortiumEur));
+    }
+
+    // 6. Match Live Court Cases / ADFI Report Codes / KZK Dossiers
+    if (j6) {
+      const m1 = (j6.module1_collusiveLitigation && j6.module1_collusiveLitigation.liveEissCommercialDisputes) || [];
+      const m2 = (j6.module2_impunityIndex && j6.module2_impunityIndex.liveEissAndKandCases) || [];
+      const m4 = (j6.module4_kzkVas && j6.module4_kzkVas.liveVasFinalActs) || [];
+      const allCases = [
+        ...m1.map((c) => ({ kind: 'ТД/ВТД (Търговски спор)', no: c.caseNo, court: c.court, auth: c.authorityName, authEik: c.authorityEik, party: `${c.sideLeft} ↔ ${c.sideRight}`, outcome: c.outcome, disp: c.disposition, url: c.actDownloadUrl })),
+        ...m2.map((c) => ({ kind: 'КАНД/АНД (АДФИ/СП НП)', no: c.caseNo, court: c.court, auth: c.authorityName, authEik: c.authorityEik, party: `${c.agency} · НП ${c.npNo || ''}`, outcome: c.outcome, disp: c.disposition, url: c.actDownloadUrl })),
+        ...m4.map((v) => ({ kind: 'ВАС IV отд. (КЗК ЗОП)', no: v.vasCaseNo, court: 'ВАС', auth: v.authorityName, authEik: v.authorityEik, party: `${v.appellantName} (КЗК ${v.kzkDossierNo || ''})`, outcome: v.vasOutcome, disp: v.disposition, url: v.actDownloadUrl })),
+      ];
+      const caseNumMatch = nlu.raw.match(/\b(\d{2,5}\/202[456])\b/);
+      for (const cs of allCases) {
+        if (caseNumMatch && cs.no && cs.no.includes(caseNumMatch[1])) {
+          result.courtCases.push(cs);
+        }
+      }
+    }
+
+    // 7. Conversational Context Fallback (when user asks follow-up like "а какви дела има?", "дай сигнал за него")
+    const hasAnyEntity = result.officials.length || result.authorities.length || result.companies.length || result.oblasts.length || result.courtCases.length;
+    if (!hasAnyEntity && (isFollowUp || nlu.intents.some((i) => i.id === 'SIGNAL'))) {
+      if (oracleContext.lastOfficial) { result.officials.push({ item: oracleContext.lastOfficial, score: 0.95 }); result.fromContext = true; }
+      if (oracleContext.lastAuthority) { result.authorities.push({ item: oracleContext.lastAuthority, score: 0.95 }); result.fromContext = true; }
+      if (oracleContext.lastCompany) { result.companies.push({ item: oracleContext.lastCompany, score: 0.95 }); result.fromContext = true; }
+      if (oracleContext.lastOblast) { result.oblasts.push({ item: oracleContext.lastOblast, score: 0.95 }); result.fromContext = true; }
+    }
+
+    // Update conversational context with top resolved entities
+    if (result.officials.length) oracleContext.lastOfficial = result.officials[0].item;
+    if (result.authorities.length) oracleContext.lastAuthority = result.authorities[0].item;
+    if (result.companies.length) oracleContext.lastCompany = result.companies[0].item;
+    if (result.oblasts.length) oracleContext.lastOblast = result.oblasts[0].item;
+    if (nlu.intents.length) oracleContext.lastIntents = nlu.intents.map((i) => i.id);
+
+    return result;
+  }
+
   function ensureOracleReady() {
     if (oracleInitialized) return;
     oracleInitialized = true;
-    appendOracleMsg('ai', `Здравейте! Аз съм <strong>СИГМА 3.0 ORACLE</strong> — детерминистичен криминалистичен асистент, работещ на живо в браузъра върху всички <strong>206 907 договора (€53,22 млрд.)</strong>, <strong>4 344 възложители</strong>, <strong>17 428 фирми/ДЗЗД</strong>, <strong>571 свързани лица</strong> и <strong>3 035 XML декларации</strong>.<br/><br/>Изберете готов въпрос по-горе или напишете име на политик, община, област, ЕИК, „Сравни X и Y“ или „Генерирай сигнал за [име]“.`);
+    appendOracleMsg('ai', `Здравейте! Аз съм <strong>СИГМА 3.0 ORACLE</strong> — интелигентен одиторски AI агент с <strong>разбиране на свободен естествен език (NLU)</strong>, <strong>автоматична транслитерация от шльокавица/латиница</strong>, <strong>толерантност към правописни грешки (Fuzzy Matching)</strong> и <strong>контекстна памет между въпросите</strong>.<br/><br/>
+    Пишете свободно със свои думи — например:<br/>
+    • <em>„Кажи ми всичко за Бургас — поръчки, АДФИ ревизии и съдебни дела“</em><br/>
+    • <em>„Какви дела в съда, анекси и жалби в КЗК има за АПИ?“</em><br/>
+    • <em>„kaji mi za glavbolgarstroi i patinjenering“</em> (разбира и латиница)<br/>
+    • <em>„Кои кметове си дават поръчки сами на себе си?“</em> &rarr; и после <em>„Генерирай сигнал за първия“</em>.`);
   }
 
-  function appendOracleMsg(role, html) {
+  function appendOracleMsg(role, html, nluMeta = null) {
     const box = document.getElementById('oracleMessages');
     if (!box) return;
     const div = document.createElement('div');
     div.className = `msg-bubble ${role === 'user' ? 'msg-user' : 'msg-ai'}`;
-    div.innerHTML = role === 'ai' ? `<div class="msg-ai-head">СИГМА 3.0 ORACLE · 0 ms · Детерминистична справка</div>${html}` : html;
+    let metaRibbon = '';
+    if (role === 'ai' && nluMeta) {
+      const tags = [];
+      if (nluMeta.hasLatin) tags.push(`<span class="tag tag-teal" style="font-size:10px;">Авто-транслитерация: Латиница &rarr; Кирилица</span>`);
+      if (nluMeta.fromContext) tags.push(`<span class="tag tag-plum" style="font-size:10px;">Контекстна памет от предходен въпрос</span>`);
+      (nluMeta.intents || []).slice(0, 3).forEach((it) => tags.push(`<span class="tag tag-navy" style="font-size:10px;">${ it.label }</span>`));
+      if (nluMeta.entitySummary) tags.push(`<span class="tag tag-ochre" style="font-size:10px;">Субект: ${ nluMeta.entitySummary }</span>`);
+      if (tags.length) {
+        metaRibbon = `<div style="display:flex;gap:5px;flex-wrap:wrap;margin:4px 0 8px;">${tags.join('')}</div>`;
+      }
+    }
+    div.innerHTML = role === 'ai'
+      ? `<div class="msg-ai-head">СИГМА 3.0 ORACLE · NLU &amp; 13-Радарен RAG Синтез</div>${metaRibbon}${html}`
+      : html;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
+  }
+
+  function renderFollowUpChips(suggestions) {
+    if (!suggestions || !suggestions.length) return '';
+    return `<div style="margin-top:10px;padding-top:8px;border-top:1px dashed var(--border);display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+      <span class="muted" style="font-size:11px;">Продължи разговора:</span>
+      ${suggestions.map((s) => `<button type="button" class="city-chip" style="font-size:11px;padding:3px 8px;" data-oracle-q="${s.replace(/"/g, '&quot;')}">${s}</button>`).join('')}
+    </div>`;
   }
 
   async function askOracle(question) {
@@ -819,27 +1375,50 @@
     const qRaw = (question || '').trim();
     if (!qRaw) return;
     appendOracleMsg('user', esc(qRaw));
-    const q = qRaw.toLowerCase();
 
-    // 1. Signal generation intent
-    if (q.includes('сигнал') || q.includes('доклад за') || q.includes('справка за')) {
-      const target = state.officials.find((o) => {
-        const parts = o.name.toLowerCase().split(/\s+/);
-        return parts.length >= 2 && q.includes(parts[0]) && q.includes(parts[parts.length - 1]);
-      }) || state.officials.find((o) => o.name.toLowerCase().split(/\s+/).some((p) => p.length >= 5 && q.includes(p)));
+    const [auths, comps, f7, j6] = await Promise.all([
+      ensureAuthoritiesLoaded(),
+      ensureCompaniesLoaded(),
+      state.forensics7 || (window.SIGMA3_F7 ? window.SIGMA3_F7.ensureForensics7Loaded() : Promise.resolve(null)),
+      state.judicial6 || (window.SIGMA3_J6 ? window.SIGMA3_J6.ensureJudicial6Loaded() : Promise.resolve(null)),
+    ]);
+
+    const nlu = analyzeNaturalQuery(qRaw);
+    const ents = resolveEntitiesFuzzy(nlu, state, auths, comps, j6, f7);
+    const intentSet = new Set(nlu.intents.map((i) => i.id));
+
+    const entNames = [
+      ...ents.officials.slice(0, 1).map((x) => x.item.name),
+      ...ents.authorities.slice(0, 1).map((x) => x.item.name),
+      ...ents.companies.slice(0, 1).map((x) => x.item.name.slice(0, 35)),
+      ...ents.oblasts.slice(0, 1).map((x) => `Обл. ${x.item.name}`),
+    ];
+    const nluMeta = {
+      hasLatin: nlu.hasLatin,
+      fromContext: ents.fromContext,
+      intents: nlu.intents,
+      entitySummary: entNames.length ? esc(entNames.join(' · ')) : '',
+    };
+
+    // =========================================================================
+    // A. SIGNAL GENERATION INTENT
+    // =========================================================================
+    if (intentSet.has('SIGNAL')) {
+      const target = ents.officials[0] ? ents.officials[0].item : oracleContext.lastOfficial;
       if (target) {
         generateSignalBrief(target.slug);
-        appendOracleMsg('ai', `Генерирах официална одитна справка / сигнал за <strong>${esc(target.name)}</strong> (${esc(target.primaryInstitution)}, Риск ${riskBadgeHtml(target.sigma3Score)}, Комбиниран обем: <strong class="mono">${fmtEur(target.combinedEur)}</strong>). Прозорецът за копиране/печат/изтегляне е отворен.`);
+        appendOracleMsg('ai', `Генерирах официална одитна справка / сигнал до <strong>АДФИ, КПК (бивша КПКОНПИ), Сметната палата и EPPO</strong> за <strong>${esc(target.name)}</strong> (${esc(target.primaryInstitution)}, Риск ${riskBadgeHtml(target.sigma3Score)}, Комбиниран обем: <strong class="mono">${fmtEur(target.combinedEur)}</strong>). Модалният прозорец за копиране, изтегляне (.md) и печат (PDF) е отворен.` +
+          renderFollowUpChips([`Покажи всички договори на ${target.name}`, `Какви АДФИ проверки има в ${target.primaryInstitution}?`]), nluMeta);
         return;
       }
     }
 
-    // 2. Compare two oblasts / cities
-    if (q.includes('сравни') && state.macro) {
-      const obs = state.macro.mapGeo.oblasts;
-      const found = obs.filter((ob) => q.includes(ob.name.replace(' (столица)', '').toLowerCase()));
-      if (found.length >= 2) {
-        const [a, b] = found;
+    // =========================================================================
+    // B. MULTI-ENTITY COMPARISON (2 Oblasts, 2 Authorities, or 2 Companies)
+    // =========================================================================
+    if (intentSet.has('COMPARE') || ents.oblasts.length >= 2) {
+      if (ents.oblasts.length >= 2) {
+        const a = ents.oblasts[0].item, b = ents.oblasts[1].item;
         appendOracleMsg('ai', `<strong>Сравнителен криминалистичен профил: Област ${esc(a.name)} vs. Област ${esc(b.name)}</strong>
           <table style="margin-top:8px;"><thead><tr><th>Показател</th><th class="num">${esc(a.name)}</th><th class="num">${esc(b.name)}</th></tr></thead>
           <tbody>
@@ -849,177 +1428,452 @@
             <tr><td>Самовъзлагане (Собств. инст.)</td><td class="num" style="color:var(--crimson);font-weight:700;">${a.ownHits}</td><td class="num" style="color:var(--crimson);font-weight:700;">${b.ownHits}</td></tr>
             <tr><td>Скрити ДЗЗД на политици</td><td class="num" style="color:var(--plum);">${fmtEur(a.hiddenDzzdEur)}</td><td class="num" style="color:var(--plum);">${fmtEur(b.hiddenDzzdEur)}</td></tr>
             <tr><td>СИГМА 3.0 Риск индекс</td><td class="num">${riskBadgeHtml(a.riskScore)}</td><td class="num">${riskBadgeHtml(b.riskScore)}</td></tr>
-          </tbody></table>`);
+          </tbody></table>` +
+          renderFollowUpChips([`Кажи ми всичко за ${a.name.replace(' (столица)', '')}`, `Кажи ми всичко за ${b.name.replace(' (столица)', '')}`]), nluMeta);
+        return;
+      }
+      if (ents.authorities.length >= 2) {
+        const a = ents.authorities[0].item, b = ents.authorities[1].item;
+        appendOracleMsg('ai', `<strong>Сравнение на възложители: ${esc(a.name)} vs. ${esc(b.name)}</strong>
+          <table style="margin-top:8px;"><thead><tr><th>Показател</th><th class="num">${esc(a.name.slice(0, 32))}</th><th class="num">${esc(b.name.slice(0, 32))}</th></tr></thead>
+          <tbody>
+            <tr><td>ЕИК / Област</td><td class="num mono">${esc(a.eik)} (${esc(a.region)})</td><td class="num mono">${esc(b.eik)} (${esc(b.region)})</td></tr>
+            <tr><td>Общ разход по ЗОП (€)</td><td class="num"><b>${fmtEur(a.spentEur)}</b></td><td class="num"><b>${fmtEur(b.spentEur)}</b></td></tr>
+            <tr><td>Договори / Изпълнители</td><td class="num">${fmtInt(a.contracts)} / ${fmtInt(a.suppliers)}</td><td class="num">${fmtInt(b.contracts)} / ${fmtInt(b.suppliers)}</td></tr>
+            <tr><td>Свързани лица / Самовъзлагане</td><td class="num">${a.linkedCount} / <b>${a.ownHits}</b></td><td class="num">${b.linkedCount} / <b>${b.ownHits}</b></td></tr>
+            <tr><td>АДФИ доклади / КЗК дела</td><td class="num">${a.adfiCount || 0} / ${a.kzkCount || 0}</td><td class="num">${b.adfiCount || 0} / ${b.kzkCount || 0}</td></tr>
+            <tr><td>Риск индекс 3.0</td><td class="num">${riskBadgeHtml(a.riskScore)}</td><td class="num">${riskBadgeHtml(b.riskScore)}</td></tr>
+          </tbody></table>`, nluMeta);
         return;
       }
     }
 
-    // 3. Benford & Pareto
-    if (q.includes('бенфорд') || q.includes('парето') || q.includes('джини')) {
-      const bf = state.macro.benford;
-      appendOracleMsg('ai', `<strong>Математически одит по Закона на Бенфорд и Парето/Джини:</strong>
-        <ul class="clean-list" style="margin-top:6px;">
-          <li><strong>Възложители (n=${fmtInt(bf.authorities.n)}):</strong> MAD = <code>${bf.authorities.mad}</code>, &chi;&sup2; = <code>${bf.authorities.chi2}</code> — <strong>${esc(bf.authorities.conformity)}</strong>. Първа цифра <b>4</b> се среща в <b>${bf.authorities.observed[3]}%</b> при теоретични <b>9,69%</b> (сигнал за прагово групиране на бюджети).</li>
-          <li><strong>Компании (n=${fmtInt(bf.companies.n)}):</strong> MAD = <code>${bf.companies.mad}</code> — <strong>${esc(bf.companies.conformity)}</strong>.</li>
-          <li><strong>Парето хиперконцентрация:</strong> Топ 1% от фирмите държат <strong>${bf.paretoCompanies.top1Pct}%</strong> (Gini <b>${bf.paretoCompanies.gini}</b>), а Топ 1% от възложителите контролират <strong>${bf.paretoAuthorities.top1Pct}%</strong> (Gini <b>${bf.paretoAuthorities.gini}</b>) от всички €53,22 млрд.</li>
-        </ul>`);
-      return;
+    // =========================================================================
+    // C. 360° CROSS-RADAR ENTITY SYNTHESIS (When a City/Oblast, Authority, Official, or Company is named!)
+    // =========================================================================
+    const hasSpecificEntity = (ents.officials.length && ents.officials[0].score >= 0.86)
+      || (ents.authorities.length && ents.authorities[0].score >= 0.82)
+      || (ents.companies.length && ents.companies[0].score >= 0.84)
+      || (ents.oblasts.length && ents.oblasts[0].score >= 0.84)
+      || ents.courtCases.length > 0;
+
+    if (hasSpecificEntity) {
+      const sections = [];
+      const topOff = ents.officials[0] && ents.officials[0].score >= 0.86 ? ents.officials[0].item : null;
+      const topAuth = ents.authorities[0] && ents.authorities[0].score >= 0.82 ? ents.authorities[0].item : null;
+      const topComp = ents.companies[0] && ents.companies[0].score >= 0.84 ? ents.companies[0].item : null;
+      const topOb = ents.oblasts[0] && ents.oblasts[0].score >= 0.84 ? ents.oblasts[0].item : null;
+
+      // Build needle set for cross-radar filtering (EIKs + entity keywords)
+      const filterEiks = new Set(ents.eiks);
+      const filterNames = [];
+      if (topAuth) { filterEiks.add(topAuth.eik); filterNames.push(topAuth.name.toLowerCase()); }
+      if (topComp && topComp.eik) { filterEiks.add(topComp.eik); filterNames.push(topComp.name.toLowerCase().slice(0, 22)); }
+      if (topOb) { filterNames.push(topOb.name.replace(' (столица)', '').toLowerCase()); }
+      if (topOff) {
+        topOff.companies.forEach((c) => { if (c.eik) filterEiks.add(c.eik); });
+        filterNames.push(topOff.primaryInstitution.toLowerCase());
+      }
+
+      const matchesEntityRecord = (recEik, recText) => {
+        if (recEik && filterEiks.has(String(recEik))) return true;
+        const low = String(recText || '').toLowerCase();
+        return filterNames.some((fn) => fn.length >= 4 && low.includes(fn));
+      };
+
+      // 1. Official Profile (if matched)
+      if (topOff) {
+        const dc = state.deepBySlug.get(topOff.slug);
+        sections.push(`<div class="contract-row" style="border-left:3px solid var(--crimson);">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div><strong>Длъжностно лице:</strong> <a href="#" data-open-slug="${esc(topOff.slug)}"><strong>${esc(topOff.name)}</strong></a> · <span class="muted">${esc(topOff.primaryInstitution)}</span></div>
+            <div>${riskBadgeHtml(topOff.sigma3Score)} ${topOff.ownInstitution ? '<span class="tag tag-crimson">Самовъзлагане</span>' : ''}</div>
+          </div>
+          <div style="margin-top:4px;font-size:12px;">
+            В периода на мандата: <strong class="mono">${fmtEur(topOff.periodEur)}</strong> · Директно в СИГМА: <strong class="mono">${fmtEur(topOff.totalEur)}</strong> (${topOff.contractCount} дог.)
+            ${topOff.dzzdEur > 0 ? ` · <strong style="color:var(--plum);">Скрити ДЗЗД (${topOff.dzzdCnt}): +${fmtEur(topOff.dzzdEur)}</strong> &rarr; Общо: <strong class="mono">${fmtEur(topOff.combinedEur)}</strong>` : ''}
+          </div>
+          <div class="inst-line" style="margin-top:4px;">Свързани фирми: ${topOff.companies.map((c) => `<a href="#" data-open-company="${esc(c.eik)}">${esc(c.name)} (${esc(c.eik)})</a>`).join(' · ')}</div>
+          ${dc && dc.topConsortia ? `<div class="inst-line" style="color:var(--plum);">Топ консорциуми: ${dc.topConsortia.slice(0, 2).map((tc) => `${esc(tc.name.slice(0, 55))} (${fmtEur(tc.wonEur)})`).join(' | ')}</div>` : ''}
+          <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="btn btn-dark" style="padding:2px 8px;font-size:11px;" data-open-slug="${esc(topOff.slug)}">Пълно досие &rarr;</button>
+            <button class="btn" style="padding:2px 8px;font-size:11px;" data-gen-signal="${esc(topOff.slug)}">Генерирай официален сигнал</button>
+          </div>
+        </div>`);
+      }
+
+      // 2. Authority Profile (if matched)
+      if (topAuth) {
+        const linkedOffs = state.officials.filter((o) => (o.byAuthority || []).some((ba) => String(ba.id) === String(topAuth.eik)) || o.primaryInstitution.toLowerCase().includes(topAuth.name.toLowerCase()));
+        sections.push(`<div class="contract-row" style="border-left:3px solid var(--navy-dark);">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div><strong>Възложител:</strong> <a href="#" data-open-authority="${esc(topAuth.eik)}"><strong>${esc(topAuth.name)}</strong></a> <span class="eik-tag">ЕИК ${esc(topAuth.eik)}</span> · <span class="muted">${esc(topAuth.region || '')}</span></div>
+            <div>${riskBadgeHtml(topAuth.riskScore)} ${topAuth.judicialBoost > 0 ? `<span class="tag tag-plum">+${topAuth.judicialBoost} съд/АДФИ</span>` : ''}</div>
+          </div>
+          <div style="margin-top:4px;font-size:12px;">
+            Общ разход (2020–2026): <strong class="mono">${fmtEur(topAuth.spentEur)}</strong> · <strong>${fmtInt(topAuth.contracts)} договора</strong> към ${fmtInt(topAuth.suppliers)} изпълнители · Среден договор: ${fmtEur(topAuth.avgEur)}
+            ${topAuth.singleOffer > 0 ? ` · 1 оферта: <strong style="color:var(--crimson);">${(topAuth.singleOffer * 100).toFixed(1)}%</strong>` : ''}
+          </div>
+          ${topAuth.judicialReasons && topAuth.judicialReasons.length ? `<div class="inst-line" style="color:#4f46e5;margin-top:3px;"><strong>Съдебни/контролни рискови фактори:</strong> ${topAuth.judicialReasons.map((r) => esc(r)).join(' · ')}</div>` : ''}
+          ${linkedOffs.length ? `<div class="inst-line" style="margin-top:3px;">Свързани длъжностни лица (${linkedOffs.length}): ${linkedOffs.slice(0, 4).map((o) => `<a href="#" data-open-slug="${esc(o.slug)}">${esc(o.name)}</a> (${fmtEur(o.periodEur)})`).join(' · ')}</div>` : ''}
+          <div style="margin-top:6px;"><button class="btn" style="padding:2px 8px;font-size:11px;" data-open-authority="${esc(topAuth.eik)}">Отвори досие на възложителя &rarr;</button></div>
+        </div>`);
+      }
+
+      // 3. Company / Consortium Profile (if matched)
+      if (topComp) {
+        const compPairs = ((state.macro && state.macro.cartelEngine && state.macro.cartelEngine.coBiddingPairs) || []).filter((p) => p.eikA === topComp.eik || p.eikB === topComp.eik);
+        sections.push(`<div class="contract-row" style="border-left:3px solid var(--ochre);">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+            <div><strong>Изпълнител:</strong> <a href="#" data-open-company="${esc(topComp.eik || topComp.name)}"><strong>${esc(topComp.name)}</strong></a> ${topComp.eik ? `<span class="eik-tag">ЕИК ${esc(topComp.eik)}</span>` : '<span class="tag tag-plum">ДЗЗД</span>'}</div>
+            <div>${topComp.judicialRiskScore > 0 ? riskBadgeHtml(topComp.judicialRiskScore) : ''}</div>
+          </div>
+          <div style="margin-top:4px;font-size:12px;">
+            Директни договори: <strong class="mono">${fmtEur(topComp.wonEur)}</strong> (${fmtInt(topComp.contracts)} дог. при ${fmtInt(topComp.authorities)} възложители)
+            ${topComp.consortiumEur > 0 ? ` · <strong style="color:var(--plum);">Чрез ДЗЗД (${topComp.consortiumCount}): +${fmtEur(topComp.consortiumEur)}</strong>` : ''}
+          </div>
+          ${topComp.judicialReasons && topComp.judicialReasons.length ? `<div class="inst-line" style="color:var(--crimson);margin-top:3px;"><strong>Съдебен/криминалистичен профил:</strong> ${topComp.judicialReasons.map((r) => esc(r)).join(' · ')}</div>` : ''}
+          ${compPairs.length ? `<div class="inst-line" style="margin-top:3px;">Повтарящи се ДЗЗД партньори: ${compPairs.slice(0, 3).map((p) => `${esc(p.eikA === topComp.eik ? p.nameB : p.nameA)} (${p.jointCount} ДЗЗД / ${fmtEur(p.jointEur)})`).join(' · ')}</div>` : ''}
+          <div style="margin-top:6px;"><button class="btn" style="padding:2px 8px;font-size:11px;" data-open-company="${esc(topComp.eik || topComp.name)}">Отвори досие на фирмата &rarr;</button></div>
+        </div>`);
+      }
+
+      // 4. Oblast Regional Profile (if matched and not overshadowed by a non-municipal query)
+      if (topOb && (!topOff || ents.authorities.length > 0)) {
+        sections.push(`<div class="contract-row" style="border-left:3px solid #0284c7;">
+          <strong>Регионален срез — Област ${esc(topOb.name)} (${esc(topOb.nuts3)}):</strong>
+          Общо <strong>${fmtEur(topOb.valueEur)}</strong> (${fmtInt(topOb.contracts)} дог. при ${topOb.authorities} възложители) ·
+          Свързани лица: <strong>${topOb.officialCount}</strong> (Самовъзлагане: <strong style="color:var(--crimson);">${topOb.ownHits}</strong>) ·
+          Скрити ДЗЗД: <strong style="color:var(--plum);">+${fmtEur(topOb.hiddenDzzdEur)}</strong> · Риск ${riskBadgeHtml(topOb.riskScore)}
+        </div>`);
+      }
+
+      // 5. Cross-Check Live Judicial & Control Radar (EPEP TD, ADFI, KAND, KZK/VAS) for this Entity!
+      if (j6) {
+        const m1 = j6.module1_collusiveLitigation || {};
+        const m2 = j6.module2_impunityIndex || {};
+        const m4 = j6.module4_kzkVas || {};
+        const m5 = j6.module5_insolvencyPhoenix || {};
+
+        const tdHits = (m1.liveEissCommercialDisputes || []).filter((c) => matchesEntityRecord(c.authorityEik, `${c.authorityName} ${c.contractorName} ${c.sideLeft} ${c.sideRight} ${c.court}`) || matchesEntityRecord(c.contractorEik, ''));
+        const kandHits = (m2.liveEissAndKandCases || []).filter((c) => matchesEntityRecord(c.authorityEik, `${c.authorityName} ${c.court}`));
+        const adfiTopHits = (m2.topInspectedAuthorities || []).filter((a) => matchesEntityRecord(a.eik, `${a.name} ${a.region}`));
+        const art17Hits = (m2.updatedArt17Reports || []).filter((r) => matchesEntityRecord(r.authorityEik, `${r.authorityName} ${r.object}`));
+        const vasHits = (m4.liveVasFinalActs || []).filter((v) => matchesEntityRecord(v.authorityEik, `${v.authorityName} ${v.appellantName}`) || matchesEntityRecord(v.appellantEik, ''));
+        const kzkHits = [...(m4.prelimRulings || []), ...(m4.decisions || [])].filter((r) => matchesEntityRecord(r.authorityEik, `${r.authorityName} ${r.respondentsRaw} ${r.initiatorsRaw}`));
+        const distHits = (m5.distressedFirms || []).filter((d) => matchesEntityRecord(d.eik, d.name));
+
+        const jLines = [];
+        if (tdHits.length) {
+          jLines.push(`<li><strong>Търговски дела в ЕПЕП (${tdHits.length}):</strong> ` +
+            tdHits.slice(0, 3).map((c) => `${esc(c.court)} <b>${esc(c.caseNo)}</b> (${esc(c.sideLeft)} &harr; ${esc(c.sideRight)}) — <span class="tag tag-crimson">${esc(c.outcome)}</span> <a href="${esc(c.actDownloadUrl)}" target="_blank">Акт ↗</a>`).join(' | ') + `</li>`);
+        }
+        if (adfiTopHits.length || art17Hits.length) {
+          const repSum = adfiTopHits.slice(0, 2).map((a) => `<b>${esc(a.name)}</b>: ${a.reportCount} доклада АДФИ (${a.updatedArt17Count} актуализирани по чл. 17(7))`).join('; ');
+          jLines.push(`<li><strong>Инспекции на АДФИ:</strong> ${repSum || `${art17Hits.length} актуализирани доклада по чл. 17, ал. 7 ЗДФИ`}</li>`);
+        }
+        if (kandHits.length) {
+          jLines.push(`<li><strong>Съдебни решения по НП на АДФИ / КАНД (${kandHits.length}):</strong> ` +
+            kandHits.slice(0, 3).map((c) => `${esc(c.court)} <b>${esc(c.caseNo)}</b> (${esc(c.authorityName)}) — <span class="tag ${c.outcome.includes('ОТМЕНЕНО') ? 'tag-crimson' : 'tag-teal'}">${esc(c.outcome)}</span> <a href="${esc(c.actDownloadUrl)}" target="_blank">Акт ↗</a>`).join(' | ') + `</li>`);
+        }
+        if (vasHits.length || kzkHits.length) {
+          const vTxt = vasHits.slice(0, 3).map((v) => `ВАС д. <b>${esc(v.vasCaseNo)}</b> (${esc(v.appellantName)} &rarr; ${esc(v.authorityName)}): <span class="tag tag-plum">${esc(v.vasOutcome)}</span> <a href="${esc(v.actDownloadUrl)}" target="_blank">ВАС ↗</a>`).join(' | ');
+          jLines.push(`<li><strong>КЗК &amp; ВАС IV отделение (${vasHits.length} акта ВАС / ${kzkHits.length} акта КЗК):</strong> ${vTxt || kzkHits.slice(0, 2).map((k) => `${esc(k.caseNo)}: ${esc(k.outcome)}`).join(' | ')}</li>`);
+        }
+        if (distHits.length) {
+          jLines.push(`<li><strong>Запори / Несъстоятелност в ТР:</strong> ${distHits.map((d) => `${esc(d.name)} (${d.distraintCount} запора, ${d.pledgeCount} залога)`).join('; ')}</li>`);
+        }
+        if (jLines.length) {
+          sections.push(`<div class="contract-row" style="border-left:3px solid #4f46e5;">
+            <strong style="color:#4f46e5;">Съдебно-институционален радар (ЕПЕП / ВАС / АДФИ / КЗК / ТР):</strong>
+            <ul class="clean-list" style="margin-top:4px;font-size:12px;">${jLines.join('')}</ul>
+          </div>`);
+        }
+      }
+
+      // 6. Cross-Check 7 Procurement Forensic Engines for this Entity!
+      if (f7) {
+        const annexHits = ((f7.engine1_annexInflation && f7.engine1_annexInflation.contracts) || []).filter((c) => matchesEntityRecord(c.authorityEik, `${c.authority} ${c.contractor}`) || matchesEntityRecord(c.contractorEik, ''));
+        const salamiHits = ((f7.engine3_salamiSlicing && f7.engine3_salamiSlicing.clusters) || []).filter((c) => matchesEntityRecord(c.authorityEik, `${c.authority} ${c.contractor}`));
+        const rotHits = ((f7.engine6_cartelGraphs && f7.engine6_cartelGraphs.rotationRings) || []).filter((r) => matchesEntityRecord(r.authorityEik, r.authority));
+        const nlpHits = ((f7.engine7_nlpTailoredSpecs && f7.engine7_nlpTailoredSpecs.flaggedContracts) || []).filter((c) => matchesEntityRecord(c.authorityEik, `${c.authority} ${c.contractor}`));
+
+        const fLines = [];
+        if (annexHits.length) {
+          fLines.push(`<li><strong>Анекси и оскъпяване (${annexHits.length}):</strong> ${annexHits.slice(0, 2).map((c) => `${esc(c.authority)} &rarr; ${esc(c.contractor.slice(0, 38))}: +${fmtEur(c.inflationEur)} (+${c.inflationPct}%)`).join(' | ')}</li>`);
+        }
+        if (salamiHits.length) {
+          fLines.push(`<li><strong>Разделяне под прага / Salami (${salamiHits.length} клъстера):</strong> ${salamiHits.slice(0, 2).map((c) => `${esc(c.authority)} &rarr; ${esc(c.contractor.slice(0, 35))} (${c.contractCount} дог. за ${c.spanDays} дни = ${fmtEur(c.totalEur)})`).join(' | ')}</li>`);
+        }
+        if (rotHits.length) {
+          fLines.push(`<li><strong>Картелна ротация (${rotHits.length} пръстена):</strong> ${rotHits.slice(0, 2).map((r) => `${esc(r.authority)} (CPV ${esc(r.sector)}, редуване ${esc(r.sequence)}, ${fmtEur(r.ringEur)})`).join(' | ')}</li>`);
+        }
+        if (nlpHits.length) {
+          fLines.push(`<li><strong>NLP „Шити“ спецификации (${nlpHits.length}):</strong> ${nlpHits.slice(0, 2).map((c) => `${esc(c.authority)} — марка/критерий <b>${esc(c.matchedBrand || c.trigger)}</b> (${fmtEur(c.valueEur)})`).join(' | ')}</li>`);
+        }
+        if (fLines.length) {
+          sections.push(`<div class="contract-row" style="border-left:3px solid var(--plum);">
+            <strong style="color:var(--plum);">Криминалистични радари (Анекси / Salami / Ротация / NLP):</strong>
+            <ul class="clean-list" style="margin-top:4px;font-size:12px;">${fLines.join('')}</ul>
+          </div>`);
+        }
+      }
+
+      if (sections.length) {
+        const followUps = [];
+        if (topOff) followUps.push(`Генерирай сигнал за ${topOff.name}`);
+        if (topAuth) followUps.push(`Какви съдебни дела и АДФИ доклади има за ${topAuth.name}?`);
+        if (topComp) followUps.push(`В кои ДЗЗД консорциуми участва ${topComp.name.slice(0, 28)}?`);
+        if (topOb) followUps.push(`Кои са лицата със самовъзлагане в ${topOb.name.replace(' (столица)', '')}?`);
+        appendOracleMsg('ai', `<strong>360° Кръстосан одиторски синтез за вашата заявка:</strong><div style="margin-top:8px;">${sections.join('')}</div>` + renderFollowUpChips(followUps), nluMeta);
+        return;
+      }
     }
 
-    // 4. Cartels
-    if (q.includes('картел') || q.includes('двойк')) {
-      const pairs = (state.macro.cartelEngine.coBiddingPairs || []).slice(0, 10);
-      appendOracleMsg('ai', `<strong>Топ 10 най-чести картелни ДЗЗД двойки (от 3 427 анализирани консорциума):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        pairs.map((p) => `<li><strong>${esc(p.nameA)}</strong> &harr; <strong>${esc(p.nameB)}</strong> — <span class="mono" style="color:var(--crimson);font-weight:700;">${p.jointCount} общи ДЗЗД · ${fmtEur(p.jointEur)}</span></li>`).join('') + `</ol>`);
-      return;
+    // =========================================================================
+    // D. MULTI-INTENT TOPIC SYNTHESIS (Combines ALL matched intents in the query!)
+    // =========================================================================
+    const blocks = [];
+
+    if (intentSet.has('JUDICIAL_TD') && j6) {
+      const m1 = j6.module1_collusiveLitigation || {};
+      const list = (m1.liveEissCommercialDisputes || []).slice(0, 8);
+      blocks.push(`<div><strong>Търговски спорове Възложител &harr; Изпълнител в ЕПЕП / ЕИСС (${(m1.liveEissCommercialDisputes || []).length} верифицирани ТД/ВТД дела, 0 дела на Прокуратурата по чл. 155 ТЗ):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((c) => `<li><strong>${esc(c.court)} · ${esc(c.caseNo)}</strong>: <a href="#" data-open-authority="${esc(c.authorityEik)}"><strong>${esc(c.authorityName)}</strong></a> &harr; ${c.contractorEik ? `<a href="#" data-open-company="${esc(c.contractorEik)}">${esc(c.contractorName)}</a>` : esc(c.sideRight)} — <span class="tag tag-crimson">${esc(c.outcome)}</span> · <a href="${esc(c.actDownloadUrl)}" target="_blank">Пълен акт ↗</a></li>`).join('') + `</ol></div>`);
     }
 
-    // 5. XML new politicians
-    if (q.includes('xml') || q.includes('нови политиц') || q.includes('извън сигма')) {
-      const list = ((state.deep && state.deep.deepLinks) || []).filter((r) => r.missedBySigma).slice(0, 12);
-      appendOracleMsg('ai', `<strong>Връзки, пропуснати от СИГМА 2.0 (от 3 035 сканирани XML декларации 2025–2026 г.):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((r) => `<li><strong>${esc(r.politician)}</strong> (${esc(r.position)}, ${esc(r.institution)}) &rarr; <span class="tag tag-ochre">${esc(r.linkType)}</span> &rarr; <strong>${esc(r.companyName)}</strong> (<span class="mono">${fmtEur(r.companyWonEur)}</span>) · <a href="${esc(r.declarationUrl)}" target="_blank">XML ↗</a></li>`).join('') + `</ol>`);
-      return;
+    if (intentSet.has('JUDICIAL_ADFI') && j6) {
+      const m2 = j6.module2_impunityIndex || {};
+      const cases = (m2.liveEissAndKandCases || []).slice(0, 7);
+      const topA = (m2.topInspectedAuthorities || []).slice(0, 5);
+      const outB = (m2.eissOutcomeBreakdown || []).map((o) => `${esc(o.outcome)}: <b>${o.count}</b>`).join(' · ');
+      blocks.push(`<div><strong>АДФИ Индекс на безнаказаността (${fmtInt(m2.totalReports)} доклада · ${fmtInt(m2.updatedArt17Count)} по чл. 17, ал. 7 ЗДФИ) &amp; КАНД решения в ЕПЕП (${outB}):</strong>
+        <div style="font-size:12px;margin-top:4px;"><b>Топ инспектирани възложители:</b> ${topA.map((a) => `<a href="#" data-open-authority="${esc(a.eik)}">${esc(a.name)}</a> (${a.reportCount} докл.)`).join(' · ')}</div>
+        <ol style="margin:6px 0 0;padding-left:18px;">` +
+        cases.map((c) => `<li><strong>${esc(c.court)} · ${esc(c.caseNo)}</strong> (${esc(c.authorityName)}) — <span class="tag ${c.outcome.includes('ОТМЕНЕНО') ? 'tag-crimson' : 'tag-teal'}">${esc(c.outcome)}</span> ${c.annulmentReason && c.annulmentReason !== '—' ? `(${esc(c.annulmentReason)})` : ''} · <a href="${esc(c.actDownloadUrl)}" target="_blank">Акт ↗</a></li>`).join('') + `</ol></div>`);
     }
 
-    // 6. Hidden DZZD top 10
-    if (q.includes('дззд') || q.includes('консорциум')) {
-      const list = ((state.deep && state.deep.hiddenConsortiumLeaderboard) || []).slice(0, 10);
-      appendOracleMsg('ai', `<strong>Топ 10 длъжностни лица с най-големи скрити ДЗЗД поръчки (+€1,92 млрд. общо):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((lb) => `<li><a href="#" data-open-slug="${esc(lb.slug)}"><strong>${esc(lb.officialName)}</strong></a> (${esc(lb.institution)}) — СИГМА показва ${fmtEur(lb.directTotalEur)}, а <strong>скрити ДЗЗД (${lb.hiddenConsortiumCount})</strong>: <span class="mono" style="color:var(--crimson);font-weight:700;">+${fmtEur(lb.hiddenConsortiumEur)}</span></li>`).join('') + `</ol>`);
-      return;
+    if (intentSet.has('JUDICIAL_KZK_VAS') && j6) {
+      const m4 = j6.module4_kzkVas || {};
+      const vas = (m4.liveVasFinalActs || []).slice(0, 7);
+      const ing = m4.ingestedCounts || {};
+      blocks.push(`<div><strong>КЗК &times; Върховен административен съд IV отд. (${(m4.liveVasFinalActs || []).length} окончателни акта на ВАС · ${ing.prelimGranted || 0} допуснати предв. изп. · ${ing.decisionsOverturned || 0} отменени в КЗК):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        vas.map((v) => `<li><strong>ВАС адм.д. № ${esc(v.vasCaseNo)}</strong> (КЗК ${esc(v.kzkDossierNo || 'ЗОП')}): ${esc(v.appellantName)} &rarr; <a href="#" data-open-authority="${esc(v.authorityEik)}"><strong>${esc(v.authorityName)}</strong></a> — <span class="tag ${v.vasOutcome.includes('ОТМЕНЯ') ? 'tag-crimson' : 'tag-teal'}">${esc(v.vasOutcome)}</span> · <a href="${esc(v.actDownloadUrl)}" target="_blank">ВАС Акт ↗</a></li>`).join('') + `</ol></div>`);
     }
 
-    // 7. Own institution / self-dealing
-    if (q.includes('самовъзлагане') || q.includes('собствената институция')) {
+    if (intentSet.has('JUDICIAL_LAWYERS') && j6) {
+      const m3 = j6.module3_legalExpertGraph || {};
+      const laws = (m3.topLawFirmHubs || []).slice(0, 6);
+      const eissL = (m3.eissExtractedLawyers || []).slice(0, 6);
+      blocks.push(`<div><strong>Мрежа на адвокати, юрисконсулти и вещи лица (${fmtInt(m3.lawFirmsCount)} кантори за ${fmtEur(m3.lawFirmsTotalEur)} · ${(m3.eissExtractedLawyers || []).length} процесуални представители от ЕПЕП · ${(m3.adfiRegisteredExperts || {}).totalExperts || 0} вещи лица АДФИ):</strong>
+        <ol style="margin:6px 0 0;padding-left:18px;">` +
+        laws.map((l) => `<li><a href="#" data-open-company="${esc(l.eik || l.name)}"><strong>${esc(l.name)}</strong></a> — <strong>${l.authorityCount} институции</strong> · ${fmtEur(l.totalEur)} (${l.singleOfferPct}% с 1 оферта)</li>`).join('') + `</ol>
+        <div class="inst-line" style="margin-top:4px;">Примери от съдебни актове в ЕПЕП: ${eissL.map((lw) => `<b>${esc(lw.role)} ${esc(lw.name)}</b> (${esc(lw.court)} ${esc(lw.caseNo)})`).join(' · ')}</div></div>`);
+    }
+
+    if (intentSet.has('JUDICIAL_PHOENIX') && j6) {
+      const m5 = j6.module5_insolvencyPhoenix || {};
+      const dist = (m5.distressedFirms || []).slice(0, 6);
+      const chains = (m5.phoenixChains || []).slice(0, 4);
+      blocks.push(`<div><strong>Несъстоятелност, запори в ТР (${m5.distressedOrPledgedCount} фирми) и „Феникс“ вериги (${m5.phoenixChainsCount} вериги · ${m5.burnoutFirmsCount} Burnout компании за ${fmtEur(m5.burnoutTotal2020_2023Eur)}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        dist.map((d) => `<li><a href="#" data-open-company="${esc(d.eik)}"><strong>${esc(d.name)}</strong></a> (ЕИК ${esc(d.eik)}) — <strong>${fmtEur(d.wonEur)}</strong> · <span class="tag tag-crimson">${d.distraintCount} запора / ${d.pledgeCount} залога</span></li>`).join('') + `</ol>
+        <div class="inst-line" style="margin-top:4px;">Феникс групи по собственик: ${chains.map((c) => `<b>${esc(c.owner)}</b> (${c.firmCount} фирми / ${fmtEur(c.combinedEur)})`).join(' · ')}</div></div>`);
+    }
+
+    if (intentSet.has('JUDICIAL_EPPO') && j6) {
+      const m6 = j6.module6_criminalEppo || {};
+      const hits = (m6.eppoHighRiskContracts || []).slice(0, 6);
+      blocks.push(`<div><strong>ЗМИП и EPPO Радар на ЕС средства (${fmtInt(m6.euFundedContractsTotal)} ЕС договора за ${fmtEur(m6.euFundedTotalEur)}, от които ${m6.euSingleOfferSharePct}% с 1 оферта · ${fmtInt(m6.eppoHighRiskCount)} високорискови договора &ge;€1 млн.):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        hits.map((h) => `<li><a href="#" data-open-authority="${esc(h.authorityEik)}"><strong>${esc(h.authority)}</strong></a> &rarr; ${esc(h.contractor.slice(0, 45))} — <strong class="mono" style="color:var(--crimson);">${fmtEur(h.valueEur)}</strong> (${(h.triggers || []).slice(0, 2).join(', ')})</li>`).join('') + `</ol></div>`);
+    }
+
+    if (intentSet.has('SELF_DEALING')) {
       const list = state.officials.filter((o) => o.ownInstitution).sort((a, b) => b.periodEur - a.periodEur).slice(0, 10);
-      appendOracleMsg('ai', `<strong>Топ 10 лица със самовъзлагане (от общо 53 директни съвпадения):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) — В периода: <strong class="mono">${fmtEur(o.periodEur)}</strong> · +ДЗЗД: <span class="mono" style="color:var(--plum);">${fmtEur(o.dzzdEur)}</span> ${riskBadgeHtml(o.sigma3Score)}</li>`).join('') + `</ol>`);
-      return;
+      oracleContext.lastOfficial = list[0] || oracleContext.lastOfficial;
+      blocks.push(`<div><strong>Топ 10 длъжностни лица със самовъзлагане (от собствената институция — общо 53 лица):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) — В мандата: <strong class="mono">${fmtEur(o.periodEur)}</strong> · +ДЗЗД: <span class="mono" style="color:var(--plum);">${fmtEur(o.dzzdEur)}</span> ${riskBadgeHtml(o.sigma3Score)}</li>`).join('') + `</ol></div>`);
     }
 
-    // 8. HHI Monopolies
-    if (q.includes('hhi') || q.includes('монопол')) {
-      const list = ((state.comp && state.comp.byConcentration) || []).slice(0, 10);
-      appendOracleMsg('ai', `<strong>Топ 10 институции по концентрация на доставчици (HHI):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((x) => `<li><a href="#" data-open-authority="${esc(x.slug)}"><strong>${esc(x.name)}</strong></a> — HHI <strong class="mono" style="color:var(--crimson);">${Number(x.hhi).toFixed(2)}</strong> · ${fmtEur(x.valueEur)} (${x.suppliers} доставчици)</li>`).join('') + `</ol>`);
-      return;
+    if (intentSet.has('HIDDEN_DZZD')) {
+      const list = ((state.deep && state.deep.hiddenConsortiumLeaderboard) || []).slice(0, 10);
+      blocks.push(`<div><strong>Топ 10 длъжностни лица с най-големи скрити ДЗЗД поръчки (+€1,92 млрд. общо в 338 консорциума без ЕИК):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((lb) => `<li><a href="#" data-open-slug="${esc(lb.slug)}"><strong>${esc(lb.officialName)}</strong></a> (${esc(lb.institution)}) — Директно: ${fmtEur(lb.directTotalEur)} · <strong>Скрити ДЗЗД (${lb.hiddenConsortiumCount}): <span class="mono" style="color:var(--crimson);">+${fmtEur(lb.hiddenConsortiumEur)}</span></strong></li>`).join('') + `</ol></div>`);
     }
 
-    // 9. Single-offer mega contracts
-    if (q.includes('1 оферта') || q.includes('една оферта')) {
-      const list = (state.macro.topLists.topSingleOffer || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Най-големи договори с 1 оферта (общо 83 993 дог. / €18,50 млрд. = 40,7% от стойността):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((c) => `<li><strong>${esc(c.authorityName)}</strong> &rarr; ${esc(c.bidderName)} — <strong class="mono" style="color:var(--crimson);">${fmtEur(c.valueEur)}</strong> (${c.signedAt}) · <button class="btn btn-oracle" style="padding:1px 6px;font-size:11px;" data-inspect-contract="${esc(c.id)}">Жив JSON</button></li>`).join('') + `</ol>`);
-      return;
+    if (intentSet.has('XML_DECLARATIONS')) {
+      const list = ((state.deep && state.deep.deepLinks) || []).filter((r) => r.missedBySigma).slice(0, 10);
+      blocks.push(`<div><strong>Нови връзки от 3 035 XML декларации пред Сметната палата (Табл. 6/7 заеми, Табл. 9 акции в АД, чл. 35 — 26 връзки при 16 нови лица):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((r) => `<li><strong>${esc(r.politician)}</strong> (${esc(r.position)}, ${esc(r.institution)}) &rarr; <span class="tag tag-ochre">${esc(r.linkType)}</span> &rarr; <a href="#" data-open-company="${esc(r.companyEik)}"><strong>${esc(r.companyName)}</strong></a> (<span class="mono">${fmtEur(r.companyWonEur)}</span>) · <a href="${esc(r.declarationUrl)}" target="_blank">XML ↗</a></li>`).join('') + `</ol></div>`);
     }
 
-    // 10. DANS / DATO / Parliament
-    if (q.includes('данс') || q.includes('дато') || q.includes('народно събрание') || q.includes('депутат')) {
-      const sec = state.officials.filter((o) => o.circle.includes('Служби'));
-      const mps = state.officials.filter((o) => o.circle.includes('Народно събрание')).sort((a, b) => b.combinedEur - a.combinedEur);
-      appendOracleMsg('ai', `<strong>Служби за сигурност (ДАНС, ДАТО, МВР):</strong> ${sec.length} лица (В периода: ${fmtEur(sec.reduce((a, o) => a + o.periodEur, 0))}).<br/>
-        <strong>Народно събрание (Депутати):</strong> ${mps.length} лица (Комбиниран обем СИГМА + ДЗЗД: ${fmtEur(mps.reduce((a, o) => a + o.combinedEur, 0))}). Топ 5 депутати:<ol style="margin:6px 0 0;padding-left:18px;">` +
-        mps.slice(0, 5).map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> — СИГМА: ${fmtEur(o.totalEur)} ${o.dzzdEur > 0 ? '+ ДЗЗД ' + fmtEur(o.dzzdEur) : ''}</li>`).join('') + `</ol>`);
-      return;
-    }
-
-    // 10B. 7 Forensic & 6 Judicial Radar Intents (LIVE!)
-    const f7 = state.forensics7 || (window.SIGMA3_F7 ? await window.SIGMA3_F7.ensureForensics7Loaded() : null);
-    const j6 = state.judicial6 || (window.SIGMA3_J6 ? await window.SIGMA3_J6.ensureJudicial6Loaded() : null);
-
-    if (f7 && (q.includes('анекс') || q.includes('оскъпяване') || q.includes('инфлац'))) {
+    if (intentSet.has('FORENSIC_ANNEX') && f7) {
       const e1 = f7.engine1_annexInflation || {};
       const list = (e1.contracts || []).filter((c) => c.inflationEur > 0).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Анекси и пост-договорно оскъпяване (+${fmtEur(e1.totalInflationEur)} доказани от живи JSON):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((c) => `<li><strong>${esc(c.authority)}</strong> &rarr; ${esc(c.contractor.slice(0, 48))} — ${fmtEur(c.signingEur)} &rarr; <strong>${fmtEur(c.currentEur)}</strong> (<span style="color:var(--crimson);font-weight:700;">+${fmtEur(c.inflationEur)} / +${c.inflationPct}%</span>)</li>`).join('') + `</ol>`);
-      return;
+      blocks.push(`<div><strong>Анекси и пост-договорно оскъпяване (+${fmtEur(e1.totalInflationEur)} доказано увеличение чрез анекси):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((c) => `<li><strong>${esc(c.authority)}</strong> &rarr; ${esc(c.contractor.slice(0, 46))} — ${fmtEur(c.signingEur)} &rarr; <strong>${fmtEur(c.currentEur)}</strong> (<span style="color:var(--crimson);font-weight:700;">+${fmtEur(c.inflationEur)} / +${c.inflationPct}%</span>)</li>`).join('') + `</ol></div>`);
     }
-    if (f7 && (q.includes('кух') || q.includes('новосъздаден') || q.includes('shell'))) {
+
+    if (intentSet.has('FORENSIC_SHELL') && f7) {
       const e2 = f7.engine2_shellCompanies || {};
       const list = (e2.companies || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Новосъздадени / „кухи“ фирми (Верифицирани в ТР · ${e2.verifiedShellCount} фирми / ${fmtEur(e2.totalShellEur)}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((c) => `<li><a href="#" data-open-company="${esc(c.eik)}"><strong>${esc(c.name)}</strong></a> (ЕИК ${esc(c.eik)}) — учр. ${esc(c.incorpDate)}, 1-ви дог. след <strong>${c.daysToFirstContract} дни</strong>, капитал ${esc(c.capitalRaw || '—')}, спечелени <strong style="color:var(--crimson);">${fmtEur(c.totalEur)}</strong></li>`).join('') + `</ol>`);
-      return;
+      blocks.push(`<div><strong>Новосъздадени и „кухи“ фирми (Верифицирани в ТР · ${e2.verifiedShellCount} фирми за ${fmtEur(e2.totalShellEur)}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((c) => `<li><a href="#" data-open-company="${esc(c.eik)}"><strong>${esc(c.name)}</strong></a> (ЕИК ${esc(c.eik)}) — учр. ${esc(c.incorpDate)}, 1-ви договор след <strong>${c.daysToFirstContract} дни</strong>, капитал ${esc(c.capitalRaw || '—')}, спечелени <strong style="color:var(--crimson);">${fmtEur(c.totalEur)}</strong></li>`).join('') + `</ol></div>`);
     }
-    if (f7 && (q.includes('salami') || q.includes('разделяне') || q.includes('под прага'))) {
+
+    if (intentSet.has('FORENSIC_SALAMI') && f7) {
       const e3 = f7.engine3_salamiSlicing || {};
       const list = (e3.clusters || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Разделяне под прага (Salami Slicing — ${fmtInt(e3.nonPharmaClusters)} клъстера за ${fmtEur(e3.nonPharmaTotalEur)}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((c) => `<li><strong>${esc(c.authority)}</strong> &rarr; ${esc(c.contractor)} — <strong>${c.contractCount} дог. за ${c.spanDays} дни</strong> = <strong style="color:var(--crimson);">${fmtEur(c.totalEur)}</strong> (${c.thresholdRatio}× прага)</li>`).join('') + `</ol>`);
-      return;
+      blocks.push(`<div><strong>Разделяне на поръчки под прага (Salami Slicing — ${fmtInt(e3.nonPharmaClusters)} не-фарма клъстера за ${fmtEur(e3.nonPharmaTotalEur)}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((c) => `<li><strong>${esc(c.authority)}</strong> &rarr; ${esc(c.contractor)} — <strong>${c.contractCount} дог. за ${c.spanDays} дни</strong> = <strong style="color:var(--crimson);">${fmtEur(c.totalEur)}</strong> (${c.thresholdRatio}× прага)</li>`).join('') + `</ol></div>`);
     }
-    if (f7 && (q.includes('дарен') || q.includes('ерик') || q.includes('меди'))) {
+
+    if (intentSet.has('FORENSIC_POLITICS_MEDIA') && f7) {
       const e4 = f7.engine4_politicsAndMedia || {};
       const list = (e4.partyAgencies || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Политически дарения (ЕРИК 2023–2026: ${fmtInt(e4.donorsIndexed)} дарители) и медийни плащания (${fmtEur(e4.mediaTotalEur)}):</strong> <strong>${e4.partyAgenciesWinningProcurement} партийни PR/медийни агенции</strong> са спечелили <strong>${fmtEur(e4.partyAgenciesTotalEur)}</strong> обществени поръчки. Топ 8:<ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((a) => `<li><a href="#" data-open-company="${esc(a.eik)}"><strong>${esc(a.name)}</strong></a> (${esc((a.parties || []).slice(0, 2).join(', '))}) — <strong>${fmtEur(a.totalWonEur)}</strong></li>`).join('') + `</ol>`);
-      return;
+      blocks.push(`<div><strong>Политически дарения (ЕРИК: ${fmtInt(e4.donorsIndexed)} дарители) и медийни договори (${fmtEur(e4.mediaTotalEur)}):</strong> <strong>${e4.partyAgenciesWinningProcurement} партийни PR/медийни агенции</strong> са спечелили <strong>${fmtEur(e4.partyAgenciesTotalEur)}</strong>:<ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((a) => `<li><a href="#" data-open-company="${esc(a.eik)}"><strong>${esc(a.name)}</strong></a> (${esc((a.parties || []).slice(0, 2).join(', '))}) — <strong>${fmtEur(a.totalWonEur)}</strong></li>`).join('') + `</ol></div>`);
     }
-    if (f7 && (q.includes('ротац') || q.includes('общ адрес'))) {
-      const e6 = f7.engine6_cartelGraphs || {};
-      const list = (e6.rotationRings || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Графов детектор за ротация на победители (${fmtInt(e6.rotationRingsCount)} пръстена · ${e6.sharedAddressesCount} общи адреса по ТР):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((r) => `<li><strong>${esc(r.authority)}</strong> (CPV ${esc(r.sector)}) — Редуване <code>${esc(r.sequence)}</code> (${r.alternationPct}%, ср. ${r.avgBids} оф.) · <strong>${fmtEur(r.ringEur)}</strong></li>`).join('') + `</ol>`);
-      return;
+
+    if (intentSet.has('FORENSIC_TIME') && f7) {
+      const e5 = f7.engine5_timeAnomalies || {};
+      const list = (e5.yearEndDumpers || []).slice(0, 8);
+      blocks.push(`<div><strong>Времеви аномалии и декемврийски бюджетен дъмпинг (${fmtInt((e5.yearEndDumpers || []).length)} институции с Ноември–Декември пик &ge;32%):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((d) => `<li><a href="#" data-open-authority="${esc(d.eik)}"><strong>${esc(d.name)}</strong></a> — Ное–Дек дял: <strong style="color:var(--crimson);">${d.novDecSharePct}%</strong> (${fmtEur(d.novDecEur)} от общо ${fmtEur(d.totalEur)})</li>`).join('') + `</ol></div>`);
     }
-    if (f7 && (q.includes('шит') || q.includes('спецификац') || q.includes('марк'))) {
+
+    if (intentSet.has('FORENSIC_CARTEL')) {
+      const pairs = (state.macro.cartelEngine.coBiddingPairs || []).slice(0, 7);
+      const rot = (f7 && f7.engine6_cartelGraphs && f7.engine6_cartelGraphs.rotationRings || []).slice(0, 4);
+      blocks.push(`<div><strong>Картелен радар — Топ ДЗЗД двойки със съвместни оферти (от 3 427 консорциума) и ротационни пръстени:</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        pairs.map((p) => `<li><a href="#" data-open-company="${esc(p.eikA)}"><strong>${esc(p.nameA)}</strong></a> &harr; <a href="#" data-open-company="${esc(p.eikB)}"><strong>${esc(p.nameB)}</strong></a> — <span class="mono" style="color:var(--crimson);font-weight:700;">${p.jointCount} общи ДЗЗД · ${fmtEur(p.jointEur)}</span></li>`).join('') + `</ol>` +
+        (rot.length ? `<div class="inst-line" style="margin-top:4px;">Ротация на победители: ${rot.map((r) => `<b>${esc(r.authority)}</b> (${esc(r.sequence)}, ${fmtEur(r.ringEur)})`).join(' · ')}</div>` : '') + `</div>`);
+    }
+
+    if (intentSet.has('FORENSIC_NLP') && f7) {
       const e7 = f7.engine7_nlpTailoredSpecs || {};
       const list = (e7.brandLeaderboard || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>NLP „Шити“ поръчки (${fmtInt(e7.totalHighRiskSpecs)} критични договора за ${fmtEur(e7.totalHighRiskEur)}):</strong> Топ марки по обем с 1 оферта:<ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((b) => `<li><strong>${esc(b.brand)}</strong> — ${b.contracts} дог., <strong>${b.singleOfferPct}% с 1 оферта</strong> (${fmtEur(b.singleOfferEur)})</li>`).join('') + `</ol>`);
-      return;
+      blocks.push(`<div><strong>NLP „Шити“ поръчки и ограничителни критерии по чл. 49 ЗОП (${fmtInt(e7.totalHighRiskSpecs)} договора за ${fmtEur(e7.totalHighRiskEur)}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((b) => `<li>Марка/Критерий <strong>${esc(b.brand)}</strong> — ${b.contracts} дог., <strong>${b.singleOfferPct}% с 1 оферта</strong> (${fmtEur(b.singleOfferEur)})</li>`).join('') + `</ol></div>`);
     }
-    if (j6 && (q.includes('адфи') || q.includes('безнаказаност') || q.includes('инспекц'))) {
-      const m2 = j6.module2_impunityIndex || {};
-      const list = (m2.topInspectedAuthorities || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>АДФИ Индекс на безнаказаността (${fmtInt(m2.totalReports)} живи доклада 2024–2026 · ${fmtInt(m2.updatedArt17Count)} актуализирани по чл. 17(7)):</strong> Най-проверявани възложители:<ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((a) => `<li><a href="#" data-open-authority="${esc(a.eik)}"><strong>${esc(a.name)}</strong></a> — <strong>${a.reportCount} доклада АДФИ</strong> (${a.updatedArt17Count} по чл. 17) · ЗОП: ${fmtEur(a.spentEur)}</li>`).join('') + `</ol>`);
-      return;
+
+    if (intentSet.has('SINGLE_OFFER_HHI')) {
+      const list = (state.macro.topLists.topSingleOffer || []).slice(0, 6);
+      const hhiList = ((state.comp && state.comp.byConcentration) || []).slice(0, 5);
+      blocks.push(`<div><strong>Поръчки с 1 оферта (83 993 дог. / €18,50 млрд. = 40,7% от обема) и Топ HHI монополи:</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+        list.map((c) => `<li><strong>${esc(c.authorityName)}</strong> &rarr; ${esc(c.bidderName)} — <strong class="mono" style="color:var(--crimson);">${fmtEur(c.valueEur)}</strong> (${c.signedAt}) · <button class="btn btn-oracle" style="padding:1px 6px;font-size:11px;" data-inspect-contract="${esc(c.id)}">Жив JSON</button></li>`).join('') + `</ol>` +
+        `<div class="inst-line" style="margin-top:4px;">Топ HHI концентрация: ${hhiList.map((x) => `<a href="#" data-open-authority="${esc(x.slug)}"><b>${esc(x.name)}</b></a> (HHI ${Number(x.hhi).toFixed(2)})`).join(' · ')}</div></div>`);
     }
-    if (j6 && (q.includes('кзк') || q.includes('вас') || q.includes('предварително изпълнение'))) {
-      const m4 = j6.module4_kzkVas || {};
-      const ing = m4.ingestedCounts || {};
-      const list = (m4.prelimRulings || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>КЗК / ВАС ЗОП Радар (2026: ${fmtInt((m4.year2026Totals || {}).proceedings)} производства · ${ing.prelimGranted || 0} допуснати предв. изп. · ${ing.decisionsOverturned || 0} отменени):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((r) => `<li><a href="${esc(r.url)}" target="_blank"><strong>${esc(r.caseNo)} ↗</strong></a> (${esc(r.date)}) — <strong>${esc(r.outcome)}</strong> · ${esc(r.respondentsRaw.slice(0, 55))}</li>`).join('') + `</ol>`);
-      return;
+
+    if (intentSet.has('BENFORD_PARETO')) {
+      const bf = state.macro.benford;
+      blocks.push(`<div><strong>Математически одит по Закона на Бенфорд и Парето/Джини:</strong>
+        <ul class="clean-list" style="margin-top:6px;">
+          <li><strong>Възложители (n=${fmtInt(bf.authorities.n)}):</strong> MAD = <code>${bf.authorities.mad}</code>, &chi;&sup2; = <code>${bf.authorities.chi2}</code> — <strong>${esc(bf.authorities.conformity)}</strong> (пик при първа цифра 4: ${bf.authorities.observed[3]}% срещу теоретични 9,69%).</li>
+          <li><strong>Компании (n=${fmtInt(bf.companies.n)}):</strong> MAD = <code>${bf.companies.mad}</code> — <strong>${esc(bf.companies.conformity)}</strong>.</li>
+          <li><strong>Парето хиперконцентрация:</strong> Топ 1% от фирмите държат <strong>${bf.paretoCompanies.top1Pct}%</strong> (Gini <b>${bf.paretoCompanies.gini}</b>), а Топ 1% от възложителите контролират <strong>${bf.paretoAuthorities.top1Pct}%</strong> от пазара.</li>
+        </ul></div>`);
     }
-    if (j6 && (q.includes('адвокат') || q.includes('вещ') || q.includes('експерт'))) {
-      const m3 = j6.module3_legalExpertGraph || {};
-      const list = (m3.topLawFirmHubs || []).slice(0, 8);
-      appendOracleMsg('ai', `<strong>Мрежа на адвокати и вещи лица (${fmtInt(m3.lawFirmsCount)} правни кантори за ${fmtEur(m3.lawFirmsTotalEur)} · ${(m3.adfiRegisteredExperts || {}).totalExperts || 0} АДФИ вещи лица):</strong> Топ адвокатски хъбове:<ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((l) => `<li><a href="#" data-open-company="${esc(l.eik || l.name)}"><strong>${esc(l.name)}</strong></a> — <strong>${l.authorityCount} институции</strong> · ${fmtEur(l.totalEur)} (${l.singleOfferPct}% с 1 оф.)</li>`).join('') + `</ol>`);
-      return;
+
+    if (intentSet.has('SECTOR_CIRCLE')) {
+      const qL = nlu.fullNorm;
+      let circleFilter = () => true;
+      let title = 'Свързани лица по институционален сектор';
+      if (qL.includes('кмет') || qL.includes('общин')) { circleFilter = (o) => o.circle.includes('Общини'); title = 'Общини и общински съвети (кметове и общински съветници)'; }
+      else if (qL.includes('депутат') || qL.includes('народно събрание') || qL.includes('парламент')) { circleFilter = (o) => o.circle.includes('Народно събрание'); title = 'Народно събрание (Депутати)'; }
+      else if (qL.includes('данс') || qL.includes('дато') || qL.includes('служб') || qL.includes('мвр')) { circleFilter = (o) => o.circle.includes('Служби'); title = 'Служби за сигурност (ДАНС, ДАТО, МВР)'; }
+      else if (qL.includes('болниц') || qL.includes('мбал') || qL.includes('здрав')) { circleFilter = (o) => o.circle.includes('болници'); title = 'Държавни и общински болници'; }
+      else if (qL.includes('минист')) { circleFilter = (o) => o.circle.includes('Централна власт'); title = 'Централна власт (Министерства и агенции)'; }
+      const sub = state.officials.filter(circleFilter).sort((a, b) => b.combinedEur - a.combinedEur);
+      if (sub.length) {
+        oracleContext.lastOfficial = sub[0];
+        blocks.push(`<div><strong>${title} — общо ${sub.length} лица (Комбиниран обем СИГМА + ДЗЗД: ${fmtEur(sub.reduce((a, o) => a + o.combinedEur, 0))}):</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
+          sub.slice(0, 8).map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) — В мандата: <b>${fmtEur(o.periodEur)}</b> · Общо+ДЗЗД: <b>${fmtEur(o.combinedEur)}</b> ${riskBadgeHtml(o.sigma3Score)}</li>`).join('') + `</ol></div>`);
+      }
     }
-    if (j6 && (q.includes('несъстоятел') || q.includes('феникс') || q.includes('запор') || q.includes('eppo') || q.includes('европрокуратур'))) {
-      const m5 = j6.module5_insolvencyPhoenix || {};
-      const m6 = j6.module6_criminalEppo || {};
-      appendOracleMsg('ai', `<strong>Несъстоятелност / Феникс и EPPO Радар:</strong><ul class="clean-list" style="margin-top:6px;">
-        <li><strong>Несъстоятелност и запори (ТР):</strong> ${m5.distressedOrPledgedCount} фирми със запори/залози/несъстоятелност · <strong>${m5.burnoutFirmsCount} „Burnout“ фирми</strong> (${fmtEur(m5.burnoutTotal2020_2023Eur)} през 2020–23 &rarr; €0 през 2024–26) · ${m5.phoenixChainsCount} Феникс/мулти-фирмени вериги.</li>
-        <li><strong>ЕС Средства / EPPO (Регламент ЕС 2017/1939):</strong> ${fmtEur(m6.euFundedTotalEur)} в ${fmtInt(m6.euFundedContractsTotal)} ЕС договора (<strong>${m6.euSingleOfferSharePct}% с 1 оферта</strong>) · <strong>${fmtInt(m6.eppoHighRiskCount)} високорискови договора &ge;€1M</strong> (${fmtEur(m6.eppoHighRiskEur)}).</li>
-      </ul>`);
+
+    if (intentSet.has('HIGH_RISK_OVERVIEW') && !blocks.length) {
+      const topOffs = [...state.officials].sort((a, b) => b.sigma3Score - a.sigma3Score || b.combinedEur - a.combinedEur).slice(0, 7);
+      const topAuths = [...auths].sort((a, b) => b.riskScore - a.riskScore || b.spentEur - a.spentEur).slice(0, 5);
+      oracleContext.lastOfficial = topOffs[0];
+      blocks.push(`<div><strong>Топ рискови профили в СИГМА 3.0 FINALITY (по 6-факторен Риск индекс + Съдебен/АДФИ/КЗК буст):</strong>
+        <div style="margin-top:6px;"><b>1. Длъжностни лица с най-висок риск и финансов обем:</b><ol style="margin:4px 0 6px;padding-left:18px;">` +
+        topOffs.map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) — Общо+ДЗЗД: <strong>${fmtEur(o.combinedEur)}</strong> ${o.ownInstitution ? '<span class="tag tag-crimson">Самовъзлагане</span>' : ''} ${riskBadgeHtml(o.sigma3Score)}</li>`).join('') + `</ol></div>
+        <div><b>2. Възложители с най-висок комбиниран риск (ЗОП + АДФИ + КЗК + Съд):</b><ol style="margin:4px 0 0;padding-left:18px;">` +
+        topAuths.map((a) => `<li><a href="#" data-open-authority="${esc(a.eik)}"><strong>${esc(a.name)}</strong></a> (ЕИК ${esc(a.eik)}) — <strong>${fmtEur(a.spentEur)}</strong> · ${riskBadgeHtml(a.riskScore)}</li>`).join('') + `</ol></div></div>`);
+    }
+
+    if (blocks.length) {
+      appendOracleMsg('ai', blocks.join('<hr style="border:none;border-top:1px solid var(--border);margin:10px 0;"/>') +
+        renderFollowUpChips([
+          'Генерирай сигнал за първото лице',
+          'Покажи търговските дела в съда (ЕПЕП)',
+          'Покажи отменените глоби на АДФИ',
+          'Кои са топ 10 със скрити ДЗЗД?',
+        ]), nluMeta);
       return;
     }
 
-    // 11. EIK or Entity Deep Search across ALL 22,343 records
-    const eikM = q.match(/\b(\d{9})\b/);
-    const [auths, comps] = await Promise.all([ensureAuthoritiesLoaded(), ensureCompaniesLoaded()]);
-    const needle = eikM ? eikM[1] : q.replace(/(покажи|провери|какво|има|за|община|област|фирма|информация|данни)/g, '').trim();
-    const hitOffs = state.officials.filter((o) => o.name.toLowerCase().includes(needle) || o.primaryInstitution.toLowerCase().includes(needle) || (o.oblast && o.oblast.toLowerCase().includes(needle)) || o.companies.some((c) => c.eik === needle || c.name.toLowerCase().includes(needle))).slice(0, 6);
-    const hitAuths = auths.filter((a) => a.eik === needle || a.name.toLowerCase().includes(needle)).slice(0, 5);
-    const hitComps = comps.filter((c) => c.eik === needle || c.name.toLowerCase().includes(needle)).slice(0, 5);
+    // =========================================================================
+    // E. BROAD FULL-TEXT & SUBJECT SEARCH (Contract subjects, brands, court text, fuzzy fallback)
+    // =========================================================================
+    const searchStems = nlu.stems.filter((s) => s.length >= 3);
+    const matchByStems = (text) => {
+      const low = String(text || '').toLowerCase();
+      let hits = 0;
+      for (const st of searchStems) {
+        if (low.includes(st) || tokenFuzzyMatchScore(st, low) >= 0.84) hits++;
+      }
+      return hits;
+    };
 
-    if (hitOffs.length || hitAuths.length || hitComps.length) {
-      let out = `<strong>Резултати от пълния индекс (22 343 записа) за „${esc(needle || qRaw)}“:</strong>`;
-      if (hitOffs.length) out += `<div style="margin-top:8px;"><b>Свързани лица (${hitOffs.length}):</b><ul>` + hitOffs.map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) · В периода: <b>${fmtEur(o.periodEur)}</b> · Общо+ДЗЗД: <b>${fmtEur(o.combinedEur)}</b> ${riskBadgeHtml(o.sigma3Score)} · <button class="btn" style="padding:1px 6px;font-size:11px;" data-gen-signal="${esc(o.slug)}">Сигнал</button></li>`).join('') + `</ul></div>`;
-      if (hitAuths.length) out += `<div style="margin-top:8px;"><b>Възложители (${hitAuths.length}):</b><ul>` + hitAuths.map((a) => `<li><a href="#" data-open-authority="${esc(a.eik)}"><strong>${esc(a.name)}</strong></a> (ЕИК ${esc(a.eik)}) · <b>${fmtEur(a.spentEur)}</b> (${fmtInt(a.contracts)} дог.)</li>`).join('') + `</ul></div>`;
-      if (hitComps.length) out += `<div style="margin-top:8px;"><b>Компании / ДЗЗД (${hitComps.length}):</b><ul>` + hitComps.map((c) => `<li><a href="#" data-open-company="${esc(c.eik || c.name)}"><strong>${esc(c.name.slice(0, 80))}</strong></a> · Директно: <b>${fmtEur(c.wonEur)}</b>${c.consortiumEur > 0 ? ' · ДЗЗД: <b style="color:var(--plum);">+' + fmtEur(c.consortiumEur) + '</b>' : ''}</li>`).join('') + `</ul></div>`;
-      appendOracleMsg('ai', out);
+    const hitOffs = state.officials.map((o) => ({ o, h: matchByStems(`${o.name} ${o.primaryInstitution} ${o.oblast || ''} ${o.companies.map((c) => c.name).join(' ')}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.o.combinedEur - a.o.combinedEur).slice(0, 5);
+    const hitAuths = auths.map((a) => ({ a, h: matchByStems(`${a.name} ${a.settlement || ''} ${a.region || ''}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.a.spentEur - a.a.spentEur).slice(0, 5);
+    const hitComps = comps.map((c) => ({ c, h: matchByStems(`${c.name} ${c.settlement || ''}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.c.wonEur - a.c.wonEur).slice(0, 5);
+
+    // Also search contract subjects in topSingleOffer, annex contracts, litigation contracts, and court cases!
+    const allSampleContracts = [
+      ...((state.macro && state.macro.topLists && state.macro.topLists.topSingleOffer) || []).map((c) => ({ id: c.id, auth: c.authorityName, comp: c.bidderName, subj: c.subject, eur: c.valueEur })),
+      ...((f7 && f7.engine1_annexInflation && f7.engine1_annexInflation.contracts) || []).map((c) => ({ id: c.id, auth: c.authority, comp: c.contractor, subj: `Анекс (+${c.inflationPct}%): ${c.subject || ''}`, eur: c.currentEur })),
+      ...((j6 && j6.module1_collusiveLitigation && j6.module1_collusiveLitigation.topLitigationContracts) || []).map((c) => ({ id: c.id, auth: c.authority, comp: c.contractor, subj: c.subject, eur: c.valueEur })),
+    ];
+    const hitContracts = allSampleContracts.map((c) => ({ c, h: matchByStems(`${c.subj} ${c.auth} ${c.comp}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.c.eur - a.c.eur).slice(0, 5);
+
+    if (hitOffs.length || hitAuths.length || hitComps.length || hitContracts.length) {
+      let out = `<strong>Намерени резултати при размито търсене (Fuzzy &amp; Stem Match) за „${esc(qRaw)}“:</strong>`;
+      if (hitOffs.length) {
+        oracleContext.lastOfficial = hitOffs[0].o;
+        out += `<div style="margin-top:8px;"><b>Свързани длъжностни лица (${hitOffs.length}):</b><ul>` + hitOffs.map(({ o }) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) · В мандата: <b>${fmtEur(o.periodEur)}</b> · Общо+ДЗЗД: <b>${fmtEur(o.combinedEur)}</b> ${riskBadgeHtml(o.sigma3Score)} · <button class="btn" style="padding:1px 6px;font-size:11px;" data-gen-signal="${esc(o.slug)}">Сигнал</button></li>`).join('') + `</ul></div>`;
+      }
+      if (hitAuths.length) {
+        oracleContext.lastAuthority = hitAuths[0].a;
+        out += `<div style="margin-top:8px;"><b>Възложители (${hitAuths.length}):</b><ul>` + hitAuths.map(({ a }) => `<li><a href="#" data-open-authority="${esc(a.eik)}"><strong>${esc(a.name)}</strong></a> (ЕИК ${esc(a.eik)}) · <b>${fmtEur(a.spentEur)}</b> (${fmtInt(a.contracts)} дог.) · ${riskBadgeHtml(a.riskScore)}</li>`).join('') + `</ul></div>`;
+      }
+      if (hitComps.length) {
+        oracleContext.lastCompany = hitComps[0].c;
+        out += `<div style="margin-top:8px;"><b>Изпълнители / ДЗЗД (${hitComps.length}):</b><ul>` + hitComps.map(({ c }) => `<li><a href="#" data-open-company="${esc(c.eik || c.name)}"><strong>${esc(c.name.slice(0, 80))}</strong></a> · Директно: <b>${fmtEur(c.wonEur)}</b>${c.consortiumEur > 0 ? ' · ДЗЗД: <b style="color:var(--plum);">+' + fmtEur(c.consortiumEur) + '</b>' : ''}</li>`).join('') + `</ul></div>`;
+      }
+      if (hitContracts.length) {
+        out += `<div style="margin-top:8px;"><b>Конкретни договори по предмет (${hitContracts.length}):</b><ul>` + hitContracts.map(({ c }) => `<li><strong>${esc(c.auth)}</strong> &rarr; ${esc(c.comp.slice(0, 45))}: <em>${esc((c.subj || '').slice(0, 95))}</em> — <b class="mono">${fmtEur(c.eur)}</b> ${c.id ? `<button class="btn btn-oracle" style="padding:1px 6px;font-size:10.5px;" data-inspect-contract="${esc(c.id)}">JSON</button>` : ''}</li>`).join('') + `</ul></div>`;
+      }
+      appendOracleMsg('ai', out + renderFollowUpChips([
+        hitAuths[0] ? `Какви съдебни дела и АДФИ доклади има за ${hitAuths[0].a.name}?` : 'Покажи търговските дела в ЕПЕП',
+        hitOffs[0] ? `Генерирай сигнал за ${hitOffs[0].o.name}` : 'Кои кметове имат самовъзлагане?',
+      ]), nluMeta);
       return;
     }
 
-    appendOracleMsg('ai', `Общ национален срез на <strong>СИГМА 3.0 FINALITY</strong>: <strong>206 907 договора</strong> за <strong>€53,22 млрд.</strong> (40,7% с 1 оферта), <strong>571 свързани лица</strong> (53 със самовъзлагане), <strong>+€1,92 млрд. скрити ДЗЗД</strong> и <strong>60 картелни двойки</strong>. Опитайте конкретно име, ЕИК, град или готов бутон по-горе.`);
+    appendOracleMsg('ai', `Разбрах въпроса ви (нормализиран като: <code>${esc(nlu.cyrQuery)}</code>), но не открих директен субект с това име. Ето общия национален срез на <strong>СИГМА 3.0 FINALITY</strong>:
+      <ul class="clean-list" style="margin-top:6px;">
+        <li><strong>Обем по ЗОП:</strong> 206 907 договора за <strong>€53,22 млрд.</strong> (40,7% с 1 оферта) при 4 344 възложители и 17 428 изпълнители.</li>
+        <li><strong>Свързани лица и ДЗЗД:</strong> 571 длъжностни лица (53 със самовъзлагане), <strong>+€1,92 млрд.</strong> в скрити ДЗЗД консорциуми и 26 нови връзки от XML декларации.</li>
+        <li><strong>Съдебен радар (ЕПЕП / ВАС / АДФИ / КЗК):</strong> 86 пълни съдебни акта без CAPTCHA (28 търговски спора ТД/ВТД, 28 КАНД решения по НП на АДФИ, 30 окончателни акта на ВАС IV отд.), 2 229 доклада на АДФИ (370 по чл. 17, ал. 7 ЗДФИ) и 90 структурирани адвокати.</li>
+      </ul>` +
+      renderFollowUpChips([
+        'Кажи ми всичко за Бургас — поръчки, АДФИ и съд',
+        'Какви дела и анекси има за АПИ?',
+        'Покажи отменените глоби на АДФИ в съда',
+        'Кои кметове имат самовъзлагане?',
+      ]), nluMeta);
   }
 
   // =========================================================================
@@ -1218,8 +2072,17 @@
       const b = e.target.closest('[data-oracle-q]');
       if (b) askOracle(b.dataset.oracleQ);
     });
+    document.getElementById('oracleMessages')?.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-oracle-q]');
+      if (b) askOracle(b.dataset.oracleQ);
+    });
     document.getElementById('oracleClearBtn')?.addEventListener('click', () => {
       document.getElementById('oracleMessages').innerHTML = '';
+      oracleContext.lastOfficial = null;
+      oracleContext.lastAuthority = null;
+      oracleContext.lastCompany = null;
+      oracleContext.lastOblast = null;
+      oracleContext.lastIntents = [];
       oracleInitialized = false;
       ensureOracleReady();
     });
