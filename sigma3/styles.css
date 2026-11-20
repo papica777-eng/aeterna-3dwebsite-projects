@@ -494,44 +494,44 @@ code {
 
 .hero-emblem-stage {
   flex: 0 0 auto;
-  width: clamp(270px, 29vw, 400px);
+  width: clamp(300px, 31vw, 440px);
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: none;
   user-select: none;
+  margin: -18px -10px -18px 0;
 }
 
-.hero-emblem-svg {
+.hero-emblem-img {
   width: 100%;
   height: auto;
   display: block;
-  overflow: visible;
+  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
+  mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
 }
 
-.emblem-bg-base {
-  fill: #26231f;
-  stroke: #26231f;
+.hero-emblem-light {
+  display: block;
+  mix-blend-mode: multiply;
+  filter: contrast(1.04) saturate(1.06);
 }
 
-[data-theme=dark] .emblem-bg-base,
-.dark .emblem-bg-base {
-  fill: #cbd5e1;
-  stroke: #cbd5e1;
+.hero-emblem-dark {
+  display: none;
+  mix-blend-mode: lighten;
 }
 
-.emblem-beam-layer {
-  animation: heroBeamBreath 5s ease-in-out infinite alternate;
+[data-theme=dark] .hero-emblem-light,
+.dark .hero-emblem-light {
+  display: none;
 }
 
-@keyframes heroBeamBreath {
-  0% {
-    opacity: 0.84;
-  }
-  100% {
-    opacity: 1;
-  }
+[data-theme=dark] .hero-emblem-dark,
+.dark .hero-emblem-dark {
+  display: block;
 }
+
 @media (max-width: 960px) {
   .hero-top-split {
     flex-direction: column;
