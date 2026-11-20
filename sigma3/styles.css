@@ -116,11 +116,11 @@ code {
 }
 
 /* =========================================================================
-   MASTHEAD (.topbar — Modeled after sigma.midt.bg .site-header)
+   MASTHEAD (.topbar — 3-Column Modern SaaS / GovTech Header)
    ========================================================================= */
 .topbar {
-  background: var(--paper);
-  border-bottom: 1px solid var(--border);
+  background: #0b111c;
+  border-bottom: 1px solid #1e293b;
   position: sticky;
   top: 0;
   z-index: 45;
@@ -129,104 +129,226 @@ code {
 .topbar-inner {
   max-width: 1340px;
   margin: 0 auto;
-  padding: 18px 36px 14px;
+  padding: 10px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
+  gap: 20px;
 }
 
-@media (max-width: 880px) {
+@media (max-width: 980px) {
   .topbar-inner {
-    padding: 14px 20px;
+    padding: 10px 20px;
+    flex-wrap: wrap;
+    gap: 12px;
   }
 }
-.brand-wrap {
+.topbar-left {
+  flex: 0 0 auto;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.brand-home-link {
-  text-decoration: none;
-  color: var(--ink);
-  display: inline-flex;
   align-items: center;
 }
 
-.brand-home-link:hover {
-  color: var(--ink);
-  text-decoration: none;
-}
-
-.nasvetlo-official-header {
-  display: inline-flex;
+.brand-logo {
+  display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
+  text-decoration: none;
+  color: #ffffff;
 }
 
-.nasvetlo-header-img {
-  width: 44px;
-  height: 44px;
-  object-fit: cover;
-  border: 1px solid var(--ink);
+.brand-logo:hover {
+  text-decoration: none;
+  color: #ffffff;
+}
+
+.brand-logo-icon {
+  height: 38px;
+  width: 38px;
+  object-fit: contain;
   display: block;
   flex-shrink: 0;
 }
 
-.nasvetlo-header-text {
+.brand-logo-text {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  line-height: 1.12;
 }
 
-.nasvetlo-header-row {
+.brand-logo-name {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+}
+
+.brand-logo-accent {
+  color: #f59e0b;
+}
+
+.brand-logo-meta {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #94a3b8;
+  margin-top: 2px;
+}
+
+/* Center Search Bar in Header */
+.topbar-center {
+  flex: 1 1 280px;
+  display: flex;
+  justify-content: center;
+  max-width: 420px;
+}
+
+.btn-cmd-center {
+  width: 100%;
   display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 10px;
+  padding: 7px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #334155;
+  color: #cbd5e1;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 
-.nasvetlo-brand-name {
-  font-family: var(--font-sans);
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.btn-cmd-center:hover {
+  background: rgba(255, 255, 255, 0.11);
+  border-color: #f59e0b;
+  color: #ffffff;
+}
+
+.cmd-search-icon {
+  font-size: 15px;
+  color: #94a3b8;
   line-height: 1;
-  color: var(--ink);
 }
 
-.nasvetlo-brand-tagline {
-  font-family: var(--font-sans);
-  font-size: 11.5px;
-  color: var(--ink-muted);
-  line-height: 1.2;
+.cmd-search-label {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.sigma-edition-tag {
+.btn-cmd-center kbd {
   font-family: var(--font-mono);
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--crimson);
-  border: 1px solid var(--crimson);
-  background: var(--crimson-bg);
-  padding: 2px 7px;
+  font-size: 10px;
+  padding: 2px 6px;
+  background: #0f172a;
+  border: 1px solid #475569;
+  color: #94a3b8;
 }
 
-.brand-sub {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--ink-muted);
-}
-
-.topbar-actions {
+/* Right Action Buttons in Header */
+.topbar-right {
+  flex: 0 0 auto;
   display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.topbar-btn {
+  background: transparent;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.topbar-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+  border-color: #94a3b8;
+  color: #ffffff;
+}
+
+.topbar-btn-ai {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: #0b111c;
+  font-weight: 700;
+}
+
+.topbar-btn-ai:hover {
+  background: #fbbf24;
+  border-color: #fbbf24;
+  color: #0b111c;
+}
+
+/* Thin Informational Subbar Under Header */
+.info-subbar {
+  background: var(--surface-alt);
+  border-bottom: 1px solid var(--border);
+}
+
+.info-subbar-inner {
+  max-width: 1340px;
+  margin: 0 auto;
+  padding: 6px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 980px) {
+  .info-subbar-inner {
+    padding: 6px 20px;
+  }
+}
+.info-subbar-meta {
+  display: flex;
+  align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--ink-muted);
+}
+
+.civic-positioning-tag {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.info-subbar-sep {
+  color: var(--border-strong);
+  opacity: 0.4;
+}
+
+.info-subbar-links {
+  display: flex;
   align-items: center;
+  gap: 14px;
+}
+
+.subbar-link,
+.subbar-link-btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-secondary);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.subbar-link:hover,
+.subbar-link-btn:hover {
+  color: var(--crimson);
+  text-decoration: underline;
 }
 
 /* Buttons (sigma.midt.bg Editorial Monospace Style) */
