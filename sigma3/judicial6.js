@@ -6,6 +6,7 @@
   let j6Loading = null;
   let activeSub = 'impunity';
   let kzkView = 'vas';
+  let art17View = 'all';
   let j6Wired = false;
 
   async function ensureJudicial6Loaded() {
@@ -327,18 +328,22 @@
       <div class="panel-box" style="margin-bottom:16px;">
         <div class="chart-head">
           <div>
-            <h3 style="margin:0;border:none;padding:0;">Пълен регистър на 370-те актуализирани доклада на АДФИ по чл. 17, ал. 7 от ЗДФИ (${art17Reps.length} показани)</h3>
+            <h3 style="margin:0;border:none;padding:0;">Пълен регистър на 370-те актуализирани доклада на АДФИ по чл. 17, ал. 7 от ЗДФИ (${art17Reps.length} общо)</h3>
             <p class="chart-caption" style="margin-bottom:0;">
-              Доклади с промяна в обстоятелствата след проверка от Прокуратурата (чл. 19 ЗДФИ) или приключило АНД/КАНД производство, разпределени по дирекции (ДИД1-СФ до ДИД8-ВТ).
+              Директните съвпадения по ЕИК/УНП със съдебни решения по КАНД/АНД са разграничени от останалите актуализирани доклади след проверка на Прокуратурата (чл. 19 ЗДФИ).
             </p>
           </div>
-          <div style="display:flex;gap:5px;flex-wrap:wrap;">
-            ${dirBreak.map((d) => `<span class="tag tag-navy">${esc(d.directorate)}: <strong>${d.count}</strong></span>`).join('')}
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <div class="pill-row" id="art17ViewPills" style="margin:0;">
+              <button class="pill ${art17View === 'all' ? 'active' : ''}" data-a17-v="all">Всички 370 по чл. 17(7) (${art17Reps.length})</button>
+              <button class="pill ${art17View === 'direct' ? 'active' : ''}" data-a17-v="direct">Директно свързани с КАНД по ЕИК (${art17Reps.filter((x) => x.linkType === 'EXACT_EIK').length})</button>
+            </div>
+            ${dirBreak.slice(0, 6).map((d) => `<span class="tag tag-navy">${esc(d.directorate)}: <strong>${d.count}</strong></span>`).join('')}
           </div>
         </div>
         <div class="table-wrap" style="border:none;max-height:460px;overflow-y:auto;margin-top:10px;"><table>
-          <thead><tr><th>№</th><th>Код на доклад (ДИД)</th><th>Дата / Основание</th><th>Инспектиран обект (Възложител ЕИК)</th><th>Проследена съдебна / прокурорска съдба (ЕИСС &amp; чл. 17, ал. 7 ЗДФИ)</th><th>PDF / Акт</th></tr></thead>
-          <tbody>${art17Reps.slice(0, 150).map((r, i) => `<tr>
+          <thead><tr><th>№</th><th>Код на доклад (ДИД)</th><th>Дата / Основание</th><th>Инспектиран обект (Географски потвърден ЕИК)</th><th>Тип връзка и Съдебна / Прокурорска съдба</th><th>PDF / Акт</th></tr></thead>
+          <tbody>${(art17View === 'direct' ? art17Reps.filter((x) => x.linkType === 'EXACT_EIK') : art17Reps).slice(0, 150).map((r, i) => `<tr>
             <td class="mono muted">${i + 1}</td>
             <td style="white-space:nowrap;">
               <span class="tag tag-crimson">${esc(r.code)}</span>
@@ -347,12 +352,17 @@
             <td class="mono" style="white-space:nowrap;">${esc(r.date)}<div class="inst-line">${esc(r.basis)}</div></td>
             <td>
               ${r.authorityEik
-                ? `<a href="#" data-open-authority="${esc(r.authorityEik)}"><strong>${esc(r.authorityName)}</strong></a><div class="inst-line mono">ЕИК ${esc(r.authorityEik)} · ЗОП: ${fmtEur(r.authoritySpentEur || 0)}</div>`
+                ? `<a href="#" data-open-authority="${esc(r.authorityEik)}"><strong>${esc(r.authorityName)}</strong></a><div class="inst-line mono">ЕИК ${esc(r.authorityEik)} · ${esc(r.authorityRegion || '')} · ЗОП: ${fmtEur(r.authoritySpentEur || 0)}</div>`
                 : `<span style="font-size:12px;">${esc(r.object.slice(0, 95))}</span>`}
             </td>
             <td style="font-size:12px;">
-              <div><strong>${esc(r.linkedCourtCase || 'Чл. 17, ал. 7 ЗДФИ')}</strong></div>
-              <div class="inst-line">
+              <div>
+                ${r.linkType === 'EXACT_EIK'
+                  ? '<span class="tag tag-teal">ДИРЕКТНО СЪВПАДЕНИЕ (ЕИК/УНП)</span>'
+                  : '<span class="tag tag-slate">ЧЛ. 17, АЛ. 7 ЗДФИ (АКТУАЛИЗИРАН PDF)</span>'}
+                <strong>${esc(r.linkedCourtCase || 'Чл. 17, ал. 7 ЗДФИ')}</strong>
+              </div>
+              <div class="inst-line" style="margin-top:3px;">
                 <span class="tag ${String(r.courtFate).includes('ОТМЕНЕНО') ? 'tag-crimson' : String(r.courtFate).includes('ПОТВЪРДЕНО') ? 'tag-teal' : 'tag-ochre'}">${esc(r.courtFate)}</span>
                 ${r.annulmentReason && r.annulmentReason !== '—' ? `<span class="tag tag-plum">${esc(r.annulmentReason)}</span>` : ''}
               </div>
@@ -361,7 +371,7 @@
               <a class="btn" style="padding:3px 8px;font-size:11px;" href="${esc(r.url)}" target="_blank" rel="noopener">Доклад PDF ↗</a>
               ${r.linkedCaseUrl && r.linkedCaseUrl !== r.url ? `<a class="btn" style="padding:3px 7px;font-size:10.5px;margin-left:4px;" href="${esc(r.linkedCaseUrl)}" target="_blank" rel="noopener">Съд ↗</a>` : ''}
             </td>
-          </tr>`).join('')}</tbody>
+          </tr>`).join('') || `<tr><td colspan="6" class="loading">Няма записи за избрания филтър.</td></tr>`}</tbody>
         </table></div>
       </div>
 
@@ -414,6 +424,13 @@
           </tr>`).join('')}</tbody>
         </table></div>
       </div>`;
+
+    document.getElementById('art17ViewPills')?.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-a17-v]');
+      if (!b) return;
+      art17View = b.dataset.a17V;
+      renderMod2Impunity(host, q);
+    });
   }
 
   // ---- MODULE J3: LEGAL & EXPERT GRAPH ----
