@@ -202,7 +202,7 @@
     const refreshed = latestDate || '2026-11-20';
     const asOf = latestDate || '2026-11-20';
     document.getElementById('syncSubtitle').textContent =
-      `Жив масив sigma.midt.bg + Сметна палата + ТР + ЕПЕП/АДФИ/КЗК · Обновено: ${refreshed} · ${fmtInt(t.contracts)} дог. · ${fmtInt(t.authorities)} инст. · ${fmtInt(t.bidders)} фирми`;
+      `Данни към: ${refreshed} · ${fmtInt(t.contracts)} дог. · ${fmtInt(t.authorities)} инст.`;
     document.getElementById('asOfChip').textContent = `Данни към: ${asOf}`;
     document.getElementById('f1Val').textContent = fmtEur(t.valueEur);
     document.getElementById('f1Sub').textContent = `${fmtInt(t.contracts)} договора · ${fmtInt(t.authorities)} възложители · ${fmtInt(t.bidders)} фирми`;
