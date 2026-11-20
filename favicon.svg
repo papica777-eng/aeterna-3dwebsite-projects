@@ -1,57 +1,24 @@
-<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="НА СВЕТЛО — Прожектор върху обществените поръчки и дивидентите">
-  <defs>
-    <radialGradient id="vaultBg" cx="35%" cy="30%" r="75%">
-      <stop offset="0%" stop-color="#111a2e" />
-      <stop offset="55%" stop-color="#070b14" />
-      <stop offset="100%" stop-color="#03050a" />
-    </radialGradient>
-    <linearGradient id="bezelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#fbbf24" />
-      <stop offset="35%" stop-color="#38bdf8" />
-      <stop offset="70%" stop-color="#1e293b" />
-      <stop offset="100%" stop-color="#f59e0b" />
-    </linearGradient>
-    <linearGradient id="beamOuter" x1="16%" y1="16%" x2="88%" y2="88%">
-      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.95" />
-      <stop offset="25%" stop-color="#fbbf24" stop-opacity="0.6" />
-      <stop offset="60%" stop-color="#38bdf8" stop-opacity="0.28" />
-      <stop offset="100%" stop-color="#10b981" stop-opacity="0.0" />
-    </linearGradient>
-    <linearGradient id="beamCore" x1="18%" y1="18%" x2="82%" y2="82%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.98" />
-      <stop offset="35%" stop-color="#fde047" stop-opacity="0.65" />
-      <stop offset="75%" stop-color="#fbbf24" stop-opacity="0.22" />
-      <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.0" />
-    </linearGradient>
-    <linearGradient id="goldBar" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#fef08a" />
-      <stop offset="45%" stop-color="#f59e0b" />
-      <stop offset="100%" stop-color="#b45309" />
-    </linearGradient>
-    <linearGradient id="emeraldBar" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#6ee7b7" />
-      <stop offset="50%" stop-color="#10b981" />
-      <stop offset="100%" stop-color="#047857" />
-    </linearGradient>
-    <clipPath id="vaultClip">
-      <circle cx="60" cy="60" r="54" />
-    </clipPath>
-  </defs>
-  <circle cx="60" cy="60" r="57.5" fill="#050811" stroke="url(#bezelGrad)" stroke-width="3" />
-  <circle cx="60" cy="60" r="54" fill="url(#vaultBg)" />
-  <g clip-path="url(#vaultClip)">
-    <polygon points="23,23 118,52 118,118 50,118" fill="url(#beamOuter)" />
-    <polygon points="23,23 114,68 98,114 66,114" fill="url(#beamCore)" />
-    <ellipse cx="78" cy="88" rx="28" ry="13" fill="#fbbf24" fill-opacity="0.16" stroke="#fbbf24" stroke-width="1.2" stroke-dasharray="4 2" />
-    <rect x="56" y="76" width="10" height="18" rx="1.8" fill="url(#goldBar)" stroke="#fef08a" stroke-width="0.9" />
-    <rect x="70" y="66" width="10" height="28" rx="1.8" fill="url(#goldBar)" stroke="#ffffff" stroke-width="1" />
-    <rect x="84" y="54" width="11" height="40" rx="1.8" fill="url(#emeraldBar)" stroke="#a7f3d0" stroke-width="1.2" />
-    <path d="M 53 73 L 71 59 L 90 45" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" />
-    <polygon points="94,42 86,43 91,50" fill="#ffffff" />
-    <circle cx="64" cy="52" r="11.5" fill="#0b1324" stroke="#fbbf24" stroke-width="2.2" />
-    <text x="64" y="57.5" text-anchor="middle" fill="#fef08a" font-family="monospace" font-size="16" font-weight="700">€</text>
-    <polygon points="14,10 29,15 24,30 10,24" fill="#1e293b" stroke="#fbbf24" stroke-width="1.6" />
-    <ellipse cx="25" cy="23" rx="4.8" ry="7.8" transform="rotate(-45 25 23)" fill="#fef08a" stroke="#ffffff" stroke-width="1.6" />
-    <circle cx="25" cy="23" r="3.4" fill="#ffffff" />
+<svg viewBox="0 0 165 115" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="НА СВЕТЛО · СИГМА 3.0">
+  <rect width="165" height="115" rx="14" fill="#faf8f5" />
+  <polygon points="50,36 156,6 156,90 50,60" fill="#ac1b18" fill-opacity="0.16" />
+  <g fill="#ac1b18">
+    <rect x="4" y="37" width="12" height="22" rx="2.5" />
+    <rect x="18" y="33" width="4" height="30" rx="1" />
+    <rect x="24" y="33" width="4" height="30" rx="1" />
+    <path d="M 30 31 L 47 23.5 C 49.2 22.5 51 24 51 26.5 L 51 69.5 C 51 72 49.2 73.5 47 72.5 L 30 65 Z" />
+    <path d="M 21 65 L 21 75 C 21 78 23 80 26 80 L 36 80" fill="none" stroke="#ac1b18" stroke-width="5.5" stroke-linecap="round" />
+    <path d="M 27 78 L 6 104" fill="none" stroke="#ac1b18" stroke-width="10" stroke-linecap="round" />
+    <path d="M 27 78 L 41 104" fill="none" stroke="#ac1b18" stroke-width="7.5" stroke-linecap="round" />
   </g>
+  <g fill="#171511" transform="translate(12, 0)">
+    <rect x="60" y="25" width="76" height="2.4" rx="1.2" fill="#ac1b18" />
+    <rect x="62" y="32" width="78" height="2.4" rx="1.2" />
+    <rect x="66" y="39" width="66" height="2.4" rx="1.2" fill="#ac1b18" />
+    <rect x="59" y="46" width="73" height="2.4" rx="1.2" />
+    <rect x="61" y="53" width="68" height="2.4" rx="1.2" fill="#ac1b18" />
+    <rect x="61" y="60" width="71" height="2.4" rx="1.2" />
+    <rect x="67" y="67" width="45" height="2.4" rx="1.2" fill="#ac1b18" />
+    <rect x="68" y="74" width="40" height="2.4" rx="1.2" />
+  </g>
+  <circle fill="#ac1b18" cx="134.65" cy="11" r="6.5" />
 </svg>
