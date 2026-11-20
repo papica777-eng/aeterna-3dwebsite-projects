@@ -1,0 +1,32 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — JUDICIAL x PROCUREMENT RADAR (6 Modules: АДФИ, КЗК, ВАС, ЕИСС)
+// =============================================================================
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+.judicial-radar-scope {
+  .eiss-live-panel {
+    @include m.radar-panel-card(t.node-prop("judicial", color));
+  }
+
+  .lawyer-network-panel {
+    @include m.radar-panel-card(t.node-prop("lawyer", color));
+  }
+
+  .expert-network-panel {
+    @include m.radar-panel-card(t.node-prop("expert", color));
+  }
+
+  .table-wrap {
+    @include m.thin-scrollbar();
+  }
+}
+
+.eiss-disposition-box {
+  padding: 6px 9px;
+  background: #f8fafc;
+  border-left: 3px solid var(--node-judicial, #4f46e5);
+  border-radius: 3px;
+  font-size: 11.6px;
+  line-height: 1.38;
+}

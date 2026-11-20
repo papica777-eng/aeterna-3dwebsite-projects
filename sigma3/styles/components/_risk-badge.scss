@@ -1,0 +1,34 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — DYNAMIC RISK INDEX (0–100) BADGES (_risk-badge.scss)
+// =============================================================================
+@use "sass:map";
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+:root {
+  @each $lvl, $cfg in t.$risk-levels {
+    --risk-#{$lvl}-fg: #{map.get($cfg, fg)};
+    --risk-#{$lvl}-bg: #{map.get($cfg, bg)};
+    --risk-#{$lvl}-border: #{map.get($cfg, border)};
+  }
+}
+
+@each $lvl, $cfg in t.$risk-levels {
+  .risk-tier--#{$lvl} {
+    @include m.badge-chip(map.get($cfg, fg), map.get($cfg, bg), map.get($cfg, border));
+  }
+}
+
+.risk-meter-track {
+  width: 100%;
+  height: 6px;
+  background: #f1f5f9;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.risk-meter-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.25s ease;
+}

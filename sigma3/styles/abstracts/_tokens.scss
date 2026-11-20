@@ -1,0 +1,55 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — DESIGN SYSTEM TOKENS (Dart Sass @use / @forward)
+//   Exports SCSS maps (map.get) AND :root CSS Custom Properties for JS/SVG/Canvas
+// =============================================================================
+@use "sass:map";
+
+// 9-Node Knowledge Graph Palette (6 Core + 3 Judicial/Forensic Node Types)
+$graph-nodes: (
+  "official":   (color: #b91c1c, bg: #fef2f2, border: #fecaca, shape: "circle",   label: "Длъжностно лице"),
+  "family":     (color: #b45309, bg: #fffbeb, border: #fde68a, shape: "circle",   label: "Свързано лице"),
+  "company":    (color: #7c2d12, bg: #fff7ed, border: #fed7aa, shape: "circle",   label: "Фирма-изпълнител"),
+  "inst":       (color: #1e3a8a, bg: #eff6ff, border: #bfdbfe, shape: "circle",   label: "Възложител (4 344)"),
+  "consortium": (color: #6b21a8, bg: #faf5ff, border: #e9d5ff, shape: "circle",   label: "Консорциум / ДЗЗД"),
+  "donor":      (color: #0f766e, bg: #f0fdfa, border: #99f6e4, shape: "circle",   label: "Политически дарител"),
+  "judicial":   (color: #4f46e5, bg: #eef2ff, border: #c7d2fe, shape: "diamond",  label: "Съдебно дело / КЗК / АДФИ"),
+  "lawyer":     (color: #0284c7, bg: #f0f9ff, border: #bae6fd, shape: "square",   label: "Адвокат / Пълномощник"),
+  "expert":     (color: #059669, bg: #ecfdf5, border: #a7f3d0, shape: "triangle", label: "Вещо лице / Надзор")
+);
+
+// Composite Risk Index Scale (0–100)
+$risk-levels: (
+  "critical": (min: 75, max: 100, fg: #991b1b, bg: #fee2e2, border: #fca5a5, label: "КРИТИЧЕН (75–100)"),
+  "high":     (min: 50, max: 74,  fg: #9a3412, bg: #ffedd5, border: #fdba74, label: "ВИСОК (50–74)"),
+  "elevated": (min: 25, max: 49,  fg: #854d0e, bg: #fef9c3, border: #fde047, label: "ПОВИШЕН (25–49)"),
+  "low":      (min: 0,  max: 24,  fg: #065f46, bg: #d1fae5, border: #6ee7b7, label: "НИСЪК (0–24)")
+);
+
+// Restrictive NLP Clause Categories (Art. 49 ZOP & Art. 2(2) ZOP)
+$nlp-clauses: (
+  "brand":      (fg: #991b1b, bg: #fee2e2, border: #f87171, label: "Търговска марка / модел (чл. 49, ал. 2 ЗОП)"),
+  "turnover":   (fg: #9a3412, bg: #ffedd5, border: #fb923c, label: "Свръх-оборот / специфичен опит"),
+  "iso":        (fg: #5b21b6, bg: #f3e8ff, border: #c084fc, label: "Кумулативни ISO сертификати"),
+  "deadline":   (fg: #1e40af, bg: #dbeafe, border: #60a5fa, label: "Съкратен срок / петъчен търг"),
+  "SingleBid":  (fg: #be123c, bg: #ffe4e6, border: #fda4af, label: "1 оферта след отстраняване")
+);
+
+// Typography & Density Tokens
+$font-serif: "Newsreader", "Source Serif 4", Georgia, serif;
+$font-sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+$font-mono:  "JetBrains Mono", "Fira Code", Consolas, monospace;
+
+$density-modes: (
+  "presentation": (cell-pad-y: 9px, cell-pad-x: 11px, font-size: 12.8px, row-line: 1.42),
+  "compact":      (cell-pad-y: 4px, cell-pad-x: 7px,  font-size: 11.4px, row-line: 1.22)
+);
+
+@function node-prop($node-key, $prop) {
+  $node: map.get($graph-nodes, $node-key);
+  @return map.get($node, $prop);
+}
+
+@function risk-prop($level-key, $prop) {
+  $lvl: map.get($risk-levels, $level-key);
+  @return map.get($lvl, $prop);
+}

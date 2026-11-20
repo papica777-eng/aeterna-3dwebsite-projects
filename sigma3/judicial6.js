@@ -5,7 +5,7 @@
   let j6Data = null;
   let j6Loading = null;
   let activeSub = 'impunity';
-  let kzkView = 'prelim';
+  let kzkView = 'vas';
   let j6Wired = false;
 
   async function ensureJudicial6Loaded() {
@@ -132,11 +132,15 @@
     const m6 = j6Data.module6_criminalEppo || {};
     const kzkTot = m4.year2026Totals || {};
     const kzkIng = m4.ingestedCounts || {};
+    const eissAdfiCnt = (m2.liveEissAndKandCases || []).length;
+    const eissVasCnt = (m4.liveVasFinalActs || []).length;
+    const eissTdCnt = (m1.liveEissCommercialDisputes || []).length;
+    const eissLawCnt = (m3.eissExtractedLawyers || []).length;
     el.innerHTML = `
-      <div class="kpi-card"><div class="kpi-label">1. Съдебно-свързани договори</div><div class="kpi-val">${fmtInt(m1.litigationLinkedContractsCount)} дог.</div><div class="kpi-sub">${fmtEur(m1.litigationLinkedEur)} · ${(m1.highRiskAnnexDisputeMatrix || []).length} риск спорове</div></div>
-      <div class="kpi-card emphasis"><div class="kpi-label">2. АДФИ Инспекции (2024–26)</div><div class="kpi-val" style="color:var(--crimson);">${fmtInt(m2.totalReports)} доклада</div><div class="kpi-sub">${fmtInt(m2.matchedAuthoritiesCount)} инст. · ${fmtInt(m2.updatedArt17Count)} по чл. 17(7)</div></div>
-      <div class="kpi-card"><div class="kpi-label">3. Адвокати и Вещи лица</div><div class="kpi-val">${fmtInt(m3.lawFirmsCount)} / ${fmtInt((m3.adfiRegisteredExperts || {}).totalExperts)}</div><div class="kpi-sub">Кантори (${fmtEur(m3.lawFirmsTotalEur)}) · АДФИ експерти</div></div>
-      <div class="kpi-card emphasis"><div class="kpi-label">4. КЗК / ВАС ЗОП (2026 живо)</div><div class="kpi-val">${fmtInt(kzkTot.proceedings)} дела</div><div class="kpi-sub">${kzkIng.prelimGranted || 0} допуснати предв. изп. · ${kzkIng.decisionsOverturned || 0} отменени</div></div>
+      <div class="kpi-card"><div class="kpi-label">1. Търговски дела (ЕИСС) &amp; ЗОП</div><div class="kpi-val">${fmtInt(eissTdCnt)} ТД / ${fmtInt(m1.litigationLinkedContractsCount)} дог.</div><div class="kpi-sub">Живи ТД/ВТД дела с диспозитив · ${fmtEur(m1.litigationLinkedEur)}</div></div>
+      <div class="kpi-card emphasis"><div class="kpi-label">2. АДФИ + КАНД/АНД (ЕИСС)</div><div class="kpi-val" style="color:var(--crimson);">${fmtInt(m2.updatedArt17Count)} чл.17(7) · ${eissAdfiCnt} дела</div><div class="kpi-sub">${fmtInt(m2.totalReports)} докл. АДФИ · Потвърдени vs Отменени НП</div></div>
+      <div class="kpi-card"><div class="kpi-label">3. Адвокати и Вещи лица</div><div class="kpi-val">${fmtInt(m3.lawFirmsCount)} кант. / ${eissLawCnt} юристи</div><div class="kpi-sub">${fmtEur(m3.lawFirmsTotalEur)} · ${fmtInt((m3.adfiRegisteredExperts || {}).totalExperts)} АДФИ експерти</div></div>
+      <div class="kpi-card emphasis"><div class="kpi-label">4. КЗК &amp; ВАС IV отд. (ЕИСС)</div><div class="kpi-val">${eissVasCnt} акта ВАС</div><div class="kpi-sub">${kzkIng.prelimGranted || 0} допуснати предв. изп. · ${kzkIng.decisionsOverturned || 0} отм. в КЗК</div></div>
       <div class="kpi-card"><div class="kpi-label">5. Несъстоятелност / Феникс</div><div class="kpi-val">${fmtInt(m5.burnoutFirmsCount)} burnout</div><div class="kpi-sub">${m5.distressedOrPledgedCount} със запори/залози ТР · ${m5.phoenixChainsCount} вериги</div></div>
       <div class="kpi-card"><div class="kpi-label">6. ЕС Средства / EPPO Радар</div><div class="kpi-val">${fmtEur(m6.euFundedTotalEur)}</div><div class="kpi-sub">${m6.euSingleOfferSharePct}% с 1 оф. · ${fmtInt(m6.eppoHighRiskCount)} EPPO тригера</div></div>`;
   }
@@ -153,24 +157,64 @@
     else if (activeSub === 'eppo') renderMod6Eppo(host, q);
   }
 
-  // ---- MODULE J1: COLLUSIVE LITIGATION ----
+  // ---- MODULE J1: COLLUSIVE LITIGATION (LIVE EISS COMMERCIAL DISPUTES + ANNEX MATRIX) ----
   function renderMod1Collusive(host, q) {
     const { fmtEur, esc } = api();
     const m1 = j6Data.module1_collusiveLitigation || {};
+    let eissTd = m1.liveEissCommercialDisputes || [];
     let watch = m1.highRiskAnnexDisputeMatrix || [];
     let lits = m1.topLitigationContracts || [];
     if (q) {
+      eissTd = eissTd.filter((c) => `${c.court} ${c.caseNo} ${c.sideLeft} ${c.sideRight} ${c.authorityName} ${c.contractorName} ${c.disposition} ${c.outcome}`.toLowerCase().includes(q));
       watch = watch.filter((w) => `${w.authority} ${w.contractor} ${w.unp}`.toLowerCase().includes(q));
       lits = lits.filter((l) => `${l.authority} ${l.contractor} ${l.subject}`.toLowerCase().includes(q));
     }
     const sc = m1.eissConnectorSchema || {};
+    const outBreak = m1.commercialOutcomeBreakdown || [];
     host.innerHTML = `
       <div class="editorial-note note-crimson">
         <div>
-          <strong>1. Фиктивни съдебни спорове за източване на бюджет (Collusive Litigation):</strong>
-          Засича рисковата зона, в която изпълнител печели поръчка и иска допълнителни суми чрез анекси или съдебни спогодби с възложителя, заобикаляйки ЗОП.
-          Тъй като публичният портал <code>legalacts.justice.bg</code> е защитен с CAPTCHA (която спазваме стриктно без заобикаляне), СИГМА 3.0 съчетава <strong>живата матрица „Анекс оскъпяване &times; КЗК/АДФИ спорове“</strong>, <strong>договорите за съдебни спогодби/процесуално представителство от ЦАИС ЕОП</strong> и готовата схема за сървърна <strong>RegiX / ЕИСС интеграция за МИДТ</strong>: <code>${esc(sc.detectionRule)}</code>.
+          <strong>1. Съдебни спорове Изпълнител &harr; Възложител (Директен ЕПЕП / ЕИСС API достъп без CAPTCHA + Анекс радар):</strong>
+          Автоматично извличане на пълните диспозитиви, мотиви, страни и адвокати по <strong>реални търговски и въззивни търговски дела (ТД / ВТД)</strong> между фирми-изпълнители и публични възложители директно от <code>ecase.justice.bg</code> (<code>/Case/LoadData &rarr; /Case/ActsLoadData &rarr; /api/file/download/{gid}</code>), съчетано с матрицата на анексираните договори (&ge;20–50% оскъпяване).
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            ${outBreak.map((o) => `<span class="tag ${o.outcome.includes('ОСЪДЕН') || o.outcome.includes('СПОГОДБА') ? 'tag-crimson' : o.outcome.includes('ОТХВЪРЛЕН') ? 'tag-teal' : 'tag-navy'}">${esc(o.outcome)}: <strong>${o.count}</strong></span>`).join('')}
+          </div>
         </div>
+      </div>
+
+      <div class="panel-box" style="margin-bottom:16px;">
+        <h3>Живи Търговски и Въззивни дела (ТД / ВТД) между Изпълнители и Възложители в ЕПЕП / ЕИСС (${eissTd.length} дела с извлечен диспозитив)</h3>
+        <div class="table-wrap" style="border:none;max-height:500px;overflow-y:auto;"><table>
+          <thead><tr><th>Съд / Дело / Акт</th><th>Страни (Ищец &harr; Ответник)</th><th>Възложител (4 344) &amp; Роля</th><th>Извлечен диспозитив от ЕИСС и Съдебен състав</th><th>Пълен акт</th></tr></thead>
+          <tbody>${eissTd.map((c) => `<tr>
+            <td style="white-space:nowrap;">
+              <strong>${esc(c.court)}</strong>
+              <div class="inst-line mono">${esc(c.caseNo)} · ${esc(c.actNo)}</div>
+              <div class="inst-line mono muted">${esc(c.actDate)}</div>
+            </td>
+            <td>
+              <div style="font-size:12px;"><strong>Ищец:</strong> ${esc(c.sideLeft)}</div>
+              <div style="font-size:12px;"><strong>Ответник:</strong> ${esc(c.sideRight)}</div>
+              ${c.contractorEik ? `<div class="inst-line"><a href="#" data-open-company="${esc(c.contractorEik)}">Фирма в ЗОП: ${esc(c.contractorName)} (${fmtEur(c.contractorWonEur)})</a></div>` : ''}
+            </td>
+            <td>
+              <a href="#" data-open-authority="${esc(c.authorityEik)}"><strong>${esc(c.authorityName)}</strong></a>
+              <div class="inst-line mono">ЕИК ${esc(c.authorityEik)} · ${esc(c.authorityRole)}</div>
+              <div style="margin-top:4px;"><span class="tag ${c.severity === 'critical' ? 'tag-crimson' : c.severity === 'warn' ? 'tag-ochre' : 'tag-teal'}">${esc(c.outcome)}</span></div>
+              ${c.claimedAmount ? `<div class="inst-line mono" style="color:var(--crimson);font-weight:700;">Претенция/Присъдено: ${esc(c.claimedAmount)}</div>` : ''}
+            </td>
+            <td style="font-size:11.8px;max-width:440px;">
+              <div>${esc((c.disposition || '').slice(0, 260))}${(c.disposition || '').length > 260 ? '…' : ''}</div>
+              ${(c.judges && c.judges.length) ? `<div class="inst-line muted">Съдии: ${esc(c.judges.join(', '))}</div>` : ''}
+              ${(c.lawyers && c.lawyers.length) ? `<div class="inst-line" style="color:#0284c7;">Юристи: ${esc(c.lawyers.join(' · '))}</div>` : ''}
+              ${(c.experts && c.experts.length) ? `<div class="inst-line" style="color:#059669;">Вещи лица: ${esc(c.experts.join(', '))}</div>` : ''}
+            </td>
+            <td style="white-space:nowrap;">
+              <a class="btn" style="padding:3px 8px;font-size:11px;margin-bottom:4px;display:inline-block;" href="${esc(c.actDownloadUrl)}" target="_blank" rel="noopener">Акт HTML ↗</a><br/>
+              <a class="btn" style="padding:2px 7px;font-size:10.5px;" href="${esc(c.caseUrl)}" target="_blank" rel="noopener">ЕПЕП Карта ↗</a>
+            </td>
+          </tr>`).join('') || `<tr><td colspan="5" class="loading">Няма намерени търговски дела за филтъра.</td></tr>`}</tbody>
+        </table></div>
       </div>
 
       <div class="panel-box" style="margin-bottom:16px;">
@@ -190,7 +234,7 @@
 
       <div class="panel-box">
         <h3>Договори в ЦАИС ЕОП, касаещи съдебни спорове, арбитраж, спогодби и принудително изпълнение (Топ ${lits.length})</h3>
-        <div class="table-wrap" style="border:none;max-height:420px;overflow-y:auto;"><table>
+        <div class="table-wrap" style="border:none;max-height:400px;overflow-y:auto;"><table>
           <thead><tr><th>Дата</th><th>Възложител &rarr; Изпълнител</th><th>Предмет</th><th class="num">Стойност (€)</th><th>JSON</th></tr></thead>
           <tbody>${lits.map((l) => `<tr>
             <td class="mono" style="white-space:nowrap;">${esc(l.signedAt)}</td>
@@ -203,33 +247,127 @@
       </div>`;
   }
 
-  // ---- MODULE J2: ADFI IMPUNITY INDEX (ALL 2,229 LIVE REPORTS!) ----
+  // ---- MODULE J2: ADFI IMPUNITY INDEX (ALL 2,229 REPORTS + 370 ART.17(7) FATE + LIVE EISS KAND/AND!) ----
   function renderMod2Impunity(host, q) {
     const { fmtEur, fmtInt, esc, riskBadgeHtml } = api();
     const m2 = j6Data.module2_impunityIndex || {};
+    let eissCases = m2.liveEissAndKandCases || [];
+    let art17Reps = m2.updatedArt17Reports || [];
     let insts = m2.topInspectedAuthorities || [];
     let uninsp = m2.uninspectedMegaSpenders || [];
     if (q) {
+      eissCases = eissCases.filter((c) => `${c.court} ${c.caseNo} ${c.andCaseNo} ${c.npNo} ${c.adfiOrder} ${c.authorityName} ${c.outcome} ${c.annulmentReason} ${c.disposition}`.toLowerCase().includes(q));
+      art17Reps = art17Reps.filter((r) => `${r.code} ${r.object} ${r.authorityName} ${r.authorityEik} ${r.directorate} ${r.linkedCourtCase} ${r.courtFate}`.toLowerCase().includes(q));
       insts = insts.filter((a) => `${a.name} ${a.eik} ${a.region}`.toLowerCase().includes(q));
       uninsp = uninsp.filter((a) => `${a.name} ${a.eik} ${a.region}`.toLowerCase().includes(q));
     }
     const byYr = m2.byYear || {};
     const basisRows = m2.byBasis || [];
     const maxB = Math.max(...basisRows.map((b) => b.count), 1);
+    const outBreak = m2.eissOutcomeBreakdown || [];
+    const annulBreak = m2.eissAnnulmentReasons || [];
+    const dirBreak = m2.updatedByDirectorate || [];
 
     host.innerHTML = `
       <div class="editorial-note note-crimson">
         <div>
-          <strong>2. Индекс на безнаказаността (АДФИ 2024–2026 — ВСИЧКИ ${fmtInt(m2.totalReports)} официални доклада на живо):</strong>
-          Пълен автоматичен инжест от <code>adfi.minfin.bg/bg/34</code> (чл. 17 ЗДФИ). Кръстосани са <strong>${fmtInt(m2.matchedReports)} доклада</strong> към <strong>${fmtInt(m2.matchedAuthoritiesCount)} възложители</strong> от ЦАИС ЕОП.
-          Общо <strong>${fmtInt(m2.updatedArt17Count)} доклада (${m2.updatedArt17Pct}%)</strong> са <strong>актуализирани по чл. 17, ал. 7 ЗДФИ</strong> (промяна в административнонаказателното / съдебното / начетното производство след инспекцията!).
-          По години: ${Object.entries(byYr).map(([y, c]) => `<strong>${y}:</strong> ${fmtInt(c)}`).join(' · ')}.
+          <strong>2. Индекс на безнаказаността: Проследяване на 370-те актуализирани доклада на АДФИ (чл. 17, ал. 7 ЗДФИ) и съдебната съдба на НП по АНД / КАНД в ЕИСС:</strong>
+          Автоматично свързване на докладите от <code>adfi.minfin.bg/bg/34</code> (<strong>${fmtInt(m2.totalReports)} доклада</strong>, от които <strong>${fmtInt(m2.updatedArt17Count)} актуализирани по чл. 17, ал. 7 ЗДФИ</strong>) с конкретните <strong>административнонаказателни дела (АНД / КАНД)</strong> в районните и административните съдилища чрез директния ЕПЕП / ЕИСС API поток (<code>ecase.justice.bg</code> без CAPTCHA).
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            ${outBreak.map((o) => `<span class="tag ${o.outcome.includes('ОТМЕНЕНО') ? 'tag-crimson' : o.outcome.includes('ИЗМЕНЕНО') ? 'tag-ochre' : 'tag-teal'}">${esc(o.outcome)}: <strong>${o.count}</strong></span>`).join('')}
+            ${annulBreak.map((a) => `<span class="tag tag-plum">Причина за отмяна — ${esc(a.reason)}: <strong>${a.count}</strong></span>`).join('')}
+          </div>
         </div>
+      </div>
+
+      <div class="panel-box" style="margin-bottom:16px;">
+        <h3>Съдебна съдба на наказателните постановления (НП) на АДФИ и Сметната палата — Живи КАНД / АНД решения от ЕИСС (${eissCases.length} дела с пълни мотиви)</h3>
+        <div class="table-wrap" style="border:none;max-height:520px;overflow-y:auto;"><table>
+          <thead><tr><th>Съд / КАНД &amp; АНД №</th><th>НП / АУАН / Заповед АДФИ</th><th>Инспектиран възложител &amp; УНП</th><th>Нарушение и Глоба</th><th>Съдебен резултат (Потвърдено / Намалено / Отменено)</th><th>Пълен акт</th></tr></thead>
+          <tbody>${eissCases.map((c) => `<tr>
+            <td style="white-space:nowrap;">
+              <strong>${esc(c.court)}</strong>
+              <div class="inst-line mono">${esc(c.caseNo)} · ${esc(c.actNo)}</div>
+              ${c.andCaseNo ? `<div class="inst-line mono" style="color:var(--plum);">Първа инст.: ${esc(c.andCourt ? c.andCourt + ' ' : '')}${esc(c.andCaseNo)}</div>` : ''}
+              <div class="inst-line mono muted">${esc(c.actDate)}</div>
+            </td>
+            <td style="font-size:12px;">
+              <div><strong>${esc(c.agency)}:</strong> ${esc(c.agencyRole)}</div>
+              ${c.npNo ? `<div class="inst-line mono"><strong>НП №</strong> ${esc(c.npNo)}</div>` : ''}
+              ${c.auanNo ? `<div class="inst-line mono">АУАН № ${esc(c.auanNo)}</div>` : ''}
+              ${c.adfiOrder ? `<div class="inst-line mono" style="color:var(--crimson);">${esc(c.adfiOrder)}</div>` : ''}
+            </td>
+            <td>
+              ${c.authorityEik
+                ? `<a href="#" data-open-authority="${esc(c.authorityEik)}"><strong>${esc(c.authorityName)}</strong></a><div class="inst-line mono">ЕИК ${esc(c.authorityEik)} (${esc(c.matchMethod)})</div>`
+                : `<strong>${esc(c.authorityName)}</strong>`}
+              ${c.unp ? `<div class="inst-line mono">УНП: <strong>${esc(c.unp)}</strong></div>` : ''}
+            </td>
+            <td style="font-size:12px;">
+              <div><span class="tag tag-navy">${esc(c.violatedArticle)}</span></div>
+              ${c.fineAmount ? `<div class="inst-line mono" style="color:var(--crimson);font-weight:700;margin-top:4px;">Санкция: ${esc(c.fineAmount)}</div>` : '<div class="inst-line muted">По ЗОП / ЗДФИ</div>'}
+            </td>
+            <td style="max-width:410px;font-size:11.8px;">
+              <div>
+                <span class="tag ${c.severity === 'critical' ? 'tag-crimson' : c.severity === 'warn' ? 'tag-ochre' : 'tag-teal'}">${esc(c.outcome)}</span>
+                ${c.annulmentReason && c.annulmentReason !== '—' ? `<span class="tag tag-plum">${esc(c.annulmentReason)}</span>` : ''}
+              </div>
+              <div style="margin-top:4px;">${esc((c.disposition || '').slice(0, 230))}${(c.disposition || '').length > 230 ? '…' : ''}</div>
+              ${(c.judges && c.judges.length) ? `<div class="inst-line muted">Съдии: ${esc(c.judges.join(', '))}</div>` : ''}
+              ${(c.lawyers && c.lawyers.length) ? `<div class="inst-line" style="color:#0284c7;">${esc(c.lawyers.join(' · '))}</div>` : ''}
+            </td>
+            <td style="white-space:nowrap;">
+              <a class="btn" style="padding:3px 8px;font-size:11px;margin-bottom:4px;display:inline-block;" href="${esc(c.actDownloadUrl)}" target="_blank" rel="noopener">Акт HTML ↗</a><br/>
+              <a class="btn" style="padding:2px 7px;font-size:10.5px;" href="${esc(c.caseUrl)}" target="_blank" rel="noopener">ЕПЕП ↗</a>
+            </td>
+          </tr>`).join('') || `<tr><td colspan="6" class="loading">Няма намерени КАНД/АНД дела за филтъра.</td></tr>`}</tbody>
+        </table></div>
+      </div>
+
+      <div class="panel-box" style="margin-bottom:16px;">
+        <div class="chart-head">
+          <div>
+            <h3 style="margin:0;border:none;padding:0;">Пълен регистър на 370-те актуализирани доклада на АДФИ по чл. 17, ал. 7 от ЗДФИ (${art17Reps.length} показани)</h3>
+            <p class="chart-caption" style="margin-bottom:0;">
+              Доклади с промяна в обстоятелствата след проверка от Прокуратурата (чл. 19 ЗДФИ) или приключило АНД/КАНД производство, разпределени по дирекции (ДИД1-СФ до ДИД8-ВТ).
+            </p>
+          </div>
+          <div style="display:flex;gap:5px;flex-wrap:wrap;">
+            ${dirBreak.map((d) => `<span class="tag tag-navy">${esc(d.directorate)}: <strong>${d.count}</strong></span>`).join('')}
+          </div>
+        </div>
+        <div class="table-wrap" style="border:none;max-height:460px;overflow-y:auto;margin-top:10px;"><table>
+          <thead><tr><th>№</th><th>Код на доклад (ДИД)</th><th>Дата / Основание</th><th>Инспектиран обект (Възложител ЕИК)</th><th>Проследена съдебна / прокурорска съдба (ЕИСС &amp; чл. 17, ал. 7 ЗДФИ)</th><th>PDF / Акт</th></tr></thead>
+          <tbody>${art17Reps.slice(0, 150).map((r, i) => `<tr>
+            <td class="mono muted">${i + 1}</td>
+            <td style="white-space:nowrap;">
+              <span class="tag tag-crimson">${esc(r.code)}</span>
+              <div class="inst-line mono">${esc(r.directorate)}</div>
+            </td>
+            <td class="mono" style="white-space:nowrap;">${esc(r.date)}<div class="inst-line">${esc(r.basis)}</div></td>
+            <td>
+              ${r.authorityEik
+                ? `<a href="#" data-open-authority="${esc(r.authorityEik)}"><strong>${esc(r.authorityName)}</strong></a><div class="inst-line mono">ЕИК ${esc(r.authorityEik)} · ЗОП: ${fmtEur(r.authoritySpentEur || 0)}</div>`
+                : `<span style="font-size:12px;">${esc(r.object.slice(0, 95))}</span>`}
+            </td>
+            <td style="font-size:12px;">
+              <div><strong>${esc(r.linkedCourtCase || 'Чл. 17, ал. 7 ЗДФИ')}</strong></div>
+              <div class="inst-line">
+                <span class="tag ${String(r.courtFate).includes('ОТМЕНЕНО') ? 'tag-crimson' : String(r.courtFate).includes('ПОТВЪРДЕНО') ? 'tag-teal' : 'tag-ochre'}">${esc(r.courtFate)}</span>
+                ${r.annulmentReason && r.annulmentReason !== '—' ? `<span class="tag tag-plum">${esc(r.annulmentReason)}</span>` : ''}
+              </div>
+            </td>
+            <td style="white-space:nowrap;">
+              <a class="btn" style="padding:3px 8px;font-size:11px;" href="${esc(r.url)}" target="_blank" rel="noopener">Доклад PDF ↗</a>
+              ${r.linkedCaseUrl && r.linkedCaseUrl !== r.url ? `<a class="btn" style="padding:3px 7px;font-size:10.5px;margin-left:4px;" href="${esc(r.linkedCaseUrl)}" target="_blank" rel="noopener">Съд ↗</a>` : ''}
+            </td>
+          </tr>`).join('')}</tbody>
+        </table></div>
       </div>
 
       <div class="two-col" style="margin-bottom:16px;">
         <div class="panel-box">
-          <h3>Основания за възлагане на инспекциите на АДФИ (${fmtInt(m2.totalReports)} доклада)</h3>
+          <h3>Основания за възлагане на инспекциите на АДФИ (${fmtInt(m2.totalReports)} доклада · ${Object.entries(byYr).map(([y, c]) => `${y}: ${fmtInt(c)}`).join(' · ')})</h3>
           <div class="bar-list">
             ${basisRows.map((b) => `<div class="bar-row" style="cursor:default;">
               <div class="bar-top"><span>${esc(b.label)}</span><span class="mono"><strong>${fmtInt(b.count)}</strong></span></div>
@@ -248,7 +386,7 @@
 
       <div class="panel-box" style="margin-bottom:16px;">
         <h3>Най-често инспектирани от АДФИ институции (Топ ${insts.length} · С преки PDF връзки към докладите)</h3>
-        <div class="table-wrap" style="border:none;max-height:500px;overflow-y:auto;"><table>
+        <div class="table-wrap" style="border:none;max-height:460px;overflow-y:auto;"><table>
           <thead><tr><th>№</th><th>Възложител (ЕИК / Област)</th><th class="num">ЗОП разход (€)</th><th class="num">АДФИ докл.</th><th class="num">Чл. 17(7) актуал.</th><th class="num">Индекс</th><th>Живи АДФИ PDF доклади</th></tr></thead>
           <tbody>${insts.map((a, i) => `<tr>
             <td class="mono muted">${i + 1}</td>
@@ -264,7 +402,7 @@
 
       <div class="panel-box">
         <h3>„Сляпо петно“ на одита: Топ 25 мега-възложители (&ge;€40 млн.) с 0 публикувани доклада от АДФИ (2024–2026)</h3>
-        <div class="table-wrap" style="border:none;max-height:380px;overflow-y:auto;"><table>
+        <div class="table-wrap" style="border:none;max-height:360px;overflow-y:auto;"><table>
           <thead><tr><th>№</th><th>Институция (ЕИК)</th><th>Тип / Област</th><th class="num">Изразходвано (€)</th><th class="num">Договори</th><th class="num">1 оферта %</th></tr></thead>
           <tbody>${uninsp.map((u, i) => `<tr data-open-authority="${esc(u.eik)}">
             <td class="mono muted">${i + 1}</td>
@@ -362,6 +500,20 @@
             <td style="font-size:12px;">${esc(s.specialty)}</td>
           </tr>`).join('')}</tbody>
         </table></div>
+      </div>
+
+      <div class="panel-box" style="margin-top:16px;">
+        <h3>Извлечени адвокати, юрисконсулти и вещи лица директно от съдебните актове в ЕПЕП / ЕИСС (${(m3.eissExtractedLawyers || []).length} процесуални представители)</h3>
+        <div class="table-wrap" style="border:none;max-height:340px;overflow-y:auto;"><table>
+          <thead><tr><th>Роля и Име в съдебния акт</th><th>Съд / Дело</th><th>Възложител / Институция</th><th>Страни по делото</th><th>ЕПЕП</th></tr></thead>
+          <tbody>${(m3.eissExtractedLawyers || []).map((lw) => `<tr>
+            <td><strong style="color:#0284c7;">${esc(lw.role)} ${esc(lw.name)}</strong></td>
+            <td class="mono" style="white-space:nowrap;">${esc(lw.court)} · ${esc(lw.caseNo)}</td>
+            <td><strong>${esc(lw.authority)}</strong></td>
+            <td style="font-size:12px;">${esc(lw.party)}</td>
+            <td><a class="btn" style="padding:2px 8px;font-size:11px;" href="${esc(lw.caseUrl)}" target="_blank" rel="noopener">Дело ↗</a></td>
+          </tr>`).join('')}</tbody>
+        </table></div>
       </div>`;
 
     document.getElementById('btnOpenLegalGraphPreset')?.addEventListener('click', () => {
@@ -372,18 +524,20 @@
     });
   }
 
-  // ---- MODULE J4: KZK / VAS PRELIMINARY EXECUTION (LIVE reg.cpc.bg!) ----
+  // ---- MODULE J4: KZK / VAS PRELIMINARY EXECUTION (LIVE reg.cpc.bg + LIVE VAS CourtId=113 EISS!) ----
   function renderMod4KzkVas(host, q) {
     const { fmtEur, fmtInt, esc } = api();
     const m4 = j6Data.module4_kzkVas || {};
     const tot = m4.year2026Totals || {};
     const ing = m4.ingestedCounts || {};
+    let vasActs = m4.liveVasFinalActs || [];
     let prelims = m4.prelimRulings || [];
     let decs = m4.decisions || [];
     let doss = m4.openDossiers || [];
     let topAuths = m4.topAuthorities || [];
     let topApps = m4.topAppellants || [];
     if (q) {
+      vasActs = vasActs.filter((v) => `${v.vasCaseNo} ${v.vasActNo} ${v.kzkDossierNo} ${v.kzkActNo} ${v.appellantName} ${v.authorityName} ${v.vasOutcome} ${v.disposition}`.toLowerCase().includes(q));
       prelims = prelims.filter((r) => `${r.caseNo} ${r.actNo} ${r.initiatorsRaw} ${r.respondentsRaw} ${r.disposition} ${r.outcome}`.toLowerCase().includes(q));
       decs = decs.filter((r) => `${r.caseNo} ${r.actNo} ${r.initiatorsRaw} ${r.respondentsRaw} ${r.disposition} ${r.outcome}`.toLowerCase().includes(q));
       doss = doss.filter((r) => `${r.caseNo} ${r.unp} ${r.initiatorsRaw} ${r.respondentsRaw} ${r.description}`.toLowerCase().includes(q));
@@ -396,8 +550,45 @@
       return `<span class="tag ${cls}">${esc(r.outcome)}</span>`;
     };
 
+    const renderVasTable = (list) => `<div class="table-wrap" style="border:none;max-height:540px;overflow-y:auto;"><table>
+      <thead><tr><th>ВАС Дело / Акт (IV отд.)</th><th>Обжалван акт на КЗК &amp; ЦАИС ЕОП</th><th>Жалбоподател (Фирма)</th><th>Възложител (Ответник)</th><th>Окончателен резултат във ВАС и Диспозитив</th><th>ВАС Акт</th></tr></thead>
+      <tbody>${list.map((v) => `<tr>
+        <td style="white-space:nowrap;">
+          <strong>ВАС адм.д. № ${esc(v.vasCaseNo)}</strong>
+          <div class="inst-line mono">${esc(v.vasActNo)} · ${esc(v.vasActDate)}</div>
+          <div class="inst-line"><span class="tag ${v.isPrelim ? 'tag-ochre' : 'tag-navy'}">${v.isPrelim ? 'Чл. 217 ЗОП (Предв. изп. / ЧАД)' : 'Чл. 216 ЗОП (По същество / КАД)'}</span></div>
+        </td>
+        <td style="white-space:nowrap;">
+          ${v.kzkDossierNo ? `<div><strong>Преписка:</strong> <span class="mono">${esc(v.kzkDossierNo)}</span></div>` : ''}
+          ${v.kzkActNo ? `<div class="inst-line mono">Акт КЗК: ${esc(v.kzkActNo)}</div>` : ''}
+          ${(v.eopDecisionRefs && v.eopDecisionRefs.length) ? `<div class="inst-line mono" style="color:var(--plum);">ЦАИС: ${esc(v.eopDecisionRefs.join(', '))}</div>` : ''}
+          ${v.unp ? `<div class="inst-line mono">УНП ${esc(v.unp)}</div>` : ''}
+        </td>
+        <td>
+          ${v.appellantEik
+            ? `<a href="#" data-open-company="${esc(v.appellantEik)}"><strong>${esc(v.appellantName)}</strong></a> <span class="tag tag-teal">MATCH</span>`
+            : `<strong style="font-size:12px;">${esc(v.appellantName)}</strong>`}
+        </td>
+        <td>
+          ${v.authorityEik
+            ? `<a href="#" data-open-authority="${esc(v.authorityEik)}"><strong>${esc(v.authorityName)}</strong></a> <span class="tag tag-teal">${esc(v.authorityMatch)}</span>`
+            : `<span style="font-size:12px;">${esc(v.authorityName)}</span>`}
+        </td>
+        <td style="max-width:410px;font-size:11.8px;">
+          <div><span class="tag ${v.severity === 'critical' ? 'tag-crimson' : v.severity === 'ok' ? 'tag-teal' : 'tag-slate'}">${esc(v.vasOutcome)}</span></div>
+          <div style="margin-top:4px;">${esc((v.disposition || '').slice(0, 235))}${(v.disposition || '').length > 235 ? '…' : ''}</div>
+          ${(v.judges && v.judges.length) ? `<div class="inst-line muted">Състав на ВАС: ${esc(v.judges.join(', '))}</div>` : ''}
+          ${(v.lawyers && v.lawyers.length) ? `<div class="inst-line" style="color:#0284c7;">${esc(v.lawyers.join(' · '))}</div>` : ''}
+        </td>
+        <td style="white-space:nowrap;">
+          <a class="btn" style="padding:3px 8px;font-size:11px;margin-bottom:4px;display:inline-block;" href="${esc(v.actDownloadUrl)}" target="_blank" rel="noopener">ВАС Акт ↗</a><br/>
+          <a class="btn" style="padding:2px 7px;font-size:10.5px;" href="${esc(v.caseUrl)}" target="_blank" rel="noopener">ЕПЕП ↗</a>
+        </td>
+      </tr>`).join('') || `<tr><td colspan="6" class="loading">Няма записи за филтъра.</td></tr>`}</tbody>
+    </table></div>`;
+
     const renderActsTable = (list) => `<div class="table-wrap" style="border:none;max-height:520px;overflow-y:auto;"><table>
-      <thead><tr><th>Акт / Производство</th><th>Дата</th><th>Произнасяне и ВАС статус</th><th>Инициатор (17 428 фирми)</th><th>Ответник (4 344 възл.)</th></tr></thead>
+      <thead><tr><th>Акт / Производство</th><th>Дата</th><th>Произнасяне на КЗК и Окончателен ВАС статус</th><th>Инициатор (17 428 фирми)</th><th>Ответник (4 344 възл.)</th></tr></thead>
       <tbody>${list.map((r) => `<tr>
         <td style="white-space:nowrap;">
           <a href="${esc(r.url)}" target="_blank" rel="noopener"><strong>${esc(r.caseNo || r.actNo)} ↗</strong></a>
@@ -406,7 +597,10 @@
         </td>
         <td class="mono" style="white-space:nowrap;">${esc(r.date)}</td>
         <td>
-          <div>${sevTag(r)} ${r.appealedToVas ? '<span class="tag tag-plum">Обжалвано пред ВАС</span>' : ''}</div>
+          <div>
+            ${sevTag(r)}
+            ${r.vasOutcome ? `<a class="tag tag-plum" href="${esc(r.vasActUrl || '#')}" target="_blank" rel="noopener">ВАС д. ${esc(r.vasCaseNo)}: ${esc(r.vasOutcome)} ↗</a>` : (r.appealedToVas ? '<span class="tag tag-plum">Обжалвано пред ВАС</span>' : '')}
+          </div>
           <div class="inst-line">${esc(r.disposition.slice(0, 175))}</div>
         </td>
         <td>
@@ -423,7 +617,8 @@
     </table></div>`;
 
     let bodyHtml = '';
-    if (kzkView === 'prelim') bodyHtml = renderActsTable(prelims);
+    if (kzkView === 'vas') bodyHtml = renderVasTable(vasActs);
+    else if (kzkView === 'prelim') bodyHtml = renderActsTable(prelims);
     else if (kzkView === 'decisions') bodyHtml = renderActsTable(decs);
     else if (kzkView === 'dossiers') {
       bodyHtml = `<div class="table-wrap" style="border:none;max-height:520px;overflow-y:auto;"><table>
@@ -468,16 +663,21 @@
       </div>`;
     }
 
+    const vasBreak = m4.vasOutcomeBreakdown || [];
     host.innerHTML = `
       <div class="editorial-note">
         <div>
-          <strong>4. Предварително изпълнение и блокиране на конкуренцията (КЗК / ВАС · Жив регистър <code>reg.cpc.bg</code>):</strong>
-          Само за 2026 г. в КЗК са образувани <strong>${fmtInt(tot.proceedings)} производства по ЗОП</strong>, <strong>${fmtInt(tot.decisions)} решения</strong> и <strong>${fmtInt(tot.prelimDeterminations)} определения</strong> (предимно по искания за предварително изпълнение).
-          Инжестирани на живо: <strong>${ing.prelimRulings} определения</strong> (от които <strong style="color:var(--crimson);">${ing.prelimGranted} ДОПУСКАТ предварително изпълнение</strong>), <strong>${ing.decisions} решения</strong> (<strong>${ing.decisionsOverturned} отменят възложителя</strong>) и <strong>${ing.vasAppealed} обжалвания пред ВАС</strong>.
+          <strong>4. Предварително изпълнение и блокиране на конкуренцията (КЗК <code>reg.cpc.bg</code> &times; Окончателни актове на ВАС IV отделение <code>ecase.justice.bg</code> без CAPTCHA):</strong>
+          Само за 2026 г. в КЗК са образувани <strong>${fmtInt(tot.proceedings)} производства по ЗОП</strong>, <strong>${fmtInt(tot.decisions)} решения</strong> и <strong>${fmtInt(tot.prelimDeterminations)} определения</strong>.
+          Чрез директния ЕПЕП / ЕИСС API достъп до <strong>Върховния административен съд (CourtId 113)</strong> са извлечени пълните диспозитиви на <strong>${vasActs.length} окончателни решения и определения на ВАС</strong> по жалби срещу актове на КЗК (дали ВАС оставя в сила или отменя решението/предварителното изпълнение на КЗК):
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;">
+            ${vasBreak.map((vb) => `<span class="tag ${vb.outcome.includes('ОТМЕНЯ') ? 'tag-crimson' : 'tag-teal'}">${esc(vb.outcome)}: <strong>${vb.count}</strong></span>`).join('')}
+          </div>
         </div>
         <div class="pill-row" id="kzkViewPills">
-          <button class="pill ${kzkView === 'prelim' ? 'active' : ''}" data-kzk-v="prelim">Предварително изпълнение (${prelims.length})</button>
-          <button class="pill ${kzkView === 'decisions' ? 'active' : ''}" data-kzk-v="decisions">Решения по ЗОП (${decs.length})</button>
+          <button class="pill ${kzkView === 'vas' ? 'active' : ''}" data-kzk-v="vas">Окончателни актове на ВАС (${vasActs.length})</button>
+          <button class="pill ${kzkView === 'prelim' ? 'active' : ''}" data-kzk-v="prelim">КЗК Предварително изпълнение (${prelims.length})</button>
+          <button class="pill ${kzkView === 'decisions' ? 'active' : ''}" data-kzk-v="decisions">КЗК Решения по ЗОП (${decs.length})</button>
           <button class="pill ${kzkView === 'dossiers' ? 'active' : ''}" data-kzk-v="dossiers">Открити дела с УНП (${doss.length})</button>
           <button class="pill ${kzkView === 'stats' ? 'active' : ''}" data-kzk-v="stats">Класация страни</button>
         </div>

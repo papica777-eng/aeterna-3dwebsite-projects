@@ -1,0 +1,10 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — MAIN SCSS ENTRYPOINT (Dart Sass @use Architecture · Zero @import)
+// =============================================================================
+@use "abstracts/tokens";
+@use "abstracts/mixins";
+@use "components/graph-9node";
+@use "components/risk-badge";
+@use "components/nlp-clauses";
+@use "radars/judicial";
+@use "radars/forensics";

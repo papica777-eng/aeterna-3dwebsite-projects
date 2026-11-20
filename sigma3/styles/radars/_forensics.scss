@@ -1,0 +1,42 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — 7 PROCUREMENT FORENSICS RADARS (Анекси, Salami, Картели, ЕРИК)
+// =============================================================================
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+.forensics-radar-scope {
+  .annex-inflation-panel {
+    @include m.radar-panel-card(#b91c1c);
+  }
+
+  .salami-cluster-panel {
+    @include m.radar-panel-card(#b45309);
+  }
+
+  .cartel-rotation-panel {
+    @include m.radar-panel-card(#6b21a8);
+  }
+
+  .table-wrap {
+    @include m.thin-scrollbar();
+  }
+}
+
+// High-Density Auditor Mode vs. Presentation Mode (switched via body[data-density="compact"])
+body[data-density="compact"] {
+  .table-wrap table {
+    @include m.high-density-table("compact");
+  }
+
+  .kpi-card {
+    padding: 8px 10px;
+  }
+
+  .kpi-val {
+    font-size: 18px;
+  }
+
+  .panel-box {
+    padding: 10px 12px;
+  }
+}

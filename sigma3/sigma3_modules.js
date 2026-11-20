@@ -739,16 +739,26 @@
         else { ctx.strokeStyle = lit ? 'rgba(100,116,139,0.35)' : 'rgba(100,116,139,0.06)'; ctx.lineWidth = 0.9; }
         ctx.stroke();
       }
+      const rootCss = getComputedStyle(document.documentElement);
+      const cssToken = (v, fb) => (rootCss.getPropertyValue(v) || '').trim() || fb;
+      const colInst = cssToken('--node-inst', '#1e3a8a');
+      const colOffOwn = cssToken('--node-official', '#b91c1c');
+      const colComp = cssToken('--node-company', '#b45309');
+      const colRel = cssToken('--node-consortium', '#6b21a8');
+      const colDzzd = cssToken('--node-donor', '#0d9488');
+      const colJudicial = cssToken('--node-judicial', '#4f46e5');
+      const colLawyer = cssToken('--node-lawyer', '#0284c7');
+      const colExpert = cssToken('--node-expert', '#059669');
       for (const n of nodes) {
         const lit = !hov || activeSet.has(n.id);
-        let fill = '#1e3a8a';
-        if (n.type === 'official') fill = n.meta.ownInstitution ? '#b91c1c' : '#e11d48';
-        else if (n.type === 'company') fill = '#b45309';
-        else if (n.type === 'relative') fill = '#6b21a8';
-        else if (n.type === 'dzzd') fill = '#0d9488';
-        else if (n.type === 'court_case') fill = '#4f46e5';
-        else if (n.type === 'lawyer') fill = '#0284c7';
-        else if (n.type === 'expert') fill = '#059669';
+        let fill = colInst;
+        if (n.type === 'official') fill = n.meta.ownInstitution ? colOffOwn : '#e11d48';
+        else if (n.type === 'company') fill = colComp;
+        else if (n.type === 'relative') fill = colRel;
+        else if (n.type === 'dzzd') fill = colDzzd;
+        else if (n.type === 'court_case') fill = colJudicial;
+        else if (n.type === 'lawyer') fill = colLawyer;
+        else if (n.type === 'expert') fill = colExpert;
         ctx.globalAlpha = lit ? 1 : 0.14;
         ctx.beginPath();
         if (n.type === 'court_case') {

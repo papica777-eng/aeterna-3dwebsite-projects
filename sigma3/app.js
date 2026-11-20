@@ -1238,6 +1238,19 @@
       switchTab('proposal');
       document.getElementById('mainTabs').scrollIntoView({ behavior: 'smooth' });
     });
+    const densBtn = document.getElementById('densityToggleBtn');
+    if (densBtn) {
+      densBtn.addEventListener('click', () => {
+        const isCompact = document.body.getAttribute('data-density') === 'compact';
+        if (isCompact) {
+          document.body.removeAttribute('data-density');
+          densBtn.textContent = 'Одиторски изглед';
+        } else {
+          document.body.setAttribute('data-density', 'compact');
+          densBtn.textContent = 'Презентационен изглед';
+        }
+      });
+    }
 
     const runHeroSearch = () => {
       const val = document.getElementById('heroSearchInput').value.trim();

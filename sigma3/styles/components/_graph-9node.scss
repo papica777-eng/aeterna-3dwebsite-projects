@@ -1,0 +1,53 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — 9-NODE KNOWLEDGE GRAPH COMPONENT (_graph-9node.scss)
+//   Generates :root CSS variables for SVG/Canvas/JS + Diamond/Square/Triangle Legend
+// =============================================================================
+@use "sass:map";
+@use "../abstracts/tokens" as t;
+@use "../abstracts/mixins" as m;
+
+:root {
+  @each $key, $cfg in t.$graph-nodes {
+    --node-#{$key}: #{map.get($cfg, color)};
+    --node-#{$key}-bg: #{map.get($cfg, bg)};
+    --node-#{$key}-border: #{map.get($cfg, border)};
+  }
+  --node-court_case: #{t.node-prop("judicial", color)};
+}
+
+.sigma3-graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+@each $key, $cfg in t.$graph-nodes {
+  .node-chip--#{$key} {
+    @include m.badge-chip(map.get($cfg, color), map.get($cfg, bg), map.get($cfg, border));
+  }
+}
+
+.node-glyph {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+
+  &--circle {
+    border-radius: 50%;
+  }
+
+  &--diamond {
+    transform: rotate(45deg);
+    border-radius: 1px;
+  }
+
+  &--square {
+    border-radius: 2px;
+  }
+
+  &--triangle {
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  }
+}

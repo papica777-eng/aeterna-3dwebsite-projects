@@ -1058,6 +1058,74 @@ tbody td { padding: 9px 11px; vertical-align: top; }
 .legend-square { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
 .legend-tri { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid #059669; margin-right: 4px; vertical-align: middle; }
 
+/* ==========================================================================
+   COMPILED FROM styles/main.scss (Dart Sass @use Architecture · Zero @import)
+   ========================================================================== */
+:root {
+  --node-official: #b91c1c;
+  --node-official-bg: #fef2f2;
+  --node-official-border: #fecaca;
+  --node-family: #b45309;
+  --node-family-bg: #fffbeb;
+  --node-family-border: #fde68a;
+  --node-company: #7c2d12;
+  --node-company-bg: #fff7ed;
+  --node-company-border: #fed7aa;
+  --node-inst: #1e3a8a;
+  --node-inst-bg: #eff6ff;
+  --node-inst-border: #bfdbfe;
+  --node-consortium: #6b21a8;
+  --node-consortium-bg: #faf5ff;
+  --node-consortium-border: #e9d5ff;
+  --node-donor: #0f766e;
+  --node-donor-bg: #f0fdfa;
+  --node-donor-border: #99f6e4;
+  --node-judicial: #4f46e5;
+  --node-judicial-bg: #eef2ff;
+  --node-judicial-border: #c7d2fe;
+  --node-court_case: #4f46e5;
+  --node-lawyer: #0284c7;
+  --node-lawyer-bg: #f0f9ff;
+  --node-lawyer-border: #bae6fd;
+  --node-expert: #059669;
+  --node-expert-bg: #ecfdf5;
+  --node-expert-border: #a7f3d0;
+  --risk-critical-fg: #991b1b;
+  --risk-critical-bg: #fee2e2;
+  --risk-critical-border: #fca5a5;
+  --risk-high-fg: #9a3412;
+  --risk-high-bg: #ffedd5;
+  --risk-high-border: #fdba74;
+  --risk-elevated-fg: #854d0e;
+  --risk-elevated-bg: #fef9c3;
+  --risk-elevated-border: #fde047;
+  --risk-low-fg: #065f46;
+  --risk-low-bg: #d1fae5;
+  --risk-low-border: #6ee7b7;
+}
+.sigma3-graph-legend { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.node-chip--official { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #b91c1c; background-color: #fef2f2; border: 1px solid #fecaca; white-space: nowrap; }
+.node-chip--judicial { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #4f46e5; background-color: #eef2ff; border: 1px solid #c7d2fe; white-space: nowrap; }
+.node-chip--lawyer { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #0284c7; background-color: #f0f9ff; border: 1px solid #bae6fd; white-space: nowrap; }
+.node-chip--expert { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #059669; background-color: #ecfdf5; border: 1px solid #a7f3d0; white-space: nowrap; }
+.node-glyph { display: inline-block; width: 10px; height: 10px; flex-shrink: 0; }
+.node-glyph--circle { border-radius: 50%; }
+.node-glyph--diamond { transform: rotate(45deg); border-radius: 1px; }
+.node-glyph--square { border-radius: 2px; }
+.node-glyph--triangle { clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.risk-tier--critical { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #991b1b; background-color: #fee2e2; border: 1px solid #fca5a5; }
+.risk-tier--high { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #9a3412; background-color: #ffedd5; border: 1px solid #fdba74; }
+.risk-tier--elevated { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #854d0e; background-color: #fef9c3; border: 1px solid #fde047; }
+.risk-tier--low { display: inline-flex; align-items: center; gap: 4px; padding: 2px 7px; border-radius: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: #065f46; background-color: #d1fae5; border: 1px solid #6ee7b7; }
+.eiss-disposition-box { padding: 6px 9px; background: #f8fafc; border-left: 3px solid var(--node-judicial, #4f46e5); border-radius: 3px; font-size: 11.6px; line-height: 1.38; }
+body[data-density="compact"] .table-wrap table { font-size: 11.4px; line-height: 1.22; }
+body[data-density="compact"] .table-wrap table th,
+body[data-density="compact"] .table-wrap table td { padding: 4px 7px; }
+body[data-density="compact"] .kpi-card { padding: 8px 10px; }
+body[data-density="compact"] .kpi-val { font-size: 18px; }
+body[data-density="compact"] .panel-box { padding: 10px 12px; }
+
+
 /* Print / PDF Export Styling */
 @media print {
   .topbar, .tabs, .hof-trigger-wrap, .hero-search-box, .btn, .site-footer { display: none !important; }

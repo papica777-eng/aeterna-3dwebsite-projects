@@ -1,0 +1,58 @@
+// =============================================================================
+// SIGMA 3.0 FINALITY — REUSABLE MIXINS (Max 3 Nesting Levels · High-Density Tables)
+// =============================================================================
+@use "sass:map";
+@use "tokens" as t;
+
+@mixin high-density-table($mode: "presentation") {
+  $cfg: map.get(t.$density-modes, $mode);
+  font-size: map.get($cfg, font-size);
+  line-height: map.get($cfg, row-line);
+
+  th,
+  td {
+    padding: map.get($cfg, cell-pad-y) map.get($cfg, cell-pad-x);
+  }
+}
+
+@mixin thin-scrollbar($thumb: #cbd5e1, $track: #f8fafc) {
+  scrollbar-width: thin;
+  scrollbar-color: $thumb $track;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $track;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $thumb;
+    border-radius: 4px;
+  }
+}
+
+@mixin badge-chip($fg, $bg, $border) {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-family: t.$font-mono;
+  font-size: 11px;
+  font-weight: 600;
+  color: $fg;
+  background-color: $bg;
+  border: 1px solid $border;
+  white-space: nowrap;
+}
+
+@mixin radar-panel-card($accent-color) {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-top: 3px solid $accent-color;
+  border-radius: 6px;
+  padding: 14px 16px;
+}
