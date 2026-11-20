@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>AETERNA PAAS // 3D Planetarium Observatory & Bespoke Digital Worlds</title>
+  <meta name="description" content="Explore real-time C/ERFA/WebGL2 astronomy powered by Stellarium Web Engine fused with AETERNA interactive 3D website flagships, 8K shaders, and turnkey business platforms starting at $495." />
+  <meta name="theme-color" content="#020307" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles/paas-cosmos.css" />
+</head>
+<body>
+  <!-- STELLARIUM C/C++/ERFA/WebGL2 WASM SKY ENGINE -->
+  <canvas id="stel-canvas" aria-label="Interactive 3D Stellarium Observatory Sky"></canvas>
+  <div id="nightModeOverlay" aria-hidden="true"></div>
+
+  <!-- SYNCHRONIZED 3D SKY BEACONS (BUSINESS WORLDS & MILLENNIUM 8K STUDIOS) -->
+  <div id="paasWorldPins" aria-label="Interactive Website & Studio Beacons"></div>
+
+  <!-- STELLARIUM STREAMING DATA PROGRESS -->
+  <div id="stelProgressRack" aria-live="polite"></div>
+
+  <!-- BOOT SPLASH CURTAIN -->
+  <div id="bootCurtain" role="status">
+    <div class="boot-inner">
+      <div class="boot-logo">AETERNA COSMOS</div>
+      <div class="boot-sub">Stellarium Web Engine &bull; WebGL2 + ERFA WASM</div>
+      <div class="boot-bar"><span></span></div>
+      <div class="boot-status" id="bootStatus">Loading Compiled Astronomy Kernel...</div>
+    </div>
+  </div>
+
+  <!-- TOP COCKPIT HUD -->
+  <header id="topBar">
+    <div class="brand-cluster">
+      <button type="button" class="hud-btn-menu" id="btnExploreSites" title="Explore Business Websites & 8K Studios">
+        <span>&#9776; Explore Sites</span>
+        <span class="badge-count" id="countSitesBadge">15</span>
+      </button>
+      <a class="brand-title" href="./classic/index.html" title="Open Classic AETERNA Studio">
+        <strong>AETERNA</strong>
+        <span>PaaS Observatory</span>
+      </a>
+    </div>
+
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+      <input id="searchInput" type="search" autocomplete="off" placeholder="Search business industry, 8K studio, star or planet (e.g. Saturn, M31, Cafe)" />
+      <button type="button" class="search-clear" id="btnClearSearch" aria-label="Clear search">&times;</button>
+      <div class="search-dropdown" id="searchDropdown"></div>
+    </div>
+
+    <div class="top-right">
+      <div class="tel-pill" id="hudTelCoords">AZM <b>48.0&deg;</b> &middot; ALT <b>+24.0&deg;</b> &middot; FOV <b>72.0&deg;</b></div>
+      <button type="button" class="btn-order-top" id="btnTopConfigure">Configure ($495+)</button>
+    </div>
+  </header>
+
+  <!-- LEFT EXPLORE DRAWER -->
+  <aside id="leftDrawer" aria-label="Website Systems & 8K Studios Catalog">
+    <div class="drawer-head">
+      <div>
+        <h2>DIGITAL SYSTEMS &amp; 8K STUDIOS</h2>
+        <p>Click any world to slew &amp; launch interactive live demo</p>
+      </div>
+      <button type="button" class="btn-close-round" id="btnCloseLeft" aria-label="Close Explorer">&times;</button>
+    </div>
+
+    <div class="cat-bar" id="catBar">
+      <button type="button" class="cat-pill active" data-cat="all">All (15)</button>
+      <button type="button" class="cat-pill" data-cat="trades">Trades</button>
+      <button type="button" class="cat-pill" data-cat="hospitality">Caf&eacute;s</button>
+      <button type="button" class="cat-pill" data-cat="ecommerce">E-Commerce</button>
+      <button type="button" class="cat-pill" data-cat="sports">Sports</button>
+      <button type="button" class="cat-pill" data-cat="clinic">Clinics &amp; Legal</button>
+      <button type="button" class="cat-pill" data-cat="luxury">Luxury</button>
+      <button type="button" class="cat-pill" data-cat="labs">8K &amp; 3D Labs</button>
+    </div>
+
+    <div class="brand-box">
+      <label>Live Brand &amp; City Preview Injector</label>
+      <div class="brand-row">
+        <input id="brandNameInput" type="text" placeholder="Your Brand Name" />
+        <input id="brandCityInput" type="text" placeholder="City / Suburb" />
+      </div>
+    </div>
+
+    <div class="drawer-scroll" id="drawerCardsList"></div>
+  </aside>
+
+  <!-- RIGHT COMPACT INSPECTOR PANEL (ALWAYS FITS LAPTOP VIEWPORTS) -->
+  <section id="inspectorPanel" aria-live="polite" aria-label="Object & System Inspector">
+    <div class="insp-head">
+      <div class="insp-badge-icon" id="inspBadgeIcon">&#10022;</div>
+      <div class="insp-head-meta">
+        <div class="insp-kicker" id="inspKicker">SECTOR // TELEMETRY</div>
+        <h3 id="inspTitle">Target Name</h3>
+      </div>
+      <button type="button" class="btn-insp-close" id="btnCloseInspector" aria-label="Close Inspector">&times;</button>
+    </div>
+
+    <div class="insp-scroll">
+      <p class="insp-desc" id="inspDesc"></p>
+
+      <div class="insp-stats">
+        <div class="tel-box"><div class="tel-k" id="stat1K">LIGHTHOUSE</div><div class="tel-v" id="stat1V">100 / 100</div></div>
+        <div class="tel-box"><div class="tel-k" id="stat2K">SPEED</div><div class="tel-v" id="stat2V">0.3s</div></div>
+        <div class="tel-box"><div class="tel-k" id="stat3K">OWNERSHIP</div><div class="tel-v" id="stat3V">100% CODE</div></div>
+      </div>
+
+      <div class="insp-sky-coords" id="inspSkyCoords"></div>
+      <div class="insp-feats" id="inspFeatures"></div>
+
+      <div class="insp-price-card" id="inspPriceCard">
+        <div>
+          <div class="p-tag" id="inspPriceTag">RECOMMENDED LAUNCH</div>
+          <div class="p-main" id="inspPriceMain">$495 Base Launchpad</div>
+        </div>
+        <div class="p-sub" id="inspPriceSub">Turnkey Code Delivery</div>
+      </div>
+    </div>
+
+    <div class="insp-footer">
+      <button type="button" class="btn-launch" id="btnInspPrimary">&#128065; LAUNCH LIVE INTERACTIVE WEBSITE</button>
+      <div class="btn-row-sec">
+        <button type="button" class="btn-sec" id="btnInspConfigure">&#9881; Customize &amp; Buy</button>
+        <a class="btn-sec" id="btnInspExt" href="./classic/index.html" target="_blank" rel="noopener">Open Tab &#8599;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ULTRA VISUALS POPOVER (NATIVE WASM UNIFORM TUNING + WONDERS TOUR) -->
+  <div id="ultraDrawer" role="dialog" aria-label="Stellarium Ultra Visuals & Sky Presets">
+    <div class="ud-head">
+      <span>&#10024; Stellarium Ultra Visuals &amp; Astronomy Presets</span>
+      <button type="button" class="btn-close-round" id="btnCloseUltra" aria-label="Close Ultra Visuals">&times;</button>
+    </div>
+
+    <div class="ud-sliders">
+      <div class="slider-box">
+        <div class="sl-top"><span>Exposure</span><b id="valExposure">1.15&times;</b></div>
+        <input id="rngExposure" type="range" min="0.4" max="3.0" step="0.05" value="1.15" />
+      </div>
+      <div class="slider-box">
+        <div class="sl-top"><span>Light Pollution</span><b id="valBortle">Class 2</b></div>
+        <input id="rngBortle" type="range" min="1" max="9" step="1" value="2" />
+      </div>
+      <div class="slider-box">
+        <div class="sl-top"><span>Star Scale</span><b id="valStarScale">1.10&times;</b></div>
+        <input id="rngStarScale" type="range" min="0.6" max="2.2" step="0.05" value="1.1" />
+      </div>
+    </div>
+
+    <div class="ud-toggles" id="fxTogglesRow">
+      <button type="button" class="fx-chip active" data-fx="satellites">&#128752; Satellites &amp; TLE</button>
+      <button type="button" class="fx-chip" data-fx="ecliptic">&#9788; Ecliptic Line</button>
+      <button type="button" class="fx-chip" data-fx="meridian">&#9737; Meridian Line</button>
+      <button type="button" class="fx-chip active" data-fx="hints">&#9673; Planet Labels</button>
+      <button type="button" class="fx-chip" data-fx="bigmoon">&#127765; 4&times; Supermoon</button>
+    </div>
+
+    <div class="ud-presets" id="fxPresetsRow">
+      <span class="preset-lbl">Quick Slew:</span>
+      <button type="button" class="preset-btn" data-preset="NAME Moon">&#127765; Moon</button>
+      <button type="button" class="preset-btn" data-preset="NAME Jupiter">&#129680; Jupiter</button>
+      <button type="button" class="preset-btn" data-preset="NAME Saturn">&#129680; Saturn</button>
+      <button type="button" class="preset-btn" data-preset="M31">&#127756; Andromeda M31</button>
+      <button type="button" class="preset-btn" data-preset="M42">&#10024; Orion M42</button>
+      <button type="button" class="preset-btn" data-preset="world:millennium-8k-raymarch">&#128142; 8K Raymarch Studio</button>
+      <button type="button" class="preset-btn" data-preset="world:millennium-vortex">&#127744; 8K Liquid Vortex</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM OBSIDIAN CONTROL DOCK (GENUINE STELLARIUM SVG BUTTONS) -->
+  <nav id="bottomDock" aria-label="Observatory Sky Layers">
+    <button type="button" class="stel-btn active" id="btnStelCstLines" title="Constellations Lines & Labels">
+      <img src="./symbols/btn-cst-lines.svg" alt="Constellation Lines" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelCstArt" title="Constellation Artwork (Johan Meuris)">
+      <img src="./symbols/btn-cst-art.svg" alt="Constellation Artwork" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelAtmo" title="Atmosphere Scattering (Preetham Sky)">
+      <img src="./symbols/btn-atmosphere.svg" alt="Atmosphere" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelLandscape" title="Guereins 360 Horizon Landscape">
+      <img src="./symbols/btn-landscape.svg" alt="Landscape" />
+    </button>
+    <button type="button" class="stel-btn" id="btnStelAzGrid" title="Azimuthal Coordinate Grid">
+      <img src="./symbols/btn-azimuthal-grid.svg" alt="Azimuthal Grid" />
+    </button>
+    <button type="button" class="stel-btn" id="btnStelEqGrid" title="Equatorial RA/Dec Grid">
+      <img src="./symbols/btn-equatorial-grid.svg" alt="Equatorial Grid" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelDso" title="Deep Sky Objects (Nebulae & Galaxies)">
+      <img src="./symbols/btn-nebulae.svg" alt="Deep Sky Objects" />
+    </button>
+    <button type="button" class="stel-btn active" id="btnStelMilkyWay" title="Milky Way HiPS Panorama">
+      <span class="txt-ico">&#10035;</span>
+    </button>
+
+    <span class="dock-sep"></span>
+
+    <button type="button" class="dock-pill-btn active" id="btnStelBeacons" title="Toggle Website World Beacons">
+      &#127760; Sites
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnToggleUltra" title="Ultra Visuals Sliders & Sky Tours">
+      &#10024; Ultra FX
+    </button>
+    <button type="button" class="stel-btn" id="btnNightMode" title="Red Astronomer Night Mode">
+      <img src="./symbols/btn-night-mode.svg" alt="Night Mode" />
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnUnlockTarget" style="display:none;" title="Release Locked Target">
+      &#128275; Unlock
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnResetHorizon" title="Reset Horizon View">
+      &#10226; Reset
+    </button>
+    <button type="button" class="dock-pill-btn" id="btnFullscreen" title="Fullscreen Mode">
+      &#9974;
+    </button>
+  </nav>
+
+  <!-- BOTTOM-LEFT LOCATION SWITCHER -->
+  <div class="corner-badge left" id="cornerLocation" title="Click to switch Observatory Latitude / Longitude">
+    <strong id="locNameOut">Melbourne Observatory <span style="color:var(--gold,#c5a34e);">[AU]</span></strong>
+    <div id="locCoordsOut">37.81&deg;S &middot; 144.96&deg;E &middot; 31m</div>
+  </div>
+  <div id="locPopover" role="menu">
+    <button type="button" class="active" data-loc="melbourne"><span>Melbourne</span><span>37.8&deg;S</span></button>
+    <button type="button" data-loc="sofia"><span>Sofia Vitosha</span><span>42.7&deg;N</span></button>
+    <button type="button" data-loc="atacama"><span>Atacama Paranal</span><span>Bortle 1</span></button>
+    <button type="button" data-loc="london"><span>Greenwich London</span><span>51.5&deg;N</span></button>
+    <button type="button" data-loc="nyc"><span>New York</span><span>40.7&deg;N</span></button>
+    <button type="button" data-loc="tokyo"><span>Tokyo Mitaka</span><span>35.7&deg;N</span></button>
+  </div>
+
+  <!-- BOTTOM-RIGHT SIMULATED UTC CLOCK & AGPLv3 ENGINE CREDIT -->
+  <div class="corner-badge right" id="cornerClock">
+    <strong id="clockTimeOut">--:--:-- UTC</strong>
+    <div id="clockDateOut">Astronomical Dusk</div>
+    <div class="time-controls" id="timeControls">
+      <button type="button" data-tact="0" title="Pause Simulation">||</button>
+      <button type="button" class="active" data-tact="1" title="Real-Time">1&times;</button>
+      <button type="button" data-tact="100" title="100x Warp">100&times;</button>
+      <button type="button" data-tact="1000" title="1000x Warp">1000&times;</button>
+      <button type="button" data-tact="sunset" title="Jump to Evening Twilight">Dusk</button>
+      <button type="button" data-tact="plus2h" title="Advance +2 Hours">+2h</button>
+    </div>
+    <div class="agpl-note">
+      Engine: Stellarium Web (<a href="./LICENSE-AGPL-3.0.txt" target="_blank" rel="noopener">GNU AGPL v3</a>)
+    </div>
+  </div>
+
+  <!-- FULLSCREEN LIVE INTERACTIVE PREVIEW MODAL -->
+  <div class="full-modal" id="modalPreview">
+    <div class="modal-bar">
+      <div class="modal-title" id="previewTitle">Interactive Preview</div>
+      <div class="modal-actions">
+        <span id="previewExtNote" style="display:none;font-family:var(--font-mono);font-size:10px;color:#fcd34d;">If blocked by third-party headers, use Open New Tab &rarr;</span>
+        <a id="previewExtLink" class="btn-ext" href="./classic/index.html" target="_blank" rel="noopener">Open New Tab &#8599;</a>
+        <button type="button" class="btn-order-top" id="btnPreviewCfg">Order Package ($495+)</button>
+        <button type="button" class="btn-close-modal" id="btnClosePreview">&times; Close</button>
+      </div>
+    </div>
+    <iframe class="preview-frame" id="previewFrame" title="Live Interactive Website Preview"></iframe>
+  </div>
+
+  <!-- $495+ MODULAR & ENTERPRISE COMMERCIAL CONFIGURATOR MODAL -->
+  <div class="full-modal" id="modalConfig">
+    <div class="config-dialog">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+        <div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:#c5a34e;letter-spacing:1.4px;">AETERNA COMMERCIAL ARCHITECT</div>
+          <h3 style="font-family:var(--font-display);font-size:20px;color:#fff;">Configure Your Website Package</h3>
+        </div>
+        <button type="button" class="btn-close-round" id="btnCloseConfig" aria-label="Close Configurator">&times;</button>
+      </div>
+
+      <div class="cfg-tabs" id="cfgTabs">
+        <button type="button" class="cfg-tab active" data-mode="modular">&#9889; $495 Base Launchpad + Modular Add-ons</button>
+        <button type="button" class="cfg-tab" data-mode="enterprise">&#128142; Bespoke Enterprise Flagships ($1,500 &ndash; $8,900)</button>
+      </div>
+
+      <div id="paneModular">
+        <div class="addon-check-card" style="border-color:#c5a34e;background:rgba(197,163,78,0.08);">
+          <input type="checkbox" checked disabled />
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13.5px;">
+              <span>Base Business Launchpad (Turnkey Foundation)</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">$495 AUD / USD</span>
+            </div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Mobile-first high-speed design, verified business info, Google Map, tap-to-call button, SSL &amp; edge deployment.</div>
+          </div>
+        </div>
+
+        <label class="addon-check-card">
+          <input type="checkbox" class="mod-addon" data-price="450" data-label="Local Suburb SEO Booster" />
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
+              <span>1. Local Suburb &amp; City SEO Booster (5 Target Pages)</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $450</span>
+            </div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Dedicated suburb landing pages + Schema.org LocalBusiness markup to dominate local Google Maps.</div>
+          </div>
+        </label>
+
+        <label class="addon-check-card">
+          <input type="checkbox" class="mod-addon" data-price="450" data-label="Interactive Quote Calculator" />
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
+              <span>2. Interactive Quote / Area / Pricing Calculator</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $450</span>
+            </div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Clients calculate job cost &amp; send structured specs straight to your WhatsApp/SMS.</div>
+          </div>
+        </label>
+
+        <label class="addon-check-card">
+          <input type="checkbox" class="mod-addon" data-price="350" data-label="24/7 Emergency SMS Intake" />
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
+              <span>3. 24/7 Emergency SMS Intake &amp; Auto-Responder</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $350</span>
+            </div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Immediate missed-call SMS capture so you never lose urgent clients to competitors.</div>
+          </div>
+        </label>
+
+        <label class="addon-check-card">
+          <input type="checkbox" class="mod-addon" data-price="120" data-rec="true" data-label="Managed Edge Care" />
+          <div style="flex:1;">
+            <div style="display:flex;justify-content:space-between;font-weight:700;font-size:13px;">
+              <span>4. Managed Edge Care, Domain &amp; Unlimited Updates</span>
+              <span style="color:#fde047;font-family:var(--font-mono);">+ $120 / mo</span>
+            </div>
+            <div style="font-size:11.5px;color:#8b9bb4;">Custom domain renewal, SSL, 99.99% global uptime SLA &amp; monthly content updates.</div>
+          </div>
+        </label>
+
+        <div style="margin-top:14px;padding:15px;background:rgba(255,255,255,0.03);border:1px solid rgba(197,163,78,0.42);border-radius:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+          <div>
+            <div style="font-family:var(--font-mono);font-size:10px;color:#8b9bb4;">CONFIGURED PACKAGE TOTAL:</div>
+            <div id="modTotalOut" style="font-family:var(--font-display);font-size:24px;font-weight:700;color:#fde047;">$495</div>
+          </div>
+          <a id="btnModWhatsApp" href="https://wa.me/359884638640" target="_blank" rel="noopener" class="btn-order-top" style="text-decoration:none;background:#25d366;color:#05070c;">&#9889; Launch via WhatsApp</a>
+        </div>
+      </div>
+
+      <div id="paneEnterprise" style="display:none;">
+        <div class="tier-grid">
+          <div class="tier-card">
+            <div class="tk">TIER 01 &bull; EXPRESS</div>
+            <div class="tv">$1,500</div>
+            <div class="td">5-Page Bespoke Brand Site</div>
+            <a href="https://buy.stripe.com/9B6cMZga86Qa9IE8gDfAc00" target="_blank" rel="noopener">Pay Stripe ($1,500)</a>
+          </div>
+          <div class="tier-card featured">
+            <div class="tk" style="color:#c5a34e;">TIER 02 &bull; PRO</div>
+            <div class="tv">$2,800</div>
+            <div class="td">12-Page Corporate + Visual CMS</div>
+            <a href="https://buy.stripe.com/9B614hcXW4I25sodAXfAc01" target="_blank" rel="noopener">Pay Stripe ($2,800)</a>
+          </div>
+          <div class="tier-card">
+            <div class="tk">TIER 03 &bull; 3D WEBGL</div>
+            <div class="tv">$4,900</div>
+            <div class="td">Spatial Interactive 3D Shaders</div>
+            <a href="https://buy.stripe.com/9B6cMZ5vub6q0840ObfAc02" target="_blank" rel="noopener">Pay Stripe ($4,900)</a>
+          </div>
+          <div class="tier-card">
+            <div class="tk">TIER 04 &bull; E-COMM</div>
+            <div class="tv">$8,900</div>
+            <div class="td">Full Store + Tax Invoicing</div>
+            <a href="https://buy.stripe.com/aFa5kx8HG1vQ7AwbsPfAc03" target="_blank" rel="noopener">Pay Stripe ($8,900)</a>
+          </div>
+        </div>
+
+        <div class="wire-box">
+          <strong style="color:#c5a34e;">OFFICIAL CORPORATE PAYMENT CHANNELS (100% CODE OWNERSHIP COVENANT):</strong><br />
+          &bull; PayPal Business: <strong>billing@aeterna.website</strong> | Entity: AETERNA Technologies EOOD (UIC/VAT: BG101327948)<br />
+          &bull; SEPA / SWIFT IBAN: <strong>BG22INTF40012011857631</strong> (BIC: INTFBGSF &middot; iCard AD)<br />
+          &bull; Direct Architect WhatsApp / Call: <strong>+359 884 638 640</strong> (dimitar@aeterna.website)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPILED STELLARIUM WASM + PAAS COSMOS ENGINE (NO SPINNING SPHERES) -->
+  <script src="./engine/stellarium-web-engine.js"></script>
+  <script src="./scripts/paas-cosmos.js" defer></script>
+</body>
+</html>
