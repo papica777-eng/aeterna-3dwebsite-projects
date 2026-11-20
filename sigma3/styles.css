@@ -515,11 +515,11 @@ code {
 
 [data-theme=dark] .hero-emblem-visual,
 .dark .hero-emblem-visual {
-  aspect-ratio: 1/1;
-  background-image: url("./hero-emblem-dark.jpg?v=20261120h");
-  mix-blend-mode: lighten;
-  -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
-  mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
+  aspect-ratio: 976/800;
+  background-image: url("./hero-emblem-dark.jpg?v=20261120i");
+  mix-blend-mode: screen;
+  -webkit-mask-image: none;
+  mask-image: none;
 }
 
 @media (max-width: 960px) {
