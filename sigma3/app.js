@@ -661,7 +661,7 @@
     const metric = state.atlasMetric;
     const titles = {
       valueEur: 'Общи разходи по обществени поръчки (€)',
-      riskScore: 'СИГМА 3.0 Съставен индекс на риска (0–100)',
+      riskScore: 'NAsvetlo Съставен индекс на риска (0–100)',
       ownHits: 'Случаи на самовъзлагане (От собствената институция)',
       officialCount: 'Брой свързани длъжностни лица (СИГМА)',
       hiddenDzzdEur: 'Скрити ДЗЗД консорциуми на политици (€)',
@@ -929,7 +929,7 @@
       });
     }
     const riskExplain = rb ? `<div class="contract-row" style="border-left:3px solid var(--crimson);font-size:12px;">
-      <strong>Разбивка на СИГМА 3.0 Риск индекс (${o.sigma3Score}/100):</strong>
+      <strong>Разбивка на NAsvetlo Риск индекс (${o.sigma3Score}/100):</strong>
       Самовъзлагане: <b>+${rb.own}</b> · В периода: <b>+${rb.period}</b> · Скрити ДЗЗД: <b>+${rb.dzzd}</b> · Роля/пропуск ТР: <b>+${rb.registry}</b> · Споделена фирма: <b>+${rb.shared}</b> · Свързано лице: <b>+${rb.family}</b>
       ${compRiskAlerts.length ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);color:var(--crimson);"><strong>Съдебен / Криминалистичен слой (13 радара):</strong> ${compRiskAlerts.map((x) => esc(x)).join(' | ')}</div>` : ''}
     </div>` : '';
@@ -1015,7 +1015,7 @@
     const lines = [
       `========================================================================`,
       `ОФИЦИАЛНА АНАЛИТИЧНА СПРАВКА / СИГНАЛ ЗА ПРОВЕРКА ПО ЗОП И ЗПК`,
-      `Генерирано от СИГМА 3.0 FINALITY (https://nasvetlo.website) · Дата: ${today}`,
+      `Генерирано от NAsvetlo (https://nasvetlo.website — независима гражданска платформа върху данни CC-BY 4.0 на МИДТ / СИГМА 2.0) · Дата: ${today}`,
       `========================================================================`,
       ``,
       `ДО:`,
@@ -1028,7 +1028,7 @@
       `   Име: ${o.name}`,
       `   Категория: ${o.circle}`,
       `   Основна институция: ${o.primaryInstitution}${o.oblast ? ' (Област ' + o.oblast + ')' : ''}`,
-      `   СИГМА 3.0 Риск индекс: ${o.sigma3Score}/100`,
+      `   NAsvetlo Риск индекс: ${o.sigma3Score}/100`,
       `   Признак „От собствената институция“: ${o.ownInstitution ? 'ДА (ДИРЕКТНО САМОВЪЗЛАГАНЕ)' : 'НЕ'}`,
       `   Вписани роли по Търговския регистър / пропуски: ${o.hasRegistryRole || o.omissionsCount > 0 ? 'ДА' : 'НЕ'}`,
       `   Официален профил в СИГМА 2.0 (МИДТ): ${o.sigmaUrl}`,
@@ -1047,7 +1047,7 @@
       ...(o.relatives && o.relatives.length ? [``, `   Свързани физически лица по ТР: ${o.relatives.map((r) => `${r.name} (${r.role})`).join('; ')}`] : []),
       ``,
       ...(dc ? [
-        `5. СКРИТИ КОНСОРЦИУМИ (ДЗЗД БЕЗ ЕИК), РАЗКРИТИ ОТ СИГМА 3.0 FINALITY`,
+        `5. СКРИТИ КОНСОРЦИУМИ (ДЗЗД БЕЗ ЕИК), РАЗКРИТИ ОТ NAsvetlo`,
         ...dc.topConsortia.map((tc, idx) => `   ${idx + 1}. ${tc.name} — ${fmtEur(tc.wonEur)} (${tc.contracts} дог.)`),
         ``,
       ] : []),

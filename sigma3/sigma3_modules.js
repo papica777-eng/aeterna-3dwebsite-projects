@@ -1330,7 +1330,7 @@
   function ensureOracleReady() {
     if (oracleInitialized) return;
     oracleInitialized = true;
-    appendOracleMsg('ai', `Здравейте! Аз съм <strong>СИГМА 3.0 ORACLE</strong> — интелигентен одиторски AI агент с <strong>разбиране на свободен естествен език (NLU)</strong>, <strong>автоматична транслитерация от шльокавица/латиница</strong>, <strong>толерантност към правописни грешки (Fuzzy Matching)</strong> и <strong>контекстна памет между въпросите</strong>.<br/><br/>
+    appendOracleMsg('ai', `Здравейте! Аз съм <strong>NAsvetlo ORACLE</strong> — интелигентен одиторски AI агент с <strong>разбиране на свободен естествен език (NLU)</strong>, <strong>автоматична транслитерация от шльокавица/латиница</strong>, <strong>толерантност към правописни грешки (Fuzzy Matching)</strong> и <strong>контекстна памет между въпросите</strong>.<br/><br/>
     Пишете свободно със свои думи — например:<br/>
     • <em>„Кажи ми всичко за Бургас — поръчки, АДФИ ревизии и съдебни дела“</em><br/>
     • <em>„Какви дела в съда, анекси и жалби в КЗК има за АПИ?“</em><br/>
@@ -1358,7 +1358,7 @@
       }
     }
     div.innerHTML = role === 'ai'
-      ? `<div class="msg-ai-head">СИГМА 3.0 ORACLE · QAntum Cognitive ReAct &amp; 256-D Vector RAG</div>${metaRibbon}${html}`
+      ? `<div class="msg-ai-head">NAsvetlo ORACLE · QAntum Cognitive ReAct &amp; 256-D Vector RAG</div>${metaRibbon}${html}`
       : html;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
@@ -1458,7 +1458,7 @@
             <tr><td>Свързани длъжностни лица</td><td class="num">${a.officialCount}</td><td class="num">${b.officialCount}</td></tr>
             <tr><td>Самовъзлагане (Собств. инст.)</td><td class="num" style="color:var(--crimson);font-weight:700;">${a.ownHits}</td><td class="num" style="color:var(--crimson);font-weight:700;">${b.ownHits}</td></tr>
             <tr><td>Скрити ДЗЗД на политици</td><td class="num" style="color:var(--plum);">${fmtEur(a.hiddenDzzdEur)}</td><td class="num" style="color:var(--plum);">${fmtEur(b.hiddenDzzdEur)}</td></tr>
-            <tr><td>СИГМА 3.0 Риск индекс</td><td class="num">${riskBadgeHtml(a.riskScore)}</td><td class="num">${riskBadgeHtml(b.riskScore)}</td></tr>
+            <tr><td>NAsvetlo Риск индекс</td><td class="num">${riskBadgeHtml(a.riskScore)}</td><td class="num">${riskBadgeHtml(b.riskScore)}</td></tr>
           </tbody></table>` +
           renderFollowUpChips([`Кажи ми всичко за ${a.name.replace(' (столица)', '')}`, `Кажи ми всичко за ${b.name.replace(' (столица)', '')}`]), nluMeta);
         return;
@@ -1826,7 +1826,7 @@
       const topOffs = [...state.officials].sort((a, b) => b.sigma3Score - a.sigma3Score || b.combinedEur - a.combinedEur).slice(0, 7);
       const topAuths = [...auths].sort((a, b) => b.riskScore - a.riskScore || b.spentEur - a.spentEur).slice(0, 5);
       oracleContext.lastOfficial = topOffs[0];
-      blocks.push(`<div><strong>Топ рискови профили в СИГМА 3.0 FINALITY (по 6-факторен Риск индекс + Съдебен/АДФИ/КЗК буст):</strong>
+      blocks.push(`<div><strong>Топ рискови профили в NAsvetlo (по 6-факторен Риск индекс + Съдебен/АДФИ/КЗК буст):</strong>
         <div style="margin-top:6px;"><b>1. Длъжностни лица с най-висок риск и финансов обем:</b><ol style="margin:4px 0 6px;padding-left:18px;">` +
         topOffs.map((o) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) — Общо+ДЗЗД: <strong>${fmtEur(o.combinedEur)}</strong> ${o.ownInstitution ? '<span class="tag tag-crimson">Самовъзлагане</span>' : ''} ${riskBadgeHtml(o.sigma3Score)}</li>`).join('') + `</ol></div>
         <div><b>2. Възложители с най-висок комбиниран риск (ЗОП + АДФИ + КЗК + Съд):</b><ol style="margin:4px 0 0;padding-left:18px;">` +
@@ -1898,7 +1898,7 @@
       return;
     }
 
-    appendOracleMsg('ai', `Разбрах въпроса ви (нормализиран като: <code>${esc(nlu.cyrQuery)}</code>), но не открих директен субект с това име. Ето общия национален срез на <strong>СИГМА 3.0 FINALITY</strong>:
+    appendOracleMsg('ai', `Разбрах въпроса ви (нормализиран като: <code>${esc(nlu.cyrQuery)}</code>), но не открих директен субект с това име. Ето общия национален срез на <strong>NAsvetlo</strong>:
       <ul class="clean-list" style="margin-top:6px;">
         <li><strong>Обем по ЗОП:</strong> 206 907 договора за <strong>€53,22 млрд.</strong> (40,7% с 1 оферта) при 4 344 възложители и 17 428 изпълнители.</li>
         <li><strong>Свързани лица и ДЗЗД:</strong> 571 длъжностни лица (53 със самовъзлагане), <strong>+€1,92 млрд.</strong> в скрити ДЗЗД консорциуми и 26 нови връзки от XML декларации.</li>
@@ -1958,29 +1958,29 @@
 
   function downloadProposalMarkdown() {
     const md = [
-      `# МЕМОРАНДУМ ЗА ИНСТИТУЦИОНАЛНО НАДГРАЖДАНЕ: СИГМА 2.0 → СИГМА 3.0 FINALITY`,
+      `# МЕМОРАНДУМ ЗА ИНСТИТУЦИОНАЛНО НАДГРАЖДАНЕ: СИГМА 2.0 → NAsvetlo`,
       ``,
-      `- **Демонстрационна платформа на живо:** https://nasvetlo.website`,
+      `- **Независима гражданска платформа на живо:** https://nasvetlo.website`,
       `- **Базов източник:** https://sigma.midt.bg (МИДТ, MIT / CC-BY 4.0)`,
       `- **Дата:** ${new Date().toISOString().slice(0, 10)}`,
       ``,
       `## 1. Резюме за ръководството на МИДТ`,
       `СИГМА 2.0 постави отличен отворен фундамент за прозрачност на българските обществени поръчки (206 907 договора / €53,22 млрд.).`,
-      `СИГМА 3.0 FINALITY надгражда директно същата архитектура (Cloudflare Workers + D1 + React Router v7), като реализира днес модулите от пътната карта на МИДТ и затваря 4 измерими слепи петна:`,
+      `NAsvetlo е независима гражданска платформа, изградена върху отворените данни (CC-BY 4.0) на МИДТ / СИГМА 2.0, която демонстрира на живо затварянето на 4 измерими слепи петна:`,
       `1. **+€1,92 млрд. скрити поръчки през ДЗЗД консорциуми без ЕИК** при 76 длъжностни лица от СИГМА.`,
       `2. **26 пропуснати връзки и 16 нови висши политици** от 3 035 XML декларации пред Сметната палата (Табл. 6, 7, 9, 11 и Декл. чл. 35).`,
       `3. **Картелен Co-Bidding двигател (60 повтарящи се ДЗЗД двойки)** + **Закон на Бенфорд (MAD 0,0122 при възложители)** + **Парето/Джини (0,906)** + **6-факторен Риск индекс (0–100)**.`,
       `4. **Работещ на живо AI Асистент на български (ORACLE)** с €0 разход за LLM API и 0× HTTP 503.`,
       ``,
       `## 2. Сравнителна матрица`,
-      `| Измерение | СИГМА 2.0 | СИГМА 3.0 FINALITY | Ефект |`,
+      `| Измерение | СИГМА 2.0 | NAsvetlo | Ефект |`,
       `|---|---|---|---|`,
       ...PROPOSAL_ROWS.map((r) => `| ${r[0]} | ${r[1]} | ${r[2].replace(/<[^>]+>/g, '')} | ${r[3]} |`),
     ].join('\n');
     const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'MEMORANDUM_MIDT_SIGMA_3_0_FINALITY.md';
+    a.download = 'MEMORANDUM_MIDT_NASVETLO.md';
     a.click();
   }
 

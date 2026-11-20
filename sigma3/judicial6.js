@@ -503,7 +503,7 @@
           <div>
             <h3 style="margin:0;border:none;padding:0;">Официален списък на вещите лица към АДФИ (${adfiVl.totalExperts || 0} експерти · ${esc(adfiVl.asOf)})</h3>
             <p class="chart-caption" style="margin-bottom:0;">
-              <strong>Дефицит на прозрачност:</strong> АДФИ публикува списъка с инициали (<code>А. Б. А.</code>) по чл. 2 ЗЗЛД, което пречи на гражданския контрол за конфликт на интереси. СИГМА 3.0 предлага псевдонимизирана проверка в RegiX.
+              <strong>Дефицит на прозрачност:</strong> АДФИ публикува списъка с инициали (<code>А. Б. А.</code>) по чл. 2 ЗЗЛД, което пречи на гражданския контрол за конфликт на интереси. NAsvetlo предлага псевдонимизирана проверка в RegiX.
             </p>
           </div>
           <a class="btn" href="${esc(adfiVl.sourceUrl)}" target="_blank" rel="noopener">Оригинален PDF на АДФИ ↗</a>
