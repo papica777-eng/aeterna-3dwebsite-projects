@@ -78,7 +78,8 @@
             <button class="city-chip" data-quick="Народно събрание">Депутати (57)</button>
             <button class="city-chip" data-quick="ДАНС">ДАНС / ДАТО</button>
             <button class="city-chip chip-accent" data-jump-tab="atlas">Карта 28 области</button>
-            <button class="city-chip chip-accent" data-jump-tab="cartels">Картели ДЗЗД</button>
+            <button class="city-chip chip-accent" data-jump-tab="forensics7">7 Кримин. радара</button>
+            <button class="city-chip chip-accent" data-jump-tab="judicial6">Съдебен радар (АДФИ/КЗК)</button>
           </div>
         </div>
       </div>
@@ -158,16 +159,18 @@
     </button>
   </div>
 
-  <!-- PRIMARY 10-MODULE NAVIGATION TABS -->
+  <!-- PRIMARY 12-MODULE NAVIGATION TABS -->
   <nav class="tabs" id="mainTabs" role="tablist" aria-label="Аналитични модули на СИГМА 3.0 FINALITY">
     <button class="tab-btn active" data-tab="dashboard">Команден пулт</button>
     <button class="tab-btn" data-tab="atlas">Атлас 28 области</button>
     <button class="tab-btn" data-tab="directory">Свързани лица (571)</button>
     <button class="tab-btn" data-tab="deep">Отвъд СИГМА 2.0 (ДЗЗД/XML)</button>
+    <button class="tab-btn tab-btn-forensics" data-tab="forensics7">7 Криминалистични радара</button>
+    <button class="tab-btn tab-btn-judicial" data-tab="judicial6">Съдебен радар (АОП × Съд)</button>
     <button class="tab-btn" data-tab="cartels">Картели, Бенфорд и HHI</button>
     <button class="tab-btn" data-tab="authorities">Институции (4 344)</button>
     <button class="tab-btn" data-tab="companies">Компании и ДЗЗД (17 428)</button>
-    <button class="tab-btn" data-tab="graph">Мрежов граф 3.0</button>
+    <button class="tab-btn" data-tab="graph">Мрежов граф 3.0 (9 типа)</button>
     <button class="tab-btn tab-btn-oracle" data-tab="oracle">AI Асистент (НА ЖИВО)</button>
     <button class="tab-btn tab-btn-proposal" data-tab="proposal">Предложение МИДТ (3.0)</button>
   </nav>
@@ -468,6 +471,50 @@
   </section>
 
   <!-- =================================================================== -->
+  <!-- TAB 4B: 7 DEEP ANTI-CORRUPTION FORENSIC ENGINES -->
+  <!-- =================================================================== -->
+  <section class="tab-panel" id="tab-forensics7">
+    <div class="kpi-grid" id="f7TopKpiGrid" style="margin-bottom:14px;"></div>
+    <div class="controls-card">
+      <div class="search-row">
+        <input id="f7SearchInput" class="search-input" type="search" placeholder="Филтрирай в активния радар по фирма, ЕИК, община, марка, партия или УНП…" />
+      </div>
+      <div class="pill-row" id="f7SubTabs">
+        <button class="pill active" data-f7-sub="annex">1. Анекси и оскъпяване</button>
+        <button class="pill" data-f7-sub="shell">2. „Кухи“ и новосъздадени фирми</button>
+        <button class="pill" data-f7-sub="salami">3. Разделяне под прага (Salami)</button>
+        <button class="pill" data-f7-sub="politics">4. Дарения (ЕРИК) и Медии</button>
+        <button class="pill" data-f7-sub="time">5. Времеви аномалии (Петък / Ное–Дек)</button>
+        <button class="pill" data-f7-sub="cartels">6. Картелна ротация и Общ адрес</button>
+        <button class="pill" data-f7-sub="nlp">7. NLP „Шити“ поръчки (+ Жив одитор)</button>
+      </div>
+    </div>
+    <div id="f7BodyHost"><div class="loading">Натиснете раздела за зареждане на 7-те криминалистични радара…</div></div>
+  </section>
+
+  <!-- =================================================================== -->
+  <!-- TAB 4C: 6 JUDICIAL x PROCUREMENT ENGINES (AOP x COURTS / ADFI / KZK) -->
+  <!-- =================================================================== -->
+  <section class="tab-panel" id="tab-judicial6">
+    <div class="editorial-note" id="j6EntityMatchingBox" style="display:block;">Зареждане на слоя за съвпадения (Entity Matching Layer)…</div>
+    <div class="kpi-grid" id="j6TopKpiGrid" style="margin-bottom:14px;"></div>
+    <div class="controls-card">
+      <div class="search-row">
+        <input id="j6SearchInput" class="search-input" type="search" placeholder="Търси по възложител, фирма, ЕИК, КЗК дело, УНП, адвокатска кантора или АДФИ доклад…" />
+      </div>
+      <div class="pill-row" id="j6SubTabs">
+        <button class="pill active" data-j6-sub="impunity">2. Индекс на безнаказаността (АДФИ 2 229)</button>
+        <button class="pill" data-j6-sub="kzk">4. Предварително изпълнение (КЗК / ВАС)</button>
+        <button class="pill" data-j6-sub="legal">3. Мрежа адвокати и вещи лица</button>
+        <button class="pill" data-j6-sub="collusive">1. Фиктивни спорове и спогодби</button>
+        <button class="pill" data-j6-sub="phoenix">5. Несъстоятелност и „Феникс“ фирми</button>
+        <button class="pill" data-j6-sub="eppo">6. Криминален, ЗМИП и EPPO профил</button>
+      </div>
+    </div>
+    <div id="j6BodyHost"><div class="loading">Натиснете раздела за зареждане на съдебния радар…</div></div>
+  </section>
+
+  <!-- =================================================================== -->
   <!-- TAB 5: CARTEL LAB, BENFORD'S LAW, PARETO GINI & HHI MONOPOLIES -->
   <!-- =================================================================== -->
   <section class="tab-panel" id="tab-cartels">
@@ -668,6 +715,7 @@
         <select id="compSectorSelect" class="select-ctrl"><option value="">Всички CPV сектори</option></select>
         <select id="compSortSelect" class="select-ctrl">
           <option value="won">Сортирай: Спечелени (€)</option>
+          <option value="risk">Сортирай: Съдебен/Кримин. риск 3.0</option>
           <option value="combined">Сортирай: Директни + ДЗЗД (€)</option>
           <option value="dzzd">Сортирай: Скрити в ДЗЗД (€)</option>
           <option value="contracts">Сортирай: Брой договори</option>
@@ -676,6 +724,7 @@
       </div>
       <div class="pill-row" id="compQuickPills">
         <button class="pill active" data-comp-flag="all">Всички 17 428</button>
+        <button class="pill" data-comp-flag="jrisk">Със съдебен / кримин. риск</button>
         <button class="pill" data-comp-flag="politician">Свързани с длъжностни лица</button>
         <button class="pill" data-comp-flag="inDzzd">Участват в ДЗЗД консорциуми</button>
       </div>
@@ -725,6 +774,9 @@
           <label class="kpi-label" for="graphPresetSelect" style="display:block;margin-bottom:6px;">Срез по кръг на свързаност</label>
           <select id="graphPresetSelect" class="select-ctrl" style="width:100%;">
             <option value="own">От собствената институция (53 лица)</option>
+            <option value="judicial_full">Пълен 9-възлов граф (АОП × Дела × Адвокати × Вещи лица)</option>
+            <option value="judicial_kzk">Съдебен и КЗК/АДФИ граф (Дела + Страни)</option>
+            <option value="legal_expert">Мрежа адвокати и вещи лица (Legal &amp; Expert Graph)</option>
             <option value="dzzd">Скрити ДЗЗД консорциуми (Топ 35)</option>
             <option value="cartels">Картелни ДЗЗД двойки (Топ 40)</option>
             <option value="parliament">Народно събрание — депутати (57 лица)</option>
@@ -760,8 +812,8 @@
       <div class="graph-canvas-wrap">
         <canvas id="networkCanvas"></canvas>
         <div class="graph-tooltip" id="graphTooltip">
-          <strong>Мрежов граф 3.0 (6 типа възли)</strong><br/>
-          <span class="muted">Посочете възел за осветяване. Влачете възли, скрол за мащаб. Кликнете върху длъжностно лице за пълно досие.</span>
+          <strong>Мрежов граф 3.0 (9 типа възли)</strong><br/>
+          <span class="muted">Посочете възел за осветяване. Влачете възли, скрол за мащаб. Кликнете върху лице, фирма, дело, адвокат или вещо лице за детайли.</span>
         </div>
         <div class="graph-legend">
           <span><i class="legend-dot" style="background:#b91c1c;"></i>Собств. инст.</span>
@@ -769,7 +821,10 @@
           <span><i class="legend-dot" style="background:#b45309;"></i>Фирма (ЕИК)</span>
           <span><i class="legend-dot" style="background:#1e3a8a;"></i>Институция</span>
           <span><i class="legend-dot" style="background:#6b21a8;"></i>Роднина (ТР)</span>
-          <span><i class="legend-dot" style="background:#0d9488;"></i>ДЗЗД консорциум</span>
+          <span><i class="legend-dot" style="background:#0d9488;"></i>ДЗЗД</span>
+          <span><i class="legend-diamond" style="background:#4f46e5;"></i>Съдебно дело / КЗК / АДФИ</span>
+          <span><i class="legend-square" style="background:#0284c7;"></i>Адвокат / Кантора</span>
+          <span><i class="legend-tri"></i>Вещо лице / Надзор</span>
         </div>
       </div>
     </div>
@@ -801,7 +856,14 @@
         <button class="city-chip" data-oracle-q="Кои институции имат най-висок HHI монопол?">Най-висок HHI монопол</button>
         <button class="city-chip" data-oracle-q="Какви са най-големите поръчки с 1 оферта?">Мега-договори с 1 оферта</button>
         <button class="city-chip" data-oracle-q="Генерирай официален сигнал за Гергана Владимирова Муртова">Генерирай сигнал (демо)</button>
-        <button class="city-chip" data-oracle-q="Какво е положението в ДАНС, ДАТО и Народно събрание?">ДАНС, ДАТО и НС</button>
+        <button class="city-chip" data-oracle-q="Кои договори имат най-голямо оскъпяване чрез анекси?">Анекси и оскъпяване</button>
+        <button class="city-chip" data-oracle-q="Покажи новосъздадените и кухи фирми от Търговския регистър">„Кухи“ фирми (ТР)</button>
+        <button class="city-chip" data-oracle-q="Кои общини правят разделяне под прага (Salami Slicing)?">Salami Slicing</button>
+        <button class="city-chip" data-oracle-q="Кои партийни медии и агенции от ЕРИК печелят поръчки?">Дарения ЕРИК &amp; Медии</button>
+        <button class="city-chip" data-oracle-q="Покажи АДФИ индекса на безнаказаността и инспекциите">АДФИ Индекс (2 229)</button>
+        <button class="city-chip" data-oracle-q="Какви са последните определения на КЗК за предварително изпълнение?">КЗК Предв. изпълнение</button>
+        <button class="city-chip" data-oracle-q="Покажи адвокатските кантори и вещите лица в обществените поръчки">Адвокати и Вещи лица</button>
+        <button class="city-chip" data-oracle-q="Какво показва радарът за несъстоятелност, Феникс фирми и EPPO?">Несъстоятелност &amp; EPPO</button>
       </div>
 
       <div class="oracle-messages" id="oracleMessages" aria-live="polite"></div>
@@ -1002,5 +1064,7 @@
 
 <script src="sigma3/app.js"></script>
 <script src="sigma3/sigma3_modules.js"></script>
+<script src="sigma3/forensics7.js"></script>
+<script src="sigma3/judicial6.js"></script>
 </body>
 </html>

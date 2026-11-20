@@ -1041,6 +1041,23 @@ tbody td { padding: 9px 11px; vertical-align: top; }
   .hof-shell, .hof-title, .hof-card.rank-apex, .hof-trigger, .hof-trigger-label, .live-pulse, .truth-live-dot { animation: none; }
 }
 
+/* Forensics 7 + Judicial 6 Highlights & Accent Tabs */
+.nlp-hl {
+  background: rgba(220, 38, 38, 0.16);
+  color: var(--crimson);
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border-bottom: 1.5px solid var(--crimson);
+}
+.tab-btn-forensics { border-bottom: 2px solid rgba(185, 28, 28, 0.45); }
+.tab-btn-forensics.active { border-bottom-color: var(--crimson); color: var(--crimson); }
+.tab-btn-judicial { border-bottom: 2px solid rgba(79, 70, 229, 0.5); }
+.tab-btn-judicial.active { border-bottom-color: #4f46e5; color: #4f46e5; }
+.legend-diamond { display: inline-block; width: 9px; height: 9px; transform: rotate(45deg); margin-right: 5px; vertical-align: middle; }
+.legend-square { display: inline-block; width: 9px; height: 9px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+.legend-tri { display: inline-block; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-bottom: 9px solid #059669; margin-right: 4px; vertical-align: middle; }
+
 /* Print / PDF Export Styling */
 @media print {
   .topbar, .tabs, .hof-trigger-wrap, .hero-search-box, .btn, .site-footer { display: none !important; }

@@ -15,6 +15,8 @@
     authoritiesByEik: new Map(),
     companies: null,
     companiesByEik: new Map(),
+    forensics7: null,
+    judicial6: null,
     sharedEiks: new Set(),
     trendMode: 'months',
     liveContractMode: 'top',
@@ -70,6 +72,7 @@
       linkedCount: r[12], ownHits: r[13], riskScore: r[14],
     }));
     state.authorities.forEach((a) => { if (a.eik) state.authoritiesByEik.set(a.eik, a); });
+    if (window.SIGMA3_J6) window.SIGMA3_J6.applyJudicialRiskWeightsToState();
     return state.authorities;
   }
 
@@ -81,8 +84,10 @@
       eik: r[0], name: r[1], isConsortium: r[2] === 1, settlement: r[3],
       wonEur: r[4], contracts: r[5], authorities: r[6], sector: r[7],
       linkedOfficials: r[8], consortiumCount: r[9], consortiumEur: r[10],
+      judicialRiskScore: 0, judicialReasons: [],
     }));
     state.companies.forEach((c) => { if (c.eik) state.companiesByEik.set(c.eik, c); });
+    if (window.SIGMA3_J6) window.SIGMA3_J6.applyJudicialRiskWeightsToState();
     return state.companies;
   }
 
@@ -92,6 +97,8 @@
     if (tabId === 'graph' && !state.graph.nodes.length && window.SIGMA3_MOD) {
       window.SIGMA3_MOD.buildGraphData(document.getElementById('graphPresetSelect').value);
     }
+    if (tabId === 'forensics7' && window.SIGMA3_F7) window.SIGMA3_F7.loadAndRenderForensics7();
+    if (tabId === 'judicial6' && window.SIGMA3_J6) window.SIGMA3_J6.loadAndRenderJudicial6();
     if (tabId === 'authorities' && window.SIGMA3_MOD) window.SIGMA3_MOD.loadAndRenderAuthorities();
     if (tabId === 'companies' && window.SIGMA3_MOD) window.SIGMA3_MOD.loadAndRenderCompanies();
     if (tabId === 'oracle' && window.SIGMA3_MOD) window.SIGMA3_MOD.ensureOracleReady();
@@ -176,6 +183,8 @@
       renderDirectory();
       renderDeepTab();
       if (window.SIGMA3_MOD) window.SIGMA3_MOD.initModules();
+      if (window.SIGMA3_F7) window.SIGMA3_F7.ensureForensics7Loaded();
+      if (window.SIGMA3_J6) window.SIGMA3_J6.ensureJudicial6Loaded();
       setupEvents();
     } catch (err) {
       console.error(err);
@@ -904,9 +913,18 @@
     document.getElementById('drawerBadges').innerHTML = badges.join('');
 
     const rb = o.riskBreakdown;
+    const j6 = state.judicial6;
+    const compRiskAlerts = [];
+    if (j6 && j6.riskAdjustments && j6.riskAdjustments.companies) {
+      o.companies.forEach((c) => {
+        const cr = c.eik && j6.riskAdjustments.companies[c.eik];
+        if (cr) compRiskAlerts.push(`${c.name} (${c.eik}): Риск ${cr.score}/100 — ${(cr.reasons || []).join('; ')}`);
+      });
+    }
     const riskExplain = rb ? `<div class="contract-row" style="border-left:3px solid var(--crimson);font-size:12px;">
       <strong>Разбивка на СИГМА 3.0 Риск индекс (${o.sigma3Score}/100):</strong>
       Самовъзлагане: <b>+${rb.own}</b> · В периода: <b>+${rb.period}</b> · Скрити ДЗЗД: <b>+${rb.dzzd}</b> · Роля/пропуск ТР: <b>+${rb.registry}</b> · Споделена фирма: <b>+${rb.shared}</b> · Свързано лице: <b>+${rb.family}</b>
+      ${compRiskAlerts.length ? `<div style="margin-top:6px;padding-top:6px;border-top:1px dashed var(--border);color:var(--crimson);"><strong>Съдебен / Криминалистичен слой (13 радара):</strong> ${compRiskAlerts.map((x) => esc(x)).join(' | ')}</div>` : ''}
     </div>` : '';
 
     const instHtml = o.institutions.map((i) => `<div class="contract-row"><strong>${esc(i.institution)}</strong><br/><span class="muted">${esc(i.positions.join('; '))} · Години: ${esc(i.years.join(', '))}</span></div>`).join('');
