@@ -1,19 +1,36 @@
 /**
  * ╔═══════════════════════════════════════════════════════════════════════════════╗
- * ║   SIGMA 3.0 FINALITY × QANTUM SEMANTIC DIALOGUE ENGINE (PRODUCTION RUNTIME)  ║
- * ║   Fuses the 5 Desktop TypeScript Cognitive Architectures:                     ║
- * ║   1. FeatureVectorizer (1,2-gram TF-IDF) & NaiveBayesClassifier (Softmax)     ║
- * ║   2. VectorOps (256-D DJB2 Subword Embeddings + Cosine Similarity)            ║
- * ║   3. SemanticMemoryBank (Persistent Vector RAG + Experience Reinforcement)    ║
- * ║   4. AdaptiveSemanticCore (Bidirectional Synonyms + Autonomous UI Actions)    ║
- * ║   5. CognitiveBridge ReAct Loop (Thought -> Action -> Observation -> Anchor)  ║
+ * ║   NAsvetlo ORACLE — CALIBRATED SEMANTIC DIALOGUE ENGINE (PRODUCTION RUNTIME) ║
+ * ║   1. FeatureVectorizer (Stopword-Filtered 1,2-gram TF-IDF + Subwords)        ║
+ * ║   2. Calibrated NaiveBayesClassifier (Honest Abstention + Margin Guard)      ║
+ * ║   3. VectorOps (256-D Stopword-Filtered Embeddings + Cosine Similarity)      ║
+ * ║   4. SemanticMemoryBank (High-Precision Vector RAG + Clean v2 Storage)       ║
+ * ║   5. Autonomous UI Action Executor (Theme, Density, Top-50, Shortest Path)   ║
  * ╚═══════════════════════════════════════════════════════════════════════════════╝
  */
 (() => {
   'use strict';
 
+  const NLU_STOP_WORDS = new Set([
+    'кажи', 'кажете', 'ми', 'за', 'покажи', 'покажете', 'провери', 'проверете',
+    'какво', 'какви', 'какъв', 'каква', 'има', 'имат', 'няма', 'са', 'е', 'бе', 'беше',
+    'в', 'във', 'на', 'от', 'до', 'по', 'със', 'с', 'или', 'и', 'а', 'но', 'че', 'защото',
+    'кой', 'кои', 'коя', 'кое', 'колко', 'къде', 'кога', 'как', 'защо', 'всички', 'всичко',
+    'дай', 'дайте', 'информация', 'данни', 'справка', 'одит', 'моля', 'те', 'искам', 'да',
+    'видя', 'разкажи', 'намери', 'потърси', 'извади', 'списък', 'таблица', 'относно', 'около',
+    'при', 'между', 'след', 'преди', 'над', 'под', 'най', 'много', 'малко', 'големи', 'голям',
+    'голяма', 'ли', 'се', 'си', 'му', 'й', 'им', 'ги', 'го', 'я', 'това', 'тази', 'този',
+    'тези', 'там', 'тук', 'него', 'нея', 'тях', 'ти', 'вие', 'ние', 'аз', 'мен', 'теб',
+    'тебе', 'твой', 'твоя', 'твое', 'твоите', 'ваш', 'ваша', 'вашите', 'можеш', 'може',
+    'мога', 'можете', 'можем', 'правиш', 'прави', 'правя', 'правите', 'правим', 'направи',
+    'направиш', 'нещо', 'нищо', 'някой', 'някои', 'които', 'който', 'която', 'което',
+    'само', 'вече', 'още', 'така', 'тука', 'нали', 'българия', 'фирма', 'фирми', 'компания',
+    'компании', 'институция', 'институции', 'поръчка', 'поръчки', 'договор', 'договори',
+    'обществени', 'обществена', 'пари', 'сума', 'суми', 'евро', 'лева',
+  ]);
+
   // ===========================================================================
-  // 1. VECTOR OPS (256-D DJB2 WORD + CHARACTER 3-GRAM EMBEDDINGS & COSINE SIM)
+  // 1. VECTOR OPS (256-D STOPWORD-FILTERED WORD + SUBWORD EMBEDDINGS)
   // ===========================================================================
   class VectorOps {
     static hashString(str) {
@@ -27,26 +44,30 @@
     static textToVector(text, dimension = 256) {
       const vector = new Float32Array(dimension);
       const clean = String(text || '').toLowerCase().replace(/[^а-яa-z0-9\s]/g, ' ');
-      const words = clean.split(/\s+/).filter((w) => w.length >= 2);
+      const words = clean.split(/\s+/).filter((w) => w.length >= 3 && !NLU_STOP_WORDS.has(w));
+      if (!words.length) return vector;
 
       for (let i = 0; i < words.length; i++) {
         const word = words[i];
         const posWeight = 1 / (1 + Math.log(1 + i));
         const h = this.hashString(word);
-        vector[h % dimension] += posWeight * 1.4;
+        vector[h % dimension] += posWeight * 1.85;
 
-        // Character 3-grams for typo-resilient subword representation
-        const padded = `^${word}$`;
-        for (let k = 0; k <= padded.length - 3; k++) {
-          const tri = padded.slice(k, k + 3);
-          const th = this.hashString(tri);
-          vector[th % dimension] += posWeight * 0.48;
+        // Character 4-grams reduce random Bulgarian suffix collisions dramatically vs 3-grams
+        if (word.length >= 4) {
+          const padded = `^${word}$`;
+          for (let k = 0; k <= padded.length - 4; k++) {
+            const quad = padded.slice(k, k + 4);
+            const qh = this.hashString(quad);
+            vector[qh % dimension] += posWeight * 0.42;
+          }
         }
       }
 
       let mag = 0;
       for (let i = 0; i < dimension; i++) mag += vector[i] * vector[i];
-      mag = Math.sqrt(mag) || 1;
+      if (mag === 0) return vector;
+      mag = Math.sqrt(mag);
       for (let i = 0; i < dimension; i++) vector[i] /= mag;
       return vector;
     }
@@ -65,51 +86,52 @@
   }
 
   // ===========================================================================
-  // 2. FEATURE VECTORIZER (TF-IDF N-GRAMS [1, 2]) & NAIVE BAYES CLASSIFIER
+  // 2. FEATURE VECTORIZER (TF-IDF N-GRAMS [1, 2]) & CALIBRATED NAIVE BAYES
   // ===========================================================================
   class FeatureVectorizer {
     constructor(options = {}) {
-      this.maxFeatures = options.maxFeatures || 2200;
+      this.maxFeatures = options.maxFeatures || 2400;
       this.ngrams = options.ngrams || [1, 2];
       this.vocabulary = new Map();
       this.idf = new Map();
       this.fitted = false;
     }
 
-    _tokenize(text) {
+    _tokenize(text, keepConversational = false) {
       return String(text || '')
         .toLowerCase()
         .replace(/[^а-яa-z0-9\s]/g, ' ')
         .split(/\s+/)
-        .filter((t) => t.length > 1);
+        .filter((t) => t.length > 1 && (keepConversational || !NLU_STOP_WORDS.has(t)));
     }
 
     _getNgrams(tokens) {
-      const result = [];
+      const words = [];
+      const subwords = [];
       for (const n of this.ngrams) {
         for (let i = 0; i <= tokens.length - n; i++) {
-          result.push(tokens.slice(i, i + n).join(' '));
+          words.push(tokens.slice(i, i + n).join(' '));
         }
       }
-      // Also add character 3-grams of tokens >= 4 chars so misspelled words activate Naive Bayes features!
+      // 4-char subwords preserve typo resilience while eliminating 3-char false positives
       for (const tk of tokens) {
-        if (tk.length >= 4) {
-          for (let i = 0; i <= tk.length - 3; i++) {
-            result.push(`#${tk.slice(i, i + 3)}`);
+        if (tk.length >= 5) {
+          for (let i = 0; i <= tk.length - 4; i++) {
+            subwords.push(`#${tk.slice(i, i + 4)}`);
           }
         }
       }
-      return result;
+      return { words, subwords, all: [...words, ...subwords] };
     }
 
     fit(documents) {
       const docCount = documents.length;
       const termDocCount = new Map();
       for (const doc of documents) {
-        const tokens = this._tokenize(doc);
-        const ngrams = this._getNgrams(tokens);
+        const tokens = this._tokenize(doc, false);
+        const { all } = this._getNgrams(tokens);
         const seen = new Set();
-        for (const ng of ngrams) {
+        for (const ng of all) {
           if (!seen.has(ng)) {
             seen.add(ng);
             termDocCount.set(ng, (termDocCount.get(ng) || 0) + 1);
@@ -130,13 +152,32 @@
       return this;
     }
 
-    transform(document) {
+    transformWithStats(document) {
       const vector = new Float32Array(this.vocabulary.size);
-      if (!this.fitted) return vector;
-      const tokens = this._tokenize(document);
-      const ngrams = this._getNgrams(tokens);
+      if (!this.fitted) return { vector, wordHitCount: 0, subwordHitCount: 0, tokenCount: 0 };
+      const tokens = this._tokenize(document, false);
+      const { words, subwords } = this._getNgrams(tokens);
       const tf = new Map();
-      for (const ng of ngrams) tf.set(ng, (tf.get(ng) || 0) + 1);
+      let wordHitCount = 0;
+      let subwordHitCount = 0;
+      const matchedWords = new Set();
+      const matchedSubs = new Set();
+
+      for (const w of words) {
+        if (this.vocabulary.has(w)) {
+          tf.set(w, (tf.get(w) || 0) + 1.35);
+          matchedWords.add(w);
+        }
+      }
+      for (const sw of subwords) {
+        if (this.vocabulary.has(sw)) {
+          tf.set(sw, (tf.get(sw) || 0) + 0.55);
+          matchedSubs.add(sw);
+        }
+      }
+      wordHitCount = matchedWords.size;
+      subwordHitCount = matchedSubs.size;
+
       for (const [term, freq] of tf) {
         const idx = this.vocabulary.get(term);
         if (idx !== undefined) {
@@ -149,7 +190,11 @@
       if (norm > 0) {
         for (let i = 0; i < vector.length; i++) vector[i] /= norm;
       }
-      return vector;
+      return { vector, wordHitCount, subwordHitCount, tokenCount: tokens.length };
+    }
+
+    transform(document) {
+      return this.transformWithStats(document).vector;
     }
 
     fitTransform(documents) {
@@ -159,7 +204,7 @@
   }
 
   class NaiveBayesClassifier {
-    constructor(alpha = 0.45) {
+    constructor(alpha = 0.5) {
       this.alpha = alpha;
       this.classes = [];
       this.classPriors = new Map();
@@ -169,11 +214,10 @@
 
     train(X, y) {
       this.classes = [...new Set(y)];
-      const nSamples = X.length;
       const nFeatures = X[0] ? X[0].length : 0;
-      const classCounts = new Map();
-      for (const label of y) classCounts.set(label, (classCounts.get(label) || 0) + 1);
-      for (const [cls, count] of classCounts) this.classPriors.set(cls, count / nSamples);
+      // Uniform class priors prevent corpus-size bias (e.g., COMPARE winning on empty input)
+      const uniformPrior = 1 / (this.classes.length || 1);
+      for (const cls of this.classes) this.classPriors.set(cls, uniformPrior);
 
       for (const cls of this.classes) {
         const classIndices = [];
@@ -197,7 +241,7 @@
         const featureProbs = this.featureProbabilities.get(cls);
         for (let f = 0; f < x.length; f++) {
           if (x[f] > 0) {
-            logProb += x[f] * Math.log(featureProbs[f] + 1e-10) * 6.5;
+            logProb += x[f] * Math.log(featureProbs[f] + 1e-10) * 3.8;
           }
         }
         logProbs.set(cls, logProb);
@@ -215,8 +259,8 @@
 
   class IntentClassifier {
     constructor() {
-      this.vectorizer = new FeatureVectorizer({ maxFeatures: 2400, ngrams: [1, 2] });
-      this.classifier = new NaiveBayesClassifier(0.42);
+      this.vectorizer = new FeatureVectorizer({ maxFeatures: 2600, ngrams: [1, 2] });
+      this.classifier = new NaiveBayesClassifier(0.5);
       this.trainingData = [];
       this.trained = false;
     }
@@ -237,47 +281,77 @@
 
     classify(text) {
       if (!this.trained) this.train();
-      const vec = this.vectorizer.transform(text);
-      const probs = this.classifier.predictProbabilities(vec);
+      const { vector, wordHitCount, subwordHitCount } = this.vectorizer.transformWithStats(text);
+
+      // Honest abstention: never invent an intent when zero real domain words matched
+      if (wordHitCount === 0 && subwordHitCount < 3) {
+        return {
+          text,
+          intent: null,
+          confidence: 0,
+          margin: 0,
+          wordHitCount: 0,
+          abstained: true,
+          alternatives: [],
+        };
+      }
+
+      const probs = this.classifier.predictProbabilities(vector);
       const sorted = Array.from(probs.entries()).sort((a, b) => b[1] - a[1]);
-      const top = sorted[0] || ['HIGH_RISK_OVERVIEW', 0.1];
+      const top = sorted[0];
+      const second = sorted[1] || [null, 0];
+      if (!top) {
+        return { text, intent: null, confidence: 0, margin: 0, wordHitCount, abstained: true, alternatives: [] };
+      }
+
+      const margin = top[1] - second[1];
+      const confident = (wordHitCount >= 1 && top[1] >= 0.42 && margin >= 0.14)
+        || (wordHitCount >= 2 && top[1] >= 0.34 && margin >= 0.10);
+
       return {
         text,
-        intent: top[0],
-        confidence: top[1],
-        alternatives: sorted.slice(1, 5).map(([intent, probability]) => ({ intent, probability })),
+        intent: confident ? top[0] : null,
+        confidence: confident ? top[1] : 0,
+        rawTopIntent: top[0],
+        rawTopConfidence: top[1],
+        margin,
+        wordHitCount,
+        abstained: !confident,
+        alternatives: sorted.slice(1, 4).map(([intent, probability]) => ({ intent, probability })),
       };
     }
   }
 
   // ===========================================================================
-  // 3. BIDIRECTIONAL SYNONYM EXPANDER (FROM ADAPTIVE SEMANTIC CORE)
+  // 3. BIDIRECTIONAL SYNONYM EXPANDER
   // ===========================================================================
   const INTENT_SYNONYMS = {
     'самовъзлагане': ['сам на себе си', 'собствената институция', 'собствена община', 'конфликт на интереси', 'свои фирми', 'кмет печели', 'общинари печелят', 'роднинска фирма'],
     'дззд': ['консорциум', 'обединение', 'скрити фирми', 'без еик', 'мега консорциум', 'скрити поръчки', 'dzzd'],
     'xml': ['декларация', 'декларации', 'сметна палата', 'пропуснати от сигма', 'нови политици', 'частни заеми', 'акции', 'таблица 9', 'чл 35'],
     'съд': ['дела', 'дело', 'търговски спор', 'осъден', 'неустойки', 'спогодба', 'епеп', 'еисс', 'присъда', 'съдебен', 'арбитраж', 'окръжен съд'],
-    'адфи': ['инспекция', 'финансова инспекция', 'ревизия', 'глоба', 'глоби', 'наказателно постановление', 'нп', 'ауан', 'канд', 'анд', 'безнаказаност', 'чл 17', 'отменено нп', 'adfi'],
-    'кзк': ['вас', 'върховен административен съд', 'предварително изпълнение', 'чл 205', 'обжалване', 'жалба', 'блокаж', 'спряна поръчка', 'отменено решение', 'kzk', 'vas'],
+    'адфи': ['инспекция', 'финансова инспекция', 'ревизия', 'глоба', 'глоби', 'наказателно постановление', 'ауан', 'канд', 'безнаказаност', 'чл 17', 'отменено нп', 'adfi'],
+    'кзк': ['върховен административен съд', 'предварително изпълнение', 'чл 205', 'обжалване', 'жалба', 'блокаж', 'спряна поръчка', 'отменено решение', 'kzk'],
     'адвокат': ['адвокати', 'юрист', 'юрисконсулт', 'кантора', 'кантори', 'правни услуги', 'вещо лице', 'вещи лица', 'експерт', 'строителен надзор'],
     'фалит': ['несъстоятелност', 'ликвидация', 'запор', 'запори', 'особен залог', 'чси', 'дългове', 'феникс', 'изгаряне', 'burnout', 'спряла фирма'],
     'европрокуратура': ['eppo', 'еппо', 'кьовеши', 'еврофондове', 'ес средства', 'европейски пари', 'змип', 'действителен собственик', 'офшорка'],
     'анекс': ['анекси', 'оскъпяване', 'оскъпени', 'инфлация', 'допълнително споразумение', 'увеличена цена', 'чл 116', 'дъмпинг'],
     'куха': ['кухи фирми', 'фантом', 'фантоми', 'новосъздадена', 'вчерашна фирма', '2 лева капитал', 'без история', 'shell'],
     'разделяне': ['салами', 'salami', 'раздробяване', 'нацепване', 'под прага', 'заобикаляне на търг', 'чл 20'],
-    'дарения': ['дарители', 'ерик', 'партия', 'партии', 'спонсори', 'медии', 'телевизии', 'пиар', 'реклама', 'кампания'],
+    'дарения': ['дарители', 'ерик', 'партийни', 'спонсори', 'медии', 'телевизии', 'пиар', 'реклама', 'кампания'],
     'декември': ['петък', 'ноември', 'края на годината', 'коледа', 'бюджетен дъмпинг', 'времеви аномалии', 'последния момент'],
     'картел': ['картели', 'ротация', 'редуване', 'общ адрес', 'един и същ адрес', 'двойки фирми', 'съвместни оферти', 'сговаряне'],
-    'шити': ['нагласени', 'спецификация', 'марка', 'дискриминационни', 'ограничителни', 'чл 49', 'технически критерии'],
+    'шити': ['нагласени', 'спецификация', 'дискриминационни', 'ограничителни', 'чл 49', 'технически критерии'],
     'монопол': ['1 оферта', 'една оферта', 'без конкуренция', 'единствен участник', 'пряко договаряне', 'директно възлагане', 'hhi'],
     'бенфорд': ['парето', 'джини', 'gini', 'лоренц', 'статистически одит', 'математически', 'топ 1%'],
     'сигнал': ['жалба до', 'доклад до', 'официална справка', 'прокуратура', 'кпк', 'кпконпи', 'експорт'],
-    'сравни': ['сравнение', 'разлика между', 'срещу', 'съпостави', 'vs'],
+    'сравни': ['сравнение', 'разлика между', 'срещу', 'съпостави'],
+    'помощ': ['възможности', 'функции', 'инструкция', 'ръководство', 'команди', 'примери', 'умееш', 'работиш'],
+    'източници': ['методология', 'статистика', 'актуалност', 'регистри', 'отворени данни'],
   };
 
   function expandTextWithSynonyms(text) {
-    let lower = String(text || '').toLowerCase();
+    const lower = String(text || '').toLowerCase();
     const additions = new Set();
     for (const [canonical, syns] of Object.entries(INTENT_SYNONYMS)) {
       if (lower.includes(canonical)) {
@@ -294,106 +368,109 @@
   }
 
   // ===========================================================================
-  // 4. PRE-TRAINED BULGARIAN & SHLYOKAVITSA NLU CORPUS (180+ SAMPLES)
+  // 4. PRE-TRAINED BULGARIAN AUDIT NLU CORPUS
   // ===========================================================================
   const TRAINING_CORPUS = [
+    // HELP_CAPABILITIES
+    { text: 'помощ възможности функции команди инструкция ръководство примери', intent: 'HELP_CAPABILITIES' },
+    { text: 'умееш работиш служиш обясни платформата асистента оракула', intent: 'HELP_CAPABILITIES' },
+    { text: 'какви справки одити проверки функции поддържа асистентът', intent: 'HELP_CAPABILITIES' },
+    // PLATFORM_OVERVIEW
+    { text: 'източници методология актуалност регистри отворени данни обща статистика', intent: 'PLATFORM_OVERVIEW' },
+    { text: 'откъде идват данните официални регистри сигма цаис еоп сметна палата', intent: 'PLATFORM_OVERVIEW' },
+    { text: 'обобщение макрорамка общ обем милиарда договори възложители изпълнители', intent: 'PLATFORM_OVERVIEW' },
     // COMPARE
-    { text: 'сравни област бургас и област варна разлика между двете', intent: 'COMPARE' },
-    { text: 'какво е сравнението между пловдив и стара загора по риск и поръчки', intent: 'COMPARE' },
-    { text: 'съпостави софия и благоевград коя община има повече самовъзлагане', intent: 'COMPARE' },
-    { text: 'бургас срещу варна vs хасково сравнителен профил', intent: 'COMPARE' },
+    { text: 'сравни област бургас област варна разлика сравнение', intent: 'COMPARE' },
+    { text: 'сравнението пловдив стара загора риск сравнителен профил', intent: 'COMPARE' },
+    { text: 'съпостави софия благоевград коя община повече самовъзлагане', intent: 'COMPARE' },
+    { text: 'бургас срещу варна хасково сравнителен профил', intent: 'COMPARE' },
     // SIGNAL
-    { text: 'генерирай официален сигнал до адфи кпк прокуратурата и eppo', intent: 'SIGNAL' },
-    { text: 'направи ми жалба и одитна справка за този политик или кмет', intent: 'SIGNAL' },
-    { text: 'изготви сигнал за конфликт на интереси и самовъзлагане за печат', intent: 'SIGNAL' },
-    { text: 'дай ми сигнал за първия за мyртова или гаргов', intent: 'SIGNAL' },
+    { text: 'генерирай официален сигнал адфи кпк прокуратурата eppo', intent: 'SIGNAL' },
+    { text: 'жалба одитна справка политик кмет сигнал експорт', intent: 'SIGNAL' },
+    { text: 'изготви сигнал конфликт интереси самовъзлагане печат', intent: 'SIGNAL' },
     // SELF_DEALING
-    { text: 'кои кметове и общинари си дават поръчки сами на себе си самовъзлагане', intent: 'SELF_DEALING' },
-    { text: 'покажи лицата които печелят от собствената си институция или община', intent: 'SELF_DEALING' },
-    { text: 'директен конфликт на интереси фирми на политици в собствената им община', intent: 'SELF_DEALING' },
-    { text: 'кой кмет или съветник върти далавери със свои роднински фирми в общината', intent: 'SELF_DEALING' },
+    { text: 'кметове общинари самовъзлагане собствената институция собствена община', intent: 'SELF_DEALING' },
+    { text: 'лицата печелят собствената институция община конфликт интереси', intent: 'SELF_DEALING' },
+    { text: 'директен конфликт интереси политици собствената община роднински', intent: 'SELF_DEALING' },
     // HIDDEN_DZZD
-    { text: 'скрити поръчки през дззд консорциуми и обединения без еик', intent: 'HIDDEN_DZZD' },
-    { text: 'кои политици крият фирми зад консорциум или обединение за милиарди', intent: 'HIDDEN_DZZD' },
-    { text: 'разбий мега консорциумите кои са реалните собственици зад дззд', intent: 'HIDDEN_DZZD' },
-    { text: 'топ 10 лица със скрити дззд поръчки извън директния еик', intent: 'HIDDEN_DZZD' },
+    { text: 'скрити дззд консорциуми обединения без еик', intent: 'HIDDEN_DZZD' },
+    { text: 'политици крият зад консорциум обединение милиарди', intent: 'HIDDEN_DZZD' },
+    { text: 'разбий мега консорциумите реалните собственици дззд', intent: 'HIDDEN_DZZD' },
     // XML_DECLARATIONS
-    { text: 'нови политици от xml декларациите на сметната палата пропуснати от сигма', intent: 'XML_DECLARATIONS' },
-    { text: 'скрити частни заеми акции в ад таблица 7 таблица 9 декларации по чл 35', intent: 'XML_DECLARATIONS' },
-    { text: 'какво е пропуснато в xml файловете на сметна палата извън 571 лица', intent: 'XML_DECLARATIONS' },
+    { text: 'нови политици xml декларациите сметната палата пропуснати сигма', intent: 'XML_DECLARATIONS' },
+    { text: 'скрити частни заеми акции таблица 7 таблица 9 декларации чл 35', intent: 'XML_DECLARATIONS' },
+    { text: 'пропуснато xml файловете сметна палата декларации', intent: 'XML_DECLARATIONS' },
     // JUDICIAL_TD
-    { text: 'търговски дела и спорове в съда между възложители и фирми изпълнители епеп еисс', intent: 'JUDICIAL_TD' },
-    { text: 'осъдени общини и агенции за неустойки неизпълнение или фиктивни спогодби тд втд', intent: 'JUDICIAL_TD' },
-    { text: 'какви дела има в окръжния и апелативния съд по договори за обществени поръчки', intent: 'JUDICIAL_TD' },
-    { text: 'покажи реалните съдебни спорове между възложител и фирма в еисс', intent: 'JUDICIAL_TD' },
+    { text: 'търговски дела спорове съда изпълнители епеп еисс', intent: 'JUDICIAL_TD' },
+    { text: 'осъдени общини агенции неустойки неизпълнение фиктивни спогодби втд', intent: 'JUDICIAL_TD' },
+    { text: 'съдебни дела окръжния апелативния съд търговски спорове еисс', intent: 'JUDICIAL_TD' },
     // JUDICIAL_ADFI
-    { text: 'адфи индекс на безнаказаността ревизии финансови инспекции и доклади по чл 17', intent: 'JUDICIAL_ADFI' },
-    { text: 'отменени наказателни постановления нп и глоби на адфи в съда по канд и анд дела', intent: 'JUDICIAL_ADFI' },
-    { text: 'защо съдът отменя актовете и глобите на адфи маловажен случай чл 28 занн давност', intent: 'JUDICIAL_ADFI' },
-    { text: 'кои общини и институции са най-много проверявани от адфи и имат 370 актуализирани доклада', intent: 'JUDICIAL_ADFI' },
+    { text: 'адфи индекс безнаказаността ревизии финансови инспекции доклади чл 17', intent: 'JUDICIAL_ADFI' },
+    { text: 'отменени наказателни постановления глоби адфи съда канд', intent: 'JUDICIAL_ADFI' },
+    { text: 'съдът отменя актовете глобите адфи маловажен случай чл 28 занн давност', intent: 'JUDICIAL_ADFI' },
     // JUDICIAL_KZK_VAS
-    { text: 'кзк жалби предварително изпълнение по чл 205 зоп и окончателни решения на вас', intent: 'JUDICIAL_KZK_VAS' },
-    { text: 'върховен административен съд четвърто отделение отменени решения на кзк', intent: 'JUDICIAL_KZK_VAS' },
-    { text: 'блокаж на поръчки и обжалване пред кзк и вас кои търгове са спрени или пуснати', intent: 'JUDICIAL_KZK_VAS' },
+    { text: 'кзк жалби предварително изпълнение чл 205 зоп окончателни решения вас', intent: 'JUDICIAL_KZK_VAS' },
+    { text: 'върховен административен съд четвърто отделение отменени решения кзк', intent: 'JUDICIAL_KZK_VAS' },
+    { text: 'блокаж обжалване кзк вас спрени отменено решение', intent: 'JUDICIAL_KZK_VAS' },
     // JUDICIAL_LAWYERS
-    { text: 'мрежа на адвокати адвокатски кантори юрисконсулти и вещи лица в поръчките', intent: 'JUDICIAL_LAWYERS' },
-    { text: 'кои адвокати и фирми за строителен надзор обслужват десетки общини и дела в епеп', intent: 'JUDICIAL_LAWYERS' },
-    { text: 'списък на вещите лица към адфи и правни консултанти с договори без търг', intent: 'JUDICIAL_LAWYERS' },
+    { text: 'мрежа адвокати адвокатски кантори юрисконсулти вещи лица', intent: 'JUDICIAL_LAWYERS' },
+    { text: 'адвокати строителен надзор обслужват общини дела епеп', intent: 'JUDICIAL_LAWYERS' },
+    { text: 'вещите лица адфи правни консултанти адвокатски кантори', intent: 'JUDICIAL_LAWYERS' },
     // JUDICIAL_PHOENIX
-    { text: 'фирми в несъстоятелност фалит ликвидация със запори от чси нап и особени залози в тр', intent: 'JUDICIAL_PHOENIX' },
-    { text: 'феникс фирми и изгорели burnout компании които спират и прехвърлят дейност на нова фирма', intent: 'JUDICIAL_PHOENIX' },
-    { text: 'кои изпълнители имат запори върху дяловете в търговския регистър и дългове', intent: 'JUDICIAL_PHOENIX' },
+    { text: 'несъстоятелност фалит ликвидация запори чси нап особени залози', intent: 'JUDICIAL_PHOENIX' },
+    { text: 'феникс изгорели burnout ликвидационен дългов срив прехвърлят дейност', intent: 'JUDICIAL_PHOENIX' },
+    { text: 'запори върху дяловете търговския регистър дългове несъстоятелност', intent: 'JUDICIAL_PHOENIX' },
     // JUDICIAL_EPPO
-    { text: 'европейска прокуратура eppo кьовеши злоупотреби с ес средства и еврофондове', intent: 'JUDICIAL_EPPO' },
-    { text: 'поръчки с европейско финансиране с 1 оферта и липсващ действителен собственик по змип', intent: 'JUDICIAL_EPPO' },
-    { text: 'офшорни фирми чуждестранни майки и високорискови европроекти над 1 милион евро', intent: 'JUDICIAL_EPPO' },
+    { text: 'европейска прокуратура eppo кьовеши злоупотреби ес средства еврофондове', intent: 'JUDICIAL_EPPO' },
+    { text: 'европейско финансиране оферта липсващ действителен собственик змип', intent: 'JUDICIAL_EPPO' },
+    { text: 'офшорни чуждестранни майки високорискови европроекти eppo', intent: 'JUDICIAL_EPPO' },
     // FORENSIC_ANNEX
-    { text: 'анекси и оскъпяване на договори след подписване допълнителни споразумения по чл 116', intent: 'FORENSIC_ANNEX' },
-    { text: 'кои поръчки са спечелени евтино с дъмпинг и после цената е вдигната двойно с анекс', intent: 'FORENSIC_ANNEX' },
-    { text: 'най-голяма инфлация и увеличение на стойността на договори чрез анекси', intent: 'FORENSIC_ANNEX' },
+    { text: 'анекси оскъпяване подписване допълнителни споразумения чл 116', intent: 'FORENSIC_ANNEX' },
+    { text: 'спечелени евтино дъмпинг цената вдигната двойно анекс', intent: 'FORENSIC_ANNEX' },
+    { text: 'инфлация увеличение стойността договори анекси', intent: 'FORENSIC_ANNEX' },
     // FORENSIC_SHELL
-    { text: 'кухи и новосъздадени фирми фантоми регистрирани дни преди търга с 2 лева капитал', intent: 'FORENSIC_SHELL' },
-    { text: 'вчерашни фирми без история и без персонал които печелят милиони от обществени поръчки', intent: 'FORENSIC_SHELL' },
+    { text: 'кухи новосъздадени фантоми регистрирани дни преди търга капитал', intent: 'FORENSIC_SHELL' },
+    { text: 'вчерашни без история персонал печелят милиони кухи', intent: 'FORENSIC_SHELL' },
     // FORENSIC_SALAMI
-    { text: 'разделяне на поръчки под прага салами слайсинг salami slicing за заобикаляне на търг', intent: 'FORENSIC_SALAMI' },
-    { text: 'нацепване и раздробяване на договори на малки суми точно под законовия праг по чл 20 зоп', intent: 'FORENSIC_SALAMI' },
+    { text: 'разделяне под прага салами слайсинг salami slicing заобикаляне търг', intent: 'FORENSIC_SALAMI' },
+    { text: 'нацепване раздробяване малки суми законовия праг чл 20 зоп', intent: 'FORENSIC_SALAMI' },
     // FORENSIC_POLITICS_MEDIA
-    { text: 'политически дарения в ерик спонсори на партии и договори за медии телевизии и пиар агенции', intent: 'FORENSIC_POLITICS_MEDIA' },
-    { text: 'кои дарители от кампанията и партийни медийни агенции печелят обществени поръчки', intent: 'FORENSIC_POLITICS_MEDIA' },
+    { text: 'политически дарения ерик спонсори партийни медии телевизии пиар агенции', intent: 'FORENSIC_POLITICS_MEDIA' },
+    { text: 'дарители кампанията партийни медийни агенции реклама', intent: 'FORENSIC_POLITICS_MEDIA' },
     // FORENSIC_TIME
-    { text: 'времеви аномалии поръчки подписани в петък вечер или по коледа и края на декември', intent: 'FORENSIC_TIME' },
-    { text: 'бюджетен дъмпинг през ноември и декември изхарчване на бюджета в последния момент', intent: 'FORENSIC_TIME' },
+    { text: 'времеви аномалии подписани петък вечер коледа края декември', intent: 'FORENSIC_TIME' },
+    { text: 'бюджетен дъмпинг ноември декември изхарчване бюджета последния момент', intent: 'FORENSIC_TIME' },
     // FORENSIC_CARTEL
-    { text: 'картели картелна ротация редуване на победители и фирми на един и същ общ адрес', intent: 'FORENSIC_CARTEL' },
-    { text: 'кои фирми участват винаги заедно в консорциуми и си въртят поръчките в схема', intent: 'FORENSIC_CARTEL' },
+    { text: 'картели картелна ротация редуване победители общ адрес', intent: 'FORENSIC_CARTEL' },
+    { text: 'участват заедно консорциуми въртят схема съвместни оферти картел', intent: 'FORENSIC_CARTEL' },
     // FORENSIC_NLP
-    { text: 'шити и нагласени поръчки с ограничителни условия и конкретни марки по чл 49 зоп', intent: 'FORENSIC_NLP' },
-    { text: 'дискриминационни технически спецификации и критерии написани за една конкретна фирма', intent: 'FORENSIC_NLP' },
+    { text: 'шити нагласени ограничителни условия конкретни марки чл 49 зоп', intent: 'FORENSIC_NLP' },
+    { text: 'дискриминационни технически спецификации критерии конкретна марка', intent: 'FORENSIC_NLP' },
     // SINGLE_OFFER_HHI
-    { text: 'поръчки с 1 оферта една оферта без конкуренция пряко договаряне и hhi монопол', intent: 'SINGLE_OFFER_HHI' },
-    { text: 'кои институции дават всичките си пари на един единствен доставчик без търг', intent: 'SINGLE_OFFER_HHI' },
+    { text: 'една оферта без конкуренция пряко договаряне hhi монопол', intent: 'SINGLE_OFFER_HHI' },
+    { text: 'единствен доставчик без търг концентрация монопол', intent: 'SINGLE_OFFER_HHI' },
     // BENFORD_PARETO
-    { text: 'математически и статистически одит по закона на бенфорд крива на лоренц парето и джини', intent: 'BENFORD_PARETO' },
-    { text: 'топ 1 процент от фирмите държат половината пазар хиперконцентрация и първа цифра', intent: 'BENFORD_PARETO' },
+    { text: 'математически статистически закона бенфорд крива лоренц парето джини', intent: 'BENFORD_PARETO' },
+    { text: 'хиперконцентрация първа цифра бенфорд джини парето', intent: 'BENFORD_PARETO' },
     // SECTOR_CIRCLE
-    { text: 'покажи депутатите в народното събрание парламента министрите болниците или службите данс дато мвр', intent: 'SECTOR_CIRCLE' },
-    { text: 'кметове и общински съветници в общините с фирми за обществени поръчки', intent: 'SECTOR_CIRCLE' },
+    { text: 'депутатите народното събрание парламента министрите болниците службите данс дато мвр', intent: 'SECTOR_CIRCLE' },
+    { text: 'кметове общински съветници общините министерства болници', intent: 'SECTOR_CIRCLE' },
     // HIGH_RISK_OVERVIEW
-    { text: 'кой краде най много къде са най големите далавери корупция схеми и червени флагове', intent: 'HIGH_RISK_OVERVIEW' },
-    { text: 'покажи топ 10 най рискови политици фирми и общини в класацията пирамидата', intent: 'HIGH_RISK_OVERVIEW' },
+    { text: 'краде далавери корупция схеми червени флагове злоупотреби', intent: 'HIGH_RISK_OVERVIEW' },
+    { text: 'топ рискови политици общини класацията пирамидата', intent: 'HIGH_RISK_OVERVIEW' },
     // UI_NAVIGATION
-    { text: 'отвори графа на връзките покажи картата на областите превключи на съдебния радар или тъмен режим', intent: 'UI_NAVIGATION' },
-    { text: 'намери пътя и връзката в графа между двама души или фирми включи одиторски изглед', intent: 'UI_NAVIGATION' },
+    { text: 'отвори графа връзките картата областите превключи тъмен режим', intent: 'UI_NAVIGATION' },
+    { text: 'намери пътя връзката графа включи одиторски изглед пирамидата', intent: 'UI_NAVIGATION' },
   ];
 
   // ===========================================================================
-  // 5. SEMANTIC MEMORY BANK INSTANCE & INDEXING
+  // 5. SEMANTIC MEMORY BANK (HIGH-PRECISION v2)
   // ===========================================================================
   class SemanticMemoryBank {
     constructor() {
       this.entries = new Map();
       this.dimension = 256;
-      this.storageKey = 'sigma3_qantum_semantic_memory_v1';
+      this.storageKey = 'nasvetlo_oracle_memory_v2';
       this.corpusIndexed = false;
       this.loadFromStorage();
     }
@@ -419,9 +496,15 @@
       return entry;
     }
 
-    query(queryText, limit = 5, threshold = 0.24) {
+    query(queryText, limit = 5, threshold = 0.42) {
       const expanded = expandTextWithSynonyms(queryText);
       const qVec = VectorOps.textToVector(expanded, this.dimension);
+      let hasSignal = false;
+      for (let i = 0; i < qVec.length; i++) {
+        if (qVec[i] !== 0) { hasSignal = true; break; }
+      }
+      if (!hasSignal) return [];
+
       const results = [];
       for (const entry of this.entries.values()) {
         const sim = VectorOps.cosineSimilarity(qVec, entry.vector);
@@ -437,7 +520,6 @@
       if (this.corpusIndexed) return;
       this.corpusIndexed = true;
 
-      // Index top 80 officials
       (state.officials || []).slice(0, 80).forEach((o) => {
         this.memorize(
           `Длъжностно лице ${o.name} (${o.primaryInstitution}, ${o.circle}, ${o.oblast || ''}) — В мандата: ${o.periodEur} EUR, Общо+ДЗЗД: ${o.combinedEur} EUR, Риск ${o.sigma3Score}/100. Фирми: ${(o.companies || []).map((c) => `${c.name} ЕИК ${c.eik}`).join(', ')}`,
@@ -445,7 +527,6 @@
         );
       });
 
-      // Index top 60 authorities
       (auths || []).slice(0, 60).forEach((a) => {
         this.memorize(
           `Възложител ${a.name} ЕИК ${a.eik} (${a.region || ''}, ${a.settlement || ''}) — Разход по ЗОП: ${a.spentEur} EUR, ${a.contracts} договора, Риск ${a.riskScore}/100`,
@@ -453,7 +534,6 @@
         );
       });
 
-      // Index top 60 companies
       (comps || []).slice(0, 60).forEach((c) => {
         this.memorize(
           `Изпълнител ${c.name} ЕИК ${c.eik || 'ДЗЗД'} (${c.settlement || ''}) — Спечелени: ${c.wonEur} EUR, Чрез ДЗЗД: ${c.consortiumEur} EUR, ${c.contracts} договора`,
@@ -461,7 +541,6 @@
         );
       });
 
-      // Index Live Court Cases from EPEP/EISS (Module 1, Module 2, Module 4)
       if (j6) {
         ((j6.module1_collusiveLitigation && j6.module1_collusiveLitigation.liveEissCommercialDisputes) || []).forEach((c, i) => {
           this.memorize(
@@ -483,7 +562,6 @@
         });
       }
 
-      // Index Forensic Highlights
       if (f7) {
         ((f7.engine1_annexInflation && f7.engine1_annexInflation.contracts) || []).slice(0, 25).forEach((c, i) => {
           this.memorize(
@@ -496,6 +574,7 @@
 
     loadFromStorage() {
       try {
+        if (typeof localStorage === 'undefined') return;
         const raw = localStorage.getItem(this.storageKey);
         if (raw) {
           const arr = JSON.parse(raw);
@@ -511,9 +590,10 @@
 
     saveToStorage() {
       try {
+        if (typeof localStorage === 'undefined') return;
         const exp = Array.from(this.entries.values())
           .filter((e) => e.metadata && e.metadata.type === 'experience')
-          .slice(-40)
+          .slice(-30)
           .map((e) => ({ id: e.id, content: e.content, metadata: e.metadata }));
         localStorage.setItem(this.storageKey, JSON.stringify(exp));
       } catch {}
@@ -521,26 +601,23 @@
   }
 
   // ===========================================================================
-  // 6. AUTONOMOUS UI ACTION EXECUTOR (ADAPTIVE SEMANTIC CORE / SAL BRIDGE)
+  // 6. AUTONOMOUS UI ACTION EXECUTOR
   // ===========================================================================
-  function detectAndExecuteUIAction(cyrQuery, apiObj) {
-    const q = cyrQuery.toLowerCase();
-    // 1. Theme switch
-    if (/\b(тъмен режим|тъмна тема|dark mode)\b/.test(q)) {
+  function detectAndExecuteUIAction(cyrQuery) {
+    if (typeof document === 'undefined') return null;
+    const q = String(cyrQuery || '').toLowerCase();
+    if (/\b(тъмен режим|тъмна тема|светъл режим|светла тема|dark mode|light mode)\b/.test(q)) {
       document.getElementById('themeToggleBtn')?.click();
-      return 'Превключих интерфейса в Тъмен/Светъл команден режим.';
+      return 'Превключих интерфейса между светъл и тъмен режим.';
     }
-    // 2. Auditor compact density view
     if (/\b(одиторски изглед|компактен изглед|презентационен изглед)\b/.test(q)) {
       document.getElementById('densityToggleBtn')?.click();
       return 'Превключих плътността на таблиците (Одиторски / Презентационен изглед).';
     }
-    // 3. Open Top 50 Hierarchy Modal
     if (/\b(отвори пирамидата|отвори залата|покажи пирамидата|отвори топ 50)\b/.test(q)) {
       document.getElementById('hofOpenBtn')?.click();
-      return 'Отворих модалния прозорец с Йерархичния профил на концентрацията (Топ 50).';
+      return 'Отворих прозореца с Йерархичния профил на концентрацията (Топ 50).';
     }
-    // 4. Shortest Path BFS in 9-Node Graph ("намери път между X и Y")
     const pathMatch = q.match(/(?:път|пътя|връзка|връзката)\s+между\s+([а-яa-z0-9\s.-]+?)\s+и\s+([а-яa-z0-9\s.-]+)$/i);
     if (pathMatch && window.SIGMA3_MOD) {
       const fromEnt = pathMatch[1].trim();
@@ -551,14 +628,14 @@
         fromInp.value = fromEnt;
         toInp.value = toEnt;
         document.getElementById('btnFindPath')?.click();
-        return `Стартирах BFS търсене на най-кратък път в 9-възловия граф между „${fromEnt}“ и „${toEnt}“.`;
+        return `Стартирах търсене на най-кратка връзка в 9-възловия граф между „${fromEnt}“ и „${toEnt}“.`;
       }
     }
     return null;
   }
 
   // ===========================================================================
-  // 7. BOOTSTRAP SINGLETON ENGINE & EXPORT TO WINDOW.SIGMA3_SEMANTIC_ENGINE
+  // 7. BOOTSTRAP SINGLETON ENGINE
   // ===========================================================================
   const classifier = new IntentClassifier();
   classifier.addExamples(TRAINING_CORPUS.map((s) => ({
@@ -573,23 +650,19 @@
     memoryBank.indexLiveDatasets(state, auths, comps, j6, f7);
     const expandedQuery = expandTextWithSynonyms(fullNorm);
 
-    // 1. Naive Bayes TF-IDF N-gram + Subword Classification
     const nbResult = classifier.classify(expandedQuery);
+    const ragMatches = memoryBank.query(expandedQuery, 5, 0.42);
+    const uiActionMsg = detectAndExecuteUIAction(cyrQuery);
 
-    // 2. 256-D Cosine Similarity Vector Memory Retrieval
-    const ragMatches = memoryBank.query(expandedQuery, 5, 0.25);
+    // Only reinforce high-confidence non-abstained audit queries
+    if (!nbResult.abstained && nbResult.intent && nbResult.confidence >= 0.55) {
+      memoryBank.memorize(`Въпрос: ${cyrQuery} -> Категория: ${nbResult.intent}`, {
+        type: 'experience',
+        domain: nbResult.intent,
+        confidence: nbResult.confidence,
+      });
+    }
 
-    // 3. Autonomous UI Action check (SAL)
-    const uiActionMsg = detectAndExecuteUIAction(cyrQuery, window.SIGMA3);
-
-    // 4. Memorize user query in experience memory (Reinforcement learning)
-    memoryBank.memorize(`Въпрос: ${cyrQuery} -> Намерение: ${nbResult.intent}`, {
-      type: 'experience',
-      domain: nbResult.intent,
-      confidence: Math.max(0.75, nbResult.confidence),
-    });
-
-    // 5. IntentAnchor Reality Verification Score (1.0 = 100% grounded in primary JSON datasets)
     const topVectorSim = ragMatches.length ? ragMatches[0].similarity : 0;
 
     return {
@@ -598,11 +671,12 @@
       uiActionMsg,
       memorySize: memoryBank.entries.size,
       topVectorSim,
-      anchorAlignment: 1.0,
+      anchorAlignment: (!nbResult.abstained || ragMatches.length > 0) ? 1.0 : 0,
     };
   }
 
-  window.SIGMA3_SEMANTIC_ENGINE = {
+  const root = typeof window !== 'undefined' ? window : globalThis;
+  root.SIGMA3_SEMANTIC_ENGINE = {
     VectorOps,
     FeatureVectorizer,
     NaiveBayesClassifier,

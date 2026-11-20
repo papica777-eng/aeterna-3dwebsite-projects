@@ -822,6 +822,22 @@
     'есо': 'електроенергиен системен оператор',
     'eso': 'електроенергиен системен оператор',
     'со': 'столична община',
+    'всс': 'висш съдебен съвет',
+    'vss': 'висш съдебен съвет',
+    'прб': 'прокуратура на република българия',
+    'prb': 'прокуратура на република българия',
+    'нзок': 'национална здравноосигурителна каса',
+    'nzok': 'национална здравноосигурителна каса',
+    'нап': 'национална агенция за приходите',
+    'nap': 'национална агенция за приходите',
+    'нек': 'национална електрическа компания',
+    'nek': 'национална електрическа компания',
+    'бех': 'български енергиен холдинг',
+    'beh': 'български енергиен холдинг',
+    'вма': 'военномедицинска академия',
+    'vma': 'военномедицинска академия',
+    'пирогов': 'умбалсм н.и.пирогов',
+    'pirogov': 'умбалсм н.и.пирогов',
     'мвр': 'министерство на вътрешните работи',
     'mvr': 'министерство на вътрешните работи',
     'мз': 'министерство на здравеопазването',
@@ -830,14 +846,49 @@
     'мон': 'министерство на образованието и науката',
     'мп': 'министерство на правосъдието',
     'мф': 'министерство на финансите',
+    'мо': 'министерство на отбраната',
+    'мосв': 'министерство на околната среда',
+    'мзх': 'министерство на земеделието',
     'гбс': 'главболгарстрой',
     'gbs': 'главболгарстрой',
     'дппи': 'пристанищна инфраструктура',
+    'булгаргаз': 'булгаргаз',
+    'булгартрансгаз': 'булгартрансгаз',
   };
+
+  const ENGLISH_TO_BG_PHRASES = [
+    [/\bwhat can you do\b/g, 'какво можеш да правиш'],
+    [/\bwho are you\b/g, 'кой си ти'],
+    [/\bhow do you work\b/g, 'как работиш'],
+    [/\bhow to use\b/g, 'как да те ползвам'],
+    [/\bcapabilities\b/g, 'възможности'],
+    [/\bhelp\b/g, 'помощ'],
+    [/\bhello\b/g, 'здравей'],
+    [/\bhi\b/g, 'здравей'],
+    [/\bhey\b/g, 'здравей'],
+    [/\bthanks\b/g, 'благодаря'],
+    [/\bthank you\b/g, 'благодаря'],
+    [/\bdata sources\b/g, 'източници на данни'],
+    [/\bsources\b/g, 'източници'],
+    [/\bcompare\b/g, 'сравни'],
+    [/\bdark mode\b/g, 'тъмен режим'],
+    [/\blight mode\b/g, 'светъл режим'],
+  ];
 
   function latinToCyrillicBg(str) {
     let s = String(str || '').toLowerCase();
-    // Preserve numbers & punctuation, convert multi-char Bulgarian shlyokavitsa clusters first
+    // Translate common English conversational phrases before phonetic transliteration
+    for (const [rx, bg] of ENGLISH_TO_BG_PHRASES) s = s.replace(rx, bg);
+    // Preserve acronyms that shouldn't be distorted (EPPO, XML, NLP, HHI, VSS, KZK, ADFI)
+    s = s
+      .replace(/\beppo\b/g, 'еппо')
+      .replace(/\bxml\b/g, 'xml')
+      .replace(/\bnlp\b/g, 'nlp')
+      .replace(/\bhhi\b/g, 'hhi')
+      .replace(/\bsalami\b/g, 'салами')
+      .replace(/\bshell\b/g, 'кухи')
+      .replace(/\bvs\b/g, 'срещу');
+    // Convert multi-char Bulgarian shlyokavitsa clusters first
     const multi = [
       ['sht', 'щ'], ['6t', 'щ'], ['sh', 'ш'], ['zh', 'ж'], ['ch', 'ч'],
       ['ts', 'ц'], ['tz', 'ц'], ['yu', 'ю'], ['iu', 'ю'], ['ya', 'я'],
@@ -846,6 +897,8 @@
     for (const [lat, cyr] of multi) s = s.split(lat).join(cyr);
     // Replace '4' and '6' only when adjacent to letters (shlyokavitsa for ч / ш)
     s = s.replace(/(?<=[a-zа-я])4|4(?=[a-zа-я])/g, 'ч').replace(/(?<=[a-zа-я])6|6(?=[a-zа-я])/g, 'ш');
+    // Smart Bulgarian 'y': between consonants -> 'ъ' (syd->съд, pyt->път, tyrg->търг, bylgaria->българия); otherwise -> 'й'
+    s = s.replace(/(?<=[bcdfghjklmnpqrstvwxzбвгджзклмнпрстфхцчшщ])y(?=[bcdfghjklmnpqrstvwxzбвгджзклмнпрстфхцчшщ])/g, 'ъ');
     const single = {
       a: 'а', b: 'б', v: 'в', w: 'в', g: 'г', d: 'д', e: 'е', j: 'ж', z: 'з',
       i: 'и', y: 'й', k: 'к', l: 'л', m: 'м', n: 'н', o: 'о', p: 'п', r: 'р',
@@ -854,7 +907,7 @@
     return s.replace(/[a-z]/g, (ch) => single[ch] || ch);
   }
 
-  // 2. Bulgarian Morphological Stemmer & Trigram / Levenshtein Fuzzy Similarity
+  // 2. Bulgarian Morphological Stemmer & Calibrated Fuzzy Similarity
   function stemBg(word) {
     let w = String(word || '').toLowerCase().replace(/[^а-яa-z0-9]/g, '');
     if (w.length <= 3) return w;
@@ -864,7 +917,7 @@
       'ен', 'на', 'но', 'ни', 'ът', 'ят', 'та', 'то', 'те', 'а', 'я', 'и', 'о', 'е',
     ];
     for (const suf of suffixes) {
-      if (w.length - suf.length >= 3 && w.endsWith(suf)) {
+      if (w.length - suf.length >= 4 && w.endsWith(suf)) {
         return w.slice(0, w.length - suf.length);
       }
     }
@@ -876,11 +929,11 @@
     const s2 = String(b || '').toLowerCase().trim();
     if (!s1 || !s2) return 0;
     if (s1 === s2) return 1;
-    if (s1.includes(s2) || s2.includes(s1)) {
-      const ratio = Math.min(s1.length, s2.length) / Math.max(s1.length, s2.length);
-      return Math.max(0.82, ratio);
+    const ratio = Math.min(s1.length, s2.length) / Math.max(s1.length, s2.length);
+    if ((s1.includes(s2) || s2.includes(s1)) && ratio >= 0.76 && Math.min(s1.length, s2.length) >= 5) {
+      return Math.max(0.84, ratio);
     }
-    if (s1.length < 3 || s2.length < 3) return 0;
+    if (s1.length < 4 || s2.length < 4) return 0;
     const p1 = ` ${s1} `, p2 = ` ${s2} `;
     const g1 = new Set(), g2 = new Set();
     for (let i = 0; i <= p1.length - 3; i++) g1.add(p1.slice(i, i + 3));
@@ -909,51 +962,123 @@
   }
 
   function tokenFuzzyMatchScore(queryToken, targetText) {
-    const qt = queryToken.toLowerCase();
+    const qt = String(queryToken || '').toLowerCase().replace(/[^а-яa-z0-9\s-]/g, '').trim();
     const tt = String(targetText || '').toLowerCase();
     if (!qt || !tt) return 0;
-    if (tt.includes(qt)) return 1.0;
+    // Multi-word phrase exact containment
+    if (qt.includes(' ') && tt.includes(qt)) return 1.0;
+
+    const targetWords = tt.split(/[^а-яa-z0-9]+/).filter(Boolean);
     const qStem = stemBg(qt);
-    if (qStem.length >= 3 && tt.includes(qStem)) return 0.92;
-    if (qt.length < 4) return 0;
-    const targetWords = tt.split(/[^а-яa-z0-9]+/).filter((w) => w.length >= 4);
+    const qtNormI = qt.replace(/й$/g, 'и');
     let best = 0;
+
+    const qFirst = qStem[0];
     for (const tw of targetWords) {
-      if (tw.startsWith(qStem) || qStem.startsWith(stemBg(tw))) {
-        best = Math.max(best, 0.88);
-        continue;
+      if (tw === qt || tw.replace(/й$/g, 'и') === qtNormI) return 1.0;
+      if (qt.length < 4 || tw.length < 4) continue;
+
+      if (tw[0] === qFirst) {
+        const tStem = stemBg(tw);
+        if (qStem.length >= 4 && qStem === tStem) {
+          best = Math.max(best, 0.92);
+          continue;
+        }
+        // Strict prefix match only when shared prefix covers >=78% of longer stem and >=5 chars
+        const minStemLen = Math.min(qStem.length, tStem.length);
+        const maxStemLen = Math.max(qStem.length, tStem.length);
+        if (minStemLen >= 5 && (minStemLen / maxStemLen) >= 0.78 && (tStem.startsWith(qStem) || qStem.startsWith(tStem))) {
+          best = Math.max(best, 0.87);
+          continue;
+        }
       }
-      const dist = editDistanceBounded(qt, tw, qt.length >= 7 ? 2 : 1);
-      if (dist <= (qt.length >= 7 ? 2 : 1)) {
-        best = Math.max(best, 1 - dist / Math.max(qt.length, tw.length));
-      } else {
-        const tri = trigramSim(qt, tw);
-        if (tri > best) best = tri;
+
+      if (qt.length >= 5) {
+        const maxDist = qt.length >= 8 ? 2 : 1;
+        if (Math.abs(qt.length - tw.length) <= maxDist) {
+          const dist = editDistanceBounded(qt, tw, maxDist);
+          if (dist <= maxDist) {
+            const sim = 1 - dist / Math.max(qt.length, tw.length);
+            if (sim >= 0.80) best = Math.max(best, sim);
+            continue;
+          }
+        }
+        if (qt.length >= 6 && Math.abs(qt.length - tw.length) <= 2 && (tw[0] === qt[0] || tw[1] === qt[1])) {
+          const tri = trigramSim(qt, tw);
+          if (tri >= 0.84) best = Math.max(best, tri);
+        }
       }
     }
     return best;
   }
 
   const STOP_WORDS = new Set([
-    'кажи', 'ми', 'за', 'покажи', 'провери', 'какво', 'какви', 'какъв', 'каква', 'има', 'имат',
-    'са', 'е', 'в', 'във', 'на', 'от', 'до', 'по', 'със', 'с', 'или', 'и', 'а', 'но', 'че',
+    'кажи', 'кажете', 'ми', 'за', 'покажи', 'покажете', 'провери', 'проверете',
+    'какво', 'какви', 'какъв', 'каква', 'има', 'имат', 'няма', 'са', 'е', 'бе', 'беше',
+    'в', 'във', 'на', 'от', 'до', 'по', 'със', 'с', 'или', 'и', 'а', 'но', 'че', 'защото',
     'кой', 'кои', 'коя', 'кое', 'колко', 'къде', 'кога', 'как', 'защо', 'всички', 'всичко',
-    'дай', 'ми', 'информация', 'данни', 'справка', 'одит', 'моля', 'те', 'искам', 'да', 'видя',
-    'разкажи', 'намери', 'потърси', 'извади', 'списък', 'таблица', 'относно', 'около', 'при',
-    'между', 'след', 'преди', 'над', 'под', 'най', 'много', 'малко', 'големи', 'голям', 'голяма',
-    'ли', 'се', 'си', 'му', 'й', 'им', 'ги', 'го', 'я', 'това', 'тази', 'този', 'тези', 'там',
-    'тук', 'него', 'нея', 'тях', 'фирма', 'фирми', 'фирмата', 'фирмите', 'компания', 'компании',
+    'дай', 'дайте', 'информация', 'данни', 'данните', 'справка', 'одит', 'моля', 'те', 'искам',
+    'да', 'видя', 'разкажи', 'обясни', 'намери', 'потърси', 'извади', 'списък', 'таблица',
+    'относно', 'около', 'при', 'между', 'след', 'преди', 'над', 'под', 'най', 'много', 'малко',
+    'големи', 'голям', 'голяма', 'ли', 'се', 'си', 'му', 'й', 'им', 'ги', 'го', 'я', 'това',
+    'тази', 'този', 'тези', 'там', 'тук', 'тука', 'него', 'нея', 'тях', 'ти', 'вие', 'ние', 'аз',
+    'мен', 'теб', 'тебе', 'твой', 'твоя', 'твое', 'твоите', 'ваш', 'ваша', 'вашите', 'можеш',
+    'може', 'мога', 'можете', 'можем', 'правиш', 'прави', 'правя', 'правите', 'правим', 'направи',
+    'направиш', 'работиш', 'работи', 'работя', 'умееш', 'умее', 'знаеш', 'знае', 'разбираш',
+    'помагаш', 'помага', 'помогни', 'помощ', 'здравей', 'здравеи', 'здравейте', 'здрасти',
+    'привет', 'чао', 'благодаря', 'мерси', 'супер', 'браво', 'добре', 'окей', 'нещо', 'нищо',
+    'някой', 'някои', 'някакъв', 'някаква', 'някакви', 'които', 'който', 'която', 'което',
+    'където', 'само', 'вече', 'още', 'така', 'нали', 'май', 'хей', 'ало', 'тест', 'проба',
+    'функции', 'възможности', 'команди', 'примери', 'въпрос', 'въпроси', 'отговор', 'инструкция',
+    'ръководство', 'платформа', 'платформата', 'сайт', 'сайта', 'система', 'системата',
+    'оракул', 'оракула', 'асистент', 'бота', 'бот', 'насветло', 'nasvetlo', 'oracle',
+    'фирма', 'фирми', 'фирмата', 'фирмите', 'компания', 'компании',
     'институция', 'институции', 'възложител', 'възложители', 'изпълнител', 'изпълнители',
     'поръчка', 'поръчки', 'поръчките', 'договор', 'договори', 'договорите', 'обществени',
     'обществена', 'пари', 'сума', 'суми', 'евро', 'лева', 'милиона', 'милиарда', 'българия',
   ]);
 
-  // 3. Semantic Intent Taxonomy (22 Intents with Colloquial, Slang & Morphological Triggers)
+  // 3. Calibrated Semantic Intent Taxonomy (Conversational + 22 Forensic & Judicial Intents)
   const INTENT_DEFS = [
+    {
+      id: 'HELP_CAPABILITIES',
+      label: 'Възможности и ръководство',
+      triggers: [
+        'какво можеш', 'какво умееш', 'какво правиш', 'как работиш', 'как да те ползвам',
+        'кой си ти', 'какво си ти', 'какво е насветло', 'какво е nasvetlo', 'за какво служиш',
+        'какви функции', 'какви възможности', 'помощ', 'инструкция', 'ръководство', 'команди',
+        'дай примери', 'примери за въпроси', 'как да търся', 'какво знаеш',
+      ],
+      weight: 4.0,
+    },
+    {
+      id: 'GREETING',
+      label: 'Начало на разговор',
+      triggers: ['здравей', 'здравеи', 'здравейте', 'здрасти', 'привет', 'добър ден', 'добро утро', 'добър вечер', 'здр'],
+      wordBoundary: true,
+      weight: 3.4,
+    },
+    {
+      id: 'THANK_YOU',
+      label: 'Потвърждение',
+      triggers: ['благодаря', 'мерси', 'супер си', 'браво', 'чудесно', 'благодарско'],
+      wordBoundary: true,
+      weight: 3.2,
+    },
+    {
+      id: 'PLATFORM_OVERVIEW',
+      label: 'Общ преглед и източници',
+      triggers: [
+        'откъде са данните', 'какви са източниците', 'източници на данни', 'методология',
+        'обща статистика', 'колко договора', 'актуалност на данните', 'национална статистика',
+        'какво покрива платформата', 'откъде взимаш данни',
+      ],
+      weight: 3.1,
+    },
     {
       id: 'COMPARE',
       label: 'Сравнителен одит',
-      triggers: ['сравни', 'сравнение', 'разлика', 'срещу', 'съпостави', 'vs', 'или между'],
+      triggers: ['сравни', 'сравнение', 'разлика между', 'срещу', 'съпостави', 'или между'],
       weight: 3.0,
     },
     {
@@ -965,54 +1090,54 @@
     {
       id: 'SELF_DEALING',
       label: 'Самовъзлагане и конфликт на интереси',
-      triggers: ['самовъзлаг', 'собствената инст', 'собствена общин', 'сам на себе', 'конфликт на интерес', 'кмет печели', 'кметове с фирми', 'общинари с фирми', 'свои фирми', 'роднински фирми'],
-      weight: 2.5,
+      triggers: ['самовъзлаг', 'собствената инст', 'собствена общин', 'сам на себе', 'сами на себе', 'конфликт на интерес', 'кмет печели', 'кметове с фирми', 'общинари с фирми', 'свои фирми', 'роднински фирми'],
+      weight: 2.6,
     },
     {
       id: 'HIDDEN_DZZD',
       label: 'Скрити ДЗЗД консорциуми',
       triggers: ['дззд', 'консорциум', 'обединени', 'скрити фирми', 'без еик', 'мега-консорциум', 'скрити поръчки', 'зад консорциум'],
-      weight: 2.4,
+      weight: 2.5,
     },
     {
       id: 'XML_DECLARATIONS',
-      label: 'XML декларации (Сметна палата)',
-      triggers: ['xml', 'декларац', 'сметна палата', 'пропуснати от сигма', 'нови политиц', 'извън сигма', 'частни заеми', 'акции в ад', 'таблица 9', 'таблица 7', 'чл. 35'],
-      weight: 2.4,
+      label: 'Декларации пред Сметната палата',
+      triggers: ['xml', 'декларац', 'сметна палата', 'сметната палата', 'пропуснати от сигма', 'нови политиц', 'извън сигма', 'частни заеми', 'акции в ад', 'таблица 9', 'таблица 7', 'чл. 35'],
+      weight: 2.5,
     },
     {
       id: 'JUDICIAL_TD',
-      label: 'Търговски спорове в съда (ЕПЕП ТД/ВТД)',
-      triggers: ['търговски дел', 'търговски спор', 'съдебни спор', 'дела в съда', 'съди ', 'осъден', 'неустойк', 'неизпълнени', 'спогодб', 'арбитраж', 'призрачно изпълнение', 'фиктивни спор', 'втд', 'окръжен съд'],
+      label: 'Търговски спорове в съда (ЕПЕП)',
+      triggers: ['търговски дел', 'търговски спор', 'съдебни спор', 'съдебни дела', 'дела в съда', 'делата в съда', 'епеп', 'еисс', 'осъден', 'неустойк', 'неизпълнени', 'спогодб', 'арбитраж', 'фиктивни спор', 'окръжен съд'],
       weight: 2.6,
     },
     {
       id: 'JUDICIAL_ADFI',
-      label: 'АДФИ ревизии, чл. 17(7) и КАНД/АНД глоби',
-      triggers: ['адфи', 'финансова инспекция', 'инспекц', 'ревизи', 'безнаказаност', 'наказателно постановление', 'наказателни постановления', 'глоб', 'санкци', 'ауан', 'канд', 'анд ', 'отменено нп', 'отменени глоби', 'чл. 17', 'маловажен случай', 'чл. 28 занн', 'дид1', 'дид2', 'дид3', 'дид4', 'дид5', 'дид6', 'дид7'],
+      label: 'АДФИ ревизии и КАНД глоби',
+      triggers: ['адфи', 'финансова инспекция', 'инспекц', 'ревизи', 'безнаказаност', 'наказателно постановление', 'наказателни постановления', 'глоб', 'санкци', 'ауан', 'канд', 'отменено нп', 'отменени глоби', 'чл. 17', 'маловажен случай', 'чл. 28 занн'],
       weight: 2.7,
     },
     {
       id: 'JUDICIAL_KZK_VAS',
-      label: 'КЗК жалби и окончателни актове на ВАС',
-      triggers: ['кзк', 'комисия за защита на конкуренцията', 'вас', 'върховен административен', 'предварително изпълнение', 'чл. 205', 'обжалван', 'жалб', 'блокаж', 'спряна поръчка', 'отменено решение', 'четвърто отделение'],
+      label: 'КЗК жалби и решения на ВАС',
+      triggers: ['кзк', 'комисия за защита на конкуренцията', 'върховен административен', 'предварително изпълнение', 'чл. 205', 'обжалван', 'жалб', 'блокаж', 'спряна поръчка', 'отменено решение', 'четвърто отделение', 'решения на вас', 'актове на вас', 'дела във вас', 'вас iv'],
       weight: 2.7,
     },
     {
       id: 'JUDICIAL_LAWYERS',
       label: 'Адвокати, юрисконсулти и вещи лица',
-      triggers: ['адвокат', 'юрист', 'юрисконсулт', 'кантор', 'правни услуг', 'вещ', 'вещи лица', 'експерт', 'строителен надзор', 'консултант'],
+      triggers: ['адвокат', 'юрист', 'юрисконсулт', 'кантор', 'правни услуг', 'вещо лице', 'вещи лица', 'вещите лица', 'строителен надзор'],
       weight: 2.5,
     },
     {
       id: 'JUDICIAL_PHOENIX',
-      label: 'Несъстоятелност, запори в ТР и Феникс фирми',
+      label: 'Несъстоятелност, запори и „Феникс“ фирми',
       triggers: ['несъстоятелн', 'фалит', 'фалирал', 'ликвидац', 'запор', 'залоз', 'особен залог', 'чси', 'дългов', 'феникс', 'burnout', 'изгаряне', 'спряла фирма', 'прехвърляне на фирма'],
       weight: 2.6,
     },
     {
       id: 'JUDICIAL_EPPO',
-      label: 'Европейска прокуратура (EPPO), ЕС средства и ЗМИП',
+      label: 'Европейска прокуратура (EPPO) и ЕС средства',
       triggers: ['eppo', 'еппо', 'европрокуратур', 'кьовеши', 'европейска прокуратура', 'ес средства', 'еврофонд', 'европейски пари', 'европроекти', 'змип', 'действителен собственик', 'офшор', 'чуждестранна майка'],
       weight: 2.6,
     },
@@ -1024,65 +1149,83 @@
     },
     {
       id: 'FORENSIC_SHELL',
-      label: 'Кухи и новосъздадени фирми-фантоми',
-      triggers: ['кух', 'фантом', 'новосъздаден', 'нова фирма', 'нови фирми', 'вчерашна фирма', '2 лв', 'минимален капитал', 'без история', 'shell'],
+      label: 'Новосъздадени и „кухи“ фирми',
+      triggers: ['кухи', 'куха', 'кухо', 'фантом', 'новосъздаден', 'нова фирма', 'нови фирми', 'вчерашна фирма', '2 лв', 'минимален капитал', 'без история'],
       weight: 2.5,
     },
     {
       id: 'FORENSIC_SALAMI',
-      label: 'Разделяне под прага (Salami Slicing)',
+      label: 'Разделяне под прага (Salami)',
       triggers: ['salami', 'салами', 'разделяне', 'раздробяване', 'нацепване', 'под прага', 'заобикаляне на търга', 'чл. 20', 'чл. 21'],
       weight: 2.5,
     },
     {
       id: 'FORENSIC_POLITICS_MEDIA',
-      label: 'Политически дарения (ЕРИК) и медийни договори',
-      triggers: ['дарен', 'дарител', 'ерик', 'парти', 'предизбор', 'спонсор', 'меди', 'телевизи', 'вестни', 'пиар', 'pr агенц', 'реклам'],
+      label: 'Политически дарения (ЕРИК) и медии',
+      triggers: ['дарен', 'дарител', 'ерик', 'партий', 'партия', 'партии', 'предизбор', 'спонсор', 'медии', 'медийн', 'телевизи', 'вестни', 'пиар', 'pr агенц', 'реклам'],
       weight: 2.5,
     },
     {
       id: 'FORENSIC_TIME',
-      label: 'Времеви аномалии (Петък / Ноември–Декември)',
+      label: 'Времеви аномалии (Ноември–Декември)',
       triggers: ['петък', 'декември', 'ноември', 'края на годината', 'колед', 'бюджетен дъмпинг', 'времеви аномалии', 'последния момент'],
       weight: 2.4,
     },
     {
       id: 'FORENSIC_CARTEL',
-      label: 'Картелна ротация, съвместни оферти и общ адрес',
+      label: 'Картелна ротация и общ адрес',
       triggers: ['картел', 'ротац', 'редуване', 'общ адрес', 'един и същ адрес', 'двойки фирми', 'съвместни оферти', 'co-bidding', 'сговаряне'],
       weight: 2.5,
     },
     {
       id: 'FORENSIC_NLP',
-      label: 'NLP „Шити“ поръчки и ограничителни критерии',
-      triggers: ['шит', 'нагласен', 'спецификац', 'марк', 'дискриминац', 'ограничител', 'чл. 49', 'технически критерии', 'nlp'],
+      label: 'Ограничителни критерии (чл. 49 ЗОП)',
+      triggers: ['шити', 'шита', 'шито', 'нагласен', 'спецификац', 'конкретна марка', 'дискриминац', 'ограничител', 'чл. 49', 'технически критерии'],
       weight: 2.5,
     },
     {
       id: 'SINGLE_OFFER_HHI',
-      label: 'Единични оферти (1 оферта), пряко договаряне и HHI монопол',
-      triggers: ['1 оферта', 'една оферта', 'единствен участник', 'без конкуренция', 'без търг', 'пряко договаряне', 'директно възлагане', 'hhi', 'монопол', 'концентрация'],
+      label: 'Единични оферти (1 оферта) и HHI монопол',
+      triggers: ['1 оферта', 'една оферта', 'единствен участник', 'единствен кандидат', 'без конкуренция', 'без търг', 'пряко договаряне', 'директно възлагане', 'hhi', 'монопол', 'концентрация'],
       weight: 2.3,
     },
     {
       id: 'BENFORD_PARETO',
-      label: 'Математически одит (Закон на Бенфорд и Парето/Джини)',
+      label: 'Математически одит (Бенфорд / Парето)',
       triggers: ['бенфорд', 'benford', 'парето', 'pareto', 'джини', 'gini', 'лоренц', 'математически', 'статистически', 'първа цифра', 'топ 1%'],
       weight: 2.4,
     },
     {
       id: 'SECTOR_CIRCLE',
-      label: 'Секторен срез (Общини, Депутати, Министерства, Служби, Болници)',
+      label: 'Секторен срез',
       triggers: ['кмет', 'общински съвет', 'депутат', 'народно събрание', 'парламент', 'министерств', 'министър', 'данс', 'дато', 'служби за сигурност', 'болниц', 'мбал', 'здравеопазване'],
       weight: 1.9,
     },
     {
       id: 'HIGH_RISK_OVERVIEW',
-      label: 'Топ рисков профил и корупционни индикатори',
+      label: 'Топ рискови профили',
       triggers: ['крад', 'далавер', 'корупц', 'схем', 'злоупотреб', 'нарушен', 'съмнител', 'рисков', 'червени флагове', 'топ 10', 'топ 50', 'класация', 'пирамида', 'кой води', 'най-много пари'],
       weight: 1.8,
     },
   ];
+
+  function matchesTriggerPrecision(trig, combinedLower, fullNorm, rawTokens, stems, requireWordBoundary) {
+    if (trig.includes(' ')) {
+      return combinedLower.includes(trig) || fullNorm.includes(trig);
+    }
+    if (requireWordBoundary || trig.length <= 4) {
+      return rawTokens.includes(trig) || rawTokens.some((tk) => tk.replace(/й$/g, 'и') === trig.replace(/й$/g, 'и'));
+    }
+    if (combinedLower.includes(trig) || fullNorm.includes(trig)) {
+      // Ensure prefix triggers start at a token boundary (never mid-word like "защита" matching "шит")
+      return rawTokens.some((tk) => tk.startsWith(trig)) || combinedLower.split(/[^а-яa-z0-9]+/).some((tk) => tk.startsWith(trig));
+    }
+    const trigStem = stemBg(trig);
+    if (trigStem.length >= 5 && stems.some((st) => st === trigStem || tokenFuzzyMatchScore(trigStem, st) >= 0.88)) {
+      return true;
+    }
+    return false;
+  }
 
   function analyzeNaturalQuery(qRaw) {
     const rawTrim = String(qRaw || '').trim();
@@ -1090,8 +1233,8 @@
     const cyrQuery = latinToCyrillicBg(rawTrim);
     const combinedLower = `${rawTrim.toLowerCase()} ${cyrQuery}`;
 
-    // Expand acronym aliases
-    const rawTokens = cyrQuery.split(/[^а-яa-z0-9-]+/).filter(Boolean);
+    // Strip punctuation/brackets cleanly so typos like "pravish]" never break tokenization
+    const rawTokens = cyrQuery.split(/[^а-яa-z0-9-]+/).map((t) => t.replace(/^-+|-+$/g, '')).filter(Boolean);
     const expandedPhrases = [];
     rawTokens.forEach((tk) => {
       if (ACRONYM_ALIASES[tk]) expandedPhrases.push(ACRONYM_ALIASES[tk]);
@@ -1100,28 +1243,31 @@
     const contentTokens = rawTokens.filter((t) => t.length >= 2 && !STOP_WORDS.has(t));
     const stems = contentTokens.map(stemBg);
 
-    // Detect follow-up / pronoun reference to previous turn
-    const isFollowUp = /\b(него|нея|тях|негов|нейн|техн|там|тази|този|тези|същия|същата|първия|втория|третия)\b/.test(cyrQuery)
-      || (/^(а |и |още |дай |покажи |какви |колко )/.test(cyrQuery) && contentTokens.length <= 3);
+    // Detect follow-up / pronoun reference to previous turn (only when NOT a greeting/help question)
+    const isFollowUp = /\b(него|нея|тях|негов|нейн|техн|там|тази|този|тези|същия|същата|първия|първото|втория|третия)\b/.test(cyrQuery)
+      || (/^(а |и |още |дай |покажи |какви |колко )/.test(cyrQuery) && contentTokens.length >= 1 && contentTokens.length <= 3);
 
-    // Score intents
+    // Score intents with boundary precision
     const matchedIntents = [];
     for (const def of INTENT_DEFS) {
       let score = 0;
       const hits = [];
       for (const trig of def.triggers) {
-        if (combinedLower.includes(trig) || fullNorm.includes(trig)) {
+        if (matchesTriggerPrecision(trig, combinedLower, fullNorm, rawTokens, stems, Boolean(def.wordBoundary))) {
           score += def.weight;
           hits.push(trig);
-        } else {
-          const trigStem = stemBg(trig);
-          if (trigStem.length >= 4 && stems.some((st) => st === trigStem || tokenFuzzyMatchScore(trigStem, st) >= 0.86)) {
-            score += def.weight * 0.8;
-            hits.push(trig);
-          }
         }
       }
       if (score > 0) matchedIntents.push({ id: def.id, label: def.label, score, hits });
+    }
+    // Special guard: standalone uppercase/judicial "ВАС" (never Bulgarian pronoun "при вас" / "за вас")
+    if (!matchedIntents.some((x) => x.id === 'JUDICIAL_KZK_VAS')) {
+      const hasVasToken = rawTokens.includes('вас');
+      const isPronounVas = /\b(при|за|от|на|към|с|със|без|пред|след|между)\s+вас\b/.test(cyrQuery);
+      const isExplicitUpperVas = /\bВАС\b/.test(rawTrim);
+      if (hasVasToken && !isPronounVas && (isExplicitUpperVas || /\b(дела|дело|решени|акт|кзк|съд|жалб|зоп)\b/.test(cyrQuery))) {
+        matchedIntents.push({ id: 'JUDICIAL_KZK_VAS', label: 'КЗК жалби и решения на ВАС', score: 2.7, hits: ['вас'] });
+      }
     }
     matchedIntents.sort((a, b) => b.score - a.score);
 
@@ -1308,9 +1454,10 @@
       }
     }
 
-    // 7. Conversational Context Fallback (when user asks follow-up like "а какви дела има?", "дай сигнал за него")
+    // 7. Conversational Context Fallback (only for real audit follow-ups, never for greetings/help/thanks)
+    const isMetaOnly = nlu.intents.length > 0 && nlu.intents.every((i) => i.id === 'HELP_CAPABILITIES' || i.id === 'GREETING' || i.id === 'THANK_YOU' || i.id === 'PLATFORM_OVERVIEW');
     const hasAnyEntity = result.officials.length || result.authorities.length || result.companies.length || result.oblasts.length || result.courtCases.length;
-    if (!hasAnyEntity && (isFollowUp || nlu.intents.some((i) => i.id === 'SIGNAL'))) {
+    if (!isMetaOnly && !hasAnyEntity && (isFollowUp || nlu.intents.some((i) => i.id === 'SIGNAL'))) {
       if (oracleContext.lastOfficial) { result.officials.push({ item: oracleContext.lastOfficial, score: 0.95 }); result.fromContext = true; }
       if (oracleContext.lastAuthority) { result.authorities.push({ item: oracleContext.lastAuthority, score: 0.95 }); result.fromContext = true; }
       if (oracleContext.lastCompany) { result.companies.push({ item: oracleContext.lastCompany, score: 0.95 }); result.fromContext = true; }
@@ -1334,7 +1481,7 @@
     Пишете свободно със свои думи — например:<br/>
     • <em>„Кажи ми всичко за Бургас — поръчки, АДФИ ревизии и съдебни дела“</em><br/>
     • <em>„Какви дела в съда, анекси и жалби в КЗК има за АПИ?“</em><br/>
-    • <em>„kaji mi za glavbolgarstroi i patinjenering“</em> (разбира и латиница)<br/>
+    • <em>„Провери ВСС“</em> или <em>„kaji mi za glavbolgarstroi i patinjenering“</em> (разбира и латиница)<br/>
     • <em>„Кои кметове си дават поръчки сами на себе си?“</em> &rarr; и после <em>„Генерирай сигнал за първия“</em>.`);
   }
 
@@ -1348,17 +1495,15 @@
       const tags = [];
       if (nluMeta.hasLatin) tags.push(`<span class="tag tag-teal" style="font-size:10px;">Латиница &rarr; Кирилица</span>`);
       if (nluMeta.fromContext) tags.push(`<span class="tag tag-plum" style="font-size:10px;">Контекстна памет</span>`);
-      if (nluMeta.nbIntent) tags.push(`<span class="tag tag-navy" style="font-size:10px;" title="Naive Bayes TF-IDF N-gram Classifier (intent-classifier.ts)">NB TF-IDF: ${nluMeta.nbIntent} (${(nluMeta.nbConf * 100).toFixed(0)}%)</span>`);
-      if (nluMeta.memorySize) tags.push(`<span class="tag tag-slate" style="font-size:10px;" title="SemanticMemoryBank 256-D DJB2 Vector Embeddings (semantic-memory.ts)">256-D Памет: ${nluMeta.memorySize} вектора${nluMeta.topSim ? ' · Cosine ' + nluMeta.topSim.toFixed(2) : ''}</span>`);
       (nluMeta.intents || []).slice(0, 2).forEach((it) => tags.push(`<span class="tag tag-navy" style="font-size:10px;">${it.label}</span>`));
       if (nluMeta.entitySummary) tags.push(`<span class="tag tag-ochre" style="font-size:10px;">Субект: ${nluMeta.entitySummary}</span>`);
-      tags.push(`<span class="tag tag-teal" style="font-size:10px;" title="IntentAnchor (IntentAnchor.ts) — 0% халюцинации">IntentAnchor: 100%</span>`);
+      if (nluMeta.verified) tags.push(`<span class="tag tag-teal" style="font-size:10px;">Първични публични регистри</span>`);
       if (tags.length) {
         metaRibbon = `<div style="display:flex;gap:5px;flex-wrap:wrap;margin:4px 0 8px;">${tags.join('')}</div>`;
       }
     }
     div.innerHTML = role === 'ai'
-      ? `<div class="msg-ai-head">NAsvetlo ORACLE · Семантичен одитен асистент &amp; RAG</div>${metaRibbon}${html}`
+      ? `<div class="msg-ai-head">NAsvetlo ORACLE · Одитен AI асистент</div>${metaRibbon}${html}`
       : html;
     box.appendChild(div);
     box.scrollTop = box.scrollHeight;
@@ -1389,16 +1534,17 @@
     const nlu = analyzeNaturalQuery(qRaw);
     const ents = resolveEntitiesFuzzy(nlu, state, auths, comps, j6, f7);
     const intentSet = new Set(nlu.intents.map((i) => i.id));
+    const hasMetaIntent = intentSet.has('HELP_CAPABILITIES') || intentSet.has('GREETING') || intentSet.has('THANK_YOU') || intentSet.has('PLATFORM_OVERVIEW');
 
-    // Evaluate QAntum TypeScript Semantic Dialogue Pipeline (Naive Bayes TF-IDF + 256-D Vector Memory + SAL UI Executor)
+    // Evaluate Calibrated Semantic Dialogue Pipeline (Honest Abstention NB + High-Precision Vector RAG + UI Executor)
     const semEngine = window.SIGMA3_SEMANTIC_ENGINE;
     const cog = semEngine
       ? semEngine.evaluateCognitivePipeline(qRaw, nlu.cyrQuery, nlu.fullNorm, state, auths, comps, j6, f7)
       : null;
 
-    // Fuse Naive Bayes classifier prediction when user phrasing is novel/colloquial
-    if (cog && cog.nbResult) {
-      if (!intentSet.size || cog.nbResult.confidence >= 0.14) {
+    // Only fuse Naive Bayes prediction when NOT abstained, confident (>= 45%), and no explicit meta/help intent matched
+    if (!hasMetaIntent && cog && cog.nbResult && !cog.nbResult.abstained && cog.nbResult.intent && cog.nbResult.confidence >= 0.45) {
+      if (!intentSet.size || cog.nbResult.confidence >= 0.58) {
         intentSet.add(cog.nbResult.intent);
         const def = INTENT_DEFS.find((d) => d.id === cog.nbResult.intent);
         if (def && !nlu.intents.some((x) => x.id === def.id)) {
@@ -1418,17 +1564,88 @@
       fromContext: ents.fromContext,
       intents: nlu.intents,
       entitySummary: entNames.length ? esc(entNames.join(' · ')) : '',
-      nbIntent: cog && cog.nbResult ? cog.nbResult.intent : '',
-      nbConf: cog && cog.nbResult ? cog.nbResult.confidence : 0,
-      memorySize: cog ? cog.memorySize : 0,
-      topSim: cog ? cog.topVectorSim : 0,
+      verified: true,
     };
 
-    // If Autonomous UI Action was triggered by SAL (e.g. "включи тъмен режим", "намери път между X и Y")
+    // If Autonomous UI Action was triggered (e.g. "включи тъмен режим", "намери път между X и Y")
     if (cog && cog.uiActionMsg) {
-      appendOracleMsg('ai', `<strong>Изпълнено автономно UI действие (Adaptive Semantic Core):</strong><br/>${esc(cog.uiActionMsg)}` +
-        renderFollowUpChips(['Кажи ми всичко за Бургас', 'Покажи търговските дела в ЕПЕП']), nluMeta);
+      appendOracleMsg('ai', `<strong>Изпълнено действие в интерфейса:</strong><br/>${esc(cog.uiActionMsg)}` +
+        renderFollowUpChips(['Кажи ми всичко за Бургас', 'Покажи търговските дела в ЕПЕП']), { ...nluMeta, verified: false });
       if (intentSet.has('UI_NAVIGATION') && intentSet.size === 1) return;
+    }
+
+    const hasAuditIntent = Array.from(intentSet).some((id) => id !== 'HELP_CAPABILITIES' && id !== 'GREETING' && id !== 'THANK_YOU' && id !== 'PLATFORM_OVERVIEW');
+    const hasStrongEntity = (ents.officials.length && ents.officials[0].score >= 0.86)
+      || (ents.authorities.length && ents.authorities[0].score >= 0.82)
+      || (ents.companies.length && ents.companies[0].score >= 0.84)
+      || (ents.oblasts.length && ents.oblasts[0].score >= 0.84)
+      || ents.courtCases.length > 0;
+
+    // =========================================================================
+    // 0. CONVERSATIONAL / META INTENTS (Help, Capabilities, Greeting, Thanks, Sources)
+    // =========================================================================
+    if (intentSet.has('HELP_CAPABILITIES') && !hasStrongEntity && !hasAuditIntent) {
+      const annexTotal = f7 && f7.engine1_annexInflation ? fmtEur(f7.engine1_annexInflation.totalInflationEur) : '+€1,29 млрд.';
+      const adfiCount = j6 && j6.module2_impunityIndex ? fmtInt(j6.module2_impunityIndex.totalReports) : '2 229';
+      appendOracleMsg('ai', `<strong>Какво може NAsvetlo ORACLE (автономен одиторски асистент):</strong>
+        <p style="margin:6px 0 8px;">Анализирам в реално време целия публичен масив от <strong>206 907 обществени поръчки (€53,22 млрд.)</strong>, <strong>4 344 възложители</strong>, <strong>17 428 фирми</strong>, <strong>3 427 ДЗЗД консорциума</strong> и живите съдебни и контролни регистри (ЕПЕП/ЕИСС, ВАС, КЗК, АДФИ, Сметна палата, ТР и ЕРИК) — директно във вашия браузър, без външни сървъри.</p>
+        <ul class="clean-list" style="margin:0;">
+          <li><strong>1. 360° проверка на институция, община, фирма, политик или ЕИК:</strong> напишете име, град, ЕИК или съкращение (<code>АПИ</code>, <code>ВСС</code>, <code>НКЖИ</code>, <code>АЕЦ</code>, <code>МВР</code>, <code>Бургас</code>, <code>Главболгарстрой</code>) — получавате поръчки, ДЗЗД, АДФИ ревизии, КЗК/ВАС актове и анекси на едно място.</li>
+          <li><strong>2. Криминалистични радари:</strong> самовъзлагане (53 лица), скрити ДЗЗД (+€1,92 млрд.), оскъпяване с анекси (${annexTotal}), разделяне под прага, кухи фирми, картелна ротация и ограничителни спецификации (чл. 49 ЗОП).</li>
+          <li><strong>3. Съдебен и контролен контрол:</strong> търговски дела в ЕПЕП, ${adfiCount} доклада на АДФИ и отменени глоби (КАНД), решения на КЗК и ВАС IV отд., адвокатски кантори, вещи лица, запори в ТР и високорискови европроекти (EPPO).</li>
+          <li><strong>4. Сравнителен одит и сигнали:</strong> сравнявам области или институции (<em>„Сравни Варна и Пловдив“</em>) и генерирам готова структурирана справка / сигнал до АДФИ, КПК, Сметната палата и EPPO с един клик.</li>
+          <li><strong>5. Управление на интерфейса:</strong> разбирам команди като <em>„включи тъмен режим“</em>, <em>„одиторски изглед“</em>, <em>„отвори топ 50“</em> и <em>„намери връзка между X и Y“</em>, както и писане на латиница.</li>
+        </ul>` +
+        renderFollowUpChips([
+          'Провери ВСС',
+          'Кажи ми всичко за Бургас — поръчки, АДФИ и съд',
+          'Кои кметове си дават поръчки сами на себе си?',
+          'Сравни област Варна и област Пловдив',
+        ]), { ...nluMeta, entitySummary: '', verified: false });
+      return;
+    }
+
+    if (intentSet.has('GREETING') && !hasStrongEntity && !hasAuditIntent) {
+      appendOracleMsg('ai', `Здравейте! Готов съм за одитна проверка в <strong>NAsvetlo</strong>. Напишете име на <strong>община, министерство, фирма, политик, ЕИК</strong> или задайте въпрос на свободен български език (може и на латиница) — например <em>„Провери ВСС“</em>, <em>„Какво можеш да правиш?“</em> или изберете готов срез по-долу:` +
+        renderFollowUpChips([
+          'Какво можеш да правиш?',
+          'Провери ВСС',
+          'Кажи ми всичко за Бургас — поръчки, АДФИ и съд',
+          'Кои кметове имат самовъзлагане?',
+        ]), { ...nluMeta, entitySummary: '', verified: false });
+      return;
+    }
+
+    if (intentSet.has('THANK_YOU') && !hasStrongEntity && !hasAuditIntent) {
+      appendOracleMsg('ai', `Заповядайте! Ако искате да проверим конкретна институция, ЕИК, съдебно дело или да генерираме официална справка / сигнал, просто напишете името или въпроса.` +
+        renderFollowUpChips([
+          'Провери АПИ',
+          'Покажи отменените глоби на АДФИ в съда',
+          'Кои договори имат най-голямо оскъпяване чрез анекси?',
+        ]), { ...nluMeta, entitySummary: '', verified: false });
+      return;
+    }
+
+    if (intentSet.has('PLATFORM_OVERVIEW') && !hasStrongEntity && !hasAuditIntent) {
+      const m2 = (j6 && j6.module2_impunityIndex) || {};
+      const m1 = (j6 && j6.module1_collusiveLitigation) || {};
+      const m4 = (j6 && j6.module4_kzkVas) || {};
+      const e1 = (f7 && f7.engine1_annexInflation) || {};
+      const totalActs = (m1.liveEissCommercialDisputes || []).length + (m2.liveEissAndKandCases || []).length + (m4.liveVasFinalActs || []).length;
+      appendOracleMsg('ai', `<strong>Обхват и официални първични източници на NAsvetlo:</strong>
+        <ul class="clean-list" style="margin-top:6px;">
+          <li><strong>Обществени поръчки (МИДТ / СИГМА 2.0, CC-BY 4.0 &amp; ЦАИС ЕОП):</strong> 206 907 договора за <strong>€53,22 млрд.</strong> при 4 344 възложители и 17 428 изпълнители (40,7% / €18,50 млрд. с 1 оферта).</li>
+          <li><strong>Свързани лица, ДЗЗД и Сметна палата:</strong> 571 длъжностни лица (53 със самовъзлагане), 3 427 разбити ДЗЗД консорциума (<strong>+€1,92 млрд.</strong>) и 3 035 декларации пред Сметната палата (+26 нови връзки).</li>
+          <li><strong>Одитни радари:</strong> <strong>+${fmtEur(e1.totalInflationEur || 1290789382.76)}</strong> доказано оскъпяване чрез анекси, новосъздадени фирми от ТР, разделяне под прага, дарения от ЕРИК, картелна ротация и ограничителни критерии (чл. 49 ЗОП).</li>
+          <li><strong>Съдебно-институционален слой:</strong> ${totalActs} верифицирани пълни съдебни акта от ЕПЕП/ЕИСС и ВАС IV отд., ${fmtInt(m2.totalReports || 2229)} доклада на АДФИ (${fmtInt(m2.updatedArt17Count || 370)} по чл. 17, ал. 7 ЗДФИ), регистър КЗК, запори в ТРРЮЛНЦ и високорискови европроекти (EPPO).</li>
+        </ul>` +
+        renderFollowUpChips([
+          'Какво можеш да правиш?',
+          'Провери ВСС',
+          'Покажи топ рисковите профили',
+          'Покажи търговските дела в ЕПЕП',
+        ]), { ...nluMeta, entitySummary: '' });
+      return;
     }
 
     // =========================================================================
@@ -1791,7 +2008,7 @@
       const list = (state.macro.topLists.topSingleOffer || []).slice(0, 6);
       const hhiList = ((state.comp && state.comp.byConcentration) || []).slice(0, 5);
       blocks.push(`<div><strong>Поръчки с 1 оферта (83 993 дог. / €18,50 млрд. = 40,7% от обема) и Топ HHI монополи:</strong><ol style="margin:6px 0 0;padding-left:18px;">` +
-        list.map((c) => `<li><strong>${esc(c.authorityName)}</strong> &rarr; ${esc(c.bidderName)} — <strong class="mono" style="color:var(--crimson);">${fmtEur(c.valueEur)}</strong> (${c.signedAt}) · <button class="btn btn-oracle" style="padding:1px 6px;font-size:11px;" data-inspect-contract="${esc(c.id)}">Жив JSON</button></li>`).join('') + `</ol>` +
+        list.map((c) => `<li><strong>${esc(c.authorityName)}</strong> &rarr; ${esc(c.bidderName)} — <strong class="mono" style="color:var(--crimson);">${fmtEur(c.valueEur)}</strong> (${c.signedAt}) · <button class="btn btn-oracle" style="padding:1px 6px;font-size:11px;" data-inspect-contract="${esc(c.id)}">Провери договор</button></li>`).join('') + `</ol>` +
         `<div class="inst-line" style="margin-top:4px;">Топ HHI концентрация: ${hhiList.map((x) => `<a href="#" data-open-authority="${esc(x.slug)}"><b>${esc(x.name)}</b></a> (HHI ${Number(x.hhi).toFixed(2)})`).join(' · ')}</div></div>`);
     }
 
@@ -1845,34 +2062,41 @@
     }
 
     // =========================================================================
-    // E. BROAD FULL-TEXT & SUBJECT SEARCH (Contract subjects, brands, court text, fuzzy fallback)
+    // E. CALIBRATED FULL-TEXT & SUBJECT SEARCH (Zero False-Positive Prefix Guard)
     // =========================================================================
-    const searchStems = nlu.stems.filter((s) => s.length >= 3);
-    const matchByStems = (text) => {
-      const low = String(text || '').toLowerCase();
+    const searchTokens = nlu.contentTokens.filter((t) => t.length >= 4 || /^\d{9,13}$/.test(t));
+    const matchByTokens = (text) => {
+      if (!searchTokens.length) return 0;
       let hits = 0;
-      for (const st of searchStems) {
-        if (low.includes(st) || tokenFuzzyMatchScore(st, low) >= 0.84) hits++;
+      for (const tk of searchTokens) {
+        if (tokenFuzzyMatchScore(tk, text) >= 0.88) hits++;
       }
       return hits;
     };
 
-    const hitOffs = state.officials.map((o) => ({ o, h: matchByStems(`${o.name} ${o.primaryInstitution} ${o.oblast || ''} ${o.companies.map((c) => c.name).join(' ')}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.o.combinedEur - a.o.combinedEur).slice(0, 5);
-    const hitAuths = auths.map((a) => ({ a, h: matchByStems(`${a.name} ${a.settlement || ''} ${a.region || ''}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.a.spentEur - a.a.spentEur).slice(0, 5);
-    const hitComps = comps.map((c) => ({ c, h: matchByStems(`${c.name} ${c.settlement || ''}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.c.wonEur - a.c.wonEur).slice(0, 5);
+    const hitOffs = searchTokens.length
+      ? state.officials.map((o) => ({ o, h: matchByTokens(`${o.name} ${o.primaryInstitution} ${o.oblast || ''} ${o.companies.map((c) => c.name).join(' ')}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.o.combinedEur - a.o.combinedEur).slice(0, 5)
+      : [];
+    const hitAuths = searchTokens.length
+      ? auths.map((a) => ({ a, h: matchByTokens(`${a.name} ${a.settlement || ''} ${a.region || ''}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.a.spentEur - a.a.spentEur).slice(0, 5)
+      : [];
+    const hitComps = searchTokens.length
+      ? comps.map((c) => ({ c, h: matchByTokens(`${c.name} ${c.settlement || ''}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.c.wonEur - a.c.wonEur).slice(0, 5)
+      : [];
 
-    // Also search contract subjects in topSingleOffer, annex contracts, litigation contracts, and court cases!
-    const allSampleContracts = [
+    const allSampleContracts = searchTokens.length ? [
       ...((state.macro && state.macro.topLists && state.macro.topLists.topSingleOffer) || []).map((c) => ({ id: c.id, auth: c.authorityName, comp: c.bidderName, subj: c.subject, eur: c.valueEur })),
       ...((f7 && f7.engine1_annexInflation && f7.engine1_annexInflation.contracts) || []).map((c) => ({ id: c.id, auth: c.authority, comp: c.contractor, subj: `Анекс (+${c.inflationPct}%): ${c.subject || ''}`, eur: c.currentEur })),
       ...((j6 && j6.module1_collusiveLitigation && j6.module1_collusiveLitigation.topLitigationContracts) || []).map((c) => ({ id: c.id, auth: c.authority, comp: c.contractor, subj: c.subject, eur: c.valueEur })),
-    ];
-    const hitContracts = allSampleContracts.map((c) => ({ c, h: matchByStems(`${c.subj} ${c.auth} ${c.comp}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.c.eur - a.c.eur).slice(0, 5);
+    ] : [];
+    const hitContracts = allSampleContracts.map((c) => ({ c, h: matchByTokens(`${c.subj} ${c.auth} ${c.comp}`) })).filter((x) => x.h > 0).sort((a, b) => b.h - a.h || b.c.eur - a.c.eur).slice(0, 5);
 
-    const ragHits = (cog && cog.ragMatches) ? cog.ragMatches.filter((m) => m.entry.metadata.type === 'fact' && m.similarity >= 0.27).slice(0, 4) : [];
+    const ragHits = (searchTokens.length && cog && cog.ragMatches)
+      ? cog.ragMatches.filter((m) => m.entry.metadata.type === 'fact' && m.similarity >= 0.44).slice(0, 4)
+      : [];
 
     if (hitOffs.length || hitAuths.length || hitComps.length || hitContracts.length || ragHits.length) {
-      let out = `<strong>Намерени резултати (Fuzzy Stem Match &amp; 256-D Cosine Vector Memory) за „${esc(qRaw)}“:</strong>`;
+      let out = `<strong>Намерени записи в публичните регистри за „${esc(qRaw)}“:</strong>`;
       if (hitOffs.length) {
         oracleContext.lastOfficial = hitOffs[0].o;
         out += `<div style="margin-top:8px;"><b>Свързани длъжностни лица (${hitOffs.length}):</b><ul>` + hitOffs.map(({ o }) => `<li><a href="#" data-open-slug="${esc(o.slug)}"><strong>${esc(o.name)}</strong></a> (${esc(o.primaryInstitution)}) · В мандата: <b>${fmtEur(o.periodEur)}</b> · Общо+ДЗЗД: <b>${fmtEur(o.combinedEur)}</b> ${riskBadgeHtml(o.sigma3Score)} · <button class="btn" style="padding:1px 6px;font-size:11px;" data-gen-signal="${esc(o.slug)}">Сигнал</button></li>`).join('') + `</ul></div>`;
@@ -1886,10 +2110,10 @@
         out += `<div style="margin-top:8px;"><b>Изпълнители / ДЗЗД (${hitComps.length}):</b><ul>` + hitComps.map(({ c }) => `<li><a href="#" data-open-company="${esc(c.eik || c.name)}"><strong>${esc(c.name.slice(0, 80))}</strong></a> · Директно: <b>${fmtEur(c.wonEur)}</b>${c.consortiumEur > 0 ? ' · ДЗЗД: <b style="color:var(--plum);">+' + fmtEur(c.consortiumEur) + '</b>' : ''}</li>`).join('') + `</ul></div>`;
       }
       if (hitContracts.length) {
-        out += `<div style="margin-top:8px;"><b>Конкретни договори по предмет (${hitContracts.length}):</b><ul>` + hitContracts.map(({ c }) => `<li><strong>${esc(c.auth)}</strong> &rarr; ${esc(c.comp.slice(0, 45))}: <em>${esc((c.subj || '').slice(0, 95))}</em> — <b class="mono">${fmtEur(c.eur)}</b> ${c.id ? `<button class="btn btn-oracle" style="padding:1px 6px;font-size:10.5px;" data-inspect-contract="${esc(c.id)}">JSON</button>` : ''}</li>`).join('') + `</ul></div>`;
+        out += `<div style="margin-top:8px;"><b>Конкретни договори по предмет (${hitContracts.length}):</b><ul>` + hitContracts.map(({ c }) => `<li><strong>${esc(c.auth)}</strong> &rarr; ${esc(c.comp.slice(0, 45))}: <em>${esc((c.subj || '').slice(0, 95))}</em> — <b class="mono">${fmtEur(c.eur)}</b> ${c.id ? `<button class="btn btn-oracle" style="padding:1px 6px;font-size:10.5px;" data-inspect-contract="${esc(c.id)}">Провери</button>` : ''}</li>`).join('') + `</ul></div>`;
       }
       if (ragHits.length) {
-        out += `<div style="margin-top:8px;"><b>Семантични съвпадения от 256-D Векторната памет (Cosine Similarity):</b><ul>` + ragHits.map((m) => `<li><span class="tag tag-slate" style="font-size:10px;">Cosine ${m.similarity.toFixed(2)}</span> ${esc(m.entry.content)}</li>`).join('') + `</ul></div>`;
+        out += `<div style="margin-top:8px;"><b>Свързани релевантни записи от одитния индекс:</b><ul>` + ragHits.map((m) => `<li>${esc(m.entry.content)}</li>`).join('') + `</ul></div>`;
       }
       appendOracleMsg('ai', out + renderFollowUpChips([
         hitAuths[0] ? `Какви съдебни дела и АДФИ доклади има за ${hitAuths[0].a.name}?` : 'Покажи търговските дела в ЕПЕП',
@@ -1898,18 +2122,18 @@
       return;
     }
 
-    appendOracleMsg('ai', `Разбрах въпроса ви (нормализиран като: <code>${esc(nlu.cyrQuery)}</code>), но не открих директен субект с това име. Ето общия национален срез на <strong>NAsvetlo</strong>:
+    appendOracleMsg('ai', `Не открих точен субект, ЕИК или специфичен одитен критерий за <strong>„${esc(qRaw)}“</strong>. Можете да попитате за конкретна <strong>община, министерство, фирма, ЕИК, длъжностно лице</strong> или да изберете направление:
       <ul class="clean-list" style="margin-top:6px;">
-        <li><strong>Обем по ЗОП:</strong> 206 907 договора за <strong>€53,22 млрд.</strong> (40,7% с 1 оферта) при 4 344 възложители и 17 428 изпълнители.</li>
-        <li><strong>Свързани лица и ДЗЗД:</strong> 571 длъжностни лица (53 със самовъзлагане), <strong>+€1,92 млрд.</strong> в скрити ДЗЗД консорциуми и 26 нови връзки от XML декларации.</li>
-        <li><strong>Съдебен радар (ЕПЕП / ВАС / АДФИ / КЗК):</strong> 86 пълни съдебни акта без CAPTCHA (28 търговски спора ТД/ВТД, 28 КАНД решения по НП на АДФИ, 30 окончателни акта на ВАС IV отд.), 2 229 доклада на АДФИ (370 по чл. 17, ал. 7 ЗДФИ) и 90 структурирани адвокати.</li>
+        <li><strong>Пример за институция:</strong> <em>„Провери ВСС“</em>, <em>„Кажи ми всичко за Бургас“</em>, <em>„Какви дела и анекси има за АПИ?“</em></li>
+        <li><strong>Пример за радар:</strong> <em>„Кои кметове имат самовъзлагане?“</em>, <em>„Покажи отменените глоби на АДФИ в съда“</em>, <em>„Кои са топ 10 със скрити ДЗЗД?“</em></li>
+        <li><strong>Сравнение и помощ:</strong> <em>„Сравни Варна и Пловдив“</em> или <em>„Какво можеш да правиш?“</em></li>
       </ul>` +
       renderFollowUpChips([
+        'Какво можеш да правиш?',
+        'Провери ВСС',
         'Кажи ми всичко за Бургас — поръчки, АДФИ и съд',
-        'Какви дела и анекси има за АПИ?',
-        'Покажи отменените глоби на АДФИ в съда',
         'Кои кметове имат самовъзлагане?',
-      ]), nluMeta);
+      ]), { ...nluMeta, intents: [], entitySummary: '', verified: false });
   }
 
   // =========================================================================
@@ -2132,6 +2356,12 @@
     initModules, loadAndRenderAuthorities, loadAndRenderCompanies,
     openAuthorityDossier, openCompanyDossier, buildGraphData,
     ensureOracleReady, askOracle,
+    _testOracle: {
+      analyzeNaturalQuery,
+      resolveEntitiesFuzzy,
+      tokenFuzzyMatchScore,
+      latinToCyrillicBg,
+    },
   };
 
   if (window.SIGMA3 && window.SIGMA3.state && window.SIGMA3.state.meta) {
