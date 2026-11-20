@@ -180,12 +180,12 @@ code {
   font-family: var(--font-sans);
   font-size: 1.25rem;
   font-weight: 800;
-  color: #ffffff;
   letter-spacing: -0.02em;
-}
-
-.brand-logo-accent {
-  color: #f59e0b;
+  display: inline-block;
+  background: linear-gradient(90deg, #ffffff 0%, #ffffff 30%, #f59e0b 30%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .brand-logo-meta {
@@ -503,33 +503,24 @@ code {
   margin: -18px -10px -18px 0;
 }
 
-.hero-emblem-img {
+.hero-emblem-visual {
   width: 100%;
-  height: auto;
-  display: block;
+  aspect-ratio: 1/1;
+  background-image: url("./hero-emblem-light.jpg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  mix-blend-mode: multiply;
+  filter: contrast(1.04) saturate(1.06);
   -webkit-mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
   mask-image: radial-gradient(circle at center, #000 58%, transparent 88%);
 }
 
-.hero-emblem-light {
-  display: block;
-  mix-blend-mode: multiply;
-  filter: contrast(1.04) saturate(1.06);
-}
-
-.hero-emblem-dark {
-  display: none;
+[data-theme=dark] .hero-emblem-visual,
+.dark .hero-emblem-visual {
+  background-image: url("./hero-emblem-dark.jpg");
   mix-blend-mode: lighten;
-}
-
-[data-theme=dark] .hero-emblem-light,
-.dark .hero-emblem-light {
-  display: none;
-}
-
-[data-theme=dark] .hero-emblem-dark,
-.dark .hero-emblem-dark {
-  display: block;
+  filter: none;
 }
 
 @media (max-width: 960px) {
