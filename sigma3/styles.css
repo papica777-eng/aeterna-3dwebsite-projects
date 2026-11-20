@@ -116,11 +116,175 @@ code {
   flex-wrap: wrap;
 }
 
+.brand-wrap.brand-with-logo {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+}
+
+.brand-text-col {
+  display: flex;
+  flex-direction: column;
+}
+
 .brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   flex-wrap: wrap;
+}
+
+.brand-nasvetlo-wordmark {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #060a14 0%, #111c33 55%, #070b14 100%);
+  color: #fde047;
+  border: 1px solid #f59e0b;
+  box-shadow: 0 0 14px rgba(251, 191, 36, 0.28), inset 0 0 8px rgba(251, 191, 36, 0.16);
+  text-shadow: 0 0 8px rgba(254, 240, 138, 0.65);
+}
+
+.nasvetlo-logo-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), filter 0.28s ease;
+  cursor: pointer;
+}
+
+.nasvetlo-logo-header {
+  width: 48px;
+  height: 48px;
+  filter: drop-shadow(0 2px 10px rgba(245, 158, 11, 0.32));
+}
+
+.nasvetlo-logo-hero {
+  width: 68px;
+  height: 68px;
+  filter: drop-shadow(0 4px 16px rgba(251, 191, 36, 0.45));
+}
+
+.nasvetlo-logo-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.nasvetlo-logo-wrap:hover {
+  transform: scale(1.08) rotate(-2deg);
+  filter: drop-shadow(0 0 20px rgba(254, 240, 138, 0.72));
+}
+
+.nasvetlo-logo-svg .searchlight-cone-group {
+  transform-origin: 24px 24px;
+  animation: searchlightSweep 4.8s ease-in-out infinite alternate;
+}
+
+.nasvetlo-logo-svg .illuminated-treasure-group {
+  animation: dividendGlowPulse 3.2s ease-in-out infinite alternate;
+}
+
+.nasvetlo-logo-svg .searchlight-laser-ray {
+  animation: laserScanPulse 2.4s ease-in-out infinite;
+}
+
+@keyframes searchlightSweep {
+  0% {
+    transform: rotate(-4deg) scale(0.98);
+    opacity: 0.88;
+  }
+  50% {
+    transform: rotate(1.5deg) scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(5deg) scale(1.04);
+    opacity: 0.94;
+  }
+}
+@keyframes dividendGlowPulse {
+  0% {
+    filter: brightness(0.94);
+    transform: translateY(0.5px);
+  }
+  100% {
+    filter: brightness(1.18);
+    transform: translateY(-1px);
+  }
+}
+@keyframes laserScanPulse {
+  0%, 100% {
+    stroke-opacity: 0.35;
+  }
+  50% {
+    stroke-opacity: 0.92;
+  }
+}
+.hero-spotlight-banner {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 11px 16px;
+  margin-bottom: 14px;
+  border-radius: 10px;
+  background: linear-gradient(125deg, #050811 0%, #0d1629 52%, #131f38 100%);
+  border: 1px solid rgba(251, 191, 36, 0.42);
+  box-shadow: 0 10px 26px rgba(5, 8, 17, 0.22), inset 0 0 28px rgba(251, 191, 36, 0.08);
+  color: #f8fafc;
+}
+
+.hero-spotlight-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hero-spotlight-topline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.spotlight-pill-beam {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #f59e0b, #fde047);
+  color: #050811;
+}
+
+.spotlight-domain-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.hero-spotlight-motto {
+  font-size: 13px;
+  line-height: 1.4;
+  color: #e2e8f0;
+}
+
+.hero-spotlight-motto strong {
+  color: #fde047;
+  font-weight: 700;
 }
 
 .brand-mark {
