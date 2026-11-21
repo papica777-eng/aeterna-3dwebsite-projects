@@ -130,7 +130,12 @@
     document.documentElement.setAttribute('data-theme', theme);
     try { localStorage.setItem('sigma3_theme', theme); } catch {}
     const btn = document.getElementById('themeToggleBtn');
-    if (btn) btn.textContent = theme === 'dark' ? 'Светъл режим' : 'Тъмен режим';
+    if (btn) {
+      btn.innerHTML = theme === 'dark'
+        ? '<span class="theme-prefix">НА</span><span class="theme-suffix-light">светло</span>'
+        : '<span class="theme-prefix">НА</span><span class="theme-suffix-dark">тъмно</span>';
+      btn.title = theme === 'dark' ? 'Превключи на НАсветло' : 'Превключи на НАтъмно';
+    }
   }
 
   async function init() {

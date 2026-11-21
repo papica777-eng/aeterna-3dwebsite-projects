@@ -272,6 +272,28 @@ code {
   color: #ffffff;
 }
 
+.topbar .btn.topbar-btn-theme {
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  min-width: 98px;
+  justify-content: center;
+  gap: 0;
+}
+
+.topbar .btn.topbar-btn-theme .theme-prefix {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.topbar .btn.topbar-btn-theme .theme-suffix-light {
+  color: #fbbf24;
+}
+
+.topbar .btn.topbar-btn-theme .theme-suffix-dark {
+  color: #cbd5e1;
+}
+
 .topbar .btn.topbar-btn-ai {
   background: #f59e0b;
   border: 1px solid #f59e0b;

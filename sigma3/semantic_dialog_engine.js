@@ -606,9 +606,11 @@
   function detectAndExecuteUIAction(cyrQuery) {
     if (typeof document === 'undefined') return null;
     const q = String(cyrQuery || '').toLowerCase();
-    if (/\b(тъмен режим|тъмна тема|светъл режим|светла тема|dark mode|light mode)\b/.test(q)) {
+    if (/(?:^|[\s,!.?])(натъмно|на тъмно|тъмен режим|тъмна тема|светъл режим|светла тема|dark mode|light mode)(?:$|[\s,!.?])/.test(q)
+      || /(?:включи|пусни|мини|превключи|смени|сложи)\s+(?:на\s+)?(насветло|на светло)(?:$|[\s,!.?])/.test(q)
+      || /^(насветло|на светло)$/.test(q.trim())) {
       document.getElementById('themeToggleBtn')?.click();
-      return 'Превключих интерфейса между светъл и тъмен режим.';
+      return 'Превключих интерфейса между НАсветло и НАтъмно.';
     }
     if (/\b(одиторски изглед|компактен изглед|презентационен изглед)\b/.test(q)) {
       document.getElementById('densityToggleBtn')?.click();
